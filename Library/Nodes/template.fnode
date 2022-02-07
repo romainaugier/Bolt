@@ -1,33 +1,63 @@
-// Here there is everything that is used to build the interface if the node in the graph : the name, the icon, the number and name of inputs and outputs
+// Here there is everything that can be used to build a Flash node
 // This is a comment
 
-# Interface
+# BeginAttr             // Begin the attributes definition
 
 name = Template         // Name of the node
-inputs = 0              // Number of inputs
+inputs = 1              // Number of inputs
 outputs = 1             // Number of outputs
-color = [255, 127, 64]  // Color in the interface
+color = [255, 127, 64]  // Color that will be used in the interface
 
-# Parameters            // Begin the parameters definition
+# EndAttr               // End the attributes definition
+
+# BeginParms            // Begin the parameters definition
 
 # BeginParm             // Begin one parameter definition
 
-shortName = templateparm
-longName = Template Parameter
+shortName = intparm
+longName = Integer Parameter
 defaultValue = 0
 
 # EndParm               // End one parameter definition
 
-# End Parameters        // End the parameters definition
+# BeginParm             // Begin one parameter definition
+
+shortName = floatparm
+longName = Float Parameter
+defaultValue = 10.0
+
+# EndParm               // End one parameter definition
+
+# BeginParm             // Begin one parameter definition
+
+shortName = stringparm
+longName = String Parameter
+defaultValue = "bonjour"
+
+# EndParm               // End one parameter definition
+
+# BeginParm             // Begin one parameter definition
+
+shortName = boolparm
+longName = Boolean Parameter
+defaultValue = True
+
+# EndParm               // End one parameter definition
+
+# EndParms              // End the parameters definition
 
 # BeginOp               // Begin the operation code 
 
-import os, sys
+import sys
 
-print(defaultValue) # parameters can be called with their shortName
-print(os.environ)
-print(sys.version)
+print("Flash Node compiled and ran with : ", sys.version)
 
-output1 = defaultValue
+# parameters can be called with their shortName
+print("Integer Parameter : ", intparm)
+print("Float Parameter : ", floatparm)
+print("String Parameter : ", stringparm)
+print("Boolean Parameter : ", boolparm)
+
+output0 = f"Integer Parm : {intparm}, Float Parm : {floatparm}, String Parm : {stringparm}, Bool Parm : {boolparm}"
 
 # EndOp                 // End the operation code

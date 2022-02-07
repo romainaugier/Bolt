@@ -1,0 +1,483 @@
+from ast import Param, literal_eval
+import re
+from typing import Any
+
+
+# Pre declaration of classes
+
+class Node():
+    pass
+
+class Plug():
+    pass
+
+
+# Definitions of classes
+
+class Parser():
+    """
+    Utility class to parse node definitions from files
+    """
+    def __init__(self):
+        """
+        """
+        self.name = None
+        self.inputCount = 0
+        self.outputCount = 0
+        self.parameters : list[Parameter] = []
+        self.color = None
+        self.opCode = ""
+        
+    @staticmethod
+    def CleanBrackets(text) -> list[str]:
+        """
+        """
+        clean1 = text.replace("[", "")
+        clean2 = clean1.replace("]", "")
+
+        return clean2
+
+    @staticmethod
+    def SplitEqual(text) -> list[str]:
+        """
+        """
+        return text.split("=")
+
+    def PreProcess(self, text) -> str:
+        """
+        Preprocesses the file to check if there are any error to return
+        and removes comment
+        """
+        commentPattern = re.compile(r"\s+\/\/.+|\/\/.+")
+
+        textWithoutComments = re.sub(commentPattern, "", text)
+
+        return textWithoutComments
+
+    def GetAttributes(self, lines, lineIndex) -> int:
+        """
+        """
+        while True:
+            line = lines[lineIndex]
+
+            if line.startswith("name"):
+                lineSplit = self.SplitEqual(line)
+                self.name = lineSplit[1]
+
+            elif line.startswith("inputs"):
+                lineSplit = self.SplitEqual(line)
+                self.inputCount = int(lineSplit[1])
+
+            elif line.startswith("outputs"):
+                lineSplit = self.SplitEqual(line)
+                self.outputCount = int(lineSplit[1])
+
+            elif line.startswith("color"):
+                lineSplit = self.SplitEqual(line)
+
+                self.color = []
+
+                colorsListStr = self.CleanBrackets(lineSplit[1]).split(",")
+
+                for colorStr in colorsListStr:
+                    self.color.append(int(colorStr))
+                
+            elif line.startswith("# EndAttr"):
+                return lineIndex + 1
+            
+            lineIndex += 1
+
+    def GetParameters(self, lines, lineIndex) -> int:
+        """
+        """
+        tmpShortName = ""
+        tmpLongName = ""
+        tmpValue = None
+
+        while True:
+            parmLine = lines[lineIndex]
+
+            if parmLine.startswith("# EndParms"):
+                return lineIndex + 1
+            else:
+                if parmLine.startswith("# BeginParm"):
+                    while True:
+                        parmLine = lines[lineIndex]
+
+                        if parmLine.startswith("# EndParm"):
+                            newParm = Parameter(tmpShortName, tmpLongName, tmpValue)
+                            self.parameters.append(newParm)
+
+                            tmpShortName = ""
+                            tmpLongName = ""
+                            tmpValue = None
+
+                            lineIndex += 1
+                        
+                            break
+
+                        elif parmLine.startswith("shortName"):
+                            lineSplit = self.SplitEqual(parmLine)
+                            tmpShortName = lineSplit[1].replace(" ", "")
+                        
+                        elif parmLine.startswith("longName"):
+                            lineSplit = self.SplitEqual(parmLine)
+                            tmpLongName = lineSplit[1].replace(" ", "")
+                        
+                        elif parmLine.startswith("defaultValue"):
+                            lineSplit = self.SplitEqual(parmLine)
+                            tmpValue = literal_eval(lineSplit[1].replace(" ", ""))
+                        
+                        lineIndex += 1
+
+            lineIndex += 1
+
+    def GetOpCode(self, lines, lineIndex) -> int:
+        """
+        """
+        while True:
+            opLine = lines[lineIndex]
+
+            if opLine.startswith("# EndOp"):
+                return lineIndex + 1
+            else:
+                self.opCode += opLine + "\n"
+                lineIndex += 1
+
+    def Parse(self, nodeFile) -> dict:
+        """
+        """
+        definition = {}
+
+        index = 0
+
+        with open(nodeFile, "r") as file:
+            filePreProcessed = self.PreProcess(file.read())
+            lines = filePreProcessed.split("\n")
+            lineCount = len(lines)   
+
+            while index < lineCount:
+                line = lines[index]
+
+                if line.startswith("# BeginAttr"):
+                    index = self.GetAttributes(lines, index)
+
+                elif line.startswith("# BeginParms"):
+                    index = self.GetParameters(lines, index)
+
+                elif line.startswith("# BeginOp"):
+                    index = self.GetOpCode(lines, index)
+
+                else:
+                    index += 1
+
+        definition["name"] = self.name
+        definition["inputCount"] = self.inputCount
+        definition["outputCount"] = self.outputCount
+        definition["color"] = self.color
+        definition["opCode"] = self.opCode
+        definition["parameters"] = self.parameters
+
+        return definition
+
+class Plug():
+    """
+    A Plug represents a node input or output
+    """
+    def __init__(self, name : str, parentNode : Node, connectedPlug : Plug = None):
+        """
+        """
+        self.name = name
+        self.parentNode = parentNode
+        self.connectedPlug = connectedPlug
+        self.data = None
+
+    def Name(self) -> str:
+        """
+        Returns:
+            str: name of the plug
+        """
+        return self.name
+    
+    def Node(self) -> Node:
+        """
+        Returns:
+            Node: parent node of the plug
+        """
+        return self.parentNode
+
+    def IsConnected(self) -> bool:
+        """
+        Returns:
+            bool: if the plug is connected to another plug
+        """
+        if self.connectedPlug is not None:
+            return True
+        else:
+            return False
+    
+    def Connection(self) -> Plug:
+        """
+        Returns:
+            Plug: plug that the current plug is connected to (on another node)
+        """
+        return self.connectedPlug
+    
+    def Data(self):
+        """
+        Returns:
+            Any: data of the plug
+        """
+        return self.data
+    
+    def Connect(self, plug : Plug) -> None:
+        """
+        Connects this plug to another plug
+
+        Args:
+            plug (Plug): plug to connect the current plug to
+        """
+        if plug.Node().GetID() == self.Node().GetID():
+            return
+        else:
+            self.connectedPlug = plug
+            plug.connectedPlug = self
+            
+    def Disconnect(self) -> None:
+        """
+        Disconnects a plug from its connected plug (if it has any)
+        """
+        if self.connectedPlug is not None:
+            self.connectedPlug.Disconnect()
+            self.connectedPlug = None
+
+class Parameter():
+    """
+    A parameter represents a node parameter
+    """
+    def __init__(self, shortName : str, longName : str, value = None):
+        """
+        Args:
+            shortName (str): short name of the parameter than can be called in the op code
+            longName (str): long name of the parameter to describe it
+            value ([type], optional): value of the parameter (can be of any type). Defaults to None.
+        """
+        self.shortName = shortName
+        self.longName = longName
+        self.value = value
+        
+    def ShortName(self) -> str:
+        """
+        Returns:
+            str: short name of the parameter
+        """
+        return self.shortName
+
+    def LongName(self) -> str:
+        """
+        Returns:
+            str: long name of the parameter
+        """
+        return self.longName
+    
+    def Value(self):
+        """
+        Returns:
+            any: value of the parameter
+        """
+        return self.value
+
+
+class Node():
+    """
+    """
+    def __init__(self):
+        """
+        """
+        self.isDirty = True
+        self.inQueue = False
+        self.inTempQueue = False
+        self.name = ""
+        self.parameters : list[Parameter] = []
+        self.inputs : list[Plug] = []
+        self.outputs : list[Plug] = []
+        self.color : list[float] = []
+        
+        # The id is not set here as we will set a unique one for each node in the graph
+        self.id = 0 
+        
+        self.inputCount = 0
+        self.outputCount = 0
+        
+        self.opCode = ""
+        self.opCompiledCode = ""
+
+    def SetName(self, name : str) -> None:
+        """
+        Sets the name of the node
+        """
+        self.name = name
+
+    def SetID(self, id) -> None:
+        """
+        Sets the id of the node
+        """
+        self.id = id
+
+    def GetID(self) -> bytes:
+        """
+        Returns:
+            hex: node unique id
+        """
+        return self.id
+        
+    def SetDirty(self, isDirty : bool = True) -> None:
+        """
+        Sets the node dirty state (cooked or not)
+
+        Args:
+            isDirty (bool): dirty state
+        """
+        self.isDirty = isDirty
+        
+    def IsDirty(self) -> bool:
+        """
+        Returns:
+            bool: dirty state of the node
+        """
+        return self.isDirty
+
+    def SetInQueue(self, inQueue : bool = True) -> None:
+        """
+        Sets the node to be in queue (ready to be computed)
+        Used when the graph is sorted
+
+        Args:
+            inQueue (bool): queue state
+        """
+        self.inQueue = inQueue
+
+    def InQueue(self) -> bool:
+        """
+        Returns:
+            bool: queue state of the node
+        """
+        return self.inQueue
+    
+    def SetInTempQueue(self, inTempQueue : bool = True) -> None:
+        """
+        Sets the node to be in temp queue (when sorting graph)
+        Used when the graph is sorted
+
+        Args:
+            inTempQueue (bool): temp queue state
+        """
+        self.inTempQueue = inTempQueue
+
+    def InTempQueue(self) -> bool:
+        """
+        Returns:
+            bool: temp queue state of the node
+        """
+        return self.inTempQueue
+    
+    def GetInput(self, index : int) -> Plug:
+        """
+        Args:
+            index (int): index of the input plug to return
+        Returns:
+            Plug: input plug at the given index
+        """
+        if index >= self.inputCount:
+            return None
+        else:
+            return self.inputs[index]
+    
+    def GetInputs(self) -> list[Plug]:
+        """
+        Returns:
+            list of Plug: inputs of the node
+        """
+        return self.inputs
+    
+    def SetInput(self, plug : Plug, index : int) -> None:
+        """
+        Set the input of the node at the given index
+        (connects the plug)
+
+        Args:
+            plug (Plug): plug to connect
+            index (int): index of the input to set
+        """
+        if index >= self.inputCount:
+            return
+        else:
+            self.inputs[index].Connect(plug)
+            
+    def GetOutput(self, index : int) -> Plug:
+        """
+        Args:
+            index (int): index of the output plug to return
+        Returns:
+            Plug: output plug at the given index
+        """
+        if index >= self.outputCount:
+            return None
+        else:
+            return self.outputs[index]
+        
+    def GetOutputs(self) -> list[Plug]:
+        """
+        Returns:
+            list: list of the output plugs
+        """
+        return self.outputs
+        
+    def Cook(self) -> None:
+        """
+        Executes the node operation
+        """
+        locals = {}
+        
+        # Setup locals with inputs and parameters
+        for parameter in self.parameters:
+            locals[parameter.ShortName()] = parameter.Value()
+            
+        for i, input in enumerate(self.inputs):
+            locals[f"input{i}"] = input.Data()
+            
+        globals = {}
+        
+        exec(self.opCompiledCode, globals, locals)
+
+        # Get outputs         
+        for i in range(self.outputCount):
+            self.outputs.append(locals[f"output{i}"])
+
+        self.isDirty = False
+        
+    def Load(self, nodeDefinitionPath : str) -> None:
+        """
+        Loads a node definition and compiles the op code
+
+        Args:
+            nodeDefinitionPath (str): path to the node definition file
+        """
+        parser = Parser()
+
+        nodeDefinition = parser.Parse(nodeDefinitionPath)
+
+        self.name = nodeDefinition["name"]
+        self.inputCount = nodeDefinition["inputCount"]
+        self.outputCount = nodeDefinition["outputCount"]
+        self.color = nodeDefinition["color"]
+        self.opCode = nodeDefinition["opCode"]
+        self.parameters = nodeDefinition["parameters"]
+
+        self.Compile()
+        
+    def Compile(self) -> None:
+        """
+        Compiles the node code to fasten the code execution
+        """
+        self.opCompiledCode = compile(self.opCode, "compiledCode", "exec")
