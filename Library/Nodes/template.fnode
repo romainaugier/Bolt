@@ -1,0 +1,33 @@
+// Here there is everything that is used to build the interface if the node in the graph : the name, the icon, the number and name of inputs and outputs
+// This is a comment
+
+# Interface
+
+name = Template         // Name of the node
+inputs = 0              // Number of inputs
+outputs = 1             // Number of outputs
+color = [255, 127, 64]  // Color in the interface
+
+# Parameters            // Begin the parameters definition
+
+# BeginParm             // Begin one parameter definition
+
+shortName = templateparm
+longName = Template Parameter
+defaultValue = 0
+
+# EndParm               // End one parameter definition
+
+# End Parameters        // End the parameters definition
+
+# BeginOp               // Begin the operation code 
+
+import os, sys
+
+print(defaultValue) # parameters can be called with their shortName
+print(os.environ)
+print(sys.version)
+
+output1 = defaultValue
+
+# EndOp                 // End the operation code

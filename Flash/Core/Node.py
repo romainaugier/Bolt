@@ -10,6 +10,157 @@ class Plug():
 
 # Definitions of classes
 
+class Parser():
+    """
+    Utility class to parse node definition files
+    """
+    def __init__(self):
+        """
+        """
+        self.name = None
+        self.inputCount = 0
+        self.outputCount = 0
+        self.parameters = []
+        self.color = None
+        self.opCode = None
+        
+    @staticmethod
+    def CleanBrackets(text):
+        """
+        """
+        clean1 = text.replace("[", "")
+        clean2 = clean1.replace("]", "")
+
+        return clean2
+
+    @staticmethod
+    def SplitEqual(text):
+        """
+        """
+        return text.split("=")
+
+    def Parse(self, nodeFile):
+        """
+        """
+        definition = {}
+
+        index = 0
+
+        with open(nodeFile, "r") as file:
+            lines = file.readlines()
+            lineCount = len(lines)   
+
+            while index < lineCount:
+                line = lines[index]
+
+                if line.startswith("name"):
+                    lineSplit = self.SplitEqual(line)
+                    self.name = lineSplit[1]
+                    
+                    index += 1
+
+                elif line.startswith("inputs"):
+                    lineSplit = self.SplitEqual(line)
+                    self.inputs = int(lineSplit[1])
+                    
+                    index += 1
+
+                elif line.startswith("outputs"):
+                    lineSplit = self.SplitEqual(line)
+                    self.outputs = int(lineSplit[1])
+
+                    index += 1
+
+                elif line.startswith("color"):
+                    lineSplit = self.SplitEqual(line)
+
+                    self.color = []
+
+                    colorsListStr = self.CleanBrackets(lineSplit[1]).split(",")
+
+                    for colorStr in colorsListStr:
+                        self.color.append(int(colorStr))
+                    
+                    index += 1
+
+                elif line.startswith("longOp"):
+                    lineSplit = self.SplitEqual(line)
+                    if "False" in lineSplit[1]:
+                        self.longOp = False
+                    else:
+                        self.longOp = True
+                    
+                    index += 1
+
+                elif line.startswith("# Data"):
+                    endData = False
+
+                    while endData is False:
+                        dataLine = lines[index]
+
+                        if dataLine.startswith("# EndData"):
+                            endData = True
+                            break
+                        elif dataLine.startswith("in"):
+                            lineSplit = self.SplitEqual(dataLine)
+                            data = None
+
+                            if lineSplit[1].isdigit():
+                                data = int(data)
+                            elif lineSplit[1].isdecimal():
+                                data = float(data)
+                            elif "[" in lineSplit[1] or "]" in lineSplit[1]:
+                                listItems = lineSplit[1].replace("[", "")
+                                listItems = listItems.replace("]", "")
+                                listItems = listItems.split(",")
+
+                                data = []
+
+                                for item in listItems:
+                                    if item.isdigit():
+                                        data.append(int(item))
+                                    elif item.isdecimal():
+                                        data.append(float(item))
+                                    else:
+                                        data.append(item)
+                            elif "False" in lineSplit[1]:
+                                data = False
+                            elif "True" in lineSplit[1]:
+                                data = True
+                            
+                            self.inData[lineSplit[0]] = data
+                        elif dataLine.startswith("out"):
+                            lineSplit = self.SplitEqual(dataLine)
+                        else:
+                            index += 1
+
+                elif line.startswith("# BeginOp"):
+                    endOp = False
+
+                    self.op = ""
+                    
+                    while endOp is False:
+                        opLine = lines[index]
+
+                        if opLine.startswith("# EndOp"):
+                            endOp = True
+                            self.op += opLine
+                            break
+                        else:
+                            self.op += opLine
+                            index += 1
+
+                else:
+                    index += 1
+
+        definition["name"] = self.name
+        definition["inputs"] = self.inputs
+        definition["color"] = self.color
+        definition["longOp"] = self.longOp
+        definition["op"] = self.op
+
+        return definition
+
 class Plug():
     """
     A Plug represents a node input or output
