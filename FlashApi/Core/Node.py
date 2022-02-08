@@ -1,7 +1,6 @@
-from ast import Param, literal_eval
+from ast import literal_eval
 import re, json
 from typing import Any
-
 import FlashApi.Core.FileSystem as FileSystem
 
 
@@ -64,7 +63,7 @@ class Parser():
 
             if line.startswith("name"):
                 lineSplit = self.SplitEqual(line)
-                self.name = lineSplit[1]
+                self.name = lineSplit[1].replace(" ", "")
 
             elif line.startswith("inputs"):
                 lineSplit = self.SplitEqual(line)
@@ -191,7 +190,7 @@ class Plug():
         """
         self.name = name
         self.parentNode = parentNode
-        self.connectedPlug = connectedPlug
+        self.connectedPlug : Plug = connectedPlug
         self.data = None
 
     def Name(self) -> str:
@@ -266,7 +265,7 @@ class Plug():
         Disconnects a plug from its connected plug (if it has any)
         """
         if self.connectedPlug is not None:
-            self.connectedPlug.Disconnect()
+            self.connectedPlug.connectedPlug = None
             self.connectedPlug = None
 
 class Parameter():

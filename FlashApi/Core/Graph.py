@@ -105,6 +105,12 @@ class Graph():
     def RemoveNode(self, node : Node) -> None:
         """
         """
+        for input in node.GetInputs():
+            input.Disconnect()
+
+        for output in node.GetOutputs():
+            output.Disconnect()
+
         self.nodes.remove(node)
 
         self.nodeCount -= 1

@@ -8,10 +8,10 @@
 
 # BeginAttr
 
-name = AutoPlume
+name = Hou_AutoPlume
 inputs = 2
 outputs = 1
-color = [255, 255, 255]
+color = [255, 87, 34]
 
 # EndAttr
 

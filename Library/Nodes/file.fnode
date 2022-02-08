@@ -5,7 +5,7 @@
 name = File
 inputs = 0
 outputs = 1
-color = [127, 127, 127]
+color = [0, 188, 212]
 
 # EndAttr
 

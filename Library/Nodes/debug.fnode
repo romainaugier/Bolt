@@ -2,10 +2,10 @@
 
 # BeginAttr
 
-name = Print
+name = Debug
 inputs = 1
 outputs = 1
-color = [255, 193, 7]
+color = [76, 175, 80]
 
 # EndAttr
 
