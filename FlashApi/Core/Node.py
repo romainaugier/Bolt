@@ -1,6 +1,8 @@
 from ast import Param, literal_eval
-import re
+import re, json
 from typing import Any
+
+import FlashApi.Core.FileSystem as FileSystem
 
 
 # Pre declaration of classes
@@ -222,6 +224,13 @@ class Plug():
             Plug: plug that the current plug is connected to (on another node)
         """
         return self.connectedPlug
+
+    def UpdateInputs(self) -> None:
+        """
+        Updates the data coming from the input connection
+        """
+        if self.connectedPlug is not None:
+            self.data = self.Connection().Data()
     
     def Data(self):
         """
@@ -229,6 +238,15 @@ class Plug():
             Any: data of the plug
         """
         return self.data
+
+    def SetData(self, data) -> None:
+        """
+        Set the data of the plug
+
+        Args:
+            data (any): data to set
+        """
+        self.data = data
     
     def Connect(self, plug : Plug) -> None:
         """
@@ -287,6 +305,14 @@ class Parameter():
         """
         return self.value
 
+    def SetValue(self, value) -> None:
+        """
+        Sets the parameter value
+
+        Args:
+            value (any): value to set
+        """
+        self.value = value
 
 class Node():
     """
@@ -318,18 +344,92 @@ class Node():
         """
         self.name = name
 
-    def SetID(self, id) -> None:
+    def GetName(self) -> str:
+        """
+        Returns:
+            str: name of the node
+        """
+        return self.name
+
+    def SetInputCount(self, inputCount : int) -> None:
+        """
+        Sets the number of input of the node
+
+        Args:
+            inputCount (int): input count of the node
+        """
+        assert(inputCount >= 0)
+        self.inputCount = inputCount
+
+    def GetInputCount(self) -> int:
+        """
+        Returns:
+            int: number of inputs
+        """
+        return self.inputCount
+    
+    def SetOutputCount(self, outputCount : int) -> None:
+        """
+        Sets the number of output of the node
+
+        Args:
+            outputCount (int): output count of the node
+        """
+        assert(outputCount >= 0)
+        self.outputCount = outputCount
+    
+    def GetOutputCount(self) -> int:
+        """
+        Returns:
+            int: number of outputs
+        """
+        return self.outputCount
+
+    def SetOpCode(self, code : str) -> None:
+        """
+        Sets the op code of the node
+
+        Args:
+            code (str): python code as a string
+        """
+        self.opCode = code
+
+    def GetOpCode(self) -> str:
+        """
+        Returns:
+            str: opcode of the node
+        """
+        return self.opCode
+
+    def SetID(self, id : str) -> None:
         """
         Sets the id of the node
         """
         self.id = id
 
-    def GetID(self) -> bytes:
+    def GetID(self) -> str:
         """
         Returns:
             hex: node unique id
         """
         return self.id
+
+    def SetColor(self, color : list[float]) -> None:
+        """
+        Set the node rgb color (for interface)
+
+        Args:
+            color (list[float]): r, g, and v values of the node color
+        """
+        assert(len(color) == 3)
+        self.color = color
+
+    def GetColor(self) -> list[float]:
+        """
+        Returns:
+            list[float]: node rgb color
+        """
+        return self.color
         
     def SetDirty(self, isDirty : bool = True) -> None:
         """
@@ -413,6 +513,18 @@ class Node():
             return
         else:
             self.inputs[index].Connect(plug)
+
+    def SetInputFromPlugName(self, plug : Plug, name : str) -> None:
+        """
+        Set the input of the node with the given name
+
+        Args:
+            plug (Plug): plug to connect
+            name (str): name of the input to set
+        """
+        for input in self.inputs:
+            if input.Name() == name:
+                input.Connect(plug)
             
     def GetOutput(self, index : int) -> Plug:
         """
@@ -432,6 +544,48 @@ class Node():
             list: list of the output plugs
         """
         return self.outputs
+
+    def SetParm(self, parmName : str, parmValue) -> None:
+        """
+        Set a parameter value using the shortName
+
+        Args:
+            parmName (str): name of the parameter
+            parmValue ([type]): value of the parameter
+        """
+        parmExists = False
+
+        for parm in self.parameters:
+            if parm.ShortName() == parmName:
+                parm.SetValue(parmValue)
+                parmExists = True
+                break
+
+    def GetParm(self, parmName : str) -> Parameter:
+        """
+        Returns a parameter specified by the parmName
+
+        Args:
+            parmName (str): shortName of the queried parameter
+
+        Returns:
+            Parameter: parameter
+        """
+        parmExists = False
+
+        for parm in self.parameters:
+            if parm.ShortName() == parmName:
+                parmExists = True
+                return parm
+
+        return None
+
+    def GetParms(self) -> list[Parameter]:
+        """
+        Returns:
+            list[Parameter]: list of the node parameters
+        """
+        return self.parameters
         
     def Cook(self) -> None:
         """
@@ -444,15 +598,17 @@ class Node():
             locals[parameter.ShortName()] = parameter.Value()
             
         for i, input in enumerate(self.inputs):
+            input.UpdateInputs()
             locals[f"input{i}"] = input.Data()
             
-        globals = {}
+        globals = { "FlashTempDir" : FileSystem.GetRoamingDataDir,
+                    "FlashTempScript" : FileSystem.GetNewRandomPyFile }
         
         exec(self.opCompiledCode, globals, locals)
 
         # Get outputs         
         for i in range(self.outputCount):
-            self.outputs.append(locals[f"output{i}"])
+            self.outputs[i].SetData(locals[f"output{i}"])
 
         self.isDirty = False
         
@@ -473,6 +629,74 @@ class Node():
         self.color = nodeDefinition["color"]
         self.opCode = nodeDefinition["opCode"]
         self.parameters = nodeDefinition["parameters"]
+
+        for i in range(self.inputCount):
+            self.inputs.append(Plug(f"input{i}", self))
+        
+        for i in range(self.outputCount):
+            self.outputs.append(Plug(f"output{i}", self))
+
+        self.Compile()
+
+    def ToDict(self) -> dict:
+        """
+        Translates the node to a dict representation
+
+        Returns:
+            dict: node as a dictionnary
+        """
+        nodeAsDict = {}
+
+        nodeAsDict["name"] = self.GetName()
+        nodeAsDict["id"] = self.GetID()
+        nodeAsDict["color"] = self.GetColor()
+        nodeAsDict["inputCount"] = self.GetInputCount()
+        nodeAsDict["outputCount"] = self.GetOutputCount()
+        nodeAsDict["opCode"] = self.GetOpCode()
+
+        nodeAsDict["inputs"] = {}
+        nodeAsDict["outputs"] = {}
+        nodeAsDict["parms"] = {}
+
+        for i, input in enumerate(self.GetInputs()):
+            nodeAsDict["inputs"][input.Name()] = { "connectionIndex" : i, "connectionNodeId" : input.Connection().Node().GetID() }
+        
+        for i, output in enumerate(self.GetOutputs()):
+            nodeAsDict["outputs"][output.Name()] = { "connectionIndex" : i, "connectionNodeId" : output.Connection().Node().GetID() }
+
+        for parm in self.GetParms():
+            nodeAsDict["parms"][parm.ShortName()] = { "longName" : parm.LongName(), "value" : parm.Value() }
+
+        return nodeAsDict
+
+    def FromDict(self, nodeAsDict : dict) -> None:
+        """
+        Load a node from a node dict representation
+
+        Args:
+            nodeAsDict (dict): dict representation of the node
+        """
+        self.inputs.clear()
+        self.outputs.clear()
+        self.parameters.clear()
+        
+        self.SetDirty()
+
+        self.SetName(nodeAsDict["name"])
+        self.SetID(nodeAsDict["id"])
+        self.SetColor(nodeAsDict["color"])
+        self.SetInputCount(nodeAsDict["inputCount"])
+        self.SetOutputCount(nodeAsDict["outputCount"])
+        self.SetOpCode(nodeAsDict["opCode"])
+
+        for input in nodeAsDict["inputs"]:
+            self.inputs.append(Plug(input, self))
+
+        for output in nodeAsDict["outputs"]:
+            self.outputs.append(Plug(output, self))
+
+        for parmName, parm in nodeAsDict["parms"].items():
+            self.parameters.append(Parameter(parmName, parm["longName"], parm["value"]))
 
         self.Compile()
         

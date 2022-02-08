@@ -1,0 +1,75 @@
+// Generate a temporary python script to pass to a hython node to use for
+// automate the plume generation process
+
+// input0 : alembic file of the animation
+// input1 : template houdini file to generate the plumes
+
+// output0 : generated script
+
+# BeginAttr
+
+name = AutoPlume
+inputs = 2
+outputs = 1
+color = [255, 255, 255]
+
+# EndAttr
+
+# BeginParms
+
+# BeginParm
+
+shortName = outfilepath
+longName = Plume Alembic File Path
+defaultValue = ""
+
+# EndParm
+
+# BeginParm
+
+shortName = framerange
+longName = Frame Range
+defaultValue = [100, 240]
+
+# EndParm
+
+# EndParms
+
+# BeginOp
+
+generatedScript = f"""import hou
+
+hou.hipFile.load("{input1}")
+
+animSopNode = None
+plumeSopNode = None
+
+for node in hou.node("/obj").children():
+    if node.name() == "anim_import":
+        animSopNode = node
+    elif node.name() == "plume":
+        plumeSopNode = node
+
+if animSopNode != None:
+    for node in animSopNode.children():
+        if node.type().name() == "alembic":
+            node.parm("fileName").set("{input0}")
+            break
+
+if plumeSopNode != None:
+    for node in plumeSopNode.children():
+        if node.type().name() == "rop_alembic":
+            node.parm("filename").set("{outfilepath}")
+            node.parm("f1").set({framerange[0]})
+            node.parm("f2").set({framerange[1]})
+            node.parm("execute").pressButton()
+"""
+
+tmpScriptFilePath = FlashTempScript()
+
+with open(tmpScriptFilePath, "w") as scriptFile:
+    scriptFile.write(generatedScript)
+
+output0 = tmpScriptFilePath.replace("\\", "/")
+
+# EndOp

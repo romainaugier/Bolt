@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, copy
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
@@ -10,23 +10,45 @@ if __name__ == "__main__":
 
     graph = Graph()
 
-    for i in range(5):
-        tempNode = Node()
-        tempNode.inputCount = 2
-        tempNode.inputs = [Plug("input1", tempNode), Plug("input2", tempNode)]
-        tempNode.outputCount = 1
-        tempNode.outputs = [Plug("output1", tempNode)]
-        tempNode.SetName(f"node{i}")
+    fileNode = Node()
+    fileNode.Load("D:/dev/Flash/Library/Nodes/file.fnode")
 
-        graph.AddNode(tempNode)
+    printNode = Node()
+    printNode.Load("D:/dev/Flash/Library/Nodes/print.fnode")
 
-    graph.nodes[3].SetInput(graph.nodes[1].GetOutput(0), 0)
-    graph.nodes[1].SetInput(graph.nodes[2].GetOutput(0), 0)
-    graph.nodes[2].SetInput(graph.nodes[0].GetOutput(0), 0)
-    graph.nodes[2].SetInput(graph.nodes[4].GetOutput(0), 1)
-    graph.nodes[4].SetInput(graph.nodes[0].GetOutput(0), 0)
+    hou_autoPlumeNode = Node()
+    hou_autoPlumeNode.Load("D:/dev/Flash/Library/Nodes/hou_autoplume.fnode")
+
+    hou_loadalembicNode = Node()
+    hou_loadalembicNode.Load("D:/dev/Flash/Library/Nodes/hou_loadalembic.fnode")
+
+    hythonNode = Node()
+    hythonNode.Load("D:/dev/Flash/Library/Nodes/hython.fnode")
+
+    fileNode1 = copy.deepcopy(fileNode)
+    fileNode1.SetParm("filepath", "Z:/OEUF/assets/props/Volcan/modeling/main/Houdini/export/water_plane.abc")
+
+    hou_loadalembicNode1 = copy.deepcopy(hou_loadalembicNode)
+    hou_loadalembicNode1.SetParm("file", "D:/test.hip")
+
+    printNode1 = copy.deepcopy(printNode)
+
+    hythonNode1 = copy.deepcopy(hythonNode)
+
+    graph.AddNode(fileNode1)
+    graph.AddNode(hou_loadalembicNode1)
+    graph.AddNode(printNode1)
+    graph.AddNode(hythonNode1)
+
+    hou_loadalembicNode1.SetInput(fileNode1.GetOutput(0), 0)
+    printNode1.SetInput(hou_loadalembicNode1.GetOutput(0), 0)
+    hythonNode1.SetInput(printNode1.GetOutput(0), 0)
+
+    serializedGraph = graph.Serialize()
+
+    graph.Deserialize(serializedGraph)
 
     graph.Sort()
 
     for node in graph.sortedNodes:
-        print(node.name)
+        print(node.GetName())

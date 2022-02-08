@@ -1,0 +1,18 @@
+// Prints the input value and returns it
+
+# BeginAttr
+
+name = Print
+inputs = 1
+outputs = 1
+color = [255, 193, 7]
+
+# EndAttr
+
+# BeginOp
+
+print(f"Debug Node : {input0}")
+
+output0 = input0
+
+# EndOp

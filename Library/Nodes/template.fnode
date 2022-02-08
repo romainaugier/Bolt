@@ -52,12 +52,18 @@ import sys
 
 print("Flash Node compiled and ran with : ", sys.version)
 
+# A set of utility functions are available for the user
+# Returns the temporary directory so the user can store files there
+# (such as generated script files...)
+flashTempDir = FlashTempDir()
+
 # parameters can be called with their shortName
 print("Integer Parameter : ", intparm)
 print("Float Parameter : ", floatparm)
 print("String Parameter : ", stringparm)
 print("Boolean Parameter : ", boolparm)
 
+# outputs can be called with output + output number (starting at 0)
 output0 = f"Integer Parm : {intparm}, Float Parm : {floatparm}, String Parm : {stringparm}, Bool Parm : {boolparm}"
 
 # EndOp                 // End the operation code

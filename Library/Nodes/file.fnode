@@ -1,0 +1,28 @@
+// Look for a file and returns it
+
+# BeginAttr
+
+name = File
+inputs = 0
+outputs = 1
+color = [127, 127, 127]
+
+# EndAttr
+
+# BeginParms
+
+# BeginParm
+
+shortName = filepath
+longName = File Path
+defaultValue = ""
+
+# EndParm
+
+# EndParms
+
+# BeginOp
+
+output0 = filepath
+
+# EndOp
