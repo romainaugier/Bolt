@@ -329,6 +329,11 @@ class GGraph(QtWidgets.QGraphicsView):
         for node in self.graph.GetNodes():
             gNode = self.getNodeById(node.GetID())
 
+            for output in node.GetOutputs():
+                if output.IsConnected():
+                    connectedGNode =  self.getNodeById(output.GetConnection().GetNode().GetID())
+                    self.addEdge(gNode.getOutputGPlugs()[output.GetIndex()], connectedGNode.getInputGPlugs()[output.GetConnection().GetIndex()])
+
 
     def contextMenuEvent(self, event: QtGui.QContextMenuEvent) -> None:
         """

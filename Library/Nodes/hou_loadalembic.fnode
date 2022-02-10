@@ -6,10 +6,11 @@
 
 # BeginAttr
 
-name = Hou_LoadAlembic
+name = Hou_Load_Alembic
 inputs = 1
 outputs = 1
 color = [255, 87, 34]
+icon = D:/dev/Flash/Library/Icons/houdini.png
 
 # EndAttr
 

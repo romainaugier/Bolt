@@ -75,7 +75,7 @@ class Graph():
 
         for output in node.GetOutputs():
             if output.IsConnected():
-                self.VisitNode(output.Connection().Node())
+                self.VisitNode(output.GetConnection().GetNode())
 
         node.SetInTempQueue(False)
         node.SetInQueue()
@@ -223,7 +223,8 @@ class Graph():
         nodesAsDicts = json.loads(serializedGraph)
 
         for node in nodesAsDicts:
-            tmpNode = Node(self.logger)
+            tmpNode = Node()
+            tmpNode.SetLogger(self.logger)
             tmpNode.FromDict(node)
             self.nodes.append(tmpNode)
 

@@ -33,6 +33,20 @@ class Icons():
         """
         return self.icons[name]
 
+    def AddPixmap(self, path : str) -> str:
+        """
+        Adds a pixmap to the pixmap library
+
+        Args:
+            path (str): path to the pixmap
+        """
+        pixname = os.path.splitext(os.path.basename(path))[0]
+
+        if not pixname in self.pixmaps:
+            self.pixmaps[pixname] = QtGui.QPixmap(path)
+        
+        return pixname
+
     def GetPixmap(self, name : str) -> QtGui.QPixmap:
         """
         Returns a QPixmap given a name

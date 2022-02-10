@@ -8,10 +8,11 @@
 
 # BeginAttr
 
-name = Hou_AutoPlume
+name = Hou_Auto_Plume
 inputs = 2
 outputs = 1
 color = [255, 87, 34]
+icon = D:/dev/Flash/Library/Icons/houdini.png
 
 # EndAttr
 

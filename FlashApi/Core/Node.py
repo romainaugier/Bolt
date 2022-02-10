@@ -1,5 +1,5 @@
 from ast import literal_eval
-import re, json, copy
+import re, json, copy, os
 
 import FlashApi.Core.FileSystem as FileSystem
 from FlashApi.Core.Logger import *
@@ -27,6 +27,7 @@ class Parser():
         self.outputCount = 0
         self.parameters : list[Parameter] = []
         self.color = None
+        self.iconPath = ""
         self.opCode = ""
         
     @staticmethod
@@ -63,7 +64,7 @@ class Parser():
 
             if line.startswith("name"):
                 lineSplit = self.SplitEqual(line)
-                self.name = lineSplit[1].replace(" ", "")
+                self.name = lineSplit[1].strip()
 
             elif line.startswith("inputs"):
                 lineSplit = self.SplitEqual(line)
@@ -82,6 +83,14 @@ class Parser():
 
                 for colorStr in colorsListStr:
                     self.color.append(int(colorStr))
+
+            elif line.startswith("icon"):
+                lineSplit = self.SplitEqual(line)
+                iconPath = lineSplit[1].strip()
+                if os.path.exists(iconPath):
+                    self.iconPath = iconPath
+                else:
+                    self.iconPath = ""
                 
             elif line.startswith("# EndAttr"):
                 return lineIndex + 1
@@ -119,15 +128,15 @@ class Parser():
 
                         elif parmLine.startswith("shortName"):
                             lineSplit = self.SplitEqual(parmLine)
-                            tmpShortName = lineSplit[1].replace(" ", "")
+                            tmpShortName = lineSplit[1].strip()
                         
                         elif parmLine.startswith("longName"):
                             lineSplit = self.SplitEqual(parmLine)
-                            tmpLongName = lineSplit[1].replace(" ", "")
+                            tmpLongName = lineSplit[1].strip()
                         
                         elif parmLine.startswith("defaultValue"):
                             lineSplit = self.SplitEqual(parmLine)
-                            tmpValue = literal_eval(lineSplit[1].replace(" ", ""))
+                            tmpValue = literal_eval(lineSplit[1].strip())
                         
                         lineIndex += 1
 
@@ -176,6 +185,7 @@ class Parser():
         definition["inputCount"] = self.inputCount
         definition["outputCount"] = self.outputCount
         definition["color"] = self.color
+        definition["iconPath"] = self.iconPath
         definition["opCode"] = self.opCode
         definition["parameters"] = self.parameters
 
@@ -185,27 +195,35 @@ class Plug():
     """
     A Plug represents a node input or output
     """
-    def __init__(self, name : str, parentNode : Node, connectedPlug : Plug = None):
+    def __init__(self, name : str, parentNode : Node, index : int = 0, connectedPlug : Plug = None):
         """
         """
         self.name = name
         self.parentNode = parentNode
+        self.index = index
         self.connectedPlug : Plug = connectedPlug
         self.data = None
 
-    def Name(self) -> str:
+    def GetName(self) -> str:
         """
         Returns:
             str: name of the plug
         """
         return self.name
     
-    def Node(self) -> Node:
+    def GetNode(self) -> Node:
         """
         Returns:
             Node: parent node of the plug
         """
         return self.parentNode
+
+    def GetIndex(self) -> int:
+        """
+        Returns:
+            int: index of the plug (depending on the node)
+        """
+        return self.index
 
     def IsConnected(self) -> bool:
         """
@@ -217,7 +235,7 @@ class Plug():
         else:
             return False
     
-    def Connection(self) -> Plug:
+    def GetConnection(self) -> Plug:
         """
         Returns:
             Plug: plug that the current plug is connected to (on another node)
@@ -229,7 +247,7 @@ class Plug():
         Updates the data coming from the input connection
         """
         if self.connectedPlug is not None:
-            self.data = self.Connection().Data()
+            self.data = self.GetConnection().Data()
     
     def Data(self):
         """
@@ -254,7 +272,7 @@ class Plug():
         Args:
             plug (Plug): plug to connect the current plug to
         """
-        if plug.Node().GetID() == self.Node().GetID():
+        if plug.GetNode().GetID() == self.GetNode().GetID():
             return
         else:
             self.connectedPlug = plug
@@ -332,6 +350,7 @@ class Node():
         self.inputs : list[Plug] = []
         self.outputs : list[Plug] = []
         self.color : list[float] = []
+        self.iconPath = ""
         
         # The id is not set here as we will set a unique one for each node in the graph
         self.id = 0 
@@ -439,7 +458,20 @@ class Node():
             list[float]: node rgb color
         """
         return self.color
-        
+
+    def SetIconPath(self, path : str) -> None:
+        """
+        Sets the icon path
+        """
+        self.iconPath = path
+
+    def GetIconPath(self) -> str:
+        """
+        Returns:
+            str: path to the node icon
+        """
+        return self.iconPath
+
     def SetDirty(self, isDirty : bool = True) -> None:
         """
         Sets the node dirty state (cooked or not)
@@ -545,7 +577,7 @@ class Node():
             name (str): name of the input to set
         """
         for input in self.inputs:
-            if input.Name() == name:
+            if input.GetName() == name:
                 input.Connect(plug)
             
     def GetOutput(self, index : int) -> Plug:
@@ -709,14 +741,15 @@ class Node():
         self.inputCount = nodeDefinition["inputCount"]
         self.outputCount = nodeDefinition["outputCount"]
         self.color = nodeDefinition["color"]
+        self.iconPath = nodeDefinition["iconPath"]
         self.opCode = nodeDefinition["opCode"]
         self.parameters = nodeDefinition["parameters"]
 
         for i in range(self.inputCount):
-            self.inputs.append(Plug(f"input{i}", self))
+            self.inputs.append(Plug(f"input{i}", self, i))
         
         for i in range(self.outputCount):
-            self.outputs.append(Plug(f"output{i}", self))
+            self.outputs.append(Plug(f"output{i}", self, i))
 
         self.Compile()
 
@@ -741,13 +774,13 @@ class Node():
         nodeAsDict["parms"] = {}
 
         for i, input in enumerate(self.GetInputs()):
-            nodeAsDict["inputs"][input.Name()] = { "connectionIndex" : i, "connectionNodeId" : input.Connection().Node().GetID() }
+            nodeAsDict["inputs"][input.GetName()] = { "connectionIndex" : input.GetIndex(), "connectionNodeId" : input.GetConnection().GetNode().GetID() }
         
         for i, output in enumerate(self.GetOutputs()):
             if output.IsConnected():
-                nodeAsDict["outputs"][output.Name()] = { "connectionIndex" : i, "connectionNodeId" : output.Connection().Node().GetID() }
+                nodeAsDict["outputs"][output.GetName()] = { "connectionIndex" : output.GetIndex(), "connectionNodeId" : output.GetConnection().GetNode().GetID() }
             else:
-                nodeAsDict["outputs"][output.Name()] = { "connectionIndex" : i, "connectionNodeId" : None }
+                nodeAsDict["outputs"][output.GetName()] = { "connectionIndex" : i, "connectionNodeId" : None }
 
         for parm in self.GetParms():
             nodeAsDict["parms"][parm.ShortName()] = { "longName" : parm.LongName(), "value" : parm.Value() }

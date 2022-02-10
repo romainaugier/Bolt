@@ -158,6 +158,13 @@ class GNode(QtWidgets.QGraphicsObject):
 
         self.name = self.getInternalNode().GetName()
         self.id = self.getInternalNode().GetID()
+        self.iconPath = self.getInternalNode().GetIconPath()
+
+        if self.iconPath != "":
+            pixname = self.iconsLib.AddPixmap(self.iconPath)
+            self.pixMap = self.iconsLib.GetPixmap(pixname)
+        else:
+            self.pixMap = None
 
         self.newPos = QtCore.QPointF()
 
@@ -262,11 +269,20 @@ class GNode(QtWidgets.QGraphicsObject):
         painter.setPen(Qt.NoPen)
         painter.drawPath(path.simplified())
 
+        # Icon (if has any)
+        pixMapWidth = 0
+
+        if self.pixMap is not None:
+            pixMapWidth = 18
+            painter.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
+            painter.setRenderHint(QtGui.QPainter.LosslessImageRendering)
+            painter.drawPixmap(7, 7, pixMapWidth, pixMapWidth, self.pixMap)
+
         # Label name
         painter.setPen(QtGui.QColor(224, 227, 227, 255))
-        painter.setFont(QtGui.QFont("Helvetica", 10))
+        painter.setFont(QtGui.QFont("Helvetica", 12))
 
-        fontRect = QtCore.QRect(10, 8, self.sizeX - 10, self.labelSizeY - 10)
+        fontRect = QtCore.QRect(14 + pixMapWidth, 6, self.sizeX - 10, self.labelSizeY - 10)
         painter.drawText(fontRect, 0, self.name)
 
         # Body
@@ -371,7 +387,7 @@ class Edge(QtWidgets.QGraphicsLineItem):
 
         offset = self.source.radius / 2.0
 
-        color = QtGui.QColor(224, 227, 227, 127)
+        color = QtGui.QColor(224, 227, 227, 51)
 
         if self.isHovered is True:
             color = QtGui.QColor(224, 227, 227, 255)

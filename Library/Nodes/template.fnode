@@ -7,6 +7,7 @@ name = Template         // Name of the node
 inputs = 1              // Number of inputs
 outputs = 1             // Number of outputs
 color = [255, 127, 64]  // Color that will be used in the interface
+icon = D:/dev/Flash/Library/Icons/flash.png // Icons must be png files
 
 # EndAttr               // End the attributes definition
 

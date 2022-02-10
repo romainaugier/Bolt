@@ -77,9 +77,17 @@ class ParameterWidget(QtWidgets.QWidget):
 
         masterLayout = QtWidgets.QHBoxLayout()
 
+        masterLayout.setAlignment(Qt.AlignTop)
+        masterLayout.setSpacing(0)
+        masterLayout.setContentsMargins(0, 0, 0, 0)
+
+
         self.parmLongNameLabel = QtWidgets.QLabel(self.parameter.LongName())
         self.parmLongNameLabel.setMinimumWidth(40)
+        self.parmLongNameLabel.setMinimumHeight(23)
         masterLayout.addWidget(self.parmLongNameLabel)
+
+        masterLayout.addSpacing(20)
 
         if (self.parmType == ParmType.STR or 
             self.parmType == ParmType.INT or 
@@ -178,6 +186,7 @@ class ParameterEditor(QtWidgets.QWidget):
         self.masterLayout = QtWidgets.QVBoxLayout()
         self.masterLayout.setAlignment(Qt.AlignTop)
         self.masterLayout.setSpacing(0)
+        self.masterLayout.setContentsMargins(0, 0, 0, 0)
 
         self.setLayout(self.masterLayout)
 
@@ -229,8 +238,6 @@ class ParameterEditor(QtWidgets.QWidget):
         """
         self.node = node.getInternalNode()
         self.currentNodeChanged.emit()
-
-        print(node.getInternalNode().GetID())
 
         if not self.layout() is None: self.cleanInterface()
         self.buildInterface()
