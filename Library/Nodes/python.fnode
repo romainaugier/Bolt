@@ -1,4 +1,4 @@
-// Calls hython.exe with a generated script file passed in the first input
+// Calls python.exe with a generated script file passed in the first input
 
 # BeginAttr
 

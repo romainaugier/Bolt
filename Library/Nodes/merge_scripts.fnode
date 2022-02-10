@@ -1,0 +1,39 @@
+// Merges two scripts, either its files or text, to one file
+
+# BeginAttr
+
+name = Merge_Scripts
+inputs = 2
+outputs = 1
+color = [52, 115, 165]
+icon = D:/dev/Flash/Library/Icons/python.png
+
+# EndAttr
+
+# BeginOp
+
+import os
+
+script1 = input0
+script2 = input1
+
+scriptsAreFile = False
+
+if os.path.exists(script1):
+    with open(script1, "r") as scriptFile1:
+        script1 = scriptFile1.read()
+
+if os.path.exists(script2):
+    with open(script1, "r") as scriptFile2:
+        script2 = scriptFile2.read()
+
+generatedScript = ""
+
+tmpScriptFilePath = FlashTempScript()
+
+with open(tmpScriptFilePath, "w") as scriptFile:
+    scriptFile.write(generatedScript)
+
+output0 = tmpScriptFilePath.replace("\\", "/")
+
+# EndOp

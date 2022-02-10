@@ -5,7 +5,8 @@
 name = Warning
 inputs = 1
 outputs = 1
-color = [76, 175, 80]
+color = [50, 222, 132]
+icon = D:/dev/Flash/Library/Icons/debug.png
 
 # EndAttr
 
