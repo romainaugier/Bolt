@@ -1,0 +1,18 @@
+// Debug node that emits a warning. Used for app testing
+
+# BeginAttr
+
+name = Warning
+inputs = 1
+outputs = 1
+color = [76, 175, 80]
+
+# EndAttr
+
+# BeginOp
+
+FlashLogWarning("You have done something bad, but it's ok")
+
+output0 = input0
+
+# EndOp

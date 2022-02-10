@@ -6,25 +6,52 @@ from PyQt5.QtCore import Qt
 from FlashApp.Interface.Node import *
 from FlashApi.Core.Lib import *
 from FlashApi.Core.Graph import *
+from FlashApi.Core.Logger import *
+from FlashApp.Interface.Icons import *
+
+class GraphicsScene(QtWidgets.QGraphicsScene):
+    """
+    Reimplementation of the graphics scene
+    """
+    def __init__(self, parent=None) -> None:
+        """
+        """
+        super(QtWidgets.QGraphicsScene, self).__init__(parent)
+
 
 class GGraph(QtWidgets.QGraphicsView):
     """
     Graphics view of the current graph
     """
-    def __init__(self, nodeLib : Lib, graph : Graph = None) -> None:
+    startCooking = QtCore.pyqtSignal()
+    finishedCooking = QtCore.pyqtSignal()
+    errorCooking = QtCore.pyqtSignal()
+    hasBeenEdited = QtCore.pyqtSignal()
+
+    threadCanJoin = QtCore.pyqtSignal()
+
+    selectedNodeChanged = QtCore.pyqtSignal(str)
+
+    def __init__(self, nodeLib : Lib, logger : Logger, graph : Graph = None) -> None:
         """
         """
         super().__init__()
 
-        self.scene = QtWidgets.QGraphicsScene(self) 
+        self.logger = logger
+
+        self.scene = GraphicsScene(self) 
+
+        self.iconsLib = Icons()
+        self.isCookingMovie = self.iconsLib.GetAnim("graph-cooking")
 
         self.nodeLibrary = nodeLib
         nodeLib.Load()
 
         if graph is not None:
             self.graph = graph
+            self.constructGraphFromInternalGraph()
         else:
-            self.graph = Graph()
+            self.graph = Graph(self.logger, "New")
 
         self.gEdges = []
 
@@ -39,16 +66,32 @@ class GGraph(QtWidgets.QGraphicsView):
         self.setScene(self.scene)
         self.setCacheMode(QtWidgets.QGraphicsView.CacheBackground)
         self.setViewportUpdateMode(QtWidgets.QGraphicsView.BoundingRectViewportUpdate)
-        self.setRenderHint(QtGui.QPainter.Antialiasing)
+        self.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.TextAntialiasing | QtGui.QPainter.SmoothPixmapTransform)
         self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
-        self.setResizeAnchor(QtWidgets.QGraphicsView.AnchorViewCenter)
+        self.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
         self.setContextMenuPolicy(Qt.DefaultContextMenu)
 
         self.setMinimumSize(800, 800)
 
         self.startPos = None
+        self.pan = False
+        self.setMouseTracking(True)
+
+        self.cookThread = None
+        self.threadCanJoin.connect(lambda: self.joinGraphThread())
 
         QtWidgets.QApplication.instance().installEventFilter(self)
+
+    @QtCore.pyqtSlot(str)
+    def onNodeSelectionChange(self, nodeId : str) -> None:
+        self.selectedNodeChanged.emit(nodeId)
+
+    def getAnimationLogoMovie(self) -> QtGui.QMovie:
+        """     
+        Returns:
+            QtGui.QMovie: movie
+        """
+        return self.isCookingMovie
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """
@@ -62,18 +105,17 @@ class GGraph(QtWidgets.QGraphicsView):
         elif key == Qt.Key_Delete:
             self.deleteItem()
 
-    def eventFilter(self, obj: QtCore.QObject, ev: QtCore.QEvent) -> bool:
-        if ev.type() == QtCore.QEvent.Wheel:
-            if ev.angleDelta().y() > 0:
-                self.scaleView(1.01)
-            else:
-                self.scaleView(0.99)
+    def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
+        if event.button() == QtCore.Qt.MiddleButton and self.startPos is None:
+            self.startPos = event.pos()
+            self.prevPos = event.pos()
+            self.pan = True
+        
+        return super().mousePressEvent(event)
 
-        elif ev.type() == QtCore.QEvent.MouseButtonPress and ev.button() == QtCore.Qt.MiddleButton:
-            self.startPos = ev.pos()
-            
-        elif ev.type() == QtCore.QEvent.MouseMove and self.startPos is not None:
-            delta = self.startPos - ev.pos()
+    def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
+        if self.pan:
+            delta = self.prevPos - event.pos()
 
             transform = self.transform()
 
@@ -82,16 +124,43 @@ class GGraph(QtWidgets.QGraphicsView):
 
             self.setSceneRect(self.sceneRect().translated(deltaX, deltaY))
 
-            self.startPos = ev.pos()
-            
-        elif ev.type() == QtCore.QEvent.MouseButtonRelease:
-            self.startPos = None
+            self.prevPos = event.pos()
 
-        elif ev.type() == QtCore.QEvent.MouseButtonPress and ev.button() == QtCore.Qt.LeftButton:
+        return super().mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event: QtGui.QMouseEvent) -> None:
+        if event.button() == QtCore.Qt.MiddleButton and self.startPos is not None:
+            self.startPos = None
+            self.pan = False
+
+        return super().mouseReleaseEvent(event)
+
+    def eventFilter(self, obj: QtCore.QObject, event: QtCore.QEvent) -> bool:
+        if event.type() == QtCore.QEvent.Wheel:
+            oldPos = self.mapToScene(event.pos())
+
+            if event.angleDelta().y() > 0:
+                # self.scaleView(1.01)
+                self.scale(1.01, 1.01)
+            else:
+                # self.scaleView(0.99)
+                self.scale(0.99, 0.99)
+
+            newPos = self.mapToScene(event.pos())
+
+            delta = newPos - oldPos
+
+            self.translate(delta.x(), delta.y())
+
+            return super().eventFilter(obj, event)
+
+        elif event.type() == QtCore.QEvent.MouseButtonPress and event.button() == QtCore.Qt.LeftButton:
             self.scene.clearSelection()
             self.scene.selectedItems()
+            return super().eventFilter(obj, event)
             
-        return super().eventFilter(obj, ev)
+        return super().eventFilter(obj, event)
+            
 
     def scaleView(self, scaleFactor: int) -> None:
         """
@@ -109,8 +178,24 @@ class GGraph(QtWidgets.QGraphicsView):
         tmpInternalNode = self.nodeLibrary.Get(nodeType)
         self.graph.AddNode(tmpInternalNode)
 
-        tmpGNode = GNode(tmpInternalNode, "", self)
+        tmpGNode = GNode(tmpInternalNode, "", self, self.iconsLib)
+        tmpGNode.hasBeenSelected.connect(self.onNodeSelectionChange)
         tmpGNode.setPos(position)
+
+        self.scene.addItem(tmpGNode)
+
+        self.hasBeenEdited.emit()
+
+    def addNodeFromInternalGraph(self, node : Node) -> None:
+        """
+        Adds an existing internal node to the scene
+
+        Args:
+            node (Node): internal node
+        """
+        tmpGNode = GNode(node, "", self, self.iconsLib)
+
+        tmpGNode.hasBeenSelected.connect(self.onNodeSelectionChange)
 
         self.scene.addItem(tmpGNode)
 
@@ -129,6 +214,16 @@ class GGraph(QtWidgets.QGraphicsView):
 
         self.scene.removeItem(node)
 
+        self.hasBeenEdited.emit()
+
+    def getNodeById(self, nodeId : str) -> GNode:
+        """
+        """
+        for item in self.scene.items():
+            if type(item) is GNode:
+                if item.id == nodeId:
+                    return item
+
     def addEdge(self, outputGPlug: GPlug, inputGPlug: GPlug) -> None:
         """
         """
@@ -137,6 +232,8 @@ class GGraph(QtWidgets.QGraphicsView):
         newEdge = Edge(outputGPlug, inputGPlug)
 
         self.scene.addItem(newEdge)
+
+        self.hasBeenEdited.emit()
 
     def deleteEdge(self, edge: Edge) -> None:
         """
@@ -147,6 +244,8 @@ class GGraph(QtWidgets.QGraphicsView):
         edge.destination.edges.remove(edge)
 
         self.scene.removeItem(edge)
+
+        self.hasBeenEdited.emit()
 
     def updateAllEdges(self) -> None:
         """
@@ -173,10 +272,32 @@ class GGraph(QtWidgets.QGraphicsView):
 
     def cookGraph(self) -> None:
         """
-        Launch the thread that cooks the graph
+        Cooks the graph
         """
-        self.cookThread = threading.Thread(target=self.graph.Cook())
+        self.startCooking.emit()
+        self.graph.Cook()
+        self.threadCanJoin.emit()
+
+    def launchGraphCooking(self) -> None:
+        """
+        Launches the thread that cooks the graph
+        """
+        self.isCookingMovie.start()
+        self.cookThread = threading.Thread(target=self.cookGraph)
         self.cookThread.start()
+
+    def joinGraphThread(self) -> None:
+        """
+        Joins the thread that cooks the graph
+        """
+        if self.cookThread is not None:
+            self.cookThread.join()
+            self.isCookingMovie.stop()
+
+            self.finishedCooking.emit()
+
+            if self.graph.hasError:
+                self.errorCooking.emit()
 
     def debugGraph(self) -> None:
         """
@@ -188,6 +309,26 @@ class GGraph(QtWidgets.QGraphicsView):
 
         print("Sorted Nodes : ")
         print(json.dumps([node.GetName() for node in self.graph.sortedNodes], indent=4))
+
+    def constructGraphFromInternalGraph(self) -> None:
+        """
+        Constructs the scene from a graph
+        """
+        for item in self.scene.items():
+            if type(item) is GNode:
+                self.deleteNode(item)
+            elif type(item) is GPlug:
+                node = item.node
+                self.deleteNode(node)
+            elif type(item) is Edge:
+                self.deleteEdge(item)
+
+        for node in self.graph.GetNodes():
+            self.addNodeFromInternalGraph(node)
+
+        for node in self.graph.GetNodes():
+            gNode = self.getNodeById(node.GetID())
+
 
     def contextMenuEvent(self, event: QtGui.QContextMenuEvent) -> None:
         """
@@ -205,12 +346,28 @@ class GGraph(QtWidgets.QGraphicsView):
             newNodeMenu.addAction(newNodeAction)
 
         computeAction = menu.addAction("Cook")
-        computeAction.triggered.connect(lambda: self.cookGraph())
+        computeAction.triggered.connect(lambda: self.launchGraphCooking())
 
         reloadLibAction = menu.addAction("Reload Node Library")
         reloadLibAction.triggered.connect(lambda: self.nodeLibrary.Reload())
 
         debugAction = menu.addAction("Debug Graph")
         debugAction.triggered.connect(lambda: self.debugGraph())
+
+        menu.setStyleSheet("""
+QMenu {
+	background-color: rgb(201, 196, 207);
+}
+
+QMenu::item {
+    color: rgb(72, 69, 79);
+    background-color: transparent;
+}
+
+QMenu::item:selected {
+    color: rgb(72, 69, 79);
+    background-color: rgb(205, 200, 211);
+}
+        """)
 
         menu.exec_(position)

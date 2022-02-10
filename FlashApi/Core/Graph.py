@@ -1,23 +1,39 @@
 import binascii, os, time, threading, json
+
 from FlashApi.Core.Node import Node
+from FlashApi.Core.Logger import *
 
 
 class Graph():
     """
     """
-    def __init__(self):
+    def __init__(self, logger : Logger, name : str = ""):
         """
         """
+        self.logger = logger
+        self.name = name
+        self.savePath = ""
+        self.hasError = False
         self.nodes : list[Node] = []
         self.sortedNodes : list[Node] = []
         self.nodeCount = 0
-        self.cookingThread = threading.Thread(target=Graph.Cook, args=(self,))
-        self.cookingThread.start()
 
-    def __del__(self):
+    def GetName(self) -> str:
         """
         """
-        self.cookingThread.join()
+        return self.name
+
+    def GetSavePath(self) -> str:
+        """
+        """
+        return self.savePath
+
+    def GetNodes(self) -> list[Node]:
+        """
+        Returns:
+            list[Node]: nodes of the graph
+        """
+        return self.nodes
 
     def SetAllDirty(self) -> None:
         """
@@ -70,6 +86,8 @@ class Graph():
         Depth-First search to traverse and sort the nodes to cook
         the graph
         """
+        self.logger.Log(LogLevel.DIAGNOSTIC, f"(Graph : {self.name}) : Sorting nodes")
+
         for node in self.nodes:
             node.SetInQueue(False)
             node.SetInTempQueue(False)
@@ -78,20 +96,47 @@ class Graph():
 
         while self.HasNodesToSort():
             nodeToSort = self.GetNodeToSort()
+            if nodeToSort.HasInputsNotConnected():
+                nodeToSort.ReportError()
+                self.ReportError()
+                self.logger.Log(LogLevel.ERROR, f"(Graph : {self.name}) : Error in node sorting. Node [{nodeToSort.GetName()}] has unconnected input(s)")
+                break
+
             self.VisitNode(nodeToSort)
+
+        if not self.hasError:        
+            self.logger.Log(LogLevel.DIAGNOSTIC, f"(Graph : {self.name}) : Nodes sorted")
 
     def Cook(self) -> None:
         """
         """
+        self.hasError = False
+        self.SetAllDirty()
+
+        self.logger.Log(LogLevel.DIAGNOSTIC, f"(Graph : {self.name}) : Cooking graph")
+        
         self.Sort()
 
-        for node in self.sortedNodes:
-            node.Cook()
+        if not self.hasError:
+            for node in self.sortedNodes:
+                node.Cook()
 
-    def StartCook(self) -> None:
+                # Check for errors
+                if node.hasError:
+                    self.ReportError()
+                    self.logger.Log(LogLevel.ERROR, f"(Graph : {self.name}) : Error in cooking node [{node.GetName()}]. Check the log for more details")
+                    break
+                else:
+                    self.logger.Log(LogLevel.DIAGNOSTIC, f"(Graph : {self.name}) : Cooked node [{node.GetName()}]")
+
+            if not self.hasError:
+                self.logger.Log(LogLevel.DIAGNOSTIC, f"(Graph : {self.name}) : Graph cooked")
+
+    def ReportError(self) -> None:
         """
+        Emits an error
         """
-        self.cookingThread.run()
+        self.hasError = True
 
     def AddNode(self, node : Node) -> None:
         """
@@ -101,6 +146,8 @@ class Graph():
         self.nodes.append(node)
 
         self.nodeCount += 1
+        
+        self.logger.Log(LogLevel.DIAGNOSTIC, f"(Graph : {self.name}) : Added node [{node.GetName()}]")
 
     def RemoveNode(self, node : Node) -> None:
         """
@@ -114,6 +161,8 @@ class Graph():
         self.nodes.remove(node)
 
         self.nodeCount -= 1
+
+        self.logger.Log(LogLevel.DIAGNOSTIC, f"(Graph : {self.name}) : Removed node [{node.GetName()}]")
 
     def GetNodeWithID(self, id : str) -> Node:
         """
@@ -174,7 +223,7 @@ class Graph():
         nodesAsDicts = json.loads(serializedGraph)
 
         for node in nodesAsDicts:
-            tmpNode = Node()
+            tmpNode = Node(self.logger)
             tmpNode.FromDict(node)
             self.nodes.append(tmpNode)
 
@@ -184,7 +233,46 @@ class Graph():
             j = 0
 
             for outputName, outputContent in node["outputs"].items():
-                nodeToConnect = self.GetNodeWithID(outputContent["connectionNodeId"])
-                nodeToConnect.SetInput(self.nodes[i].GetOutput(j), outputContent["connectionIndex"])
+                if outputContent["connectionNodeId"] is not None:
+                    nodeToConnect = self.GetNodeWithID(outputContent["connectionNodeId"])
+                    nodeToConnect.SetInput(self.nodes[i].GetOutput(j), outputContent["connectionIndex"])
 
                 j += 1
+
+    def SaveToFile(self, filePath : str, saveAsString : bool = True) -> None:
+        """
+        Saves the graph to a scene file and sets its name to the given filename
+
+        Args:
+            filePath (str): path of the file
+        """
+        if not os.path.exists(os.path.dirname(filePath)):
+            os.makedirs(os.path.dirname(filePath))
+
+        self.name, _ = os.path.splitext(os.path.basename(filePath))
+        self.savePath = filePath
+
+        if saveAsString:
+            with open(filePath, "w") as file:
+                serializedGraph = self.Serialize()
+                file.write(serializedGraph)
+        else:
+            with open(filePath, "wb") as file:
+                serializedGraph = self.Serialize().encode("utf-8")
+                file.write(serializedGraph)
+
+    def LoadFromFile(self, filePath : str) -> None:
+        """
+        Loads a graph from a file
+
+        Args:
+            filePath (str): file to load the graph from
+        """
+        if not os.path.exists(filePath):
+            self.logger.Log(LogLevel.ERROR, f"Can't load graph from file {filePath}, it does not exist")
+        else:
+            self.savePath = filePath
+            self.name, _ = os.path.splitext(os.path.basename(filePath))
+
+            with open(filePath, "r", encoding="utf-8") as file:
+                self.Deserialize(file.read())

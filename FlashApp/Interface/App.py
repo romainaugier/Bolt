@@ -1,54 +1,64 @@
 import os
+from sys import intern
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+from FlashApp.Interface.Icons import *
 from FlashApp.Interface.Graph import *
+from FlashApi.Core.Logger import *
+from FlashApp.Interface.Parameters import ParameterEditor
 
-class Icons():
-    """
-    """
+
+class QHLine(QtWidgets.QFrame):
     def __init__(self):
-        """
-        """
-        # TODO : link with runtime path
-        self.iconFolderPath = "D:/dev/Flash/Library/Icons"
+        super().__init__()
+        self.setMinimumWidth(1)
+        self.setFixedHeight(10)
+        self.setFrameShape(QtWidgets.QFrame.HLine)
+        self.setFrameShadow(QtWidgets.QFrame.Plain)
+        self.setContentsMargins(0, 0, 0, 0)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
 
-        self.icons = {}
+    def setColor(self, color):
+        pal = self.palette()
+        pal.setColor(QtGui.QPalette.WindowText, color)
+        self.setPalette(pal)
+    
 
-        allIcons = os.listdir(self.iconFolderPath)
-
-        for icon in allIcons:
-            name, _ = os.path.splitext(icon)
-            path = os.path.join(self.iconFolderPath, icon)
-
-            self.icons[name] = QtGui.QIcon(QtGui.QPixmap(path))
-
-    def Get(self, name):
-        """
-        """
-        return self.icons[name]
+class QVLine(QtWidgets.QFrame):
+    def __init__(self):
+        super().__init__()
+        self.setFixedWidth(10)
+        self.setMinimumHeight(1)
+        self.setLineWidth(2)
+        self.setFrameShape(QtWidgets.QFrame.VLine)
+        self.setFrameShadow(QtWidgets.QFrame.Plain)
+        self.setContentsMargins(0, 0, 0, 0)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Preferred)
+        
+    def setColor(self, color):
+        pal = self.palette()
+        pal.setColor(QtGui.QPalette.WindowText, color)
+        self.setPalette(pal)
 
 class GraphTabs(QtWidgets.QWidget):
     """
     """
-    def __init__(self, nodeLib : Lib, parent):
+
+    selectedNodeChanged = QtCore.pyqtSignal(str)
+
+    def __init__(self, nodeLib : Lib, icons : Icons, logger : Logger, parent):
         super(QtWidgets.QWidget, self).__init__(parent)
 
         self.nodeLib = nodeLib
+        self.iconsLib = icons
+        self.logger = logger
 
         self.layout = QtWidgets.QVBoxLayout(self)
 
         self.tabs = QtWidgets.QTabWidget()
 
-        self.newTab = QtWidgets.QWidget()
-
-        self.tabs.addTab(self.newTab, "Main")
-
-        self.newTab.layout = QtWidgets.QVBoxLayout()
-        self.gGraph = GGraph(self.nodeLib)
-        self.gGraph.setFrameStyle(QtWidgets.QFrame.NoFrame)
-        self.newTab.layout.addWidget(self.gGraph)
-        self.newTab.setLayout(self.newTab.layout)
+        self.addTab()
 
         self.layout.addWidget(self.tabs)
         self.setLayout(self.layout)
@@ -60,15 +70,44 @@ class GraphTabs(QtWidgets.QWidget):
         Args:
             graph (GGraph, optional): Graph to load. Defaults to None.
         """
+        tabIndex = self.tabs.count()
+
         self.newTab = QtWidgets.QWidget()
 
-        self.tabs.addTab(self.newTab, "New*")
+        if graph is not None:
+            gGraph = graph
+        else:
+            gGraph = GGraph(self.nodeLib, self.logger)
+
+        self.tabs.addTab(self.newTab, self.iconsLib.GetIcon("graph-edited"), f"{gGraph.graph.GetName()}")
+        self.tabs.setIconSize(QtCore.QSize(18, 18))
 
         self.newTab.layout = QtWidgets.QVBoxLayout()
-        self.gGraph = GGraph(self.nodeLib)
-        self.gGraph.setFrameStyle(QtWidgets.QFrame.NoFrame)
-        self.newTab.layout.addWidget(self.gGraph)
+        gGraph.setFrameStyle(QtWidgets.QFrame.NoFrame)
+        gGraph.isCookingMovie.frameChanged.connect(lambda: self.tabs.setTabIcon(tabIndex, QtGui.QIcon(gGraph.getAnimationLogoMovie().currentPixmap())))
+        gGraph.hasBeenEdited.connect(lambda: (self.tabs.setTabIcon(tabIndex, self.iconsLib.GetIcon("graph-edited")), 
+                                              self.tabs.setTabText(tabIndex, f"{gGraph.graph.GetName()}*")))
+        gGraph.finishedCooking.connect(lambda: self.tabs.setTabIcon(tabIndex, self.iconsLib.GetIcon("graph-done")))
+        gGraph.errorCooking.connect(lambda: self.tabs.setTabIcon(tabIndex, self.iconsLib.GetIcon("graph-error")))
+        gGraph.selectedNodeChanged.connect(self.onNodeSelectionChange)
+
+        self.newTab.layout.addWidget(gGraph)
         self.newTab.setLayout(self.newTab.layout)
+
+        self.tabs.setCurrentIndex(tabIndex)
+
+    @QtCore.pyqtSlot(str)
+    def onNodeSelectionChange(self, nodeId : str) -> None:
+        self.selectedNodeChanged.emit(nodeId)
+
+    def removeTab(self, index : int) -> None:
+        """
+        Removes a tab
+
+        Args:
+            index (int): tab index to remove
+        """
+        self.tabs.removeTab(index)
 
     def getActiveTabIndex(self) -> int:
         """
@@ -95,13 +134,15 @@ class App(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
 
-        self.nodeLib = Lib()
+        self.logger = Logger(level=LogLevel.DIAGNOSTIC)
+
+        self.nodeLib = Lib(self.logger)
 
         self.icons = Icons()
 
         self.setWindowTitle("Flash")
   
-        self.setWindowIcon(self.icons.Get("flash"))
+        self.setWindowIcon(self.icons.GetIcon("flash"))
 
         masterLayout = QtWidgets.QVBoxLayout()
         masterWidget = QtWidgets.QWidget()
@@ -111,31 +152,162 @@ class App(QtWidgets.QMainWindow):
         shelfLayout = QtWidgets.QHBoxLayout()
         shelfLayout.setAlignment(Qt.AlignLeft)
 
+        # Graph Buttons
+
         self.newGraphButton = QtWidgets.QPushButton("")
-        self.newGraphButton.setIcon(self.icons.Get("graph"))
+        self.newGraphButton.setIcon(self.icons.GetIcon("new-graph"))
         self.newGraphButton.setToolTip("Create New Graph")
         self.newGraphButton.clicked.connect(lambda: self.graphTabs.addTab())
         shelfLayout.addWidget(self.newGraphButton)
 
-        self.addNodeButton = QtWidgets.QPushButton("")
-        self.addNodeButton.setIcon(self.icons.Get("add-plus-button"))
-        self.addNodeButton.setToolTip("Add Node")
-        shelfLayout.addWidget(self.addNodeButton)
+        self.cookGraphButton = QtWidgets.QPushButton("")
+        self.cookGraphButton.setIcon(self.icons.GetIcon("cook-graph"))
+        self.cookGraphButton.setToolTip("Cook Active Graph")
+        self.cookGraphButton.clicked.connect(lambda: self.cookGraph())
+        shelfLayout.addWidget(self.cookGraphButton)
 
-        self.movie = QtGui.QMovie("Icons/anim-load.gif")
-        self.movie.setScaledSize(QtCore.QSize(50, 50))
-        self.testLabel = QtWidgets.QLabel("")
-        self.testLabel.setMovie(self.movie)
-        self.movie.start()
-        shelfLayout.addWidget(self.testLabel)
+        self.saveGraphButton = QtWidgets.QPushButton("")
+        self.saveGraphButton.setIcon(self.icons.GetIcon("save-graph"))
+        self.saveGraphButton.setToolTip("Save Active Graph")
+        self.saveGraphButton.clicked.connect(lambda: self.saveGraph())
+        shelfLayout.addWidget(self.saveGraphButton)
+
+        self.loadGraphButton = QtWidgets.QPushButton("")
+        self.loadGraphButton.setIcon(self.icons.GetIcon("load-graph"))
+        self.loadGraphButton.setToolTip("Load Graph from a file")
+        self.loadGraphButton.clicked.connect(lambda: self.loadGraph())
+        shelfLayout.addWidget(self.loadGraphButton)
+
+        self.layoutGraphButton = QtWidgets.QPushButton("")
+        self.layoutGraphButton.setIcon(self.icons.GetIcon("layout-graph"))
+        self.layoutGraphButton.setToolTip("Layout Active Graph")
+        self.layoutGraphButton.clicked.connect(lambda: self.layoutGraph())
+        shelfLayout.addWidget(self.layoutGraphButton)
+
+        separator = QVLine()
+        separator.setColor(QtGui.QColor(255, 255, 255, 20))
+        shelfLayout.addWidget(separator)
+
+        # Node Buttons
+
+        self.createNewNodeButton = QtWidgets.QPushButton("")
+        self.createNewNodeButton.setIcon(self.icons.GetIcon("new-node"))
+        self.createNewNodeButton.setToolTip("Create a new node type\nOpens the node properties editor")
+        shelfLayout.addWidget(self.createNewNodeButton)
+
+        self.modifySelectedNodeButton = QtWidgets.QPushButton("")
+        self.modifySelectedNodeButton.setIcon(self.icons.GetIcon("modify-node"))
+        self.modifySelectedNodeButton.setToolTip("Modify the selected node\nOpens the node properties editor")
+        shelfLayout.addWidget(self.modifySelectedNodeButton)
 
         masterLayout.addLayout(shelfLayout)
 
         # Graphs
 
-        self.graphTabs = GraphTabs(self.nodeLib, self)
-        masterLayout.addWidget(self.graphTabs)
+        graphLayout = QtWidgets.QHBoxLayout()
+
+        self.graphTabs = GraphTabs(self.nodeLib, self.icons, self.logger, self)
+        self.graphTabs.selectedNodeChanged.connect(self.onSelectedNodeChange)
+
+        graphLayout.addWidget(self.graphTabs)
+
+        self.parameterEditor = ParameterEditor()
+
+        graphLayout.addWidget(self.parameterEditor)
+
+        masterLayout.addLayout(graphLayout)
 
         masterWidget.setLayout(masterLayout)
 
         self.setCentralWidget(masterWidget)
+        
+        # Shortcuts
+        self.newGraphSc = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+N"), self)
+        self.newGraphSc.activated.connect(lambda: self.graphTabs.addTab())
+
+        self.closeGraphSc = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+W"), self)
+        self.closeGraphSc.activated.connect(lambda: self.closeGraph())
+
+        self.cookGraphSc = QtWidgets.QShortcut(QtGui.QKeySequence("C"), self)
+        self.cookGraphSc.activated.connect(lambda: self.cookGraph())
+
+    def closeGraph(self, index : int = None) -> None:
+        """
+        Close the tab at the index given as argument. If the index
+        is left to None, close the active tab
+
+        Args:
+            index (int, optional): Index of the tab to close. 
+            Defaults to None.
+        """
+        if index is not None:
+            self.graphTabs.removeTab(index)
+        else:
+            self.graphTabs.removeTab(self.graphTabs.getActiveTabIndex())
+
+    def cookGraph(self, index : int = None) -> None:
+        """
+        Cook the graph at the given index
+
+        Args:
+            index (int, optional): Index of the graph to cook. Defaults to None.
+        """
+        if index is None:
+            index = self.graphTabs.getActiveTabIndex()
+
+        self.graphTabs.tabs.widget(index).layout.itemAt(0).widget().launchGraphCooking()
+
+    def saveGraph(self, index : int = None) -> None:
+        """
+        Save the graph to a file
+
+        Args:
+            index (int, optional): index of the graph to save. Defaults to None.
+        """
+        if index is None:
+            index = self.graphTabs.getActiveTabIndex()
+
+        internalGraph : Graph = self.graphTabs.tabs.widget(index).layout.itemAt(0).widget().graph
+
+        if internalGraph.GetSavePath() != "":
+            filePath = internalGraph.GetSavePath()
+        else:
+            filePath, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save File", "C:/", "Flash Graph (*.fgraph)")
+
+        internalGraph.SaveToFile(filePath)
+
+        self.graphTabs.tabs.setTabText(index, internalGraph.GetName())
+
+    def loadGraph(self) -> None:
+        """
+        Loads a graph from a file
+        """
+        filePath, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Open File", "C:/", "Flash Graph (*.fgraph)")
+        
+        if os.path.exists(filePath):
+            newGraph = Graph(self.logger)
+            newGraph.LoadFromFile(filePath)
+
+            newGGraph = GGraph(self.nodeLib, self.logger, newGraph)
+
+            self.graphTabs.addTab(newGGraph)
+
+    def layoutGraph(self, index : int = None) -> None:
+        """
+        Layouts the grpah at the given index 
+
+        Args:
+            index (int, optional): graph index. Defaults to None.
+        """
+        pass
+
+    @QtCore.pyqtSlot(str)
+    def onSelectedNodeChange(self, nodeId : str) -> None:
+        """
+        """
+        graphTabIndex = self.graphTabs.getActiveTabIndex()
+
+        gNode = self.graphTabs.tabs.widget(graphTabIndex).layout.itemAt(0).widget().getNodeById(nodeId)
+
+        self.parameterEditor.setCurrentNode(gNode)
+        

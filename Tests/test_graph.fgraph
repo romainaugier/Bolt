@@ -1,0 +1,77 @@
+[
+  {
+    "name": "Debug",
+    "id": "6434383637653262313136346661646465366463353432303766313730333431",
+    "color": [
+      76,
+      175,
+      80
+    ],
+    "inputCount": 1,
+    "outputCount": 1,
+    "opCode": "# BeginOp\n\nFlashLogMessage(f\"Debug Node : {input0}\")\n\noutput0 = input0\n\n",
+    "inputs": {
+      "input0": {
+        "connectionIndex": 0,
+        "connectionNodeId": "3962393032336364613839316665636364656331633930623038646639623064"
+      }
+    },
+    "outputs": {
+      "output0": {
+        "connectionIndex": 0,
+        "connectionNodeId": "3736383735313061626361383961653135663436343265613766303266633163"
+      }
+    },
+    "parms": {}
+  },
+  {
+    "name": "File",
+    "id": "3962393032336364613839316665636364656331633930623038646639623064",
+    "color": [
+      0,
+      188,
+      212
+    ],
+    "inputCount": 0,
+    "outputCount": 1,
+    "opCode": "# BeginOp\n\noutput0 = filepath\n\n",
+    "inputs": {},
+    "outputs": {
+      "output0": {
+        "connectionIndex": 0,
+        "connectionNodeId": "6434383637653262313136346661646465366463353432303766313730333431"
+      }
+    },
+    "parms": {
+      "filepath": {
+        "longName": "FilePath",
+        "value": ""
+      }
+    }
+  },
+  {
+    "name": "Sleep",
+    "id": "3736383735313061626361383961653135663436343265613766303266633163",
+    "color": [
+      76,
+      175,
+      80
+    ],
+    "inputCount": 1,
+    "outputCount": 1,
+    "opCode": "# BeginOp\n\nimport time\n\ntime.sleep(5)\n\noutput0 = input0\n\n",
+    "inputs": {
+      "input0": {
+        "connectionIndex": 0,
+        "connectionNodeId": "6434383637653262313136346661646465366463353432303766313730333431"
+      }
+    },
+    "outputs": {
+      "output0": {
+        "connectionIndex": 0,
+        "connectionNodeId": null
+      }
+    },
+    "parms": {}
+  }
+]

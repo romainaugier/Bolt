@@ -13,13 +13,18 @@ color = [255, 87, 34]
 
 import subprocess
 
-print(f"Hython : Start executing script : {input0}")
+FlashLogMessage(f"Hython : Start executing script : {input0}")
 
 process = subprocess.Popen(["hython", input0], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
 stdout, stderr = process.communicate()
 
-print(f"Hython : Finished executing script : {input0}")
-print(f"Stdout : {stdout}")
-print(f"Stderr : {stderr}")
+stdoutAsStr = stdout.decode("utf-8")
+stderrAsStr = stderr.decode("utf-8")
+
+if len(stderrAsStr) > 0:
+    FlashLogError(stderrAsStr)
+else:
+    FlashLogMessage(f"Hython : Finished executing script : {input0}")
+    FlashLogMessage(stdoutAsStr)
 
 # EndOp

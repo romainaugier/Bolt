@@ -1,8 +1,8 @@
 from ast import literal_eval
-import re, json
-from typing import Any
-import FlashApi.Core.FileSystem as FileSystem
+import re, json, copy
 
+import FlashApi.Core.FileSystem as FileSystem
+from FlashApi.Core.Logger import *
 
 # Pre declaration of classes
 
@@ -319,7 +319,12 @@ class Node():
     def __init__(self):
         """
         """
+        self.logger = None
         self.isDirty = True
+        self.hasError = False
+        self.errorMessage = ""
+        self.hasWarning = False
+        self.warningMessage = ""
         self.inQueue = False
         self.inTempQueue = False
         self.name = ""
@@ -349,6 +354,11 @@ class Node():
             str: name of the node
         """
         return self.name
+
+    def SetLogger(self, logger : Logger) -> None:
+        """
+        """
+        self.logger = logger
 
     def SetInputCount(self, inputCount : int) -> None:
         """
@@ -498,6 +508,19 @@ class Node():
             list of Plug: inputs of the node
         """
         return self.inputs
+
+    def HasInputsNotConnected(self) -> bool:
+        """
+        Checks if the node has some inputs that are not connected
+
+        Returns:
+            bool: 
+        """ 
+        for input in self.inputs:
+            if not input.IsConnected():
+                return True
+
+        return False
     
     def SetInput(self, plug : Plug, index : int) -> None:
         """
@@ -590,6 +613,9 @@ class Node():
         """
         Executes the node operation
         """
+        self.hasError = False
+        self.errorMessage = ""
+
         locals = {}
         
         # Setup locals with inputs and parameters
@@ -601,7 +627,12 @@ class Node():
             locals[f"input{i}"] = input.Data()
             
         globals = { "FlashTempDir" : FileSystem.GetRoamingDataDir,
-                    "FlashTempScript" : FileSystem.GetNewRandomPyFile }
+                    "FlashTempScript" : FileSystem.GetNewRandomPyFile,
+                    "FlashLogError" : self.LogError,
+                    "FlashLogWarning" : self.LogWarning,
+                    "FlashLogMessage" : self.LogMessage,
+                    "FlashError" : self.ReportError,
+                    "FlashWarning" : self.ReportWarning }
         
         exec(self.opCompiledCode, globals, locals)
 
@@ -610,6 +641,58 @@ class Node():
             self.outputs[i].SetData(locals[f"output{i}"])
 
         self.isDirty = False
+
+    def ReportError(self) -> None:
+        """
+        Emit an error signal
+        """
+        self.hasError = True
+
+    def HasError(self) -> bool:
+        """
+        Returns if the node has an error
+        """
+        return self.hasError
+
+    def GetErrorMessage(self) -> str:
+        """
+        Returns:
+            str: Error message
+        """
+        return self.errorMessage
+
+    def ReportWarning(self) -> None:
+        """
+        Emits a warning signal
+        """
+        self.hasWarning = True
+
+    def LogError(self, message) -> None:
+        """
+        Log an error to the passed logger. This function is made to be 
+        used in the user code
+        """
+        self.logger.Log(LogLevel.ERROR, f"(Node : {self.GetName()}) : {message}")
+        self.errorMessage = message
+
+        self.ReportError()
+    
+    def LogWarning(self, message) -> None:
+        """
+        Log a warning to the passed logger. This function is made to be 
+        used in the user code
+        """
+        self.logger.Log(LogLevel.WARNING, f"(Node : {self.GetName()}) : {message}")
+        self.warningMessage = message
+
+        self.ReportWarning()
+    
+    def LogMessage(self, message) -> None:
+        """
+        Log a message to the passed logger. This function is made to be 
+        used in the user code
+        """
+        self.logger.Log(LogLevel.MESSAGE, f"(Node : {self.GetName()}) : {message}")
         
     def Load(self, nodeDefinitionPath : str) -> None:
         """
@@ -661,7 +744,10 @@ class Node():
             nodeAsDict["inputs"][input.Name()] = { "connectionIndex" : i, "connectionNodeId" : input.Connection().Node().GetID() }
         
         for i, output in enumerate(self.GetOutputs()):
-            nodeAsDict["outputs"][output.Name()] = { "connectionIndex" : i, "connectionNodeId" : output.Connection().Node().GetID() }
+            if output.IsConnected():
+                nodeAsDict["outputs"][output.Name()] = { "connectionIndex" : i, "connectionNodeId" : output.Connection().Node().GetID() }
+            else:
+                nodeAsDict["outputs"][output.Name()] = { "connectionIndex" : i, "connectionNodeId" : None }
 
         for parm in self.GetParms():
             nodeAsDict["parms"][parm.ShortName()] = { "longName" : parm.LongName(), "value" : parm.Value() }

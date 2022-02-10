@@ -1,10 +1,13 @@
 import binascii
+from distutils.log import error
 import os, math
 
 from FlashApi.Core.Node import *
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QLineF, Qt
+from PyQt5.QtCore import Qt
+
+from FlashApp.Interface.Icons import *
 
 class GNode():
     pass
@@ -140,14 +143,18 @@ class GPlug(QtWidgets.QGraphicsItem):
         self.edges.append(edge)
 
 
-class GNode(QtWidgets.QGraphicsItem):
+class GNode(QtWidgets.QGraphicsObject):
     """
     """
-    def __init__(self, node : Node, name : str, graph : GGraph):
+
+    hasBeenSelected = QtCore.pyqtSignal(str)
+
+    def __init__(self, node : Node, name : str, graph : GGraph, iconsLib : Icons):
         super().__init__()
         
         self.internalNode = node
         self.graph = graph
+        self.iconsLib = iconsLib
 
         self.name = self.getInternalNode().GetName()
         self.id = self.getInternalNode().GetID()
@@ -167,14 +174,14 @@ class GNode(QtWidgets.QGraphicsItem):
         bodySizeY = (self.sizeY - self.labelSizeY) / ((numInputs if numInputs > numOutputs else numOutputs ) + 1)
 
         for i in range(numInputs):
-            positionX = self.pos().x()
+            positionX = self.pos().x() + 5
             positionY = self.pos().y() + self.labelSizeY + (bodySizeY * (i + 1))
             
             newSock = GPlug(positionX, positionY, self.internalNode.GetInput(i), self, self.graph, parent=self)
             self.inputGPlugs.append(newSock)
         
         for i in range(numOutputs):
-            positionX = self.pos().x() + self.sizeX + 2.5
+            positionX = self.pos().x() + self.sizeX - 12.5
             positionY = self.pos().y() + self.labelSizeY + bodySizeY
             
             newSock = GPlug(positionX, positionY, self.internalNode.GetOutput(i), self, self.graph, input=False, parent=self)
@@ -213,45 +220,71 @@ class GNode(QtWidgets.QGraphicsItem):
     def boundingRect(self):
         """
         """
-        adjust = 2
-        return QtCore.QRectF(0, 0, self.sizeX + adjust, self.sizeY + adjust)
+        adjust = 10
+        return QtCore.QRectF(-adjust, -adjust, self.sizeX + adjust * 2, self.sizeY + adjust * 2)
 
-    def paint(self, painter, option, widget):
+    def paint(self, painter : QtGui.QPainter, option : QtWidgets.QStyleOptionGraphicsItem, widget : QtWidgets.QWidget) -> None:
         """
         """
-        # painter.setPen(Qt.NoPen)
-        pen = QtGui.QPen()
-        pen.setBrush(Qt.black)
-        pen.setWidth(0.01)
-        pen.setCapStyle(Qt.RoundCap)
-        pen.setJoinStyle(Qt.RoundJoin)
+        ## Shadow
+        shadowOffset = 10
+        path = QtGui.QPainterPath()
+        path.setFillRule(Qt.WindingFill)
+        path.addRoundedRect(QtCore.QRectF(shadowOffset, shadowOffset, self.sizeX, self.labelSizeY), 10, 10)
+        path.addRoundedRect(QtCore.QRectF(shadowOffset, self.labelSizeY, self.sizeX, self.sizeY - self.labelSizeY + shadowOffset), 10, 10)
+        path.addRect(shadowOffset, self.labelSizeY, self.sizeX, self.sizeY / 2)
+
+        painter.setPen(Qt.NoPen)
+        painter.setBrush(QtGui.QColor(0, 0, 0, 127))
+        painter.drawPath(path.simplified())
+        
+        ## Body
 
         painter.setRenderHint(QtGui.QPainter.Antialiasing)
         
-        GPlugWidth = 15
+        bodyColor = QtGui.QColor(48, 46, 54, 255)
 
         # Label
+        path = QtGui.QPainterPath()
+        path.setFillRule(Qt.WindingFill)
+        path.addRoundedRect(QtCore.QRectF(0, 0, self.sizeX, self.labelSizeY), 10, 10)
+        path.addRect(0, self.labelSizeY / 2, self.sizeX, self.labelSizeY / 2)
+        
         painter.setBrush(self.color)
+
+        labelGradient = QtGui.QLinearGradient()
+        labelGradient.setStart(0, 0)
+        labelGradient.setFinalStop(self.sizeX, self.labelSizeY)
+        labelGradient.setColorAt(0.0, bodyColor)
+        labelGradient.setColorAt(1.0, self.color)
+
+        painter.setBrush(labelGradient)
         painter.setPen(Qt.NoPen)
-        painter.drawRect(GPlugWidth / 2, 0, self.sizeX, self.labelSizeY)
+        painter.drawPath(path.simplified())
 
         # Label name
-        painter.setPen(Qt.white)
-        painter.setFont(QtGui.QFont("Helvetica", 12))
+        painter.setPen(QtGui.QColor(224, 227, 227, 255))
+        painter.setFont(QtGui.QFont("Helvetica", 10))
 
-        fontRect = QtCore.QRect(GPlugWidth / 2 + 10, 8, self.sizeX - 10, self.labelSizeY - 10)
+        fontRect = QtCore.QRect(10, 8, self.sizeX - 10, self.labelSizeY - 10)
         painter.drawText(fontRect, 0, self.name)
 
         # Body
-        painter.setPen(Qt.NoPen)
+        path = QtGui.QPainterPath()
+        path.setFillRule(Qt.WindingFill)
+        path.addRoundedRect(QtCore.QRectF(0, self.labelSizeY, self.sizeX, self.sizeY - self.labelSizeY), 10, 10)
+        path.addRect(0, self.labelSizeY, self.sizeX, self.sizeY / 2)
 
-        color = QtGui.QColor(25, 28, 29, 255)
 
         if self.isHovered or self.isSelected():
-            color = QtGui.QColor(35, 38, 39, 255)
+            bodyColor = QtGui.QColor(58, 56, 64, 255)
 
-        painter.setBrush(color)
-        painter.drawRect(GPlugWidth / 2, self.labelSizeY, self.sizeX, self.sizeY)
+        painter.setBrush(bodyColor)
+        painter.setPen(Qt.NoPen)
+        painter.drawPath(path.simplified())
+        
+        # self.errorPixmap = self.iconsLib.GetPixmap("node-error")
+        # painter.drawPixmap(0, 0, 48, 48, self.errorPixmap)
 
     def hoverEnterEvent(self, ev):
         self.isHovered = True
@@ -266,6 +299,7 @@ class GNode(QtWidgets.QGraphicsItem):
 
         if self.isHovered:
             self.setSelected(True)
+            self.hasBeenSelected.emit(self.id)
 
             for item in self.graph.items():
                 item.setZValue(1)

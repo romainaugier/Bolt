@@ -11,7 +11,7 @@ color = [76, 175, 80]
 
 # BeginOp
 
-print(f"Debug Node : {input0}")
+FlashLogMessage(f"Debug Node : {input0}")
 
 output0 = input0
 
