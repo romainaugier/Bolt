@@ -5,65 +5,140 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from FlashApi.Core.Node import *
 from FlashApi.Core.Graph import *
 from FlashApi.Core.Lib import *
+from FlashApi.Core.Logger import *
+
+TESTDIR = os.path.dirname(__file__)
+
+def PrintSeps():
+    print(f"\n{'#' * 30}\n")
 
 if __name__ == "__main__":
-    print("Testing Flash Graph API...")
+    logger = Logger(level=LogLevel.DEBUG)
+    
+    logger.Log(LogLevel.DEBUG, "Testing Flash API...")
 
-    print("Initializing node library...")
-    nodeLib = Lib()
-    nodeLib.Load()
+    logger.Log(LogLevel.DEBUG, "Testing template node...")
+    
+    PrintSeps()
 
-    print("Available nodes : ")
-    print(json.dumps(nodeLib.GetAvailableNodes(), indent=4))
+    node = Node()
+    node.Load("D:/dev/Flash/Library/Nodes/template.fnode")
+    node.SetLogger(logger)
 
-    graph = Graph()
+    for inputName, input in node.GetInputs().items():
+        print(inputName, input.GetLongName(), input.GetData(), input.GetType())
+    
+    for outputName, output in node.GetOutputs().items():
+        print(outputName, output.GetLongName(), output.GetData(), output.GetType())
 
-    print("Setting up nodes...")
+    PrintSeps()
 
-    hythonNode1 = nodeLib.Get("Hython")
-    printNode1 = nodeLib.Get("Print")
+    logger.Log(LogLevel.DEBUG, "Cooking template node...")
 
-    fileNode1 = nodeLib.Get("File")
-    fileNode1.SetParm("filepath", "Z:/OEUF/assets/props/Volcan/modeling/main/Houdini/export/water_plane.abc")
+    node.Cook()
+    
+    PrintSeps()
 
-    hou_loadalembicNode1 = nodeLib.Get("Hou_LoadAlembic")
-    hou_loadalembicNode1.SetParm("file", "D:/test.hip")
+    logger.Log(LogLevel.DEBUG, "Setting plug values in template node and re cooking it...")
 
+    node.SetPlugValue("inint", 10)
+    node.SetPlugValue("infloat", 58.0)
+    node.SetPlugValue("instring", "Flash Test")
+    node.SetPlugValue("inbool", False)
+    node.SetPlugValue("incustom", node)
+    node.SetPlugValue("indict", { "newdict" : True })
 
-    print("Adding nodes to graph...")
+    node.Cook()
 
-    graph.AddNode(hythonNode1)
-    graph.AddNode(printNode1)
-    graph.AddNode(hou_loadalembicNode1)
-    graph.AddNode(fileNode1)
+    PrintSeps()
 
-    print("Nodes in graph : ")
-    print(json.dumps([node.GetName()for node in graph.nodes], indent=4))
+    logger.Log(LogLevel.DEBUG, "Testing node library...")
 
-    print("Connecting nodes...")
+    nodeLibrary = Lib(logger)
+    nodeLibrary.Load()
 
-    hou_loadalembicNode1.SetInput(fileNode1.GetOutput(0), 0)
-    printNode1.SetInput(hou_loadalembicNode1.GetOutput(0), 0)
-    hythonNode1.SetInput(printNode1.GetOutput(0), 0)
+    PrintSeps()
 
-    print("Cooking Graph...")
+    logger.Log(LogLevel.DEBUG, "Testing graph...")
+
+    graph = Graph(logger, "new")
+
+    fileNode = nodeLibrary.Get("File")
+    fileNode.SetPlugValue("infile", f"{TESTDIR}/test_script.py")
+
+    debugNode = nodeLibrary.Get("Debug")
+
+    pythonNode = nodeLibrary.Get("Python")
+
+    logger.Log(LogLevel.DEBUG, "Adding nodes...")
+
+    graph.AddNode(debugNode)
+    graph.AddNode(pythonNode)
+    graph.AddNode(fileNode)
+    
+    logger.Log(LogLevel.DEBUG, "Connecting Nodes...")
+
+    debugNode.SetInput(fileNode.GetOutput(name="outfile"), name="indata")
+    pythonNode.SetInput(debugNode.GetOutput(name="outdata"), name="inscript")
+
+    for node in graph.GetNodes():
+        PrintSeps()
+        print(node.GetName())
+
+        for inputName, input in node.GetInputs().items():
+            print(input.GetLongName(), input.IsExposed(), input.GetData())
+
+    PrintSeps()
+
+    logger.Log(LogLevel.DEBUG, "Cooking graph...")
 
     graph.Cook()
 
-    print("Sorted nodes : ")
-    print(json.dumps([node.GetName() for node in graph.sortedNodes], indent=4))
+    PrintSeps()
 
-    print("Serializing Graph...")
+    logger.Log(LogLevel.DEBUG, "Serializing graph...")
 
     serializedGraph = graph.Serialize()
 
-    print("Deserializing Graph...")
+    print("\n", serializedGraph, "\n")
+
+    PrintSeps()
+
+    logger.Log(LogLevel.DEBUG, "Deserializing graph...")
 
     graph.Deserialize(serializedGraph)
 
-    print("Cooking Graph...")
+    for node in graph.GetNodes():
+        PrintSeps()
+        print(node.GetName())
+
+        for inputName, input in node.GetInputs().items():
+            print(input.GetLongName(), input.IsExposed(), input.GetData())
+
+    PrintSeps()
+
+    logger.Log(LogLevel.DEBUG, "Cooking graph after deserialization...")
 
     graph.Cook()
 
-    print("Sorted nodes : ")
-    print(json.dumps([node.GetName() for node in graph.sortedNodes], indent=4))
+    PrintSeps()
+
+    logger.Log(LogLevel.DEBUG, "Saving to file...")
+
+    graphSavePath = f"{TESTDIR}/tmp_graph.fgraph"
+
+    graph.SaveToFile(graphSavePath)
+
+    PrintSeps()
+
+    logger.Log(LogLevel.DEBUG, "Loading from file...")
+
+    graph.LoadFromFile(graphSavePath)
+
+    PrintSeps()
+
+    logger.Log(LogLevel.DEBUG, "Cooking graph after loading...")
+
+    graph.Cook()
+
+    PrintSeps()

@@ -1,53 +1,89 @@
 // Here there is everything that can be used to build a Flash node
 // This is a comment
 
-# BeginAttr             // Begin the attributes definition
+# BeginAttr                                     // Begin the attributes definition
 
-name = Template         // Name of the node
-inputs = 1              // Number of inputs
-outputs = 1             // Number of outputs
-color = [255, 127, 64]  // Color that will be used in the interface
-icon = D:/dev/Flash/Library/Icons/flash.png // Icons must be png files
+name = Template                                 // Name of the node
+color = [255, 127, 64]                          // Color that will be used in the interface
+icon = D:/dev/Flash/Library/Icons/flash.png     // Icons must be png files
 
-# EndAttr               // End the attributes definition
+# EndAttr                                       // End the attributes definition
 
-# BeginParms            // Begin the parameters definition
+# BeginPlugs                                    // Begin the plugs definition
 
-# BeginParm             // Begin one parameter definition
+# BeginPlug                                     // Begin one plug definition
 
-shortName = intparm
-longName = Integer Parameter
+shortName = inint
+longName = Integer
 defaultValue = 0
+type = int
+exposed = False
 
-# EndParm               // End one parameter definition
+# EndPlug                                       // End one plug definition
 
-# BeginParm             // Begin one parameter definition
+# BeginPlug                                     // Begin one plug definition
 
-shortName = floatparm
-longName = Float Parameter
+shortName = infloat
+longName = Float
 defaultValue = 10.0
+type = float
+exposed = False
 
-# EndParm               // End one parameter definition
+# EndPlug                                       // End one plug definition
 
-# BeginParm             // Begin one parameter definition
+# BeginPlug                                     // Begin one plug definition
 
-shortName = stringparm
-longName = String Parameter
+shortName = instring
+longName = String
 defaultValue = "bonjour"
+type = str
+exposed = False
 
-# EndParm               // End one parameter definition
+# EndPlug                                       // End one plug definition
 
-# BeginParm             // Begin one parameter definition
+# BeginPlug                                     // Begin one plug definition
 
-shortName = boolparm
-longName = Boolean Parameter
+shortName = inbool
+longName = Boolean
 defaultValue = True
+type = bool
+exposed = False
 
-# EndParm               // End one parameter definition
+# EndPlug                                       // End one plug definition
 
-# EndParms              // End the parameters definition
+# BeginPlug                                     // Begin one plug definition
 
-# BeginOp               // Begin the operation code 
+shortName = incustom
+longName = Custom
+defaultValue = None
+type = custom
+exposed = False
+
+# EndPlug
+
+# BeginPlug                                     // Begin one plug definition
+
+shortName = indict
+longName = Dict
+defaultValue = { "dict" : True }
+type = dict
+exposed = False
+
+# EndPlug                                       // End one plug definition
+
+# BeginPlug                                     // Begin of one plug definition
+
+shortName = outlist
+longName = List
+defaultValue = []
+type = list
+exposed = False
+
+# EndPlug
+
+# EndPlugs                                      // End the plugs definition
+
+# BeginOp                                       // Begin the operation code 
 
 import sys
 
@@ -58,13 +94,19 @@ print("Flash Node compiled and ran with : ", sys.version)
 # (such as generated script files...)
 flashTempDir = FlashTempDir()
 
-# parameters can be called with their shortName
-print("Integer Parameter : ", intparm)
-print("Float Parameter : ", floatparm)
-print("String Parameter : ", stringparm)
-print("Boolean Parameter : ", boolparm)
+# Prints a message to the Flash Console
+FlashLogMessage("Cooking template node...")
 
-# outputs can be called with output + output number (starting at 0)
-output0 = f"Integer Parm : {intparm}, Float Parm : {floatparm}, String Parm : {stringparm}, Bool Parm : {boolparm}"
+# plugs can be called with their shortName
+print("Integer Input Plug : ", inint)
+print("Float Input Plug : ", infloat)
+print("String Input Plug : ", instring)
+print("Boolean Input Plug : ", inbool)
+print("Custom Input Plug : ", incustom)
+print("Dict Input Plug : ", indict)
 
-# EndOp                 // End the operation code
+outlist = [inint, infloat, instring, inbool]
+
+print("List Output Plug : ", outlist)
+
+# EndOp                                         // End the operation code

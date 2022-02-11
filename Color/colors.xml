@@ -1,58 +1,37 @@
-<resources>
-    <color name="md_theme_light_primary">#795900</color>
-    <color name="md_theme_light_onPrimary">#FFFFFF</color>
-    <color name="md_theme_light_primaryContainer">#FFDF99</color>
-    <color name="md_theme_light_onPrimaryContainer">#261A00</color>
-    <color name="md_theme_light_secondary">#3C6A00</color>
-    <color name="md_theme_light_onSecondary">#FFFFFF</color>
-    <color name="md_theme_light_secondaryContainer">#B9F475</color>
-    <color name="md_theme_light_onSecondaryContainer">#0E2000</color>
-    <color name="md_theme_light_tertiary">#984163</color>
-    <color name="md_theme_light_onTertiary">#FFFFFF</color>
-    <color name="md_theme_light_tertiaryContainer">#FFD8E4</color>
-    <color name="md_theme_light_onTertiaryContainer">#3E001D</color>
-    <color name="md_theme_light_error">#BA1B1B</color>
-    <color name="md_theme_light_errorContainer">#FFDAD4</color>
-    <color name="md_theme_light_onError">#FFFFFF</color>
-    <color name="md_theme_light_onErrorContainer">#410001</color>
-    <color name="md_theme_light_background">#FBFDFD</color>
-    <color name="md_theme_light_onBackground">#191C1D</color>
-    <color name="md_theme_light_surface">#FBFDFD</color>
-    <color name="md_theme_light_onSurface">#191C1D</color>
-    <color name="md_theme_light_surfaceVariant">#E6E0EC</color>
-    <color name="md_theme_light_onSurfaceVariant">#48454F</color>
-    <color name="md_theme_light_outline">#79767F</color>
-    <color name="md_theme_light_inverseOnSurface">#EFF1F1</color>
-    <color name="md_theme_light_inverseSurface">#2D3132</color>
-    <color name="md_theme_light_inversePrimary">#FABD00</color>
-    <color name="md_theme_light_shadow">#000000</color>
-    <color name="md_theme_light_primaryInverse">#FABD00</color>
-    <color name="md_theme_dark_primary">#FABD00</color>
-    <color name="md_theme_dark_onPrimary">#402D00</color>
-    <color name="md_theme_dark_primaryContainer">#5C4300</color>
-    <color name="md_theme_dark_onPrimaryContainer">#FFDF99</color>
-    <color name="md_theme_dark_secondary">#9ED75C</color>
-    <color name="md_theme_dark_onSecondary">#1C3700</color>
-    <color name="md_theme_dark_secondaryContainer">#2C5000</color>
-    <color name="md_theme_dark_onSecondaryContainer">#B9F475</color>
-    <color name="md_theme_dark_tertiary">#FFB0CB</color>
-    <color name="md_theme_dark_onTertiary">#5D1134</color>
-    <color name="md_theme_dark_tertiaryContainer">#7A294B</color>
-    <color name="md_theme_dark_onTertiaryContainer">#FFD8E4</color>
-    <color name="md_theme_dark_error">#FFB4A9</color>
-    <color name="md_theme_dark_errorContainer">#930006</color>
-    <color name="md_theme_dark_onError">#680003</color>
-    <color name="md_theme_dark_onErrorContainer">#FFDAD4</color>
-    <color name="md_theme_dark_background">#191C1D</color>
-    <color name="md_theme_dark_onBackground">#E0E3E3</color>
-    <color name="md_theme_dark_surface">#191C1D</color>
-    <color name="md_theme_dark_onSurface">#E0E3E3</color>
-    <color name="md_theme_dark_surfaceVariant">#48454F</color>
-    <color name="md_theme_dark_onSurfaceVariant">#C9C4CF</color>
-    <color name="md_theme_dark_outline">#938F99</color>
-    <color name="md_theme_dark_inverseOnSurface">#191C1D</color>
-    <color name="md_theme_dark_inverseSurface">#E0E3E3</color>
-    <color name="md_theme_dark_inversePrimary">#795900</color>
-    <color name="md_theme_dark_shadow">#000000</color>
-    <color name="md_theme_dark_primaryInverse">#795900</color>
-</resources>
+Background: #0F111A
+Foreground: #8F93A2
+Text: #4B526D
+Selection Background: #717CB480
+Selection Foreground: #FFFFFF
+Buttons: #191A21
+Second Background: #181A1F
+Disabled: #464B5D
+Contrast: #090B10
+Active: #1A1C25
+Border: #0F111A
+Highlight: #1F2233
+Tree: #717CB430
+Notifications: #090B10
+Accent Color: #84ffff
+Excluded Files Color: #292D3E
+Green Color: #c3e88d
+Yellow Color: #ffcb6b
+Blue Color: #82aaff
+Red Color: #f07178
+Purple Color: #c792ea
+Orange Color: #f78c6c
+Cyan Color: #89ddff
+Gray Color: #717CB4
+White/Black Color: #eeffff
+Error Color: #ff5370
+Comments Color: #717CB4
+Variables Color: #eeffff
+Links Color: #80cbc4
+Functions Color: #82aaff
+Keywords Color: #c792ea
+Tags Color: #f07178
+Strings Color: #c3e88d
+Operators Color: #89ddff
+Attributes Color: #ffcb6b
+Numbers Color: #f78c6c
+Parameters Color: #f78c6c

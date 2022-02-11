@@ -3,19 +3,51 @@
 # BeginAttr
 
 name = Merge_Scripts
-inputs = 2
-outputs = 1
 color = [52, 115, 165]
 icon = D:/dev/Flash/Library/Icons/python.png
 
 # EndAttr
 
+# BeginPlugs
+
+# BeginPlug
+
+shortName = inscript1
+longName = Input Script 1
+defaultValue = ""
+type = str
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = inscript2
+longName = Input Script 2
+defaultValue = ""
+type = str
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = outscript
+longName = Output Script
+defaultValue = ""
+type = str
+exposed = False
+
+# EndPlug
+
+# EndPlugs
+
 # BeginOp
 
 import os
 
-script1 = input0
-script2 = input1
+script1 = inscript1
+script2 = inscript2
 
 scriptsAreFile = False
 
@@ -27,13 +59,140 @@ if os.path.exists(script2):
     with open(script1, "r") as scriptFile2:
         script2 = scriptFile2.read()
 
-generatedScript = ""
+importPatterns = re.compile(r"import\s.+|from\s.+")
+
+importMatches1 = re.findall(importPatterns, script1)
+
+importMatches2 = re.findall(importPatterns, script2)
+
+modulesToImport = []
+modulesToImportAs = {}
+modulesToImportFrom = {}
+
+for importMatch in importMatches1:
+    if importMatch.startswith("import"):
+        if "as" in importMatch:
+            importMatch = importMatch.replace("import", "")
+            importList = importMatch.split("as")
+
+            modulesToImportAs[importList[0].replace(" ", "")] = importList[1].replace(" ", "")
+        else:
+            importMatch = importMatch.replace("import", "")
+            importMatch = importMatch.replace(" ", "")
+            importList = importMatch.split(",")
+
+            for imp in importList: 
+                modulesToImport.append(imp)
+    
+    elif importMatch.startswith("from"):
+        importMatch = importMatch.replace("from", "")
+        importList = importMatch.split("import")
+
+        module = importList[0].replace(" ", "")
+
+        elements = importList[1].split(",")
+
+        moduleElements = []
+
+        for elem in elements:
+            moduleElements.append(elem.replace(" ", ""))
+
+        modulesToImportFrom[module] = moduleElements
+
+for importMatch in importMatches2:
+    if importMatch.startswith("import"):
+        if "as" in importMatch:
+            importMatch = importMatch.replace("import", "")
+            importList = importMatch.split("as")
+
+            moduleName = importList[0].replace(" ", "")
+            moduleAlias = importList[1].replace(" ", "")
+
+            if moduleName in modulesToImportAs:
+                if moduleAlias == modulesToImportAs[moduleName]:
+                    pass
+                else:
+                    script2 = re.sub(fr"({moduleAlias})\.", f"{modulesToImportAs[moduleName]}.", script2)
+            elif moduleName in modulesToImport:
+                script2 = re.sub(fr"({moduleAlias})\.", f"{moduleName}.", script2)
+            else:
+                modulesToImportAs[moduleName] = moduleAlias
+        else:
+            importMatch = importMatch.replace("import", "")
+            importMatch = importMatch.replace(" ", "")
+            importList = importMatch.split(",")
+
+            for imp in importList: 
+                if imp in modulesToImportAs:
+                    script1 = re.sub(fr"({modulesToImportAs[imp]})\.", f"{imp}.", script1)
+                    modulesToImportAs.pop(imp)
+                if not imp in modulesToImport:
+                    modulesToImport.append(imp)
+    
+    elif importMatch.startswith("from"):
+        importMatch = importMatch.replace("from", "")
+        importList = importMatch.split("import")
+
+        module = importList[0].replace(" ", "")
+
+        elements = importList[1].split(",")
+
+        moduleElements = []
+
+        for elem in elements:
+            moduleElements.append(elem.replace(" ", ""))
+
+        if module in modulesToImportFrom:
+            for mod in moduleElements:
+                if not mod in modulesToImportFrom[module]:
+                    modulesToImportFrom[module].append(mod)
+        else:
+            modulesToImportFrom[module] = moduleElements
+
+for importMatch in importMatches1:
+    script1 = script1.replace(importMatch, "$")
+
+for importMatch in importMatches2:
+    script2 = script2.replace(importMatch, "$")
+
+dollarPattern = re.compile(r"(\$\n)+")
+
+script1 = re.sub(dollarPattern, "# Script 1\n", script1)
+script2 = re.sub(dollarPattern, "# Script 2\n", script2)
+
+modulesToImportAsStr = "import "
+
+for i, module in enumerate(modulesToImport):
+    if i == 0:
+        modulesToImportAsStr += f"{module}"
+    else:
+        modulesToImportAsStr += f", {module}"
+
+modulesToImportAsAsStr = ""
+
+for moduleName, moduleAlias in modulesToImportAs.items():
+    modulesToImportAsAsStr += f"import {moduleName} as {moduleAlias}"
+
+modulesToImportFromAsStr = ""
+
+for moduleName, subModules in modulesToImportFrom.items():
+    subModulesToImportFrom = f"from {moduleName} import "
+
+    for i, subModule in enumerate(subModules):
+        if i == 0:
+            subModulesToImportFrom += f"{subModule}"
+        else:
+            subModulesToImportFrom += f", {subModule}"
+
+    modulesToImportFromAsStr += f"{subModulesToImportFrom}\n"
+
+mergedScripts = f"{modulesToImportAsStr}\n{modulesToImportAsAsStr}\n{modulesToImportFromAsStr}\n{script1}\n{script2}"
 
 tmpScriptFilePath = FlashTempScript()
 
 with open(tmpScriptFilePath, "w") as scriptFile:
-    scriptFile.write(generatedScript)
+    scriptFile.write(mergedScripts) 
 
-output0 = tmpScriptFilePath.replace("\\", "/")
+outscript = tmpScriptFilePath.replace("\\", "/")
 
 # EndOp

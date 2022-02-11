@@ -1,4 +1,6 @@
 from ast import literal_eval
+from enum import IntEnum
+from pickle import NONE
 import re, json, copy, os
 
 import FlashApi.Core.FileSystem as FileSystem
@@ -12,6 +14,23 @@ class Node():
 class Plug():
     pass
 
+# Plug type enumeration
+
+class PlugType(IntEnum):
+    """
+    Plug types available
+    """
+    INT = 1
+    INT2 = 2
+    INT3 = 3
+    FLOAT = 4
+    FLOAT2 = 5
+    FLOAT3 = 6
+    STR = 7
+    BOOL = 8
+    LIST = 9
+    DICT = 10
+    CUSTOM = 11
 
 # Definitions of classes
 
@@ -25,7 +44,7 @@ class Parser():
         self.name = None
         self.inputCount = 0
         self.outputCount = 0
-        self.parameters : list[Parameter] = []
+        self.plugs : list[Plug] = []
         self.color = None
         self.iconPath = ""
         self.opCode = ""
@@ -56,6 +75,32 @@ class Parser():
 
         return textWithoutComments
 
+    def GetPlugType(self, plugTypeStr : str) -> PlugType:
+        """
+        """
+        if plugTypeStr == "int":
+            return PlugType.INT
+        elif plugTypeStr == "int2":
+            return PlugType.INT2
+        elif plugTypeStr == "int3":
+            return PlugType.INT3
+        elif plugTypeStr == "float":
+            return PlugType.FLOAT
+        elif plugTypeStr == "float2":
+            return PlugType.FLOAT2
+        elif plugTypeStr == "float3":
+            return PlugType.FLOAT3
+        elif plugTypeStr == "str":
+            return PlugType.STR
+        elif plugTypeStr == "bool":
+            return PlugType.BOOL
+        elif plugTypeStr == "list":
+            return PlugType.LIST
+        elif plugTypeStr == "dict":
+            return PlugType.DICT
+        elif plugTypeStr == "custom":
+            return PlugType.CUSTOM
+
     def GetAttributes(self, lines, lineIndex) -> int:
         """
         """
@@ -65,14 +110,6 @@ class Parser():
             if line.startswith("name"):
                 lineSplit = self.SplitEqual(line)
                 self.name = lineSplit[1].strip()
-
-            elif line.startswith("inputs"):
-                lineSplit = self.SplitEqual(line)
-                self.inputCount = int(lineSplit[1])
-
-            elif line.startswith("outputs"):
-                lineSplit = self.SplitEqual(line)
-                self.outputCount = int(lineSplit[1])
 
             elif line.startswith("color"):
                 lineSplit = self.SplitEqual(line)
@@ -97,30 +134,35 @@ class Parser():
             
             lineIndex += 1
 
-    def GetParameters(self, lines, lineIndex) -> int:
+    def GetPlugs(self, lines, lineIndex) -> int:
         """
         """
         tmpShortName = ""
         tmpLongName = ""
         tmpValue = None
+        tmpType = None
+        tmpExposed = False
 
         while True:
             parmLine = lines[lineIndex]
 
-            if parmLine.startswith("# EndParms"):
+            if parmLine.startswith("# EndPlugs"):
                 return lineIndex + 1
             else:
-                if parmLine.startswith("# BeginParm"):
+                if parmLine.startswith("# BeginPlug"):
                     while True:
                         parmLine = lines[lineIndex]
 
-                        if parmLine.startswith("# EndParm"):
-                            newParm = Parameter(tmpShortName, tmpLongName, tmpValue)
-                            self.parameters.append(newParm)
+                        if parmLine.startswith("# EndPlug"):
+                            newPlug = Plug(tmpShortName, tmpLongName, None, tmpValue, tmpType)
+                            newPlug.SetExposed(tmpExposed)
+                            self.plugs.append(newPlug)
 
                             tmpShortName = ""
                             tmpLongName = ""
                             tmpValue = None
+                            tmpType = None
+                            tmpExposed = False
 
                             lineIndex += 1
                         
@@ -137,6 +179,14 @@ class Parser():
                         elif parmLine.startswith("defaultValue"):
                             lineSplit = self.SplitEqual(parmLine)
                             tmpValue = literal_eval(lineSplit[1].strip())
+
+                        elif parmLine.startswith("type"):
+                            lineSplit = self.SplitEqual(parmLine)
+                            tmpType = self.GetPlugType(lineSplit[1].strip())
+
+                        elif parmLine.startswith("exposed"):
+                            lineSplit = self.SplitEqual(parmLine)
+                            tmpExposed = True if "True" in lineSplit[1].strip() else False
                         
                         lineIndex += 1
 
@@ -172,8 +222,8 @@ class Parser():
                 if line.startswith("# BeginAttr"):
                     index = self.GetAttributes(lines, index)
 
-                elif line.startswith("# BeginParms"):
-                    index = self.GetParameters(lines, index)
+                elif line.startswith("# BeginPlugs"):
+                    index = self.GetPlugs(lines, index)
 
                 elif line.startswith("# BeginOp"):
                     index = self.GetOpCode(lines, index)
@@ -182,12 +232,10 @@ class Parser():
                     index += 1
 
         definition["name"] = self.name
-        definition["inputCount"] = self.inputCount
-        definition["outputCount"] = self.outputCount
         definition["color"] = self.color
         definition["iconPath"] = self.iconPath
         definition["opCode"] = self.opCode
-        definition["parameters"] = self.parameters
+        definition["plugs"] = self.plugs
 
         return definition
 
@@ -195,21 +243,36 @@ class Plug():
     """
     A Plug represents a node input or output
     """
-    def __init__(self, name : str, parentNode : Node, index : int = 0, connectedPlug : Plug = None):
+    def __init__(self, shortName : str, longName : str, parentNode : Node, data = None, dataType : PlugType = None, index : int = 0, connectedPlug : Plug = None):
         """
         """
-        self.name = name
-        self.parentNode = parentNode
-        self.index = index
+        self.shortName : str = shortName
+        self.longName : str = longName
+        self.parentNode : Node = parentNode
+        self.index : int = index
         self.connectedPlug : Plug = connectedPlug
-        self.data = None
+        self.data = data
+        self.type : PlugType = dataType
+        self.isExposed = False
 
-    def GetName(self) -> str:
+    def GetShortName(self) -> str:
         """
         Returns:
-            str: name of the plug
+            str: short name of the plug
         """
-        return self.name
+        return self.shortName
+    
+    def GetLongName(self) -> str:
+        """
+        Returns:
+            str: long name of the plug
+        """
+        return self.longName
+
+    def SetNode(self, node : Node) -> None:
+        """
+        """
+        self.parentNode = node
     
     def GetNode(self) -> Node:
         """
@@ -218,12 +281,35 @@ class Plug():
         """
         return self.parentNode
 
+    def SetIndex(self, index : int) -> None:
+        """
+        """
+        self.index = index
+
     def GetIndex(self) -> int:
         """
         Returns:
             int: index of the plug (depending on the node)
         """
         return self.index
+
+    def GetType(self) -> PlugType:
+        """
+        Returns:
+            PlugType: data type of the plug
+        """
+        return self.type
+
+    def IsExposed(self) -> None:
+        """
+        Tells if a plug is exposed (as a parameter)
+        """
+        return self.isExposed
+
+    def SetExposed(self, isExposed : bool) -> None:
+        """
+        """
+        self.isExposed = isExposed
 
     def IsConnected(self) -> bool:
         """
@@ -247,9 +333,9 @@ class Plug():
         Updates the data coming from the input connection
         """
         if self.connectedPlug is not None:
-            self.data = self.GetConnection().Data()
+            self.data = self.GetConnection().GetData()
     
-    def Data(self):
+    def GetData(self):
         """
         Returns:
             Any: data of the plug
@@ -272,11 +358,15 @@ class Plug():
         Args:
             plug (Plug): plug to connect the current plug to
         """
-        if plug.GetNode().GetID() == self.GetNode().GetID():
-            return
-        else:
-            self.connectedPlug = plug
-            plug.connectedPlug = self
+        if plug is not None:
+            if self.IsExposed() or plug.IsExposed():
+                return
+
+            if plug.GetNode().GetID() == self.GetNode().GetID():
+                return
+            else:
+                self.connectedPlug = plug
+                plug.connectedPlug = self
             
     def Disconnect(self) -> None:
         """
@@ -285,51 +375,6 @@ class Plug():
         if self.connectedPlug is not None:
             self.connectedPlug.connectedPlug = None
             self.connectedPlug = None
-
-class Parameter():
-    """
-    A parameter represents a node parameter
-    """
-    def __init__(self, shortName : str, longName : str, value = None):
-        """
-        Args:
-            shortName (str): short name of the parameter than can be called in the op code
-            longName (str): long name of the parameter to describe it
-            value ([type], optional): value of the parameter (can be of any type). Defaults to None.
-        """
-        self.shortName = shortName
-        self.longName = longName
-        self.value = value
-        
-    def ShortName(self) -> str:
-        """
-        Returns:
-            str: short name of the parameter
-        """
-        return self.shortName
-
-    def LongName(self) -> str:
-        """
-        Returns:
-            str: long name of the parameter
-        """
-        return self.longName
-    
-    def Value(self):
-        """
-        Returns:
-            any: value of the parameter
-        """
-        return self.value
-
-    def SetValue(self, value) -> None:
-        """
-        Sets the parameter value
-
-        Args:
-            value (any): value to set
-        """
-        self.value = value
 
 class Node():
     """
@@ -346,17 +391,13 @@ class Node():
         self.inQueue = False
         self.inTempQueue = False
         self.name = ""
-        self.parameters : list[Parameter] = []
-        self.inputs : list[Plug] = []
-        self.outputs : list[Plug] = []
+        self.inputs : dict = {}
+        self.outputs : dict = {}
         self.color : list[float] = []
         self.iconPath = ""
         
         # The id is not set here as we will set a unique one for each node in the graph
         self.id = 0 
-        
-        self.inputCount = 0
-        self.outputCount = 0
         
         self.opCode = ""
         self.opCompiledCode = ""
@@ -379,39 +420,19 @@ class Node():
         """
         self.logger = logger
 
-    def SetInputCount(self, inputCount : int) -> None:
-        """
-        Sets the number of input of the node
-
-        Args:
-            inputCount (int): input count of the node
-        """
-        assert(inputCount >= 0)
-        self.inputCount = inputCount
-
     def GetInputCount(self) -> int:
         """
         Returns:
             int: number of inputs
         """
-        return self.inputCount
-    
-    def SetOutputCount(self, outputCount : int) -> None:
-        """
-        Sets the number of output of the node
-
-        Args:
-            outputCount (int): output count of the node
-        """
-        assert(outputCount >= 0)
-        self.outputCount = outputCount
+        return len(self.inputs.keys())
     
     def GetOutputCount(self) -> int:
         """
         Returns:
             int: number of outputs
         """
-        return self.outputCount
+        return len(self.outputs.keys())
 
     def SetOpCode(self, code : str) -> None:
         """
@@ -522,19 +543,24 @@ class Node():
         """
         return self.inTempQueue
     
-    def GetInput(self, index : int) -> Plug:
+    def GetInput(self, name : str = None, index : int = None) -> Plug:
         """
         Args:
             index (int): index of the input plug to return
         Returns:
             Plug: input plug at the given index
         """
-        if index >= self.inputCount:
-            return None
+        if name is not None:
+            if not name in self.inputs:
+                return None
+            else:
+                return self.inputs[name]
+        elif index is not None:
+            return list(self.inputs.values())[index]
         else:
-            return self.inputs[index]
+            return None
     
-    def GetInputs(self) -> list[Plug]:
+    def GetInputs(self) -> dict:
         """
         Returns:
             list of Plug: inputs of the node
@@ -548,98 +574,61 @@ class Node():
         Returns:
             bool: 
         """ 
-        for input in self.inputs:
-            if not input.IsConnected():
+        for name, input in self.inputs.items():
+            if not input.IsConnected() and not input.IsExposed():
                 return True
 
         return False
     
-    def SetInput(self, plug : Plug, index : int) -> None:
+    def SetInput(self, plug : Plug, name : str = None, index : int = None) -> None:
         """
-        Set the input of the node at the given index
+        Set the input of the node at the given plug
         (connects the plug)
 
         Args:
             plug (Plug): plug to connect
             index (int): index of the input to set
         """
-        if index >= self.inputCount:
-            return
+        if name is not None:
+            if not name in self.inputs:
+                return
+            else:
+                self.inputs[name].Connect(plug)
+                return
+        elif index is not None:
+            return list(self.inputs.values())[index].Connect(plug)
         else:
-            self.inputs[index].Connect(plug)
-
-    def SetInputFromPlugName(self, plug : Plug, name : str) -> None:
-        """
-        Set the input of the node with the given name
-
-        Args:
-            plug (Plug): plug to connect
-            name (str): name of the input to set
-        """
-        for input in self.inputs:
-            if input.GetName() == name:
-                input.Connect(plug)
+            return None
             
-    def GetOutput(self, index : int) -> Plug:
+    def GetOutput(self, name : str = None, index : int = None) -> Plug:
         """
         Args:
             index (int): index of the output plug to return
         Returns:
             Plug: output plug at the given index
         """
-        if index >= self.outputCount:
-            return None
+        if name is not None:
+            if not name in self.outputs:
+                return None
+            else:
+                return self.outputs[name]
+        elif index is not None:
+            return list(self.outputs.values())[index]
         else:
-            return self.outputs[index]
+            return None
         
-    def GetOutputs(self) -> list[Plug]:
+    def GetOutputs(self) -> dict:
         """
         Returns:
             list: list of the output plugs
         """
         return self.outputs
 
-    def SetParm(self, parmName : str, parmValue) -> None:
+    def SetPlugValue(self, plugName : str, value) -> None:
         """
-        Set a parameter value using the shortName
-
-        Args:
-            parmName (str): name of the parameter
-            parmValue ([type]): value of the parameter
         """
-        parmExists = False
-
-        for parm in self.parameters:
-            if parm.ShortName() == parmName:
-                parm.SetValue(parmValue)
-                parmExists = True
-                break
-
-    def GetParm(self, parmName : str) -> Parameter:
-        """
-        Returns a parameter specified by the parmName
-
-        Args:
-            parmName (str): shortName of the queried parameter
-
-        Returns:
-            Parameter: parameter
-        """
-        parmExists = False
-
-        for parm in self.parameters:
-            if parm.ShortName() == parmName:
-                parmExists = True
-                return parm
-
-        return None
-
-    def GetParms(self) -> list[Parameter]:
-        """
-        Returns:
-            list[Parameter]: list of the node parameters
-        """
-        return self.parameters
+        if plugName in self.inputs:
+            self.inputs[plugName].SetData(value)
         
     def Cook(self) -> None:
         """
@@ -649,14 +638,10 @@ class Node():
         self.errorMessage = ""
 
         locals = {}
-        
-        # Setup locals with inputs and parameters
-        for parameter in self.parameters:
-            locals[parameter.ShortName()] = parameter.Value()
             
-        for i, input in enumerate(self.inputs):
+        for inputName, input in self.inputs.items():
             input.UpdateInputs()
-            locals[f"input{i}"] = input.Data()
+            locals[inputName] = input.GetData()
             
         globals = { "FlashTempDir" : FileSystem.GetRoamingDataDir,
                     "FlashTempScript" : FileSystem.GetNewRandomPyFile,
@@ -669,8 +654,9 @@ class Node():
         exec(self.opCompiledCode, globals, locals)
 
         # Get outputs         
-        for i in range(self.outputCount):
-            self.outputs[i].SetData(locals[f"output{i}"])
+        for outputName, output in self.outputs.items():
+            if outputName in locals:
+                output.SetData(locals[outputName])
 
         self.isDirty = False
 
@@ -738,18 +724,18 @@ class Node():
         nodeDefinition = parser.Parse(nodeDefinitionPath)
 
         self.name = nodeDefinition["name"]
-        self.inputCount = nodeDefinition["inputCount"]
-        self.outputCount = nodeDefinition["outputCount"]
         self.color = nodeDefinition["color"]
         self.iconPath = nodeDefinition["iconPath"]
         self.opCode = nodeDefinition["opCode"]
-        self.parameters = nodeDefinition["parameters"]
 
-        for i in range(self.inputCount):
-            self.inputs.append(Plug(f"input{i}", self, i))
-        
-        for i in range(self.outputCount):
-            self.outputs.append(Plug(f"output{i}", self, i))
+        for plug in nodeDefinition["plugs"]:
+            if "in" in plug.GetShortName():
+                plug.SetNode(self)
+                self.inputs[plug.GetShortName()] = plug
+            elif "out" in plug.GetShortName():
+                plug.SetNode(self)
+                self.outputs[plug.GetShortName()] = plug
+
 
         self.Compile()
 
@@ -765,26 +751,51 @@ class Node():
         nodeAsDict["name"] = self.GetName()
         nodeAsDict["id"] = self.GetID()
         nodeAsDict["color"] = self.GetColor()
-        nodeAsDict["inputCount"] = self.GetInputCount()
-        nodeAsDict["outputCount"] = self.GetOutputCount()
+        nodeAsDict["iconPath"] = self.GetIconPath()
         nodeAsDict["opCode"] = self.GetOpCode()
 
         nodeAsDict["inputs"] = {}
         nodeAsDict["outputs"] = {}
-        nodeAsDict["parms"] = {}
 
-        for i, input in enumerate(self.GetInputs()):
-            nodeAsDict["inputs"][input.GetName()] = { "connectionIndex" : input.GetIndex(), "connectionNodeId" : input.GetConnection().GetNode().GetID() }
-        
-        for i, output in enumerate(self.GetOutputs()):
-            if output.IsConnected():
-                nodeAsDict["outputs"][output.GetName()] = { "connectionIndex" : output.GetIndex(), "connectionNodeId" : output.GetConnection().GetNode().GetID() }
+        for inputName, input in self.GetInputs().items():
+            if input.IsConnected():
+                nodeAsDict["inputs"][input.GetShortName()] = { "shortName" : input.GetShortName(),
+                                                               "longName" : input.GetLongName(),
+                                                               "index" : input.GetIndex(),
+                                                               "isExposed" : input.IsExposed(),
+                                                               "data" : input.GetData(), 
+                                                               "type" : input.GetType(),
+                                                               "connectionName" : input.GetConnection().GetShortName(), 
+                                                               "connectionNodeId" : input.GetConnection().GetNode().GetID() }
             else:
-                nodeAsDict["outputs"][output.GetName()] = { "connectionIndex" : i, "connectionNodeId" : None }
-
-        for parm in self.GetParms():
-            nodeAsDict["parms"][parm.ShortName()] = { "longName" : parm.LongName(), "value" : parm.Value() }
-
+                nodeAsDict["inputs"][input.GetShortName()] = { "shortName" : input.GetShortName(),
+                                                               "longName" : input.GetLongName(),
+                                                               "index" : input.GetIndex(),
+                                                               "isExposed" : input.IsExposed(),
+                                                               "data" : input.GetData(), 
+                                                               "type" : input.GetType(),
+                                                               "connectionName" : None,
+                                                               "connectionNodeId" : None }
+        
+        for outputName, output in self.GetOutputs().items():
+            if output.IsConnected():
+                nodeAsDict["outputs"][output.GetShortName()] = { "shortName" : output.GetShortName(),
+                                                                 "longName" : output.GetLongName(),
+                                                                 "index" : output.GetIndex(),
+                                                                 "isExposed" : output.IsExposed(),
+                                                                 "data" : output.GetData(), 
+                                                                 "type" : output.GetType(),
+                                                                 "connectionName" : output.GetConnection().GetShortName(), 
+                                                                 "connectionNodeId" : output.GetConnection().GetNode().GetID() }
+            else:
+                nodeAsDict["outputs"][output.GetShortName()] = { "shortName" : output.GetShortName(),
+                                                                 "longName" : output.GetLongName(),
+                                                                 "index" : output.GetIndex(),
+                                                                 "isExposed" : output.IsExposed(),
+                                                                 "data" : output.GetData(), 
+                                                                 "type" : output.GetType(),
+                                                                 "connectionName" : None, 
+                                                                 "connectionNodeId" : None }
         return nodeAsDict
 
     def FromDict(self, nodeAsDict : dict) -> None:
@@ -796,25 +807,26 @@ class Node():
         """
         self.inputs.clear()
         self.outputs.clear()
-        self.parameters.clear()
         
         self.SetDirty()
 
         self.SetName(nodeAsDict["name"])
         self.SetID(nodeAsDict["id"])
         self.SetColor(nodeAsDict["color"])
-        self.SetInputCount(nodeAsDict["inputCount"])
-        self.SetOutputCount(nodeAsDict["outputCount"])
+        self.SetIconPath(nodeAsDict["iconPath"])
         self.SetOpCode(nodeAsDict["opCode"])
 
-        for input in nodeAsDict["inputs"]:
-            self.inputs.append(Plug(input, self))
+        for inputName, input in nodeAsDict["inputs"].items():
+            tmpPlug = Plug(input["shortName"], input["longName"], self, input["data"], input["type"])
+            tmpPlug.SetExposed(input["isExposed"])
+            tmpPlug.SetIndex(input["index"])
+            self.inputs[inputName] = tmpPlug
 
-        for output in nodeAsDict["outputs"]:
-            self.outputs.append(Plug(output, self))
-
-        for parmName, parm in nodeAsDict["parms"].items():
-            self.parameters.append(Parameter(parmName, parm["longName"], parm["value"]))
+        for outputName, output in nodeAsDict["outputs"].items():
+            tmpPlug = Plug(output["shortName"], output["longName"], self, output["data"], output["type"])
+            tmpPlug.SetExposed(output["isExposed"])
+            tmpPlug.SetIndex(output["index"])
+            self.outputs[outputName] = tmpPlug
 
         self.Compile()
         

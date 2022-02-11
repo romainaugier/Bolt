@@ -73,7 +73,7 @@ class Graph():
 
         node.SetInTempQueue()
 
-        for output in node.GetOutputs():
+        for outputName, output in node.GetOutputs().items():
             if output.IsConnected():
                 self.VisitNode(output.GetConnection().GetNode())
 
@@ -152,10 +152,10 @@ class Graph():
     def RemoveNode(self, node : Node) -> None:
         """
         """
-        for input in node.GetInputs():
+        for input in node.GetInputs().values():
             input.Disconnect()
 
-        for output in node.GetOutputs():
+        for output in node.GetOutputs().values():
             output.Disconnect()
 
         self.nodes.remove(node)
@@ -230,13 +230,12 @@ class Graph():
 
         # Connect nodes
         for i, node in enumerate(nodesAsDicts):
-            
             j = 0
 
             for outputName, outputContent in node["outputs"].items():
                 if outputContent["connectionNodeId"] is not None:
                     nodeToConnect = self.GetNodeWithID(outputContent["connectionNodeId"])
-                    nodeToConnect.SetInput(self.nodes[i].GetOutput(j), outputContent["connectionIndex"])
+                    nodeToConnect.SetInput(self.nodes[i].GetOutput(name=outputName), name=outputContent["connectionName"])
 
                 j += 1
 

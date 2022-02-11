@@ -38,6 +38,8 @@ class Lib():
 
                         self.nodePaths[tmpNode.GetName()] = f"{path}/{item}"
 
+                        self.logger.Log(LogLevel.DEBUG, f"Loaded {tmpNode.GetName()}")
+
     def Reload(self) -> None:
         """
         Reload all the nodes

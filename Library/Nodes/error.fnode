@@ -3,12 +3,34 @@
 # BeginAttr
 
 name = Error
-inputs = 1
-outputs = 1
 color = [50, 222, 132]
 icon = D:/dev/Flash/Library/Icons/debug.png
 
 # EndAttr
+
+# BeginPlugs
+
+# BeginPlug
+
+shortName = indata
+longName = Input Data
+defaultValue = None
+type = custom
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = outdata
+longName = Output Data
+defaultValue = None
+type = custom
+exposed = False
+
+# EndPlug
+
+# EndPlugs
 
 # BeginOp
 
@@ -16,6 +38,6 @@ FlashLogError("You have done something bad")
 
 FlashError()
 
-output0 = input0
+outdata = indata
 
 # EndOp

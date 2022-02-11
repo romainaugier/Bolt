@@ -1,6 +1,7 @@
 import binascii
-from distutils.log import error
 import os, math
+
+from enum import Enum
 
 from FlashApi.Core.Node import *
 
@@ -18,6 +19,38 @@ class GEdge():
 class GGraph():
     pass
 
+
+def GetPlugColor(plugType : PlugType) -> QtGui.QColor:
+    """
+    Plug types available
+    """
+    if plugType == PlugType.INT: return QtGui.QColor("#89ddff")
+    if plugType == PlugType.INT2: return QtGui.QColor("#89ddff")
+    if plugType == PlugType.INT3: return QtGui.QColor("#89ddff")
+    if plugType == PlugType.FLOAT: return QtGui.QColor("#80cbc4")
+    if plugType == PlugType.FLOAT2: return QtGui.QColor("#80cbc4")
+    if plugType == PlugType.FLOAT3: return QtGui.QColor("#80cbc4")
+    if plugType == PlugType.STR: return QtGui.QColor("#c3e88d")
+    if plugType == PlugType.BOOL: return QtGui.QColor("#f78c6c")
+    if plugType == PlugType.LIST: return QtGui.QColor("#ffcb6b")
+    if plugType == PlugType.DICT: return QtGui.QColor("#c792ea")
+    if plugType == PlugType.CUSTOM: return QtGui.QColor("#f07178")
+
+
+def GetFontRect(text : str) -> QtCore.QRect:
+    """
+    Gets size of a text
+
+    Args:
+        text (str): text
+
+    Returns:
+        QtCore.QRect: bounding box of the text
+    """
+    metric = QtGui.QFontMetrics(QtGui.QFont("Helvetica", 8))
+    return metric.boundingRect(text)
+
+
 class GPlug(QtWidgets.QGraphicsItem):
     """
     """
@@ -32,6 +65,8 @@ class GPlug(QtWidgets.QGraphicsItem):
         self.closestGPlug = None
         self.isInput = input
 
+        self.color = GetPlugColor(self.getInternalPlug().GetType())
+
         self.edges = []
 
         self.radius = 15
@@ -40,6 +75,11 @@ class GPlug(QtWidgets.QGraphicsItem):
 
         if not input:
             malus = self.radius / 2.0
+
+        self.labelRect = GetFontRect(self.getInternalPlug().GetShortName())
+
+        newPosX = self.pos().x() - self.labelRect.width() - 3
+        self.setPos(newPosX, self.pos().y())
 
         self._x = x - malus
         self._y = y - (self.radius / 2.0)
@@ -60,9 +100,12 @@ class GPlug(QtWidgets.QGraphicsItem):
         return self.internalPlug
 
     def boundingRect(self):
-        return QtCore.QRectF(0, 0, self.radius, self.radius)
+        if self.isInput:
+            return QtCore.QRectF(0, 0, self.radius + self.labelRect.width() + 3, self.radius)
+        else:
+            return QtCore.QRectF(0, 0, self.radius + self.labelRect.width() + 3, self.radius)
 
-    def paint(self, painter, option, widget) -> None:
+    def paint(self, painter : QtGui.QPainter, option : QtWidgets.QStyleOptionGraphicsItem, widget : QtWidgets.QWidget) -> None:
         """
         """
         pen = QtGui.QPen()
@@ -75,11 +118,11 @@ class GPlug(QtWidgets.QGraphicsItem):
 
         painter.setRenderHint(QtGui.QPainter.Antialiasing)
 
-        color = QtGui.QColor(224, 227, 227, 255)
-
-        painter.setBrush(color)
+        painter.setBrush(self.color)
 
         painter.drawEllipse(0, 0, self.radius, self.radius)
+
+        painter.drawRect(0, 0, 100, 100)
 
     def hoverEnterEvent(self, ev) -> None:
         """
@@ -177,22 +220,36 @@ class GNode(QtWidgets.QGraphicsObject):
 
         numInputs = self.getInternalNode().GetInputCount()
         numOutputs = self.getInternalNode().GetOutputCount()
-        
-        bodySizeY = (self.sizeY - self.labelSizeY) / ((numInputs if numInputs > numOutputs else numOutputs ) + 1)
 
-        for i in range(numInputs):
-            positionX = self.pos().x() + 5
-            positionY = self.pos().y() + self.labelSizeY + (bodySizeY * (i + 1))
-            
-            newSock = GPlug(positionX, positionY, self.internalNode.GetInput(i), self, self.graph, parent=self)
-            self.inputGPlugs.append(newSock)
+        maxNumPlugs = numInputs if numInputs > numOutputs else numOutputs
         
-        for i in range(numOutputs):
-            positionX = self.pos().x() + self.sizeX - 12.5
-            positionY = self.pos().y() + self.labelSizeY + bodySizeY
+        bodySizeYPerPlug = (self.sizeY - self.labelSizeY) / 3 
+
+        bodySizeY = bodySizeYPerPlug * (maxNumPlugs + 2)
+        
+        if bodySizeY > self.sizeY:
+            self.sizeY = bodySizeY 
+        else:
+            bodySizeYPerPlug = (self.sizeY - self.labelSizeY) / 3
+            self.sizeY = bodySizeYPerPlug * 3
+
+        i = 1
+
+        for inputName, input in self.getInternalNode().GetInputs().items():
+            positionX = self.pos().x() + 5
+            positionY = self.pos().y() + self.labelSizeY + (bodySizeYPerPlug * i)
             
-            newSock = GPlug(positionX, positionY, self.internalNode.GetOutput(i), self, self.graph, input=False, parent=self)
-            self.outputGPlugs.append(newSock)
+            newGPlug = GPlug(positionX, positionY, input, self, self.graph, parent=self)
+            self.inputGPlugs.append(newGPlug)
+
+            i += 1
+        
+        for outputName, output in self.getInternalNode().GetOutputs().items():
+            positionX = self.pos().x() + self.sizeX - 12.5
+            positionY = self.pos().y() + self.labelSizeY + bodySizeYPerPlug
+            
+            newGPlug = GPlug(positionX, positionY, output, self, self.graph, input=False, parent=self)
+            self.outputGPlugs.append(newGPlug)
 
         self.numInputs = numInputs
         self.numOuputs = numOutputs

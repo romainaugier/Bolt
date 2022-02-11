@@ -1,19 +1,41 @@
-// Prints the input value and returns it
+// Prints the input data and returns it
 
 # BeginAttr
 
 name = Debug
-inputs = 1
-outputs = 1
 color = [50, 222, 132]
 icon = D:/dev/Flash/Library/Icons/debug.png
 
 # EndAttr
 
+# BeginPlugs
+
+# BeginPlug
+
+shortName = indata
+longName = Input Data
+default = None
+type = custom
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = outdata
+longName = Output Data
+default = None
+type = custom
+exposed = False
+
+# EndPlug
+
+# EndPlugs
+
 # BeginOp
 
-FlashLogMessage(f"Debug Node : {input0}")
+FlashLogMessage(f"Debug Node : {indata}")
 
-output0 = input0
+outdata = indata
 
 # EndOp
