@@ -503,7 +503,7 @@ class Edge(QtWidgets.QGraphicsLineItem):
         gradient.setFinalStop(last)
 
         pen = QtGui.QPen()
-        pen.setWidth(5)
+        pen.setWidth(2)
         pen.setBrush(gradient)
         self.setPen(pen)
 

@@ -231,6 +231,12 @@ class App(QtWidgets.QMainWindow):
         self.cookGraphSc = QtWidgets.QShortcut(QtGui.QKeySequence("C"), self)
         self.cookGraphSc.activated.connect(lambda: self.cookGraph())
 
+        self.saveGraphSc = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+S"), self)
+        self.saveGraphSc.activated.connect(lambda: self.saveGraph())
+        
+        self.forceSaveGraphSc = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+Shift+S"), self)
+        self.forceSaveGraphSc.activated.connect(lambda: self.saveGraph(forceName=True))
+
     def closeGraph(self, index : int = None) -> None:
         """
         Close the tab at the index given as argument. If the index
@@ -257,7 +263,7 @@ class App(QtWidgets.QMainWindow):
 
         self.graphTabs.tabs.widget(index).layout.itemAt(0).widget().launchGraphCooking()
 
-    def saveGraph(self, index : int = None) -> None:
+    def saveGraph(self, index : int = None, forceName : bool = False) -> None:
         """
         Save the graph to a file
 
@@ -269,7 +275,7 @@ class App(QtWidgets.QMainWindow):
 
         internalGraph : Graph = self.graphTabs.tabs.widget(index).layout.itemAt(0).widget().graph
 
-        if internalGraph.GetSavePath() != "":
+        if internalGraph.GetSavePath() != "" and not forceName:
             filePath = internalGraph.GetSavePath()
         else:
             filePath, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save File", "C:/", "Flash Graph (*.fgraph)")
