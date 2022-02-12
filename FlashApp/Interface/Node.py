@@ -354,7 +354,7 @@ class GNode(QtWidgets.QGraphicsObject):
 
         painter.setRenderHint(QtGui.QPainter.Antialiasing)
         
-        bodyColor = QtGui.QColor("#1F2233")
+        bodyColor = QtGui.QColor("#1A1C25")
 
         # Label
         path = QtGui.QPainterPath()
@@ -396,7 +396,7 @@ class GNode(QtWidgets.QGraphicsObject):
 
 
         if self.isHovered or self.isSelected():
-            bodyColor = QtGui.QColor(58, 56, 64, 255)
+            bodyColor = QtGui.QColor("#1F2233")
 
         painter.setBrush(bodyColor)
         painter.setPen(Qt.NoPen)
