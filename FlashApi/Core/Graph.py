@@ -75,7 +75,8 @@ class Graph():
 
         for outputName, output in node.GetOutputs().items():
             if output.IsConnected():
-                self.VisitNode(output.GetConnection().GetNode())
+                for connection in output.GetConnections():
+                    self.VisitNode(connection.GetNode())
 
         node.SetInTempQueue(False)
         node.SetInQueue()
@@ -153,10 +154,12 @@ class Graph():
         """
         """
         for input in node.GetInputs().values():
-            input.Disconnect()
+            for connection in input.GetConnections():
+                input.Disconnect(connection)
 
         for output in node.GetOutputs().values():
-            output.Disconnect()
+            for connection in output.GetConnections():
+                output.Disconnect(connection)
 
         self.nodes.remove(node)
 
@@ -230,14 +233,11 @@ class Graph():
 
         # Connect nodes
         for i, node in enumerate(nodesAsDicts):
-            j = 0
-
             for outputName, outputContent in node["outputs"].items():
-                if outputContent["connectionNodeId"] is not None:
-                    nodeToConnect = self.GetNodeWithID(outputContent["connectionNodeId"])
-                    nodeToConnect.SetInput(self.nodes[i].GetOutput(name=outputName), name=outputContent["connectionName"])
-
-                j += 1
+                for connection in outputContent:
+                    if connection["connectionNodeId"] is not None:
+                        nodeToConnect = self.GetNodeWithID(connection["connectionNodeId"])
+                        nodeToConnect.SetInput(self.nodes[i].GetOutput(name=outputName), name=connection["connectionName"])
 
     def SaveToFile(self, filePath : str, saveAsString : bool = True) -> None:
         """

@@ -1,0 +1,519 @@
+[
+  {
+    "name": "File",
+    "id": "3332346432646462376130386665653836393464396433626136336232646638",
+    "color": [
+      255,
+      220,
+      106
+    ],
+    "iconPath": "",
+    "opCode": "# BeginOp\n\noutfile = infile\n\n",
+    "inputs": {
+      "infile": [
+        {
+          "shortName": "infile",
+          "longName": "Input File Path",
+          "index": 0,
+          "isExposed": true,
+          "data": "",
+          "type": 7,
+          "connectionName": null,
+          "connectionNodeId": null
+        }
+      ]
+    },
+    "outputs": {
+      "outfile": [
+        {
+          "shortName": "outfile",
+          "longName": "Output File Path",
+          "index": 0,
+          "isExposed": false,
+          "data": "",
+          "type": 7,
+          "connectionName": "indata",
+          "connectionNodeId": "3130663366383765376538356137653432316230646138386137383461336265"
+        }
+      ]
+    }
+  },
+  {
+    "name": "File",
+    "id": "6133663333353137323634303564393464323335323762343032663738353138",
+    "color": [
+      255,
+      220,
+      106
+    ],
+    "iconPath": "",
+    "opCode": "# BeginOp\n\noutfile = infile\n\n",
+    "inputs": {
+      "infile": [
+        {
+          "shortName": "infile",
+          "longName": "Input File Path",
+          "index": 0,
+          "isExposed": true,
+          "data": "",
+          "type": 7,
+          "connectionName": null,
+          "connectionNodeId": null
+        }
+      ]
+    },
+    "outputs": {
+      "outfile": [
+        {
+          "shortName": "outfile",
+          "longName": "Output File Path",
+          "index": 0,
+          "isExposed": false,
+          "data": "",
+          "type": 7,
+          "connectionName": "indata",
+          "connectionNodeId": "3261633035666636323339306366386162356434643735303133643434636431"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Template",
+    "id": "3238633461663262333535353739626134643139373566393133623131646366",
+    "color": [
+      255,
+      127,
+      64
+    ],
+    "iconPath": "",
+    "opCode": "# BeginOp\n\nimport sys\n\nprint(\"Flash Node compiled and ran with : \", sys.version)\n\n# A set of utility functions are available for the user\n# Returns the temporary directory so the user can store files there\n# (such as generated script files...)\nflashTempDir = FlashTempDir()\n\n# Prints a message to the Flash Console\nFlashLogMessage(\"Cooking template node...\")\n\n# plugs can be called with their shortName\nprint(\"Integer Input Plug : \", inint)\nprint(\"Float Input Plug : \", infloat)\nprint(\"String Input Plug : \", instring)\nprint(\"Boolean Input Plug : \", inbool)\nprint(\"Custom Input Plug : \", incustom)\nprint(\"Dict Input Plug : \", indict)\n\noutlist = [inint, infloat, instring, inbool]\n\nprint(\"List Output Plug : \", outlist)\n\n",
+    "inputs": {
+      "inint": [
+        {
+          "shortName": "inint",
+          "longName": "Integer",
+          "index": 0,
+          "isExposed": false,
+          "data": "",
+          "type": 1,
+          "connectionName": "outdata",
+          "connectionNodeId": "3130663366383765376538356137653432316230646138386137383461336265"
+        }
+      ],
+      "infloat": [
+        {
+          "shortName": "infloat",
+          "longName": "Float",
+          "index": 0,
+          "isExposed": false,
+          "data": "",
+          "type": 4,
+          "connectionName": "outdata",
+          "connectionNodeId": "3130663366383765376538356137653432316230646138386137383461336265"
+        }
+      ],
+      "instring": [
+        {
+          "shortName": "instring",
+          "longName": "String",
+          "index": 0,
+          "isExposed": false,
+          "data": "",
+          "type": 7,
+          "connectionName": "outdata",
+          "connectionNodeId": "3261633035666636323339306366386162356434643735303133643434636431"
+        }
+      ],
+      "inbool": [
+        {
+          "shortName": "inbool",
+          "longName": "Boolean",
+          "index": 0,
+          "isExposed": false,
+          "data": "",
+          "type": 8,
+          "connectionName": "outdata",
+          "connectionNodeId": "3130663366383765376538356137653432316230646138386137383461336265"
+        }
+      ],
+      "incustom": [
+        {
+          "shortName": "incustom",
+          "longName": "Custom",
+          "index": 0,
+          "isExposed": false,
+          "data": "",
+          "type": 11,
+          "connectionName": "outdir",
+          "connectionNodeId": "3764353833386161333637653139313331633633646439666532643533313661"
+        }
+      ],
+      "indict": [
+        {
+          "shortName": "indict",
+          "longName": "Dict",
+          "index": 0,
+          "isExposed": false,
+          "data": "",
+          "type": 10,
+          "connectionName": "outdata",
+          "connectionNodeId": "3261633035666636323339306366386162356434643735303133643434636431"
+        }
+      ]
+    },
+    "outputs": {
+      "outlist": [
+        {
+          "shortName": "outlist",
+          "longName": "List",
+          "index": 0,
+          "isExposed": false,
+          "data": [
+            "",
+            "",
+            "",
+            ""
+          ],
+          "type": 9,
+          "connectionName": "indata",
+          "connectionNodeId": "6664336231663865363763363735356331616635633835323264653335656235"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Debug",
+    "id": "3130663366383765376538356137653432316230646138386137383461336265",
+    "color": [
+      50,
+      222,
+      132
+    ],
+    "iconPath": "",
+    "opCode": "# BeginOp\n\nFlashLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+    "inputs": {
+      "indata": [
+        {
+          "shortName": "indata",
+          "longName": "Input Data",
+          "index": 0,
+          "isExposed": false,
+          "data": "",
+          "type": 11,
+          "connectionName": "outfile",
+          "connectionNodeId": "3332346432646462376130386665653836393464396433626136336232646638"
+        }
+      ]
+    },
+    "outputs": {
+      "outdata": [
+        {
+          "shortName": "outdata",
+          "longName": "Output Data",
+          "index": 0,
+          "isExposed": false,
+          "data": "",
+          "type": 11,
+          "connectionName": "inint",
+          "connectionNodeId": "3238633461663262333535353739626134643139373566393133623131646366"
+        },
+        {
+          "shortName": "outdata",
+          "longName": "Output Data",
+          "index": 0,
+          "isExposed": false,
+          "data": "",
+          "type": 11,
+          "connectionName": "infloat",
+          "connectionNodeId": "3238633461663262333535353739626134643139373566393133623131646366"
+        },
+        {
+          "shortName": "outdata",
+          "longName": "Output Data",
+          "index": 0,
+          "isExposed": false,
+          "data": "",
+          "type": 11,
+          "connectionName": "inbool",
+          "connectionNodeId": "3238633461663262333535353739626134643139373566393133623131646366"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Merge_Scripts",
+    "id": "3864323262356234666365643564633837396438316639366438313332666638",
+    "color": [
+      52,
+      115,
+      165
+    ],
+    "iconPath": "",
+    "opCode": "# BeginOp\n\nimport os, re\n\nscript1 = inscript1\nscript2 = inscript2\n\nscriptsAreFile = False\n\nif os.path.exists(script1):\n    with open(script1, \"r\") as scriptFile1:\n        script1 = scriptFile1.read()\n\nif os.path.exists(script2):\n    with open(script1, \"r\") as scriptFile2:\n        script2 = scriptFile2.read()\n\nimportPatterns = re.compile(r\"import\\s.+|from\\s.+\")\n\nimportMatches1 = re.findall(importPatterns, script1)\n\nimportMatches2 = re.findall(importPatterns, script2)\n\nmodulesToImport = []\nmodulesToImportAs = {}\nmodulesToImportFrom = {}\n\nfor importMatch in importMatches1:\n    if importMatch.startswith(\"import\"):\n        if \"as\" in importMatch:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importList = importMatch.split(\"as\")\n\n            modulesToImportAs[importList[0].replace(\" \", \"\")] = importList[1].replace(\" \", \"\")\n        else:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importMatch = importMatch.replace(\" \", \"\")\n            importList = importMatch.split(\",\")\n\n            for imp in importList: \n                modulesToImport.append(imp)\n    \n    elif importMatch.startswith(\"from\"):\n        importMatch = importMatch.replace(\"from\", \"\")\n        importList = importMatch.split(\"import\")\n\n        module = importList[0].replace(\" \", \"\")\n\n        elements = importList[1].split(\",\")\n\n        moduleElements = []\n\n        for elem in elements:\n            moduleElements.append(elem.replace(\" \", \"\"))\n\n        modulesToImportFrom[module] = moduleElements\n\nfor importMatch in importMatches2:\n    if importMatch.startswith(\"import\"):\n        if \"as\" in importMatch:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importList = importMatch.split(\"as\")\n\n            moduleName = importList[0].replace(\" \", \"\")\n            moduleAlias = importList[1].replace(\" \", \"\")\n\n            if moduleName in modulesToImportAs:\n                if moduleAlias == modulesToImportAs[moduleName]:\n                    pass\n                else:\n                    script2 = re.sub(fr\"({moduleAlias})\\.\", f\"{modulesToImportAs[moduleName]}.\", script2)\n            elif moduleName in modulesToImport:\n                script2 = re.sub(fr\"({moduleAlias})\\.\", f\"{moduleName}.\", script2)\n            else:\n                modulesToImportAs[moduleName] = moduleAlias\n        else:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importMatch = importMatch.replace(\" \", \"\")\n            importList = importMatch.split(\",\")\n\n            for imp in importList: \n                if imp in modulesToImportAs:\n                    script1 = re.sub(fr\"({modulesToImportAs[imp]})\\.\", f\"{imp}.\", script1)\n                    modulesToImportAs.pop(imp)\n                if not imp in modulesToImport:\n                    modulesToImport.append(imp)\n    \n    elif importMatch.startswith(\"from\"):\n        importMatch = importMatch.replace(\"from\", \"\")\n        importList = importMatch.split(\"import\")\n\n        module = importList[0].replace(\" \", \"\")\n\n        elements = importList[1].split(\",\")\n\n        moduleElements = []\n\n        for elem in elements:\n            moduleElements.append(elem.replace(\" \", \"\"))\n\n        if module in modulesToImportFrom:\n            for mod in moduleElements:\n                if not mod in modulesToImportFrom[module]:\n                    modulesToImportFrom[module].append(mod)\n        else:\n            modulesToImportFrom[module] = moduleElements\n\nfor importMatch in importMatches1:\n    script1 = script1.replace(importMatch, \"$\")\n\nfor importMatch in importMatches2:\n    script2 = script2.replace(importMatch, \"$\")\n\ndollarPattern = re.compile(r\"(\\$\\n)+\")\n\nscript1 = re.sub(dollarPattern, \"# Script 1\\n\", script1)\nscript2 = re.sub(dollarPattern, \"# Script 2\\n\", script2)\n\nmodulesToImportAsStr = \"import \"\n\nfor i, module in enumerate(modulesToImport):\n    if i == 0:\n        modulesToImportAsStr += f\"{module}\"\n    else:\n        modulesToImportAsStr += f\", {module}\"\n\nmodulesToImportAsAsStr = \"\"\n\nfor moduleName, moduleAlias in modulesToImportAs.items():\n    modulesToImportAsAsStr += f\"import {moduleName} as {moduleAlias}\"\n\nmodulesToImportFromAsStr = \"\"\n\nfor moduleName, subModules in modulesToImportFrom.items():\n    subModulesToImportFrom = f\"from {moduleName} import \"\n\n    for i, subModule in enumerate(subModules):\n        if i == 0:\n            subModulesToImportFrom += f\"{subModule}\"\n        else:\n            subModulesToImportFrom += f\", {subModule}\"\n\n    modulesToImportFromAsStr += f\"{subModulesToImportFrom}\\n\"\n\nmergedScripts = f\"{modulesToImportAsStr}\\n{modulesToImportAsAsStr}\\n{modulesToImportFromAsStr}\\n{script1}\\n{script2}\"\n\ntmpScriptFilePath = FlashTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(mergedScripts) \n\noutscript = tmpScriptFilePath.replace(\"\\\\\", \"/\")\n\n",
+    "inputs": {
+      "inscript1": [
+        {
+          "shortName": "inscript1",
+          "longName": "Input Script 1",
+          "index": 0,
+          "isExposed": false,
+          "data": "",
+          "type": 7,
+          "connectionName": "outdata",
+          "connectionNodeId": "3261633035666636323339306366386162356434643735303133643434636431"
+        }
+      ],
+      "inscript2": [
+        {
+          "shortName": "inscript2",
+          "longName": "Input Script 2",
+          "index": 0,
+          "isExposed": false,
+          "data": "",
+          "type": 7,
+          "connectionName": "outfile",
+          "connectionNodeId": "3732663630316238653234616539366139343466353135396530323062313965"
+        }
+      ]
+    },
+    "outputs": {
+      "outscript": [
+        {
+          "shortName": "outscript",
+          "longName": "Output Script",
+          "index": 0,
+          "isExposed": false,
+          "data": "C:/Users/augie/AppData/Roaming/Flash/3031386632333933356635346466343161633962373835383235386338663138.py",
+          "type": 7,
+          "connectionName": "indata",
+          "connectionNodeId": "3664306565353531646638643637613463363132656139323130303739343936"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Debug",
+    "id": "3664306565353531646638643637613463363132656139323130303739343936",
+    "color": [
+      50,
+      222,
+      132
+    ],
+    "iconPath": "",
+    "opCode": "# BeginOp\n\nFlashLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+    "inputs": {
+      "indata": [
+        {
+          "shortName": "indata",
+          "longName": "Input Data",
+          "index": 0,
+          "isExposed": false,
+          "data": "C:/Users/augie/AppData/Roaming/Flash/3031386632333933356635346466343161633962373835383235386338663138.py",
+          "type": 11,
+          "connectionName": "outscript",
+          "connectionNodeId": "3864323262356234666365643564633837396438316639366438313332666638"
+        }
+      ]
+    },
+    "outputs": {
+      "outdata": [
+        {
+          "shortName": "outdata",
+          "longName": "Output Data",
+          "index": 0,
+          "isExposed": false,
+          "data": "C:/Users/augie/AppData/Roaming/Flash/3031386632333933356635346466343161633962373835383235386338663138.py",
+          "type": 11,
+          "connectionName": null,
+          "connectionNodeId": null
+        }
+      ]
+    }
+  },
+  {
+    "name": "Debug",
+    "id": "3261633035666636323339306366386162356434643735303133643434636431",
+    "color": [
+      50,
+      222,
+      132
+    ],
+    "iconPath": "",
+    "opCode": "# BeginOp\n\nFlashLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+    "inputs": {
+      "indata": [
+        {
+          "shortName": "indata",
+          "longName": "Input Data",
+          "index": 0,
+          "isExposed": false,
+          "data": "",
+          "type": 11,
+          "connectionName": "outfile",
+          "connectionNodeId": "6133663333353137323634303564393464323335323762343032663738353138"
+        }
+      ]
+    },
+    "outputs": {
+      "outdata": [
+        {
+          "shortName": "outdata",
+          "longName": "Output Data",
+          "index": 0,
+          "isExposed": false,
+          "data": "",
+          "type": 11,
+          "connectionName": "inscript1",
+          "connectionNodeId": "3864323262356234666365643564633837396438316639366438313332666638"
+        },
+        {
+          "shortName": "outdata",
+          "longName": "Output Data",
+          "index": 0,
+          "isExposed": false,
+          "data": "",
+          "type": 11,
+          "connectionName": "indict",
+          "connectionNodeId": "3238633461663262333535353739626134643139373566393133623131646366"
+        },
+        {
+          "shortName": "outdata",
+          "longName": "Output Data",
+          "index": 0,
+          "isExposed": false,
+          "data": "",
+          "type": 11,
+          "connectionName": "instring",
+          "connectionNodeId": "3238633461663262333535353739626134643139373566393133623131646366"
+        }
+      ]
+    }
+  },
+  {
+    "name": "File",
+    "id": "3732663630316238653234616539366139343466353135396530323062313965",
+    "color": [
+      255,
+      220,
+      106
+    ],
+    "iconPath": "",
+    "opCode": "# BeginOp\n\noutfile = infile\n\n",
+    "inputs": {
+      "infile": [
+        {
+          "shortName": "infile",
+          "longName": "Input File Path",
+          "index": 0,
+          "isExposed": true,
+          "data": "",
+          "type": 7,
+          "connectionName": null,
+          "connectionNodeId": null
+        }
+      ]
+    },
+    "outputs": {
+      "outfile": [
+        {
+          "shortName": "outfile",
+          "longName": "Output File Path",
+          "index": 0,
+          "isExposed": false,
+          "data": "",
+          "type": 7,
+          "connectionName": "inscript2",
+          "connectionNodeId": "3864323262356234666365643564633837396438316639366438313332666638"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Directory",
+    "id": "3764353833386161333637653139313331633633646439666532643533313661",
+    "color": [
+      255,
+      220,
+      106
+    ],
+    "iconPath": "",
+    "opCode": "# BeginOp\n\noutdir = indir\n\n",
+    "inputs": {
+      "indir": [
+        {
+          "shortName": "indir",
+          "longName": "Input Directory Path",
+          "index": 0,
+          "isExposed": true,
+          "data": "",
+          "type": 7,
+          "connectionName": null,
+          "connectionNodeId": null
+        }
+      ]
+    },
+    "outputs": {
+      "outdir": [
+        {
+          "shortName": "outdir",
+          "longName": "Output Directory Path",
+          "index": 0,
+          "isExposed": false,
+          "data": "",
+          "type": 7,
+          "connectionName": "incustom",
+          "connectionNodeId": "3238633461663262333535353739626134643139373566393133623131646366"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Debug",
+    "id": "6664336231663865363763363735356331616635633835323264653335656235",
+    "color": [
+      50,
+      222,
+      132
+    ],
+    "iconPath": "",
+    "opCode": "# BeginOp\n\nFlashLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+    "inputs": {
+      "indata": [
+        {
+          "shortName": "indata",
+          "longName": "Input Data",
+          "index": 0,
+          "isExposed": false,
+          "data": [
+            "",
+            "",
+            "",
+            ""
+          ],
+          "type": 11,
+          "connectionName": "outlist",
+          "connectionNodeId": "3238633461663262333535353739626134643139373566393133623131646366"
+        }
+      ]
+    },
+    "outputs": {
+      "outdata": [
+        {
+          "shortName": "outdata",
+          "longName": "Output Data",
+          "index": 0,
+          "isExposed": false,
+          "data": [
+            "",
+            "",
+            "",
+            ""
+          ],
+          "type": 11,
+          "connectionName": null,
+          "connectionNodeId": null
+        }
+      ]
+    }
+  }
+]

@@ -6,7 +6,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from FlashApp.Interface.Icons import *
 from FlashApp.Interface.Graph import *
 from FlashApi.Core.Logger import *
-# from FlashApp.Interface.Parameters import ParameterEditor
+from FlashApp.Interface.PlugEditor import PlugEditor
 
 
 class QHLine(QtWidgets.QFrame):
@@ -211,9 +211,9 @@ class App(QtWidgets.QMainWindow):
 
         graphLayout.addWidget(self.graphTabs)
 
-            # self.parameterEditor = ParameterEditor()
+        self.plugEditor = PlugEditor()
 
-            # graphLayout.addWidget(self.parameterEditor)
+        graphLayout.addWidget(self.plugEditor)
 
         masterLayout.addLayout(graphLayout)
 
@@ -309,5 +309,5 @@ class App(QtWidgets.QMainWindow):
 
         gNode = self.graphTabs.tabs.widget(graphTabIndex).layout.itemAt(0).widget().getNodeById(nodeId)
 
-        # self.parameterEditor.setCurrentNode(gNode)
+        self.plugEditor.setCurrentNode(gNode)
         

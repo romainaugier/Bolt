@@ -4,6 +4,8 @@ import sys, os, copy
 from FlashApi.Core.Node import *
 from FlashApi.Core.Logger import *
 
+from FlashApp import FLASHROOT
+
 
 class Lib():
     """
@@ -14,7 +16,7 @@ class Lib():
         """
         self.logger = logger
 
-        self.path = [f"{os.path.dirname(sys.executable)}/Library/Nodes", "D:/dev/Flash/Library/Nodes"]
+        self.path = [f"{os.path.dirname(sys.executable)}/Library/Nodes", f"{FLASHROOT}/Library/Nodes"]
 
         searchPaths = ""
 

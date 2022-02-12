@@ -6,6 +6,7 @@ from FlashApi.Core.Node import *
 from FlashApi.Core.Graph import *
 from FlashApi.Core.Lib import *
 from FlashApi.Core.Logger import *
+from FlashApp import FLASHROOT
 
 TESTDIR = os.path.dirname(__file__)
 
@@ -22,7 +23,7 @@ if __name__ == "__main__":
     PrintSeps()
 
     node = Node()
-    node.Load("D:/dev/Flash/Library/Nodes/template.fnode")
+    node.Load(f"{FLASHROOT}/Library/Nodes/template.fnode")
     node.SetLogger(logger)
 
     for inputName, input in node.GetInputs().items():

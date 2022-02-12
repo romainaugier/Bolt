@@ -17,7 +17,7 @@ shortName = indir
 longName = Input Directory Path
 defaultValue = ""
 type = str
-isExposed = True
+exposed = True
 
 # EndPlug
 

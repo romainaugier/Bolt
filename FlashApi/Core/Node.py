@@ -250,7 +250,11 @@ class Plug():
         self.longName : str = longName
         self.parentNode : Node = parentNode
         self.index : int = index
-        self.connectedPlug : Plug = connectedPlug
+        self.connectedPlugs : list[Plug] = []
+
+        if connectedPlug is not None:
+            self.connectedPlugs.append(connectedPlug)
+
         self.data = data
         self.type : PlugType = dataType
         self.isExposed = False
@@ -316,24 +320,24 @@ class Plug():
         Returns:
             bool: if the plug is connected to another plug
         """
-        if self.connectedPlug is not None:
+        if len(self.connectedPlugs) > 0:
             return True
         else:
             return False
     
-    def GetConnection(self) -> Plug:
+    def GetConnections(self) -> list[Plug]:
         """
         Returns:
             Plug: plug that the current plug is connected to (on another node)
         """
-        return self.connectedPlug
+        return self.connectedPlugs
 
     def UpdateInputs(self) -> None:
         """
         Updates the data coming from the input connection
         """
-        if self.connectedPlug is not None:
-            self.data = self.GetConnection().GetData()
+        if len(self.connectedPlugs) > 0:
+            self.data = self.GetConnections()[0].GetData()
     
     def GetData(self):
         """
@@ -361,20 +365,19 @@ class Plug():
         if plug is not None:
             if self.IsExposed() or plug.IsExposed():
                 return
-
-            if plug.GetNode().GetID() == self.GetNode().GetID():
+            elif plug.GetNode().GetID() == self.GetNode().GetID():
                 return
             else:
-                self.connectedPlug = plug
-                plug.connectedPlug = self
+                self.connectedPlugs.append(plug)
+                plug.connectedPlugs.append(self)
             
-    def Disconnect(self) -> None:
+    def Disconnect(self, plug : Plug) -> None:
         """
-        Disconnects a plug from its connected plug (if it has any)
+        Disconnects the plug from the given plug
         """
-        if self.connectedPlug is not None:
-            self.connectedPlug.connectedPlug = None
-            self.connectedPlug = None
+        if self.connectedPlugs is not None:
+            plug.connectedPlugs.remove(self)
+            self.connectedPlugs.remove(plug)
 
 class Node():
     """
@@ -425,7 +428,13 @@ class Node():
         Returns:
             int: number of inputs
         """
-        return len(self.inputs.keys())
+        count = 0
+
+        for inputName, input in self.inputs.items():
+            if not input.IsExposed():
+                count += 1
+
+        return count
     
     def GetOutputCount(self) -> int:
         """
@@ -759,43 +768,51 @@ class Node():
 
         for inputName, input in self.GetInputs().items():
             if input.IsConnected():
-                nodeAsDict["inputs"][input.GetShortName()] = { "shortName" : input.GetShortName(),
-                                                               "longName" : input.GetLongName(),
-                                                               "index" : input.GetIndex(),
-                                                               "isExposed" : input.IsExposed(),
-                                                               "data" : input.GetData(), 
-                                                               "type" : input.GetType(),
-                                                               "connectionName" : input.GetConnection().GetShortName(), 
-                                                               "connectionNodeId" : input.GetConnection().GetNode().GetID() }
+
+                nodeAsDict["inputs"][input.GetShortName()] = []
+
+                for connection in input.GetConnections():
+                    nodeAsDict["inputs"][input.GetShortName()].append({ "shortName" : input.GetShortName(),
+                                                                        "longName" : input.GetLongName(),
+                                                                        "index" : input.GetIndex(),
+                                                                        "isExposed" : input.IsExposed(),
+                                                                        "data" : input.GetData(), 
+                                                                        "type" : input.GetType(),
+                                                                        "connectionName" : connection.GetShortName(), 
+                                                                        "connectionNodeId" : connection.GetNode().GetID() })
             else:
-                nodeAsDict["inputs"][input.GetShortName()] = { "shortName" : input.GetShortName(),
+                nodeAsDict["inputs"][input.GetShortName()] = [{ "shortName" : input.GetShortName(),
                                                                "longName" : input.GetLongName(),
                                                                "index" : input.GetIndex(),
                                                                "isExposed" : input.IsExposed(),
                                                                "data" : input.GetData(), 
                                                                "type" : input.GetType(),
                                                                "connectionName" : None,
-                                                               "connectionNodeId" : None }
+                                                               "connectionNodeId" : None }]
         
         for outputName, output in self.GetOutputs().items():
             if output.IsConnected():
-                nodeAsDict["outputs"][output.GetShortName()] = { "shortName" : output.GetShortName(),
-                                                                 "longName" : output.GetLongName(),
-                                                                 "index" : output.GetIndex(),
-                                                                 "isExposed" : output.IsExposed(),
-                                                                 "data" : output.GetData(), 
-                                                                 "type" : output.GetType(),
-                                                                 "connectionName" : output.GetConnection().GetShortName(), 
-                                                                 "connectionNodeId" : output.GetConnection().GetNode().GetID() }
+
+                nodeAsDict["outputs"][output.GetShortName()] = []
+
+                for connection in output.GetConnections():
+                    nodeAsDict["outputs"][output.GetShortName()].append({ "shortName" : output.GetShortName(),
+                                                                    "longName" : output.GetLongName(),
+                                                                    "index" : output.GetIndex(),
+                                                                    "isExposed" : output.IsExposed(),
+                                                                    "data" : output.GetData(), 
+                                                                    "type" : output.GetType(),
+                                                                    "connectionName" : connection.GetShortName(), 
+                                                                    "connectionNodeId" : connection.GetNode().GetID() })
             else:
-                nodeAsDict["outputs"][output.GetShortName()] = { "shortName" : output.GetShortName(),
+                nodeAsDict["outputs"][output.GetShortName()] = [{ "shortName" : output.GetShortName(),
                                                                  "longName" : output.GetLongName(),
                                                                  "index" : output.GetIndex(),
                                                                  "isExposed" : output.IsExposed(),
                                                                  "data" : output.GetData(), 
                                                                  "type" : output.GetType(),
                                                                  "connectionName" : None, 
-                                                                 "connectionNodeId" : None }
+                                                                 "connectionNodeId" : None }]
         return nodeAsDict
 
     def FromDict(self, nodeAsDict : dict) -> None:
@@ -817,12 +834,14 @@ class Node():
         self.SetOpCode(nodeAsDict["opCode"])
 
         for inputName, input in nodeAsDict["inputs"].items():
+            input = input[0]
             tmpPlug = Plug(input["shortName"], input["longName"], self, input["data"], input["type"])
             tmpPlug.SetExposed(input["isExposed"])
             tmpPlug.SetIndex(input["index"])
             self.inputs[inputName] = tmpPlug
 
         for outputName, output in nodeAsDict["outputs"].items():
+            output = output[0]
             tmpPlug = Plug(output["shortName"], output["longName"], self, output["data"], output["type"])
             tmpPlug.SetExposed(output["isExposed"])
             tmpPlug.SetIndex(output["index"])

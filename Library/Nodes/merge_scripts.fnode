@@ -44,7 +44,7 @@ exposed = False
 
 # BeginOp
 
-import os
+import os, re
 
 script1 = inscript1
 script2 = inscript2

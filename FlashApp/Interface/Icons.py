@@ -2,6 +2,7 @@ import os
 
 from PyQt5 import QtGui
 
+from FlashApp import FLASHROOT
 
 class Icons():
     """
@@ -10,7 +11,7 @@ class Icons():
         """
         """
         # TODO : link with runtime path
-        self.iconFolderPath = "D:/dev/Flash/Library/Icons"
+        self.iconFolderPath = f"{FLASHROOT}/Library/Icons"
 
         self.icons = {}
         self.anims = {}

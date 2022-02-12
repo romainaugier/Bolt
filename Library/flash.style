@@ -1,5 +1,5 @@
 QGraphicsView {
-        background-color: rgb(72, 69, 79);
+        background-color: #0F111A;
 }
 
 QMainWindow {

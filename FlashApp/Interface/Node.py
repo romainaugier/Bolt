@@ -59,13 +59,17 @@ class GPlug(QtWidgets.QGraphicsItem):
 
         self.id = binascii.hexlify(os.urandom(16)).hex()
 
-        self.internalPlug = plug
-        self.node = node
-        self.graph = graph
+        self.internalPlug : Plug = plug
+        self.node  : Node = node
+        self.graph : GGraph = graph
         self.closestGPlug = None
         self.isInput = input
 
         self.color = GetPlugColor(self.getInternalPlug().GetType())
+
+        if self.getInternalPlug().IsExposed():
+            self.color.setAlpha(62)
+            self.setAcceptTouchEvents(False)
 
         self.edges = []
 
@@ -78,10 +82,14 @@ class GPlug(QtWidgets.QGraphicsItem):
 
         self.labelRect = GetFontRect(self.getInternalPlug().GetShortName())
 
-        newPosX = self.pos().x() - self.labelRect.width() - 3
-        self.setPos(newPosX, self.pos().y())
+        self.textWOffset = 5
 
-        self._x = x - malus
+        if not self.isInput:
+            outputOffset = self.labelRect.width() + self.textWOffset
+        else:
+            outputOffset = 0
+
+        self._x = x - malus - outputOffset
         self._y = y - (self.radius / 2.0)
 
         self.setPos(self._x, self._y)
@@ -101,9 +109,9 @@ class GPlug(QtWidgets.QGraphicsItem):
 
     def boundingRect(self):
         if self.isInput:
-            return QtCore.QRectF(0, 0, self.radius + self.labelRect.width() + 3, self.radius)
+            return QtCore.QRectF(0, 0, self.radius + self.labelRect.width() + self.textWOffset, self.radius)
         else:
-            return QtCore.QRectF(0, 0, self.radius + self.labelRect.width() + 3, self.radius)
+            return QtCore.QRectF(0, 0, self.radius + self.labelRect.width() + self.textWOffset, self.radius)
 
     def paint(self, painter : QtGui.QPainter, option : QtWidgets.QStyleOptionGraphicsItem, widget : QtWidgets.QWidget) -> None:
         """
@@ -120,9 +128,22 @@ class GPlug(QtWidgets.QGraphicsItem):
 
         painter.setBrush(self.color)
 
-        painter.drawEllipse(0, 0, self.radius, self.radius)
+        if self.isInput:
+            painter.drawEllipse(0, 0, self.radius, self.radius)
 
-        painter.drawRect(0, 0, 100, 100)
+            painter.setPen(self.color)
+            painter.setFont(QtGui.QFont("Helvetica", 8))
+
+            fontRect = QtCore.QRect(self.radius + self.textWOffset, 0, self.labelRect.width(), self.radius)
+            painter.drawText(fontRect, 0, self.getInternalPlug().GetShortName())
+        else:
+            painter.drawEllipse(self.labelRect.width() + self.textWOffset, 0, self.radius, self.radius)
+
+            painter.setPen(self.color)
+            painter.setFont(QtGui.QFont("Helvetica", 8))
+
+            fontRect = QtCore.QRect(0, 0, self.labelRect.width() + self.textWOffset, self.radius)
+            painter.drawText(fontRect, 0, self.getInternalPlug().GetShortName())
 
     def hoverEnterEvent(self, ev) -> None:
         """
@@ -176,7 +197,16 @@ class GPlug(QtWidgets.QGraphicsItem):
                     condition3 = False
                     break
 
-            if condition1 and condition2 and condition3:
+            condition4 = True
+
+            if self.closestGPlug.getInternalPlug().IsExposed():
+                condition4 = False
+
+            if condition1 and condition2 and condition3 and condition4:
+                if self.closestGPlug.getInternalPlug().IsConnected():
+                    for edge in self.closestGPlug.edges:
+                        self.graph.deleteEdge(edge)
+
                 self.graph.addEdge(self, self.closestGPlug)
             
 
@@ -281,6 +311,24 @@ class GNode(QtWidgets.QGraphicsObject):
         """
         return self.outputGPlugs
 
+    def getInputGPlug(self, name : str) -> GPlug:
+        """
+        """
+        for gplug in self.inputGPlugs:
+            if gplug.getInternalPlug().GetShortName() == name:
+                return gplug
+
+        return None
+    
+    def getOutputGPlug(self, name : str) -> GPlug:
+        """
+        """
+        for gplug in self.outputGPlugs:
+            if gplug.getInternalPlug().GetShortName() == name:
+                return gplug
+
+        return None
+
     def boundingRect(self):
         """
         """
@@ -306,7 +354,7 @@ class GNode(QtWidgets.QGraphicsObject):
 
         painter.setRenderHint(QtGui.QPainter.Antialiasing)
         
-        bodyColor = QtGui.QColor(48, 46, 54, 255)
+        bodyColor = QtGui.QColor("#1F2233")
 
         # Label
         path = QtGui.QPainterPath()
@@ -314,13 +362,11 @@ class GNode(QtWidgets.QGraphicsObject):
         path.addRoundedRect(QtCore.QRectF(0, 0, self.sizeX, self.labelSizeY), 10, 10)
         path.addRect(0, self.labelSizeY / 2, self.sizeX, self.labelSizeY / 2)
         
-        painter.setBrush(self.color)
-
         labelGradient = QtGui.QLinearGradient()
         labelGradient.setStart(0, 0)
         labelGradient.setFinalStop(self.sizeX, self.labelSizeY)
         labelGradient.setColorAt(0.0, bodyColor)
-        labelGradient.setColorAt(1.0, self.color)
+        labelGradient.setColorAt(1.0, QtGui.QColor("#464B5D"))
 
         painter.setBrush(labelGradient)
         painter.setPen(Qt.NoPen)
@@ -336,8 +382,8 @@ class GNode(QtWidgets.QGraphicsObject):
             painter.drawPixmap(7, 7, pixMapWidth, pixMapWidth, self.pixMap)
 
         # Label name
-        painter.setPen(QtGui.QColor(224, 227, 227, 255))
-        painter.setFont(QtGui.QFont("Helvetica", 12))
+        painter.setPen(QtGui.QColor("#4B526D"))
+        painter.setFont(QtGui.QFont("Helvetica", 10))
 
         fontRect = QtCore.QRect(14 + pixMapWidth, 6, self.sizeX - 10, self.labelSizeY - 10)
         painter.drawText(fontRect, 0, self.name)
@@ -398,14 +444,18 @@ class GNode(QtWidgets.QGraphicsObject):
             updatedCursorY = updatedCursorPos.y() - origCursorPos.y() + origPosition.y()
 
             self.setPos(updatedCursorX, updatedCursorY)
+            self.adjustEdges()
 
-            for inputSock in self.inputGPlugs:
-                for edge in inputSock.edges:
-                    edge.adjust()
-            
-            for outputSock in self.outputGPlugs:
-                for edge in outputSock.edges:
-                    edge.adjust()   
+    def adjustEdges(self):
+        """
+        """
+        for inputPlug in self.inputGPlugs:
+            for edge in inputPlug.edges:
+                edge.adjust()
+        
+        for outputPlug in self.outputGPlugs:
+            for edge in outputPlug.edges:
+                edge.adjust()   
 
     def mouseReleaseEvent(self, ev):
         pass
@@ -444,17 +494,20 @@ class Edge(QtWidgets.QGraphicsLineItem):
 
         offset = self.source.radius / 2.0
 
-        color = QtGui.QColor(224, 227, 227, 51)
+        offsetX = self.source.radius / 2.0 + self.source.labelRect.width() + self.source.textWOffset
 
-        if self.isHovered is True:
-            color = QtGui.QColor(224, 227, 227, 255)
+        gradient = QtGui.QLinearGradient()
+        gradient.setColorAt(0.0, self.source.color)
+        gradient.setColorAt(1.0, self.destination.color)
+        gradient.setStart(first)
+        gradient.setFinalStop(last)
 
         pen = QtGui.QPen()
         pen.setWidth(5)
-        pen.setColor(color)
+        pen.setBrush(gradient)
         self.setPen(pen)
 
-        self.setLine(first.x() + offset, first.y() + offset, last.x() + offset, last.y() + offset)
+        self.setLine(first.x() + offsetX, first.y() + offset, last.x() + offset, last.y() + offset)
 
     def mousePressEvent(self, event) -> None:
         """
