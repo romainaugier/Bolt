@@ -285,45 +285,6 @@
           "isExposed": false,
           "data": "C:/Users/augie/AppData/Roaming/Flash/3031386632333933356635346466343161633962373835383235386338663138.py",
           "type": 7,
-          "connectionName": "indata",
-          "connectionNodeId": "3664306565353531646638643637613463363132656139323130303739343936"
-        }
-      ]
-    }
-  },
-  {
-    "name": "Debug",
-    "id": "3664306565353531646638643637613463363132656139323130303739343936",
-    "color": [
-      50,
-      222,
-      132
-    ],
-    "iconPath": "",
-    "opCode": "# BeginOp\n\nFlashLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
-    "inputs": {
-      "indata": [
-        {
-          "shortName": "indata",
-          "longName": "Input Data",
-          "index": 0,
-          "isExposed": false,
-          "data": "C:/Users/augie/AppData/Roaming/Flash/3031386632333933356635346466343161633962373835383235386338663138.py",
-          "type": 11,
-          "connectionName": "outscript",
-          "connectionNodeId": "3864323262356234666365643564633837396438316639366438313332666638"
-        }
-      ]
-    },
-    "outputs": {
-      "outdata": [
-        {
-          "shortName": "outdata",
-          "longName": "Output Data",
-          "index": 0,
-          "isExposed": false,
-          "data": "C:/Users/augie/AppData/Roaming/Flash/3031386632333933356635346466343161633962373835383235386338663138.py",
-          "type": 11,
           "connectionName": null,
           "connectionNodeId": null
         }

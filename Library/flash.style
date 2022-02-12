@@ -1,18 +1,19 @@
 QMainWindow {
-	background: #0F111A;
+	background: rgb(13, 14, 25);
 }
 
 QPushButton {
-	color: rgba(255, 255, 255, 40);
-	background-color: rgba(255, 255, 255, 20);
-    height: 30;
-    width: 30;
+	color: rgb(143, 144, 160);
+	background-color: rgba(74, 82, 107, 63);
+    height: 40;
+    width: 40;
     qproperty-iconSize: 25px;
+	border-radius: 4px;
 }
 
 QPushButton:hover:!pressed {
-	color: rgba(255, 255, 255, 80);
-	background-color: rgba(255, 255, 255, 40)
+	color: rgb(143, 144, 160);
+	background-color: rgba(74, 82, 107, 127);
 }
 
 QListWidget {
@@ -45,6 +46,7 @@ QMenuBar {
 
 QMenu {
 	background-color: rgb(255, 0, 0);
+	border-radius: 20px;
 }
 
 /* Tabs */
@@ -81,6 +83,7 @@ QTabBar::tab:selected, QTabBar::tab:hover {
 }
 
 QTabBar::tab:selected {
+	background: solid rgb(64, 69, 102);
     border-color: #191C1D;
     border-bottom-color: #191C1D;
 	border-top-color: #FABD00;
@@ -88,5 +91,5 @@ QTabBar::tab:selected {
 }
 
 QTabBar::tab:!selected {                           
-	background: solid rgb(72, 69, 79);
+	background: solid rgb(41, 43, 61);
 }   

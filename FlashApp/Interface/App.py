@@ -1,45 +1,12 @@
 import os
-from sys import intern
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from FlashApp.Interface.Icons import *
 from FlashApp.Interface.Graph import *
 from FlashApi.Core.Logger import *
-from FlashApp.Interface.PlugEditor import PlugEditor
+from FlashApp.Interface.Utils import *
 
-
-class QHLine(QtWidgets.QFrame):
-    def __init__(self):
-        super().__init__()
-        self.setMinimumWidth(1)
-        self.setFixedHeight(10)
-        self.setFrameShape(QtWidgets.QFrame.HLine)
-        self.setFrameShadow(QtWidgets.QFrame.Plain)
-        self.setContentsMargins(0, 0, 0, 0)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
-
-    def setColor(self, color):
-        pal = self.palette()
-        pal.setColor(QtGui.QPalette.WindowText, color)
-        self.setPalette(pal)
-    
-
-class QVLine(QtWidgets.QFrame):
-    def __init__(self):
-        super().__init__()
-        self.setFixedWidth(10)
-        self.setMinimumHeight(1)
-        self.setLineWidth(2)
-        self.setFrameShape(QtWidgets.QFrame.VLine)
-        self.setFrameShadow(QtWidgets.QFrame.Plain)
-        self.setContentsMargins(0, 0, 0, 0)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Preferred)
-        
-    def setColor(self, color):
-        pal = self.palette()
-        pal.setColor(QtGui.QPalette.WindowText, color)
-        self.setPalette(pal)
 
 class GraphTabs(QtWidgets.QWidget):
     """
@@ -207,13 +174,8 @@ class App(QtWidgets.QMainWindow):
         graphLayout = QtWidgets.QHBoxLayout()
 
         self.graphTabs = GraphTabs(self.nodeLib, self.icons, self.logger, self)
-        self.graphTabs.selectedNodeChanged.connect(self.onSelectedNodeChange)
 
         graphLayout.addWidget(self.graphTabs)
-
-        self.plugEditor = PlugEditor()
-
-        # graphLayout.addWidget(self.plugEditor)
 
         masterLayout.addLayout(graphLayout)
 
@@ -236,6 +198,12 @@ class App(QtWidgets.QMainWindow):
         
         self.forceSaveGraphSc = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+Shift+S"), self)
         self.forceSaveGraphSc.activated.connect(lambda: self.saveGraph(forceName=True))
+
+        self.loadGraphSc = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+L"), self)
+        self.loadGraphSc.activated.connect(lambda: self.loadGraph())
+        
+        self.layoutGraphSc = QtWidgets.QShortcut(QtGui.QKeySequence("L"), self)
+        self.layoutGraphSc.activated.connect(lambda: self.layoutGraph())
 
     def closeGraph(self, index : int = None) -> None:
         """
@@ -305,15 +273,8 @@ class App(QtWidgets.QMainWindow):
         Args:
             index (int, optional): graph index. Defaults to None.
         """
-        pass
+        if index is None:
+            index = self.graphTabs.getActiveTabIndex()
 
-    @QtCore.pyqtSlot(str)
-    def onSelectedNodeChange(self, nodeId : str) -> None:
-        """
-        """
-        graphTabIndex = self.graphTabs.getActiveTabIndex()
-
-        gNode = self.graphTabs.tabs.widget(graphTabIndex).layout.itemAt(0).widget().getNodeById(nodeId)
-
-        self.plugEditor.setCurrentNode(gNode)
+        self.graphTabs.tabs.widget(index).layout.itemAt(0).widget().layoutGraph()
         

@@ -86,8 +86,8 @@ class GGraph(QtWidgets.QGraphicsView):
         self.plugEditorProxy.id = 0
         self.plugEditorProxy.setWidget(self.plugEditor)
         self.plugEditorProxy.setFlag(QtWidgets.QGraphicsItem.ItemIgnoresTransformations, True)
-        self.plugEditorProxy.setPos(self.mapToScene(self.rect().width() - self.plugEditor.getWidth(), 0))
         self.plugEditorProxy.setZValue(10)
+        self.plugEditorProxy.setPos(self.mapToScene(self.rect().width() - self.plugEditor.getWidth() - 50, 50))
         self.scene.addItem(self.plugEditorProxy)
 
         self.cookThread = None
@@ -253,19 +253,21 @@ class GGraph(QtWidgets.QGraphicsView):
         debugAction = menu.addAction("Debug Graph")
         debugAction.triggered.connect(lambda: self.debugGraph())
 
+        menu.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         menu.setStyleSheet("""
 QMenu {
-	background-color: rgb(201, 196, 207);
+	background-color: rgb(13, 14, 25);
+    border-radius: 20px;
 }
 
 QMenu::item {
-    color: rgb(72, 69, 79);
+    color: rgb(143, 144, 160);
     background-color: transparent;
 }
 
 QMenu::item:selected {
-    color: rgb(72, 69, 79);
-    background-color: rgb(205, 200, 211);
+    color: rgb(255, 255, 255);
+    background-color: rgb(64, 69, 102);
 }
         """)
 
@@ -477,7 +479,7 @@ QMenu::item:selected {
 
                         pluggedNode = self.getNodeById(inGPlug.getInternalPlug().GetNode().GetID())
                         newPos = pluggedNode.pos() 
-                        gNode.setPos(newPos.x() - 50, newPos.y())
+                        gNode.setPos(newPos.x() - 50 - pluggedNode.sizeX, newPos.y())
                         gNode.adjustEdges()
 
                 for item in self.scene.items():

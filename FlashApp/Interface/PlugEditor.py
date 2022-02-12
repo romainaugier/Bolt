@@ -1,4 +1,3 @@
-from enum import Enum
 from ast import literal_eval
 
 from PyQt5 import QtCore, QtWidgets
@@ -114,6 +113,8 @@ class PlugWidget(QtWidgets.QWidget):
         masterLayout.setContentsMargins(0, 0, 0, 0)
 
         self.parmLongNameLabel = QtWidgets.QLabel(self.plug.GetLongName())
+        self.parmLongNameLabel.setFont(QtGui.QFont("Helvetica", 8))
+        self.parmLongNameLabel.setStyleSheet("color: rgb(143, 144, 160)")
         self.parmLongNameLabel.setMinimumWidth(40)
         self.parmLongNameLabel.setMinimumHeight(23)
         masterLayout.addWidget(self.parmLongNameLabel)
@@ -208,7 +209,7 @@ class PlugEditor(QtWidgets.QWidget):
     currentNodeChanged = QtCore.pyqtSignal()
     plugChanged = QtCore.pyqtSignal()
 
-    def __init__(self, iconsLib = Icons, parent=None):
+    def __init__(self, iconsLib : Icons, parent=None):
         super(QtWidgets.QWidget, self).__init__(parent)
 
         self.iconsLib = iconsLib
@@ -220,22 +221,96 @@ class PlugEditor(QtWidgets.QWidget):
 
         self.masterLayout = QtWidgets.QVBoxLayout()
         self.masterLayout.setAlignment(Qt.AlignTop)
+        
+        topLayout = QtWidgets.QHBoxLayout()
+        topLayout.setSpacing(0)
+        topLayout.setContentsMargins(0, 0, 0, 0)
 
         self.nodeNameLabel = IconLabel(None, "None")
-        self.masterLayout.addWidget(self.nodeNameLabel)
+        topLayout.addWidget(self.nodeNameLabel)
+
+        topLayout.addStretch()
+
+        self.showButton = QtWidgets.QPushButton("")
+        self.showButton.setIcon(self.iconsLib.GetIcon("arrow-down"))
+        self.showButton.setMinimumSize(20, 20)
+        self.showButton.setMaximumSize(20, 20)
+        self.showButton.clicked.connect(self.showPlugsAndInfos)
+        topLayout.addWidget(self.showButton)
+
+        self.masterLayout.addLayout(topLayout)
 
         self.plugsLayout = QtWidgets.QVBoxLayout()
         self.plugsLayout.setAlignment(Qt.AlignTop)
         self.plugsLayout.setSpacing(0)
         self.plugsLayout.setContentsMargins(0, 0, 0, 0)
-        self.masterLayout.addLayout(self.plugsLayout)
+
+        self.plugsWidget = QtWidgets.QWidget()
+        self.plugsWidget.setLayout(self.plugsLayout)
+        self.masterLayout.addWidget(self.plugsWidget)
 
         self.setLayout(self.masterLayout)
+
+        self.roundCorners()
+
+        self.setStyleSheet("""
+        QWidget {
+            background-color: rgb(13, 14, 25);
+            border-radius: 10px;
+        }
+
+        QLabel {
+            color: rgb(143, 144, 160);
+            border-radius: 0px;
+        }
+
+        QLineEdit {
+            color: rgba(234, 235, 255, 180);
+            background-color: rgb(69, 74, 92);
+            border: none;
+            border-radius: 0px;
+            selection-color: rgb(255, 255, 255);
+            selection-background-color : rgb(64, 69, 102);
+        }
+        QPushButton {
+            color: rgb(143, 144, 160);
+            background-color: rgba(74, 82, 107, 63);
+            height: 40;
+            width: 40;
+            qproperty-iconSize: 25px;
+            border-radius: 4px;
+        }
+
+        QPushButton:hover:!pressed {
+            color: rgb(143, 144, 160);
+            background-color: rgba(74, 82, 107, 127);
+        }
+        """)
 
     def getWidth(self) -> float:
         """
         """
         return self._width
+
+    def roundCorners(self) -> None:
+        """
+        """        
+        radius = 15.0
+        path = QtGui.QPainterPath()
+        path.addRoundedRect(QtCore.QRectF(self.rect()), radius, radius)
+        mask = QtGui.QRegion(path.toFillPolygon().toPolygon())
+        self.setMask(mask)
+        self.move(QtGui.QCursor.pos())
+
+    def showPlugsAndInfos(self) -> None:
+        """
+        """
+        if self.plugsWidget.isHidden():
+            self.plugsWidget.show()
+            self.showButton.setIcon(self.iconsLib.GetIcon("arrow-down"))
+        else:
+            self.plugsWidget.hide()
+            self.showButton.setIcon(self.iconsLib.GetIcon("arrow-left"))
 
     def cleanInterface(self) -> None:
         """
@@ -249,13 +324,23 @@ class PlugEditor(QtWidgets.QWidget):
         """
         # layout = QtWidgets.QVBoxLayout()
 
+        plugCount = 0
+
         for plugName, plug in self.node.GetInputs().items():
             if plug.IsExposed():
-                parmWidget = PlugWidget(plug)
-                parmWidget.valueChanged.connect(self.onPlugChange)
-                self.plugsLayout.addWidget(parmWidget)
+                plugWidget = PlugWidget(plug)
+                plugWidget.valueChanged.connect(self.onPlugChange)
+                self.plugsLayout.addWidget(plugWidget)
 
-        # self.setLayout(layout)
+                plugCount += 1
+
+        if plugCount == 0:
+            infoLabel = QtWidgets.QLabel("No exposed plug available on this node")
+            infoLabel.setFont(QtGui.QFont("Helvetica", 8))
+            infoLabel.setStyleSheet("color: rgb(143, 144, 160)")
+            self.plugsLayout.addWidget(infoLabel)
+
+        self.roundCorners()
 
     @QtCore.pyqtSlot(GNode)
     def setCurrentNode(self, node : GNode) -> None:
