@@ -1,37 +1,37 @@
-Background: #0F111A
-Foreground: #8F93A2
-Text: #4B526D
-Selection Background: #717CB480
-Selection Foreground: #FFFFFF
-Buttons: #191A21
-Second Background: #181A1F
-Disabled: #464B5D
-Contrast: #090B10
-Active: #1A1C25
-Border: #0F111A
-Highlight: #1F2233
-Tree: #717CB430
-Notifications: #090B10
-Accent Color: #84ffff
-Excluded Files Color: #292D3E
-Green Color: #c3e88d
-Yellow Color: #ffcb6b
-Blue Color: #82aaff
-Red Color: #f07178
-Purple Color: #c792ea
-Orange Color: #f78c6c
-Cyan Color: #89ddff
-Gray Color: #717CB4
-White/Black Color: #eeffff
-Error Color: #ff5370
-Comments Color: #717CB4
-Variables Color: #eeffff
-Links Color: #80cbc4
-Functions Color: #82aaff
-Keywords Color: #c792ea
-Tags Color: #f07178
-Strings Color: #c3e88d
-Operators Color: #89ddff
-Attributes Color: #ffcb6b
-Numbers Color: #f78c6c
-Parameters Color: #f78c6c
+Background: rgb(13, 14, 25)
+Foreground: rgb(143, 144, 160)
+Text: rgb(74, 82, 107)
+Selection Background: rgb(64, 69, 102)
+Selection Foreground: rgb(255, 255, 255)
+Buttons: rgb(74, 82, 107)
+Second Background: rgb(3, 25, 28)
+Disabled: rgb(69, 74, 92)
+Contrast: rgb(8, 8, 10)
+Active: rgb(25, 25, 36)
+Border: rgb(13, 15, 25)
+Highlight: rgb(30, 31, 51)
+Tree: rgb(255, 255, 255)
+Notifications: rgb(8, 8, 10)
+Accent Color: rgb(104, 240, 222)
+Excluded Files Color: rgb(41, 43, 61)
+Green Color: rgb()
+Yellow Color: rgb()
+Blue Color: rgb()
+Red Color: rgb()
+Purple Color: rgb()
+Orange Color: rgb()
+Cyan Color: rgb()
+Gray Color: rgb()
+White/Black Color: rgb()
+Error Color: rgb(234, 66, 74)
+Comments Color: rgb()
+Variables Color: rgb()
+Links Color: rgb()
+Functions Color: rgb()
+Keywords Color: rgb()
+Tags Color: rgb()
+Strings Color: rgb()
+Operators Color: rgb()
+Attributes Color: rgb()
+Numbers Color: rgb()
+Parameters Color: rgb()

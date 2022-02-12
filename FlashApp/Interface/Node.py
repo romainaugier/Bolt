@@ -1,5 +1,4 @@
-import binascii
-import os, math
+import binascii, os, math, typing
 
 from enum import Enum
 
@@ -31,8 +30,8 @@ def GetPlugColor(plugType : PlugType) -> QtGui.QColor:
     if plugType == PlugType.FLOAT2: return QtGui.QColor("#80cbc4")
     if plugType == PlugType.FLOAT3: return QtGui.QColor("#80cbc4")
     if plugType == PlugType.STR: return QtGui.QColor("#c3e88d")
-    if plugType == PlugType.BOOL: return QtGui.QColor("#f78c6c")
-    if plugType == PlugType.LIST: return QtGui.QColor("#ffcb6b")
+    if plugType == PlugType.BOOL: return QtGui.QColor("#eeffff")
+    if plugType == PlugType.LIST: return QtGui.QColor("#f78c6c")
     if plugType == PlugType.DICT: return QtGui.QColor("#c792ea")
     if plugType == PlugType.CUSTOM: return QtGui.QColor("#f07178")
 
@@ -294,6 +293,8 @@ class GNode(QtWidgets.QGraphicsObject):
         self.setZValue(1)
         self.setAcceptHoverEvents(True)
 
+    # NODE UTILS
+
     def getInternalNode(self) -> Node:
         """
         Returns:
@@ -329,11 +330,18 @@ class GNode(QtWidgets.QGraphicsObject):
 
         return None
 
+    def getPixmap(self) -> QtGui.QPixmap:
+        """
+        """
+        return self.pixMap
+
     def boundingRect(self):
         """
         """
         adjust = 10
         return QtCore.QRectF(-adjust, -adjust, self.sizeX + adjust * 2, self.sizeY + adjust * 2)
+
+    # PAINT
 
     def paint(self, painter : QtGui.QPainter, option : QtWidgets.QStyleOptionGraphicsItem, widget : QtWidgets.QWidget) -> None:
         """
@@ -347,7 +355,7 @@ class GNode(QtWidgets.QGraphicsObject):
         path.addRect(shadowOffset, self.labelSizeY, self.sizeX, self.sizeY / 2)
 
         painter.setPen(Qt.NoPen)
-        painter.setBrush(QtGui.QColor(0, 0, 0, 127))
+        painter.setBrush(QtGui.QColor(0, 0, 0, 60))
         painter.drawPath(path.simplified())
         
         ## Body
@@ -368,7 +376,7 @@ class GNode(QtWidgets.QGraphicsObject):
         labelGradient.setColorAt(0.0, bodyColor)
         labelGradient.setColorAt(1.0, QtGui.QColor("#464B5D"))
 
-        painter.setBrush(labelGradient)
+        painter.setBrush(QtGui.QColor("#1F2233"))
         painter.setPen(Qt.NoPen)
         painter.drawPath(path.simplified())
 
@@ -382,7 +390,7 @@ class GNode(QtWidgets.QGraphicsObject):
             painter.drawPixmap(7, 7, pixMapWidth, pixMapWidth, self.pixMap)
 
         # Label name
-        painter.setPen(QtGui.QColor("#4B526D"))
+        painter.setPen(QtGui.QColor("#EEFFFF"))
         painter.setFont(QtGui.QFont("Helvetica", 10))
 
         fontRect = QtCore.QRect(14 + pixMapWidth, 6, self.sizeX - 10, self.labelSizeY - 10)
@@ -394,9 +402,8 @@ class GNode(QtWidgets.QGraphicsObject):
         path.addRoundedRect(QtCore.QRectF(0, self.labelSizeY, self.sizeX, self.sizeY - self.labelSizeY), 10, 10)
         path.addRect(0, self.labelSizeY, self.sizeX, self.sizeY / 2)
 
-
         if self.isHovered or self.isSelected():
-            bodyColor = QtGui.QColor("#1F2233")
+            pass
 
         painter.setBrush(bodyColor)
         painter.setPen(Qt.NoPen)
@@ -404,6 +411,8 @@ class GNode(QtWidgets.QGraphicsObject):
         
         # self.errorPixmap = self.iconsLib.GetPixmap("node-error")
         # painter.drawPixmap(0, 0, 48, 48, self.errorPixmap)
+
+    # EVENTS
 
     def hoverEnterEvent(self, ev):
         self.isHovered = True
@@ -433,18 +442,30 @@ class GNode(QtWidgets.QGraphicsObject):
         else:
             self.canMove = True
 
-    def mouseMoveEvent(self, ev):
-        if self.canMove:
-            origCursorPos = ev.lastScenePos()
-            updatedCursorPos = ev.scenePos()
+    def mouseMoveEvent(self, event):
+        if self.canMove and event.buttons() & Qt.LeftButton:
+            origCursorPos = event.lastScenePos()
+            updatedCursorPos = event.scenePos()
 
             origPosition = self.scenePos()
 
             updatedCursorX = updatedCursorPos.x() - origCursorPos.x() + origPosition.x()
             updatedCursorY = updatedCursorPos.y() - origCursorPos.y() + origPosition.y()
 
-            self.setPos(updatedCursorX, updatedCursorY)
+            if QtGui.QGuiApplication.keyboardModifiers() & Qt.ShiftModifier:
+                gridSize = self.scene().gridSize
+
+                newPos = QtCore.QPointF(round(updatedCursorX / gridSize) * gridSize, round(updatedCursorY / gridSize) * gridSize)
+                self.setPos(newPos)
+            else:
+                self.setPos(updatedCursorX, updatedCursorY)
+            
             self.adjustEdges()
+
+    def mouseReleaseEvent(self, ev):
+        pass
+
+    # CHANGE
 
     def adjustEdges(self):
         """
@@ -457,8 +478,6 @@ class GNode(QtWidgets.QGraphicsObject):
             for edge in outputPlug.edges:
                 edge.adjust()   
 
-    def mouseReleaseEvent(self, ev):
-        pass
 
 
 class Edge(QtWidgets.QGraphicsLineItem):

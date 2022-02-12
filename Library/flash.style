@@ -1,9 +1,5 @@
-QGraphicsView {
-        background-color: #0F111A;
-}
-
 QMainWindow {
-	background: rgb(25, 28, 29);
+	background: #0F111A;
 }
 
 QPushButton {
@@ -25,7 +21,15 @@ QListWidget {
 }
 
 QLabel {
-	color: rgba(255, 255, 255, 150);
+	color: rgb(143, 144, 160);
+}
+
+QLineEdit {
+	color: rgba(234, 235, 255, 180);
+	background-color: rgb(69, 74, 92);
+	border: none;
+	selection-color: rgb(255, 255, 255);
+	selection-background-color : rgb(64, 69, 102);
 }
 
 QTextEdit {

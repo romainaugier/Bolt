@@ -6,6 +6,93 @@ from PyQt5.QtCore import Qt
 
 from FlashApi.Core.Node import *
 from FlashApp.Interface.Node import *
+from FlashApp.Interface.Icons import *
+
+
+def CleanLayout(layout : QtWidgets.QLayout) -> None:
+    """
+    Deletes widgets and layouts recursively
+
+    Args:
+        layout (QtWidgets.QLayout): layout to clear
+    """
+    if layout.count() > 0:
+        while layout.count():
+            item = layout.itemAt(0)
+            widget = item.widget()
+
+            if widget is not None:
+                widget.setParent(None)
+            else:
+                CleanLayout(item.layout())
+
+
+class IconLabel(QtWidgets.QWidget):
+    """
+    """
+
+    IconSize = QtCore.QSize(20, 20)
+    HSpacing = 10
+
+    def __init__(self, pixmap : QtGui.QPixmap, text : str, finalStretch : bool = True):
+        """
+        """
+        super(QtWidgets.QWidget, self).__init__()
+
+        self.mainLayout = QtWidgets.QHBoxLayout()
+        self.mainLayout.setSpacing(0)
+        self.mainLayout.setAlignment(Qt.AlignLeft)
+        self.mainLayout.setContentsMargins(0, 0, 0, 0)
+
+        self.setLayout(self.mainLayout)
+        
+        if pixmap is not None:
+            self.icon = QtWidgets.QLabel()
+            self.mainLayout.addWidget(self.icon)
+            self.icon.setPixmap(pixmap.scaled(self.IconSize))
+            self.spacer = QtWidgets.QSpacerItem(self.HSpacing, 0)
+            self.mainLayout.addSpacerItem(self.spacer)
+        else:
+            self.icon = None
+            self.spacer = None
+
+        self.text = QtWidgets.QLabel(text)
+        self.text.setFont(QtGui.QFont("Helvetica", 14))
+        self.text.setStyleSheet("color: rgb(143, 144, 160)")
+        self.mainLayout.addWidget(self.text)
+
+    def setText(self, text : str) -> None:
+        """
+        """
+        self.text.setText(text)
+
+    def setIcon(self, pixmap = QtGui.QPixmap) -> None:
+        """
+        """
+        text = self.text.text()
+
+        self.text.setParent(None)
+
+        if self.icon is not None:
+            self.icon.setParent(None)
+
+        if self.spacer is not None:
+            self.mainLayout.removeItem(self.spacer)
+
+        if pixmap is not None:
+            self.icon = QtWidgets.QLabel()
+            self.mainLayout.addWidget(self.icon)
+            self.icon.setPixmap(pixmap.scaled(self.IconSize))
+            self.spacer = QtWidgets.QSpacerItem(self.HSpacing, 0)
+            self.mainLayout.addSpacerItem(self.spacer)
+        else:
+            self.icon = None
+            self.spacer = None
+
+        self.text = QtWidgets.QLabel(text)
+        self.text.setFont(QtGui.QFont("Helvetica", 14))
+        self.text.setStyleSheet("color: rgb(143, 144, 160)")
+        self.mainLayout.addWidget(self.text)
 
 
 class PlugWidget(QtWidgets.QWidget):
@@ -25,7 +112,6 @@ class PlugWidget(QtWidgets.QWidget):
         masterLayout.setAlignment(Qt.AlignTop)
         masterLayout.setSpacing(0)
         masterLayout.setContentsMargins(0, 0, 0, 0)
-
 
         self.parmLongNameLabel = QtWidgets.QLabel(self.plug.GetLongName())
         self.parmLongNameLabel.setMinimumWidth(40)
@@ -122,43 +208,40 @@ class PlugEditor(QtWidgets.QWidget):
     currentNodeChanged = QtCore.pyqtSignal()
     plugChanged = QtCore.pyqtSignal()
 
-    def __init__(self, parent=None):
+    def __init__(self, iconsLib = Icons, parent=None):
         super(QtWidgets.QWidget, self).__init__(parent)
 
-        self.setMinimumWidth(350)
-        self.setMaximumWidth(350)
+        self.iconsLib = iconsLib
+
+        self._width = 350
+
+        self.setMinimumWidth(self._width)
+        self.setMaximumWidth(self._width)
 
         self.masterLayout = QtWidgets.QVBoxLayout()
         self.masterLayout.setAlignment(Qt.AlignTop)
-        self.masterLayout.setSpacing(0)
-        self.masterLayout.setContentsMargins(0, 0, 0, 0)
+
+        self.nodeNameLabel = IconLabel(None, "None")
+        self.masterLayout.addWidget(self.nodeNameLabel)
+
+        self.plugsLayout = QtWidgets.QVBoxLayout()
+        self.plugsLayout.setAlignment(Qt.AlignTop)
+        self.plugsLayout.setSpacing(0)
+        self.plugsLayout.setContentsMargins(0, 0, 0, 0)
+        self.masterLayout.addLayout(self.plugsLayout)
 
         self.setLayout(self.masterLayout)
 
-    def cleanLayout(self, layout : QtWidgets.QLayout) -> None:
+    def getWidth(self) -> float:
         """
-        Deletes widgets and layouts recursively
-
-        Args:
-            layout (QtWidgets.QLayout): layout to clear
         """
-        if layout.count() > 0:
-            while layout.count():
-                item = layout.itemAt(0)
-                widget = item.widget()
-
-                if widget is not None:
-                    widget.setParent(None)
-                else:
-                    self.cleanLayout(item.layout())
-
-            # sip.delete(layout)
+        return self._width
 
     def cleanInterface(self) -> None:
         """
         Clears the interface
         """
-        self.cleanLayout(self.masterLayout)
+        CleanLayout(self.plugsLayout)
 
     def buildInterface(self) -> None:
         """
@@ -170,7 +253,7 @@ class PlugEditor(QtWidgets.QWidget):
             if plug.IsExposed():
                 parmWidget = PlugWidget(plug)
                 parmWidget.valueChanged.connect(self.onPlugChange)
-                self.masterLayout.addWidget(parmWidget)
+                self.plugsLayout.addWidget(parmWidget)
 
         # self.setLayout(layout)
 
@@ -184,6 +267,9 @@ class PlugEditor(QtWidgets.QWidget):
         """
         self.node = node.getInternalNode()
         self.currentNodeChanged.emit()
+
+        self.nodeNameLabel.setText(self.node.GetName())
+        self.nodeNameLabel.setIcon(node.getPixmap())
 
         if not self.layout() is None: self.cleanInterface()
         self.buildInterface()

@@ -8,6 +8,7 @@ from FlashApi.Core.Lib import *
 from FlashApi.Core.Graph import *
 from FlashApi.Core.Logger import *
 from FlashApp.Interface.Icons import *
+from FlashApp.Interface.PlugEditor import *
 
 class GraphicsScene(QtWidgets.QGraphicsScene):
     """
@@ -72,15 +73,67 @@ class GGraph(QtWidgets.QGraphicsView):
         self.setContextMenuPolicy(Qt.DefaultContextMenu)
 
         self.setMinimumSize(800, 800)
+        self.gridSize = 50
+
+        self.scene.gridSize = self.gridSize
 
         self.startPos = None
         self.pan = False
         self.setMouseTracking(True)
 
+        self.plugEditor = PlugEditor(self.iconsLib)
+        self.plugEditorProxy = QtWidgets.QGraphicsProxyWidget()
+        self.plugEditorProxy.id = 0
+        self.plugEditorProxy.setWidget(self.plugEditor)
+        self.plugEditorProxy.setFlag(QtWidgets.QGraphicsItem.ItemIgnoresTransformations, True)
+        self.plugEditorProxy.setPos(self.mapToScene(self.rect().width() - self.plugEditor.getWidth(), 0))
+        self.plugEditorProxy.setZValue(10)
+        self.scene.addItem(self.plugEditorProxy)
+
         self.cookThread = None
         self.threadCanJoin.connect(lambda: self.joinGraphThread())
 
+        self.selectedNodeChanged.connect(self.onSelectedNodeChange)
+
         QtWidgets.QApplication.instance().installEventFilter(self)
+
+    # PAINTING
+
+    def drawForeground(self, painter: QtGui.QPainter, rect: QtCore.QRectF) -> None:
+        
+        self.plugEditorProxy.setPos(self.mapToScene(self.rect().width() - self.plugEditor.getWidth() - 50, 50))
+        self.plugEditorProxy.setZValue(10)
+        
+        return super().drawForeground(painter, rect)
+
+    def drawBackground(self, painter: QtGui.QPainter, rect: QtCore.QRectF) -> None:
+        
+        brush = QtGui.QBrush(QtGui.QColor("#292D3E"), Qt.SolidPattern)
+        
+        painter.fillRect(rect, brush)
+
+        gridColor = QtGui.QColor("#464B5D")
+        gridColor.setAlpha(127)
+
+        pen = QtGui.QPen()
+        pen.setColor(gridColor)
+        pen.setWidth(1)
+        painter.setPen(pen)
+
+        left = int(rect.left()) - (int(rect.left()) % self.gridSize)
+        top = int(rect.top()) - (int(rect.top()) % self.gridSize)
+
+        gridLines = []
+
+        for x in range(left, int(rect.right()), self.gridSize):
+            gridLines.append(QtCore.QLineF(x, rect.top(), x, rect.bottom()))
+        
+        for y in range(top, int(rect.bottom()), self.gridSize):
+            gridLines.append(QtCore.QLineF(rect.left(), y, rect.right(), y))
+
+        painter.drawLines(gridLines)
+
+    # UTILS
 
     @QtCore.pyqtSlot(str)
     def onNodeSelectionChange(self, nodeId : str) -> None:
@@ -93,6 +146,8 @@ class GGraph(QtWidgets.QGraphicsView):
         """
         return self.isCookingMovie
 
+    # EVENTS
+
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """
         """
@@ -104,6 +159,8 @@ class GGraph(QtWidgets.QGraphicsView):
             self.scaleView(1 / 1.2)
         elif key == Qt.Key_Delete:
             self.deleteItem()
+        
+        return super().keyPressEvent(event)
 
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
         if event.button() == QtCore.Qt.MiddleButton and self.startPos is None:
@@ -125,6 +182,7 @@ class GGraph(QtWidgets.QGraphicsView):
             self.setSceneRect(self.sceneRect().translated(deltaX, deltaY))
 
             self.prevPos = event.pos()
+
 
         return super().mouseMoveEvent(event)
 
@@ -161,7 +219,6 @@ class GGraph(QtWidgets.QGraphicsView):
             
         return super().eventFilter(obj, event)
             
-
     def scaleView(self, scaleFactor: float) -> None:
         """
         """
@@ -171,6 +228,50 @@ class GGraph(QtWidgets.QGraphicsView):
             return
 
         self.scale(scaleFactor, scaleFactor)
+
+    def contextMenuEvent(self, event: QtGui.QContextMenuEvent) -> None:
+        """
+        """
+        position = event.globalPos()
+
+        menu = QtWidgets.QMenu()
+
+        newNodeMenu = menu.addMenu("Create Node")
+
+        for nodeType in self.nodeLibrary.GetAvailableNodes():
+            newNodeAction = QtWidgets.QAction(nodeType, self)
+            newNodeAction.setData(nodeType)
+            newNodeAction.triggered.connect(lambda: self.addNode(newNodeAction.sender().data(), QtCore.QPointF(self.mapToScene(event.pos()))))
+            newNodeMenu.addAction(newNodeAction)
+
+        computeAction = menu.addAction("Cook")
+        computeAction.triggered.connect(lambda: self.launchGraphCooking())
+
+        reloadLibAction = menu.addAction("Reload Node Library")
+        reloadLibAction.triggered.connect(lambda: self.nodeLibrary.Reload())
+
+        debugAction = menu.addAction("Debug Graph")
+        debugAction.triggered.connect(lambda: self.debugGraph())
+
+        menu.setStyleSheet("""
+QMenu {
+	background-color: rgb(201, 196, 207);
+}
+
+QMenu::item {
+    color: rgb(72, 69, 79);
+    background-color: transparent;
+}
+
+QMenu::item:selected {
+    color: rgb(72, 69, 79);
+    background-color: rgb(205, 200, 211);
+}
+        """)
+
+        menu.exec_(position)
+
+    # GRAPH FUNCTIONS
 
     def addNode(self, nodeType : str, position : QtCore.QPointF) -> None:
         """
@@ -215,6 +316,14 @@ class GGraph(QtWidgets.QGraphicsView):
         self.scene.removeItem(node)
 
         self.hasBeenEdited.emit()
+
+    @QtCore.pyqtSlot(str)
+    def onSelectedNodeChange(self, nodeId : str) -> None:
+        """
+        """
+        gNode = self.getNodeById(nodeId)
+
+        self.plugEditor.setCurrentNode(gNode)
 
     def getNodeById(self, nodeId : str) -> GNode:
         """
@@ -402,45 +511,3 @@ class GGraph(QtWidgets.QGraphicsView):
         rect = scene.sceneRect()
 
         self.scaleView(0.5)
-
-    def contextMenuEvent(self, event: QtGui.QContextMenuEvent) -> None:
-        """
-        """
-        position = event.globalPos()
-
-        menu = QtWidgets.QMenu()
-
-        newNodeMenu = menu.addMenu("Create Node")
-
-        for nodeType in self.nodeLibrary.GetAvailableNodes():
-            newNodeAction = QtWidgets.QAction(nodeType, self)
-            newNodeAction.setData(nodeType)
-            newNodeAction.triggered.connect(lambda: self.addNode(newNodeAction.sender().data(), QtCore.QPointF(self.mapToScene(event.pos()))))
-            newNodeMenu.addAction(newNodeAction)
-
-        computeAction = menu.addAction("Cook")
-        computeAction.triggered.connect(lambda: self.launchGraphCooking())
-
-        reloadLibAction = menu.addAction("Reload Node Library")
-        reloadLibAction.triggered.connect(lambda: self.nodeLibrary.Reload())
-
-        debugAction = menu.addAction("Debug Graph")
-        debugAction.triggered.connect(lambda: self.debugGraph())
-
-        menu.setStyleSheet("""
-QMenu {
-	background-color: rgb(201, 196, 207);
-}
-
-QMenu::item {
-    color: rgb(72, 69, 79);
-    background-color: transparent;
-}
-
-QMenu::item:selected {
-    color: rgb(72, 69, 79);
-    background-color: rgb(205, 200, 211);
-}
-        """)
-
-        menu.exec_(position)

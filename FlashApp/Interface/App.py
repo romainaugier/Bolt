@@ -213,7 +213,7 @@ class App(QtWidgets.QMainWindow):
 
         self.plugEditor = PlugEditor()
 
-        graphLayout.addWidget(self.plugEditor)
+        # graphLayout.addWidget(self.plugEditor)
 
         masterLayout.addLayout(graphLayout)
 
