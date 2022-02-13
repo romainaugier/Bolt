@@ -4,94 +4,11 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt
 
 from FlashApi.Core.Node import *
-from FlashApp.Interface.Node import *
+from FlashApp.Interface.GNode import *
 from FlashApp.Interface.Icons import *
-
-
-def CleanLayout(layout : QtWidgets.QLayout) -> None:
-    """
-    Deletes widgets and layouts recursively
-
-    Args:
-        layout (QtWidgets.QLayout): layout to clear
-    """
-    if layout.count() > 0:
-        while layout.count():
-            item = layout.itemAt(0)
-            widget = item.widget()
-
-            if widget is not None:
-                widget.setParent(None)
-            else:
-                CleanLayout(item.layout())
-
-
-class IconLabel(QtWidgets.QWidget):
-    """
-    """
-
-    IconSize = QtCore.QSize(20, 20)
-    HSpacing = 10
-
-    def __init__(self, pixmap : QtGui.QPixmap, text : str, finalStretch : bool = True):
-        """
-        """
-        super(QtWidgets.QWidget, self).__init__()
-
-        self.mainLayout = QtWidgets.QHBoxLayout()
-        self.mainLayout.setSpacing(0)
-        self.mainLayout.setAlignment(Qt.AlignLeft)
-        self.mainLayout.setContentsMargins(0, 0, 0, 0)
-
-        self.setLayout(self.mainLayout)
-        
-        if pixmap is not None:
-            self.icon = QtWidgets.QLabel()
-            self.mainLayout.addWidget(self.icon)
-            self.icon.setPixmap(pixmap.scaled(self.IconSize))
-            self.spacer = QtWidgets.QSpacerItem(self.HSpacing, 0)
-            self.mainLayout.addSpacerItem(self.spacer)
-        else:
-            self.icon = None
-            self.spacer = None
-
-        self.text = QtWidgets.QLabel(text)
-        self.text.setFont(QtGui.QFont("Helvetica", 14))
-        self.text.setStyleSheet("color: rgb(143, 144, 160)")
-        self.mainLayout.addWidget(self.text)
-
-    def setText(self, text : str) -> None:
-        """
-        """
-        self.text.setText(text)
-
-    def setIcon(self, pixmap = QtGui.QPixmap) -> None:
-        """
-        """
-        text = self.text.text()
-
-        self.text.setParent(None)
-
-        if self.icon is not None:
-            self.icon.setParent(None)
-
-        if self.spacer is not None:
-            self.mainLayout.removeItem(self.spacer)
-
-        if pixmap is not None:
-            self.icon = QtWidgets.QLabel()
-            self.mainLayout.addWidget(self.icon)
-            self.icon.setPixmap(pixmap.scaled(self.IconSize))
-            self.spacer = QtWidgets.QSpacerItem(self.HSpacing, 0)
-            self.mainLayout.addSpacerItem(self.spacer)
-        else:
-            self.icon = None
-            self.spacer = None
-
-        self.text = QtWidgets.QLabel(text)
-        self.text.setFont(QtGui.QFont("Helvetica", 14))
-        self.text.setStyleSheet("color: rgb(143, 144, 160)")
-        self.mainLayout.addWidget(self.text)
+from FlashApp.Interface.Widgets import *
+from FlashApp.Interface.Utils import *
+from FlashApp.Interface.Style import *
 
 
 class PlugWidget(QtWidgets.QWidget):
@@ -114,9 +31,10 @@ class PlugWidget(QtWidgets.QWidget):
 
         self.parmLongNameLabel = QtWidgets.QLabel(self.plug.GetLongName())
         self.parmLongNameLabel.setFont(QtGui.QFont("Helvetica", 8))
-        self.parmLongNameLabel.setStyleSheet("color: rgb(143, 144, 160)")
+        self.parmLongNameLabel.setStyleSheet(QColorToStyleSheet(GetQColorFromPalette(ColorPalette.FOREGROUND)))
         self.parmLongNameLabel.setMinimumWidth(40)
         self.parmLongNameLabel.setMinimumHeight(23)
+        self.labelSize = self.parmLongNameLabel.width()
         masterLayout.addWidget(self.parmLongNameLabel)
 
         masterLayout.addSpacing(20)
@@ -244,6 +162,7 @@ class PlugEditor(QtWidgets.QWidget):
         self.plugsLayout.setAlignment(Qt.AlignTop)
         self.plugsLayout.setSpacing(0)
         self.plugsLayout.setContentsMargins(0, 0, 0, 0)
+        self.plugsLayout.setSizeConstraint(QtWidgets.QLayout.SetFixedSize)
 
         self.plugsWidget = QtWidgets.QWidget()
         self.plugsWidget.setLayout(self.plugsLayout)
@@ -256,7 +175,6 @@ class PlugEditor(QtWidgets.QWidget):
         self.setStyleSheet("""
         QWidget {
             background-color: rgb(13, 14, 25);
-            border-radius: 10px;
         }
 
         QLabel {
@@ -295,7 +213,7 @@ class PlugEditor(QtWidgets.QWidget):
     def roundCorners(self) -> None:
         """
         """        
-        radius = 15.0
+        radius = 10.0
         path = QtGui.QPainterPath()
         path.addRoundedRect(QtCore.QRectF(self.rect()), radius, radius)
         mask = QtGui.QRegion(path.toFillPolygon().toPolygon())
@@ -326,6 +244,12 @@ class PlugEditor(QtWidgets.QWidget):
 
         plugCount = 0
 
+        sep = QHLine()
+        sep.setLineWidth(1)
+        sep.setMinimumWidth(self._width - 30)
+        sep.setColor(GetQColorFromPalette(ColorPalette.TEXT))
+        self.plugsLayout.addWidget(sep)
+
         for plugName, plug in self.node.GetInputs().items():
             if plug.IsExposed():
                 plugWidget = PlugWidget(plug)
@@ -337,27 +261,34 @@ class PlugEditor(QtWidgets.QWidget):
         if plugCount == 0:
             infoLabel = QtWidgets.QLabel("No exposed plug available on this node")
             infoLabel.setFont(QtGui.QFont("Helvetica", 8))
-            infoLabel.setStyleSheet("color: rgb(143, 144, 160)")
+            infoLabel.setStyleSheet(QColorToStyleSheet(GetQColorFromPalette(ColorPalette.FOREGROUND)))
             self.plugsLayout.addWidget(infoLabel)
 
         self.roundCorners()
 
     @QtCore.pyqtSlot(GNode)
-    def setCurrentNode(self, node : GNode) -> None:
+    def setCurrentNode(self, node : GNode = None) -> None:
         """
         Sets the current node of the editor
 
         Args:
-            node (Node): node to edit parameters
+            node (Node): node to edit parameters. Defaults to None.
         """
-        self.node = node.getInternalNode()
-        self.currentNodeChanged.emit()
+        if node is not None:
+            self.node = node.getInternalNode()
+            self.currentNodeChanged.emit()
 
-        self.nodeNameLabel.setText(self.node.GetName())
-        self.nodeNameLabel.setIcon(node.getPixmap())
+            self.nodeNameLabel.setText(self.node.GetName())
+            self.nodeNameLabel.setIcon(node.getPixmap())
 
-        if not self.layout() is None: self.cleanInterface()
-        self.buildInterface()
+            if not self.layout() is None: self.cleanInterface()
+
+            self.buildInterface()
+
+        else:
+            if not self.layout() is None: self.cleanInterface()
+            self.nodeNameLabel.setText("None")
+            self.nodeNameLabel.setIcon(None)
 
     def onPlugChange(self) -> None:
         """

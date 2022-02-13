@@ -4,7 +4,7 @@
 
 name = Warning
 color = [50, 222, 132]
-icon = D:/dev/Flash/Library/Icons/debug.png
+icon = $FLASH_ICONS/debug.png
 
 # EndAttr
 

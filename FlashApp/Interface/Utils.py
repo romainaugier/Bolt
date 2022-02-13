@@ -1,34 +1,34 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class QHLine(QtWidgets.QFrame):
-    def __init__(self):
-        super().__init__()
-        self.setMinimumWidth(1)
-        self.setFixedHeight(10)
-        self.setFrameShape(QtWidgets.QFrame.HLine)
-        self.setFrameShadow(QtWidgets.QFrame.Plain)
-        self.setContentsMargins(0, 0, 0, 0)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
+def CleanLayout(layout : QtWidgets.QLayout) -> None:
+    """
+    Deletes widgets and layouts recursively
 
-    def setColor(self, color):
-        pal = self.palette()
-        pal.setColor(QtGui.QPalette.WindowText, color)
-        self.setPalette(pal)
+    Args:
+        layout (QtWidgets.QLayout): layout to clear
+    """
+    if layout.count() > 0:
+        while layout.count():
+            item = layout.itemAt(0)
+            widget = item.widget()
+
+            if widget is not None:
+                widget.setParent(None)
+            else:
+                CleanLayout(item.layout())
+
+
+def QColorToStyleSheet(foreground : QtGui.QColor = None, background : QtGui.QColor = None) -> str:
+    """
+    Returns a stylesheet string from the given color
+    """
+    styleSheetStr = ""
     
+    if foreground is not None:
+        styleSheetStr += f"color: rgb({foreground.red()}, {foreground.green()}, {foreground.blue()})"
+    
+    if background is not None:
+        styleSheetStr += f"background-color: rgb({foreground.red()}, {foreground.green()}, {foreground.blue()})"
 
-class QVLine(QtWidgets.QFrame):
-    def __init__(self):
-        super().__init__()
-        self.setFixedWidth(10)
-        self.setMinimumHeight(1)
-        self.setLineWidth(2)
-        self.setFrameShape(QtWidgets.QFrame.VLine)
-        self.setFrameShadow(QtWidgets.QFrame.Plain)
-        self.setContentsMargins(0, 0, 0, 0)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Preferred)
-        
-    def setColor(self, color):
-        pal = self.palette()
-        pal.setColor(QtGui.QPalette.WindowText, color)
-        self.setPalette(pal)
+    return styleSheetStr

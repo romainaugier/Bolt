@@ -4,7 +4,7 @@
 
 name = MayaPy
 color = [33, 163, 165]
-icon = D:/dev/Flash/Library/Icons/maya.png
+icon = $FLASH_ICONS/maya.png
 
 # EndAttr
 

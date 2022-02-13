@@ -3,9 +3,11 @@ import os
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from FlashApp.Interface.Icons import *
-from FlashApp.Interface.Graph import *
+from FlashApp.Interface.GGraph import *
 from FlashApi.Core.Logger import *
+from FlashApi.Core.Environment import *
 from FlashApp.Interface.Utils import *
+from FlashApp.Interface.Widgets import *
 
 
 class GraphTabs(QtWidgets.QWidget):
@@ -25,12 +27,10 @@ class GraphTabs(QtWidgets.QWidget):
 
         self.tabs = QtWidgets.QTabWidget()
 
-        self.addTab()
-
         self.layout.addWidget(self.tabs)
         self.setLayout(self.layout)
 
-    def addTab(self, graph : GGraph = None) -> None:
+    def addTab(self, graph : GGraph = None, env : Environment = None) -> None:
         """
         Adds a new tab with a graph if provided
 
@@ -44,7 +44,7 @@ class GraphTabs(QtWidgets.QWidget):
         if graph is not None:
             gGraph = graph
         else:
-            gGraph = GGraph(self.nodeLib, self.logger)
+            gGraph = GGraph(self.nodeLib, self.logger, env)
 
         self.tabs.addTab(self.newTab, self.iconsLib.GetIcon("graph-edited"), f"{gGraph.graph.GetName()}")
         self.tabs.setIconSize(QtCore.QSize(18, 18))
@@ -103,7 +103,9 @@ class App(QtWidgets.QMainWindow):
 
         self.logger = Logger(level=LogLevel.DIAGNOSTIC)
 
-        self.nodeLib = Lib(self.logger)
+        self.environment = Environment()
+
+        self.nodeLib = Lib(self.logger, self.environment)
 
         self.icons = Icons()
 
@@ -185,7 +187,7 @@ class App(QtWidgets.QMainWindow):
         
         # Shortcuts
         self.newGraphSc = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+N"), self)
-        self.newGraphSc.activated.connect(lambda: self.graphTabs.addTab())
+        self.newGraphSc.activated.connect(lambda: self.addGraph())
 
         self.closeGraphSc = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+W"), self)
         self.closeGraphSc.activated.connect(lambda: self.closeGraph())
@@ -204,6 +206,14 @@ class App(QtWidgets.QMainWindow):
         
         self.layoutGraphSc = QtWidgets.QShortcut(QtGui.QKeySequence("L"), self)
         self.layoutGraphSc.activated.connect(lambda: self.layoutGraph())
+
+        # Init at least one graph
+        self.addGraph()
+
+    def addGraph(self) -> None:
+        """
+        """
+        self.graphTabs.addTab(env=self.environment)
 
     def closeGraph(self, index : int = None) -> None:
         """
@@ -259,12 +269,12 @@ class App(QtWidgets.QMainWindow):
         filePath, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Open File", "C:/", "Flash Graph (*.fgraph)")
         
         if os.path.exists(filePath):
-            newGraph = Graph(self.logger)
+            newGraph = Graph(self.logger, self.environment)
             newGraph.LoadFromFile(filePath)
 
-            newGGraph = GGraph(self.nodeLib, self.logger, newGraph)
+            newGGraph = GGraph(self.nodeLib, self.logger, self.environment, newGraph)
 
-            self.graphTabs.addTab(newGGraph)
+            self.graphTabs.addTab(graph=newGGraph)
 
     def layoutGraph(self, index : int = None) -> None:
         """

@@ -4,7 +4,7 @@
 
 name = Python
 color = [52, 115, 165]
-icon = D:/dev/Flash/Library/Icons/python.png
+icon = $FLASH_ICONS/python.png
 
 # EndAttr
 

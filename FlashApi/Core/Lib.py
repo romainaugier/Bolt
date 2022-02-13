@@ -3,20 +3,20 @@ import sys, os, copy
 
 from FlashApi.Core.Node import *
 from FlashApi.Core.Logger import *
-
-from FlashApp import FLASHROOT
+from FlashApi.Core.Environment import *
 
 
 class Lib():
     """
     Library that manages the nodes definitions
     """
-    def __init__(self, logger : Logger):
+    def __init__(self, logger : Logger, environment : Environment):
         """
         """
         self.logger = logger
+        self.environment = environment
 
-        self.path = [f"{os.path.dirname(sys.executable)}/Library/Nodes", f"{FLASHROOT}/Library/Nodes"]
+        self.path = [f"{self.environment.Get('FLASH_LIB')}/Nodes"]
 
         searchPaths = ""
 
@@ -35,7 +35,7 @@ class Lib():
             if os.path.exists(path):
                 for item in os.listdir(path):
                     if item.endswith(".fnode"):
-                        tmpNode = Node()
+                        tmpNode = Node(self.environment)
                         tmpNode.Load(f"{path}/{item}")
 
                         self.nodePaths[tmpNode.GetName()] = f"{path}/{item}"
@@ -69,7 +69,7 @@ class Lib():
             Node: node instance
         """
         if nodeName in self.nodePaths:
-            newNode = Node()
+            newNode = Node(self.environment)
             newNode.Load(self.nodePaths[nodeName])
             newNode.SetLogger(self.logger)
             return newNode

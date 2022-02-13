@@ -35,3 +35,8 @@ def GetNewRandomPyFile() -> str:
         str: path to the file
     """
     return "{}/{}.py".format(GetRoamingDataDir(), binascii.hexlify(os.urandom(16)).hex())
+
+def CleanPath(path : str) -> str:
+    """
+    """
+    return path.replace("\\", "/")

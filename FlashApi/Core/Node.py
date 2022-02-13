@@ -5,6 +5,7 @@ import re, json, copy, os
 
 import FlashApi.Core.FileSystem as FileSystem
 from FlashApi.Core.Logger import *
+from FlashApi.Core.Environment import *
 
 # Pre declaration of classes
 
@@ -124,10 +125,7 @@ class Parser():
             elif line.startswith("icon"):
                 lineSplit = self.SplitEqual(line)
                 iconPath = lineSplit[1].strip()
-                if os.path.exists(iconPath):
-                    self.iconPath = iconPath
-                else:
-                    self.iconPath = ""
+                self.iconPath = iconPath
                 
             elif line.startswith("# EndAttr"):
                 return lineIndex + 1
@@ -382,9 +380,10 @@ class Plug():
 class Node():
     """
     """
-    def __init__(self):
+    def __init__(self, environment : Environment):
         """
         """
+        self.environment = copy.deepcopy(environment)
         self.logger = None
         self.isDirty = True
         self.hasError = False
@@ -410,6 +409,8 @@ class Node():
         Sets the name of the node
         """
         self.name = name
+
+        self.UpdateEnv()
 
     def GetName(self) -> str:
         """
@@ -499,6 +500,16 @@ class Node():
         """
         Returns:
             str: path to the node icon
+        """
+        if self.environment.SearchInString(self.iconPath):
+            return self.environment.ReplaceInString(self.iconPath)
+        else:
+            return self.iconPath
+
+    def GetIconPathRaw(self) -> str:
+        """
+        Returns:
+            str: raw path to the node icon (environment variables won't be evaluated)
         """
         return self.iconPath
 
@@ -737,6 +748,9 @@ class Node():
         self.iconPath = nodeDefinition["iconPath"]
         self.opCode = nodeDefinition["opCode"]
 
+        if not os.path.exists(self.GetIconPath()):
+            self.iconPath = ""
+
         for plug in nodeDefinition["plugs"]:
             if "in" in plug.GetShortName():
                 plug.SetNode(self)
@@ -745,6 +759,7 @@ class Node():
                 plug.SetNode(self)
                 self.outputs[plug.GetShortName()] = plug
 
+        self.UpdateEnv()
 
         self.Compile()
 
@@ -760,7 +775,7 @@ class Node():
         nodeAsDict["name"] = self.GetName()
         nodeAsDict["id"] = self.GetID()
         nodeAsDict["color"] = self.GetColor()
-        nodeAsDict["iconPath"] = self.GetIconPath()
+        nodeAsDict["iconPath"] = self.GetIconPathRaw()
         nodeAsDict["opCode"] = self.GetOpCode()
 
         nodeAsDict["inputs"] = {}
@@ -854,3 +869,16 @@ class Node():
         Compiles the node code to fasten the code execution
         """
         self.opCompiledCode = compile(self.opCode, "compiledCode", "exec")
+
+    def UpdateEnv(self, environment : Environment = None) -> None:
+        """
+        """
+        if environment is not None:
+            self.environment.Variables.update(environment.Variables)
+
+        self.environment.Set("NODE_NAME", self.GetName())
+
+    def SetEnv(self, environment : Environment) -> None:
+        """
+        """
+        self.environment = environment

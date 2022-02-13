@@ -36,7 +36,7 @@ def GetPlugColor(plugType : PlugType) -> QtGui.QColor:
     if plugType == PlugType.CUSTOM: return QtGui.QColor("#f07178")
 
 
-def GetFontRect(text : str) -> QtCore.QRect:
+def GetFontRect(text : str, font : str, size : int) -> QtCore.QRect:
     """
     Gets size of a text
 
@@ -46,13 +46,16 @@ def GetFontRect(text : str) -> QtCore.QRect:
     Returns:
         QtCore.QRect: bounding box of the text
     """
-    metric = QtGui.QFontMetrics(QtGui.QFont("Helvetica", 8))
+    metric = QtGui.QFontMetrics(QtGui.QFont(font, size))
     return metric.boundingRect(text)
 
 
-class GPlug(QtWidgets.QGraphicsItem):
+class GPlug(QtWidgets.QGraphicsObject):
     """
     """
+
+    hasBeenRightClicked = QtCore.pyqtSignal(list)
+
     def __init__(self, x: int, y: int, plug : Plug, node: Node, graph : GGraph, input=True, parent=None):
         super().__init__(parent=parent)
 
@@ -79,7 +82,7 @@ class GPlug(QtWidgets.QGraphicsItem):
         if not input:
             malus = self.radius / 2.0
 
-        self.labelRect = GetFontRect(self.getInternalPlug().GetShortName())
+        self.labelRect = GetFontRect(self.getInternalPlug().GetShortName(), "Helvetica", 8)
 
         self.textWOffset = 5
 
@@ -144,6 +147,8 @@ class GPlug(QtWidgets.QGraphicsItem):
             fontRect = QtCore.QRect(0, 0, self.labelRect.width() + self.textWOffset, self.radius)
             painter.drawText(fontRect, 0, self.getInternalPlug().GetShortName())
 
+    # EVENTS
+
     def hoverEnterEvent(self, ev) -> None:
         """
         """
@@ -155,10 +160,16 @@ class GPlug(QtWidgets.QGraphicsItem):
         """
         self.isHovered = False
         self.update()
+
+    def mousePressEvent(self, event: 'QGraphicsSceneMouseEvent') -> None:
+        if event.buttons() & QtCore.Qt.RightButton:
+            self.hasBeenRightClicked.emit([self.node.getInternalNode().GetID(), self.getInternalPlug().GetShortName()])
+        
+        return super().mousePressEvent(event)
     
-    def mouseMoveEvent(self, ev) -> None:
-        x = ev.scenePos().x()
-        y = ev.scenePos().y()
+    def mouseMoveEvent(self, event) -> None:
+        x = event.scenePos().x()
+        y = event.scenePos().y()
 
         dist = 2 ** 30
         closestGPlug = None
@@ -177,7 +188,9 @@ class GPlug(QtWidgets.QGraphicsItem):
 
         self.closestGPlug = closestGPlug
 
-    def mouseReleaseEvent(self, ev) -> None:
+        return super().mousePressEvent(event)
+
+    def mouseReleaseEvent(self, event : 'QGraphicsSceneMouseEvent') -> None:
         if self.closestGPlug is not None and not self.closestGPlug.id == self.id:
             condition1 = True
 
@@ -207,19 +220,102 @@ class GPlug(QtWidgets.QGraphicsItem):
                         self.graph.deleteEdge(edge)
 
                 self.graph.addEdge(self, self.closestGPlug)
-            
+        
+        return super().mouseMoveEvent(event)
+
+    def contextMenuEvent(self, event: QtGui.QContextMenuEvent) -> None:
+        """
+        """
+        super().contextMenuEvent(event)
+
+        position = event.screenPos()
+
+        menu = QtWidgets.QMenu()
+
+        printAction = QtWidgets.QAction("Debug")
+        printAction.triggered.connect(lambda: print("Debug"))
+        menu.addAction(printAction)
+
+        if self.getInternalPlug().IsConnected():
+            disconnectAction = menu.addAction("Disconnect")
+            # disconnectAction.triggered.connect(lambda: self.deleteEdges())
+
+        if self.isInput:
+            if self.getInternalPlug().IsExposed():
+                unexposeAction = QtWidgets.QAction("Unexpose")
+                unexposeAction.triggered.connect(self.unexpose)
+                menu.addAction(unexposeAction)
+            else:
+                unexposeAction = QtWidgets.QAction("Expose")
+                unexposeAction.triggered.connect(self.expose)
+                menu.addAction(unexposeAction)
+
+        # menu.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        menu.setStyleSheet("""
+QMenu {
+	background-color: rgb(13, 14, 25);
+    border-radius: 20px;
+}
+
+QMenu::item {
+    color: rgb(143, 144, 160);
+    background-color: transparent;
+}
+
+QMenu::item:selected {
+    color: rgb(255, 255, 255);
+    background-color: rgb(64, 69, 102);
+}
+        """)
+
+        action = menu.exec(QtCore.QPoint(position.x(), position.y()))
+
+        event.setAccepted(True)
+
+    # MISC      
+
+    def expose(self) -> None:
+        """
+        """
+        self.getInternalPlug().SetExposed(True)
+        self.color.setAlpha(62)
+        self.setAcceptTouchEvents(False)
+        self.update(self.boundingRect())
+
+        self.hasBeenRightClicked.emit([])
+        
+    def unexpose(self) -> None:
+        """
+        """
+        self.getInternalPlug().SetExposed(False)
+        self.color.setAlpha(255)
+        self.setAcceptTouchEvents(True)
+        self.update(self.boundingRect())
+        
+        self.hasBeenRightClicked.emit([])
 
     def addEdge(self, edge : GEdge) -> None:
         """
         """
         self.edges.append(edge)
 
+    def deleteEdges(self) -> None:
+        """
+        """
+        for edge in self.edges:
+            edge.source.getInternalPlug().Disconnect(edge.destination.getInternalPlug())
+
+            edge.source.edges.remove(edge)
+            edge.destination.edges.remove(edge)
+
+            self.scene.removeItem(edge)
 
 class GNode(QtWidgets.QGraphicsObject):
     """
     """
 
     hasBeenSelected = QtCore.pyqtSignal(str)
+    plugHasBeenClicked = QtCore.pyqtSignal(list)
 
     def __init__(self, node : Node, name : str, graph : GGraph, iconsLib : Icons):
         super().__init__()
@@ -239,8 +335,23 @@ class GNode(QtWidgets.QGraphicsObject):
             self.pixMap = None
 
         self.newPos = QtCore.QPointF()
+        self.iconSize = 18
 
-        self.sizeX = 250
+        labelSizeX = GetFontRect(self.name, "Helvetica", 12).width() * 2 + 3 * self.iconSize
+        inputNameSizeX = 0
+        outputNameSizeX = 0
+
+        for inputName in self.getInternalNode().GetInputs():
+            size = GetFontRect(inputName, "Helvetica", 8).width() + 15 + 5
+            inputNameSizeX = size if size > inputNameSizeX else inputNameSizeX
+        
+        for outputName in self.getInternalNode().GetOutputs():
+            size = GetFontRect(outputName, "Helvetica", 8).width() + 15 + 5
+            outputNameSizeX = size if size > outputNameSizeX else outputNameSizeX
+
+        plugsSize = inputNameSizeX + outputNameSizeX + 30
+
+        self.sizeX = labelSizeX if labelSizeX > plugsSize else plugsSize
         self.sizeY = 125
         self.labelSizeY = 30
 
@@ -269,6 +380,7 @@ class GNode(QtWidgets.QGraphicsObject):
             positionY = self.pos().y() + self.labelSizeY + (bodySizeYPerPlug * i)
             
             newGPlug = GPlug(positionX, positionY, input, self, self.graph, parent=self)
+            newGPlug.hasBeenRightClicked.connect(self.onPlugClicked)
             self.inputGPlugs.append(newGPlug)
 
             i += 1
@@ -278,6 +390,7 @@ class GNode(QtWidgets.QGraphicsObject):
             positionY = self.pos().y() + self.labelSizeY + bodySizeYPerPlug
             
             newGPlug = GPlug(positionX, positionY, output, self, self.graph, input=False, parent=self)
+            newGPlug.hasBeenRightClicked.connect(self.onPlugClicked)
             self.outputGPlugs.append(newGPlug)
 
         self.numInputs = numInputs
@@ -384,9 +497,10 @@ class GNode(QtWidgets.QGraphicsObject):
         pixMapWidth = 0
 
         if self.pixMap is not None:
-            pixMapWidth = 18
+            pixMapWidth = self.iconSize
             painter.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
             painter.setRenderHint(QtGui.QPainter.LosslessImageRendering)
+            painter.setRenderHint(QtGui.QPainter.HighQualityAntialiasing)
             painter.drawPixmap(7, 7, pixMapWidth, pixMapWidth, self.pixMap)
 
         # Label name
@@ -413,6 +527,12 @@ class GNode(QtWidgets.QGraphicsObject):
         # painter.drawPixmap(0, 0, 48, 48, self.errorPixmap)
 
     # EVENTS
+
+    @QtCore.pyqtSlot(list)
+    def onPlugClicked(self, data : list) -> None:
+        # print(data)
+        self.plugHasBeenClicked.emit(data)
+        self.hasBeenSelected.emit(self.getInternalNode().GetID())
 
     def hoverEnterEvent(self, ev):
         self.isHovered = True
@@ -461,9 +581,9 @@ class GNode(QtWidgets.QGraphicsObject):
                 self.setPos(updatedCursorX, updatedCursorY)
             
             self.adjustEdges()
-
-    def mouseReleaseEvent(self, ev):
-        pass
+        
+        else:
+            return super().mouseMoveEvent(event)
 
     # CHANGE
 
@@ -477,7 +597,6 @@ class GNode(QtWidgets.QGraphicsObject):
         for outputPlug in self.outputGPlugs:
             for edge in outputPlug.edges:
                 edge.adjust()   
-
 
 
 class Edge(QtWidgets.QGraphicsLineItem):

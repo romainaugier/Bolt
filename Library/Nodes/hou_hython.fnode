@@ -4,7 +4,7 @@
 
 name = Hython
 color = [255, 87, 34]
-icon = D:/dev/Flash/Library/Icons/houdini.png
+icon = $FLASH_ICONS/houdini.png
 
 # EndAttr
 

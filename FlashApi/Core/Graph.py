@@ -1,22 +1,26 @@
-import binascii, os, time, threading, json
+import binascii, os, time, threading, json, copy
 
-from FlashApi.Core.Node import Node
+from FlashApi.Core.Node import *
 from FlashApi.Core.Logger import *
+from FlashApi.Core.Environment import *
 
 
 class Graph():
     """
     """
-    def __init__(self, logger : Logger, name : str = ""):
+    def __init__(self, logger : Logger, environment : Environment, name : str = ""):
         """
         """
         self.logger = logger
+        self.environment = copy.deepcopy(environment)
         self.name = name
         self.savePath = ""
         self.hasError = False
         self.nodes : list[Node] = []
         self.sortedNodes : list[Node] = []
         self.nodeCount = 0
+
+        self.UpdateEnv()
 
     def GetName(self) -> str:
         """
@@ -40,6 +44,20 @@ class Graph():
         """
         for node in self.nodes:
             node.SetDirty()
+
+    def UpdateEnv(self) -> None:
+        """
+        """
+        self.environment.Set("GRAPH_NAME", self.name)
+        self.environment.Set("GRAPH_DIR", os.path.dirname(self.savePath))
+
+        for node in self.nodes:
+            node.UpdateEnv(self.environment)
+
+    def GetEnv(self) -> Environment:
+        """
+        """
+        return self.environment
 
     def HasNodesToSort(self) -> bool:
         """
@@ -226,7 +244,7 @@ class Graph():
         nodesAsDicts = json.loads(serializedGraph)
 
         for node in nodesAsDicts:
-            tmpNode = Node()
+            tmpNode = Node(self.environment)
             tmpNode.SetLogger(self.logger)
             tmpNode.FromDict(node)
             self.nodes.append(tmpNode)
@@ -261,6 +279,8 @@ class Graph():
                 serializedGraph = self.Serialize().encode("utf-8")
                 file.write(serializedGraph)
 
+        self.UpdateEnv()
+
     def LoadFromFile(self, filePath : str) -> None:
         """
         Loads a graph from a file
@@ -268,6 +288,9 @@ class Graph():
         Args:
             filePath (str): file to load the graph from
         """
+        if self.environment.SearchInString(filePath):
+            filePath = self.environment.ReplaceInString(filePath)
+
         if not os.path.exists(filePath):
             self.logger.Log(LogLevel.ERROR, f"Can't load graph from file {filePath}, it does not exist")
         else:
@@ -276,3 +299,5 @@ class Graph():
 
             with open(filePath, "r", encoding="utf-8") as file:
                 self.Deserialize(file.read())
+
+        self.UpdateEnv()

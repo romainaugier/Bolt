@@ -5,7 +5,7 @@
 
 name = Template                                 // Name of the node
 color = [255, 127, 64]                          // Color that will be used in the interface
-icon = D:/dev/Flash/Library/Icons/flash.png     // Icons must be png files
+icon = $FLASH_ICONS/flash.png     // Icons must be png files
 
 # EndAttr                                       // End the attributes definition
 
