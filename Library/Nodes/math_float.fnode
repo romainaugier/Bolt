@@ -1,0 +1,36 @@
+// Output a float constant
+
+# BeginAttr 
+
+name = Float
+
+# EndAttr
+
+# BeginPlugs
+
+# BeginPlug 
+
+shortName = infloat
+longName = Value
+defaultValue = 0.0
+type = float
+exposed = True
+
+# EndPlug
+
+# BeginPlug 
+
+shortName = outfloat
+longName = Output Float
+defaultValue = 0.0
+type = float
+
+# EndPlug
+
+# EndPlugs
+
+# BeginOp
+
+outfloat = infloat
+
+# EndOp

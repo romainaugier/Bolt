@@ -1,0 +1,56 @@
+// Generates a script to load an alembic file into a gproject file
+
+# BeginAttr
+
+name = Mercs_LoadAlembic
+icon = $FLASH_ICONS/guerilla-render.png
+
+# EndAttr
+
+# BeginPlugs
+
+# BeginPlug
+
+shortName = inabcfile
+longName = Alembic File
+defaultValue = ""
+type = str
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = outscriptfile
+longName = Output Script File
+defaultValue = ""
+type = str
+
+# EndPlug
+
+# EndPlugs
+
+# BeginOp
+
+generatedScript = f"""import guerilla, os
+
+print("test")
+
+path = "{inabcfile}"
+
+name = os.path.basename(path)
+
+with guerilla.Modifier() as mod:
+	mod.createref(name, path, options={{'prefixnodes':False,'containschildren':True}})
+
+guerilla.Document().save()
+"""
+
+tmpScriptFilePath = FlashTempScript()
+
+with open(tmpScriptFilePath, "w") as scriptFile:
+    scriptFile.write(generatedScript)
+
+outscriptfile = tmpScriptFilePath
+
+# EndOp

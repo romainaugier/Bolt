@@ -1,3 +1,5 @@
+import os
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
@@ -112,3 +114,83 @@ class IconLabel(QtWidgets.QWidget):
         """
         self.text.setFont(QtGui.QFont(fontName, fontSize))
         self.text.setStyleSheet(f"color: rgb({color[0]}, {color[1]}, {color[2]})")
+
+class ContextMenu(QtWidgets.QMenu):
+    """
+    """
+    def __init__(self, parent=None):
+        """
+        """
+        super(ContextMenu, self).__init__()
+
+        self.radius = 5
+
+        self.setStyleSheet("""
+    QMenu {
+        background-color: rgb(13, 14, 25);
+        border-radius: 20px;
+    }
+
+    QMenu::item {
+        color: rgb(143, 144, 160);
+        background-color: transparent;
+    }
+
+    QMenu::item:selected {
+        color: rgb(255, 255, 255);
+        background-color: rgb(64, 69, 102);
+    }
+""")
+
+    # https://stackoverflow.com/questions/65574567/rounded-corners-for-qmenu-in-pyqt
+    def resizeEvent(self, event):
+        """
+        """
+        path = QtGui.QPainterPath()
+        # the rectangle must be translated and adjusted by 1 pixel in order to 
+        # correctly map the rounded shape
+        rect = QtCore.QRectF(self.rect()).adjusted(.5, .5, -1.5, -1.5)
+        path.addRoundedRect(rect, self.radius, self.radius)
+        # QRegion is bitmap based, so the returned QPolygonF (which uses float
+        # values must be transformed to an integer based QPolygon
+        region = QtGui.QRegion(path.toFillPolygon(QtGui.QTransform()).toPolygon())
+        self.setMask(region)
+
+
+class LineEdit(QtWidgets.QLineEdit):
+    """
+    """
+
+    def __init__(self, parent=None):
+        """
+        """
+        super(LineEdit, self).__init__(parent)
+
+        self.setAcceptDrops(True)
+        
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasUrls:
+            event.accept()
+        else:
+            event.ignore()
+
+    def dragMoveEvent(self, event):
+        if event.mimeData().hasUrls:
+            event.setDropAction(QtCore.Qt.CopyAction)
+            event.accept()
+        else:
+            event.ignore()
+
+    def dropEvent(self, event):
+        if event.mimeData().hasUrls:
+            event.setDropAction(QtCore.Qt.CopyAction)
+            event.accept()
+
+            for url in event.mimeData().urls():
+                itemPath = url.toLocalFile()
+                
+                if os.path.isfile(itemPath):
+                    self.setText(itemPath)
+                    self.editingFinished.emit()
+        else:
+            event.ignore()

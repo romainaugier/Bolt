@@ -251,34 +251,35 @@ class App(QtWidgets.QMainWindow):
         if index is None:
             index = self.graphTabs.getActiveTabIndex()
 
+        graph : GGraph = self.graphTabs.tabs.widget(index).layout.itemAt(0).widget()
         internalGraph : Graph = self.graphTabs.tabs.widget(index).layout.itemAt(0).widget().graph
 
         if internalGraph.GetSavePath() != "" and not forceName:
             filePath = internalGraph.GetSavePath()
         else:
-            filePath, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save File", "C:/", "Flash Graph (*.fgraph)")
+            filePath, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save File", self.environment.Get("FLASH_ROOT"), "Flash Graph (*.fgraph)")
 
-        internalGraph.SaveToFile(filePath)
+        if filePath != "":
+            graph.saveGraph(filePath)
 
-        self.graphTabs.tabs.setTabText(index, internalGraph.GetName())
+            self.graphTabs.tabs.setTabText(index, internalGraph.GetName())
 
     def loadGraph(self) -> None:
         """
         Loads a graph from a file
         """
-        filePath, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Open File", "C:/", "Flash Graph (*.fgraph)")
+        filePath, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Open File", self.environment.Get("FLASH_ROOT"), "Flash Graph (*.fgraph)")
         
         if os.path.exists(filePath):
-            newGraph = Graph(self.logger, self.environment)
-            newGraph.LoadFromFile(filePath)
+            newGGraph = GGraph(self.nodeLib, self.logger, self.environment)
 
-            newGGraph = GGraph(self.nodeLib, self.logger, self.environment, newGraph)
+            newGGraph.loadGraph(filePath)
 
             self.graphTabs.addTab(graph=newGGraph)
 
     def layoutGraph(self, index : int = None) -> None:
         """
-        Layouts the grpah at the given index 
+        Layouts the graph at the given index 
 
         Args:
             index (int, optional): graph index. Defaults to None.

@@ -1,0 +1,90 @@
+// Calls guerilla --nogui with a generated script file passed in the first input
+
+# BeginAttr
+
+name = Mercs_GuerillaBatch
+color = [52, 115, 165]
+icon = $FLASH_ICONS/guerilla-render.png
+
+# EndAttr
+
+# BeginPlugs
+
+# BeginPlug
+
+shortName = inscript
+longName = Input Script Path
+defaultValue = ""
+type = str
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = inguerilladir
+longName = Input Guerilla Directory
+defaultValue = "P:/GUERILLA/2.3.0.13_Romain"
+type = str
+exposed = True
+
+# EndPlug
+
+# BeginPlug
+
+shortName = inguerillafile
+longName = Input Guerilla File
+defaultValue = ""
+type = str
+exposed = True
+
+# EndPlug
+
+# BeginPlug
+
+shortName = output
+longName = Output
+defaultValue = ""
+type = custom
+
+# EndPlug
+
+# EndPlugs
+
+# BeginOp
+
+import subprocess, platform, os
+
+FlashLogMessage(f"GuerillaBatch : Start executing script : {inscript}")
+
+if platform.system == "windows":
+    command = [f"{inguerilladir}/guerillaBatch", "--nogui"] 
+    
+    if os.path.exists(inguerillafile):
+        command.append(inguerillafile)
+    
+    command.append(inscript)
+else:
+    command = [f"{inguerilladir}/guerilla", "--nogui"]
+
+    if os.path.exists(inguerillafile):
+        command.append(inguerillafile)
+    
+    command.append(inscript)
+
+FlashLogMessage(f"GuerillaBatch Command : {' '.join(command)}")
+
+process = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+
+stdout, stderr = process.communicate()
+
+stdoutAsStr = stdout.decode("utf-8")
+stderrAsStr = stderr.decode("utf-8")
+
+if len(stderrAsStr) > 0:
+    FlashLogError(stderrAsStr)
+else:
+    FlashLogMessage(f"GuerillaBatch : Finished executing script : {inscript}")
+    FlashLogMessage(stdoutAsStr)
+
+# EndOp

@@ -3,6 +3,7 @@ import binascii, os, time, threading, json, copy
 from FlashApi.Core.Node import *
 from FlashApi.Core.Logger import *
 from FlashApi.Core.Environment import *
+from FlashApi.Utils.String import Increment
 
 
 class Graph():
@@ -162,6 +163,9 @@ class Graph():
         """
         node.SetID(binascii.hexlify(os.urandom(16)).hex())
 
+        while self.GetNodeWithName(node.GetName()) is not None:
+            node.SetName(Increment(node.GetName()))
+
         self.nodes.append(node)
 
         self.nodeCount += 1
@@ -224,12 +228,15 @@ class Graph():
         Returns:
             str: serialized content
         """
+        graphDict = {}
         nodesAsDicts = []
 
         for node in self.nodes:
             nodesAsDicts.append(node.ToDict())
 
-        return json.dumps(nodesAsDicts, indent=2)
+        graphDict["nodes"] = nodesAsDicts
+
+        return json.dumps(graphDict, indent=2)
 
     def Deserialize(self, serializedGraph : str) -> None:
         """
@@ -241,7 +248,8 @@ class Graph():
         self.nodes.clear()
         self.sortedNodes.clear()
 
-        nodesAsDicts = json.loads(serializedGraph)
+        graphDict = json.loads(serializedGraph)
+        nodesAsDicts = graphDict["nodes"]
 
         for node in nodesAsDicts:
             tmpNode = Node(self.environment)

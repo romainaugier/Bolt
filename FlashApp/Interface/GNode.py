@@ -2,12 +2,12 @@ import binascii, os, math, typing
 
 from enum import Enum
 
-from FlashApi.Core.Node import *
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 
+from FlashApi.Core.Node import *
 from FlashApp.Interface.Icons import *
+from FlashApp.Interface.Widgets import *
 
 class GNode():
     pass
@@ -50,8 +50,54 @@ def GetFontRect(text : str, font : str, size : int) -> QtCore.QRect:
     return metric.boundingRect(text)
 
 
+class BadgeState(Enum):
+    """
+    """
+    DIRTY = 0
+    COOKED = 1
+    WARNING = 2
+    ERROR = 3
+
+
+class Badge(QtWidgets.QGraphicsObject):
+    """
+    Information badge that displays the cooking state of a node (cook, warning, error)
+    """
+
+    def __init__(self, x : int, y : int, node : Node, iconsLib = Icons, parent = None) -> None:
+        """
+        """
+        super().__init__(parent=parent)
+
+        self.id = binascii.hexlify(os.urandom(16)).hex()
+
+        self.node = node
+        self.iconsLibb = iconsLib
+        self.state = BadgeState.DIRTY
+        self.message = ""
+
+        self.setPos(x, y)
+
+    def updateState(self):
+        """
+        """
+        if self.node.HasError():
+            self.state = BadgeState.ERROR
+            self.message = self.node.GetErrorMessage()
+        elif self.node.HasWarning():
+            self.state = BadgeState.WARNING
+            self.message = self.node.GetWarningMessage()
+        elif self.node.IsDirty():
+            self.state = BadgeState.DIRTY
+            self.message = ""
+        elif self.node.IsCooked():
+            self.state = BadgeState.COOKED
+            self.message = ""
+
+
 class GPlug(QtWidgets.QGraphicsObject):
     """
+    Graphical representation of a plug
     """
 
     hasBeenRightClicked = QtCore.pyqtSignal(list)
@@ -230,7 +276,7 @@ class GPlug(QtWidgets.QGraphicsObject):
 
         position = event.screenPos()
 
-        menu = QtWidgets.QMenu()
+        menu = ContextMenu()
 
         printAction = QtWidgets.QAction("Debug")
         printAction.triggered.connect(lambda: print("Debug"))
@@ -251,22 +297,6 @@ class GPlug(QtWidgets.QGraphicsObject):
                 menu.addAction(unexposeAction)
 
         # menu.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-        menu.setStyleSheet("""
-QMenu {
-	background-color: rgb(13, 14, 25);
-    border-radius: 20px;
-}
-
-QMenu::item {
-    color: rgb(143, 144, 160);
-    background-color: transparent;
-}
-
-QMenu::item:selected {
-    color: rgb(255, 255, 255);
-    background-color: rgb(64, 69, 102);
-}
-        """)
 
         action = menu.exec(QtCore.QPoint(position.x(), position.y()))
 
@@ -337,7 +367,7 @@ class GNode(QtWidgets.QGraphicsObject):
         self.newPos = QtCore.QPointF()
         self.iconSize = 18
 
-        labelSizeX = GetFontRect(self.name, "Helvetica", 12).width() * 2 + 3 * self.iconSize
+        labelSizeX = GetFontRect(self.name, "Helvetica", 12).width() * 1.5 + 3 * self.iconSize
         inputNameSizeX = 0
         outputNameSizeX = 0
 
@@ -384,14 +414,18 @@ class GNode(QtWidgets.QGraphicsObject):
             self.inputGPlugs.append(newGPlug)
 
             i += 1
+
+        i = 1
         
         for outputName, output in self.getInternalNode().GetOutputs().items():
             positionX = self.pos().x() + self.sizeX - 12.5
-            positionY = self.pos().y() + self.labelSizeY + bodySizeYPerPlug
+            positionY = self.pos().y() + self.labelSizeY + (bodySizeYPerPlug * i)
             
             newGPlug = GPlug(positionX, positionY, output, self, self.graph, input=False, parent=self)
             newGPlug.hasBeenRightClicked.connect(self.onPlugClicked)
             self.outputGPlugs.append(newGPlug)
+
+            i += 1
 
         self.numInputs = numInputs
         self.numOuputs = numOutputs
@@ -607,6 +641,8 @@ class Edge(QtWidgets.QGraphicsLineItem):
 
         self.id = binascii.hexlify(os.urandom(16)).hex()
 
+        self.setAcceptHoverEvents(True)
+
         self.source = source
         self.destination = dest
         self.source.addEdge(self)
@@ -621,6 +657,8 @@ class Edge(QtWidgets.QGraphicsLineItem):
         self.setPen(QtGui.QPen(QtGui.QColor(255, 255, 255, 125), 1.0))
 
         self.adjust()
+
+    # PAINTING
 
     def adjust(self):
         """
@@ -646,6 +684,10 @@ class Edge(QtWidgets.QGraphicsLineItem):
         self.setPen(pen)
 
         self.setLine(first.x() + offsetX, first.y() + offset, last.x() + offset, last.y() + offset)
+
+        self.update(self.boundingRect())
+
+    # EVENTS
 
     def mousePressEvent(self, event) -> None:
         """

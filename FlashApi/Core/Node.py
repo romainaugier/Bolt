@@ -46,7 +46,7 @@ class Parser():
         self.inputCount = 0
         self.outputCount = 0
         self.plugs : list[Plug] = []
-        self.color = None
+        self.color = [0, 0, 0]
         self.iconPath = ""
         self.opCode = ""
         
@@ -386,6 +386,7 @@ class Node():
         self.environment = copy.deepcopy(environment)
         self.logger = None
         self.isDirty = True
+        self.isCooked = False
         self.hasError = False
         self.errorMessage = ""
         self.hasWarning = False
@@ -432,8 +433,7 @@ class Node():
         count = 0
 
         for inputName, input in self.inputs.items():
-            if not input.IsExposed():
-                count += 1
+            count += 1
 
         return count
     
@@ -521,6 +521,7 @@ class Node():
             isDirty (bool): dirty state
         """
         self.isDirty = isDirty
+        self.isCooked = not isDirty
         
     def IsDirty(self) -> bool:
         """
@@ -528,6 +529,13 @@ class Node():
             bool: dirty state of the node
         """
         return self.isDirty
+
+    def IsCooked(self) -> bool:
+        """
+        Returns:
+            bool: cooked state of the node
+        """
+        return self.isCooked
 
     def SetInQueue(self, inQueue : bool = True) -> None:
         """
@@ -656,6 +664,8 @@ class Node():
         """
         self.hasError = False
         self.errorMessage = ""
+        self.hasWarning = False
+        self.warningMessage = ""
 
         locals = {}
             
@@ -671,7 +681,12 @@ class Node():
                     "FlashError" : self.ReportError,
                     "FlashWarning" : self.ReportWarning }
         
-        exec(self.opCompiledCode, globals, locals)
+        try:
+            exec(self.opCompiledCode, globals, locals)
+        except Exception as err:
+            self.ReportError()
+            self.errorMessage = err
+            return
 
         # Get outputs         
         for outputName, output in self.outputs.items():
@@ -679,12 +694,14 @@ class Node():
                 output.SetData(locals[outputName])
 
         self.isDirty = False
+        self.isCooked = True
 
     def ReportError(self) -> None:
         """
         Emit an error signal
         """
         self.hasError = True
+        self.isCooked = False
 
     def HasError(self) -> bool:
         """
@@ -704,6 +721,19 @@ class Node():
         Emits a warning signal
         """
         self.hasWarning = True
+
+    def HasWarning(self) -> bool:
+        """
+        Returns if the node has a warning
+        """
+        return self.hasWarning
+
+    def GetWarningMessage(self) -> str:
+        """
+        Returns:
+            str: Warning message
+        """
+        return self.warningMessage
 
     def LogError(self, message) -> None:
         """
@@ -752,10 +782,10 @@ class Node():
             self.iconPath = ""
 
         for plug in nodeDefinition["plugs"]:
-            if "in" in plug.GetShortName():
+            if plug.GetShortName().startswith("in"):
                 plug.SetNode(self)
                 self.inputs[plug.GetShortName()] = plug
-            elif "out" in plug.GetShortName():
+            elif plug.GetShortName().startswith("out"):
                 plug.SetNode(self)
                 self.outputs[plug.GetShortName()] = plug
 

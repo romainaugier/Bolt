@@ -1,0 +1,59 @@
+// Switch between the 2 input nodes
+
+# BeginAttr
+
+name = Switch
+
+# EndAttr
+
+# BeginPlugs
+
+# BeginPlug
+
+shortName = input1
+longName = Input 1
+defaultValue = None
+type = custom
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = input2
+longName = Input 2
+defaultValue = None
+type = custom
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = inswitchindex   
+longName = Switch Index
+defaultValue = 0
+type = int
+exposed = True
+
+# EndPlug
+
+# BeginPlug
+
+shortName = output
+longName = Output
+defaultValue = None
+type = custom
+
+# EndPlug
+
+# EndPlugs
+
+# BeginOp
+
+if inswitchindex == 0:
+    output = input1
+else:
+    output = input2
+
+# EndOp

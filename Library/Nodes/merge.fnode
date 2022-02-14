@@ -1,0 +1,47 @@
+// Merges two nodes and outputs data combined in a list
+
+# BeginAttr
+
+name = Merge
+icon = $FLASH_ICONS/merge.png
+
+# EndAttr
+
+# BeginPlugs
+
+# BeginPlug
+
+shortName = input1
+longName = Input 1
+defaultValue = None
+type = custom
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = input2
+longName = Input 2
+defaultValue = None
+type = custom
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = output
+longName = Output
+defaultValue = []
+type = list
+
+# EndPlug
+
+# EndPlugs
+
+# BeginOp
+
+output = [input1, input2]
+
+# EndOp

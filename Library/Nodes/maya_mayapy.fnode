@@ -2,7 +2,7 @@
 
 # BeginAttr
 
-name = MayaPy
+name = Maya_MayaPy
 color = [33, 163, 165]
 icon = $FLASH_ICONS/maya.png
 

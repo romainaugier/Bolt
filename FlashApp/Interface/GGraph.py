@@ -81,13 +81,8 @@ class GGraph(QtWidgets.QGraphicsView):
         self.setMouseTracking(True)
 
         self.plugEditor = PlugEditor(self.iconsLib)
-        self.plugEditorProxy = QtWidgets.QGraphicsProxyWidget()
-        self.plugEditorProxy.id = 0
-        self.plugEditorProxy.setWidget(self.plugEditor)
-        self.plugEditorProxy.setFlag(QtWidgets.QGraphicsItem.ItemIgnoresTransformations, True)
-        self.plugEditorProxy.setZValue(10)
-        self.plugEditorProxy.setPos(self.mapToScene(self.rect().width() - self.plugEditor.getWidth() - 50, 50))
-        self.scene.addItem(self.plugEditorProxy)
+        self.plugEditor.setParent(self)
+        self.plugEditor.move(self.rect().width() - self.plugEditor.getWidth() - 50, 50)
 
         self.cookThread = None
         self.threadCanJoin.connect(lambda: self.joinGraphThread())
@@ -104,13 +99,6 @@ class GGraph(QtWidgets.QGraphicsView):
         return self.graph.environment
 
     # PAINTING
-
-    def drawForeground(self, painter: QtGui.QPainter, rect: QtCore.QRectF) -> None:
-        
-        self.plugEditorProxy.setPos(self.mapToScene(self.rect().width() - self.plugEditor.getWidth() - 50, 50))
-        self.plugEditorProxy.setZValue(10)
-        
-        return super().drawForeground(painter, rect)
 
     def drawBackground(self, painter: QtGui.QPainter, rect: QtCore.QRectF) -> None:
         
@@ -153,6 +141,13 @@ class GGraph(QtWidgets.QGraphicsView):
         return self.isCookingMovie
 
     # EVENTS
+
+    def resizeEvent(self, event: QtGui.QResizeEvent) -> None:
+        """
+        """
+        self.plugEditor.move(self.rect().width() - self.plugEditor.getWidth() - 50, 50)
+        
+        return super().resizeEvent(event)
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """
@@ -256,7 +251,7 @@ class GGraph(QtWidgets.QGraphicsView):
         if not event.isAccepted():
             position = event.globalPos()
 
-            menu = QtWidgets.QMenu()
+            menu = ContextMenu()
 
             newNodeMenu = menu.addMenu("Create Node")
 
@@ -274,24 +269,6 @@ class GGraph(QtWidgets.QGraphicsView):
 
             debugAction = menu.addAction("Debug Graph")
             debugAction.triggered.connect(lambda: self.debugGraph())
-
-            menu.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-            menu.setStyleSheet("""
-    QMenu {
-        background-color: rgb(13, 14, 25);
-        border-radius: 20px;
-    }
-
-    QMenu::item {
-        color: rgb(143, 144, 160);
-        background-color: transparent;
-    }
-
-    QMenu::item:selected {
-        color: rgb(255, 255, 255);
-        background-color: rgb(64, 69, 102);
-    }
-            """)
 
             menu.exec_(QtCore.QPoint(position.x(), position.y()))
 
@@ -349,6 +326,7 @@ class GGraph(QtWidgets.QGraphicsView):
         gNode = self.getNodeById(nodeId)
 
         self.plugEditor.setCurrentNode(gNode)
+        # self.plugEditorProxy.update(self.plugEditorProxy.boundingRect())
 
     def getNodeById(self, nodeId : str) -> GNode:
         """
@@ -447,6 +425,56 @@ class GGraph(QtWidgets.QGraphicsView):
         print("Sorted Nodes : ")
         print(json.dumps([node.GetName() for node in self.graph.sortedNodes], indent=4))
 
+    def saveGraph(self, filePath : str) -> None:
+        """
+        Saves a graph to a .fgraph file, and adds the positions of each node
+
+        Args:
+            filePath (str): path to save the file
+        """
+        graphSerialized = self.graph.Serialize()
+
+        graphDict = json.loads(graphSerialized)
+
+        graphDict["positions"] = []
+
+        for item in self.items():
+            if type(item) is GNode:
+                nodeId = item.id
+                nodePosition = item.pos()
+
+                graphDict["positions"].append({ "id" : nodeId, "x" : nodePosition.x(), "y" : nodePosition.y() })
+
+        graphSerialized = json.dumps(graphDict, indent=2)
+
+        with open(filePath, "w") as file:
+            file.write(graphSerialized)
+
+    def loadGraph(self, filePath : str) -> None:
+        """
+        Loads a graph from a .fgraph file and position the items
+
+        Args:
+            filePath (str): path to the graph file
+        """
+        self.graph.LoadFromFile(filePath)
+
+        self.constructGraphFromInternalGraph()
+
+        with open(filePath, "r") as file:
+            graphData = json.load(file)
+
+        if "positions" in graphData:
+            for nodePos in graphData["positions"]:
+                id = nodePos["id"]
+                x = nodePos["x"]
+                y = nodePos["y"]
+
+                gNode = self.getNodeById(id)
+                gNode.setPos(x, y)
+                gNode.adjustEdges()
+
+
     def constructGraphFromInternalGraph(self) -> None:
         """
         Constructs the scene from a graph
@@ -473,7 +501,7 @@ class GGraph(QtWidgets.QGraphicsView):
                         connectedGNode =  self.getNodeById(connection.GetNode().GetID())
                         self.addEdge(gNode.getOutputGPlug(outputName), connectedGNode.getInputGPlug(connection.GetShortName()), False)
 
-        self.layoutGraph()
+        # self.layoutGraph()
 
     def layoutGraph(self) -> None:
         """

@@ -56,7 +56,7 @@ if os.path.exists(script1):
         script1 = scriptFile1.read()
 
 if os.path.exists(script2):
-    with open(script1, "r") as scriptFile2:
+    with open(script2, "r") as scriptFile2:
         script2 = scriptFile2.read()
 
 importPatterns = re.compile(r"import\s.+|from\s.+")

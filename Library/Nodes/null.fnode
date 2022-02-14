@@ -1,0 +1,36 @@
+// Just passes data from its input to the output, mostly used to layout connections
+
+# BeginAttr
+
+name = Null
+
+# EndAttr
+
+# BeginPlugs
+
+# BeginPlug
+
+shortName = input
+longName = Input Data
+default = None
+type = custom
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = output
+longName = Output Data
+default = None
+type = custom
+
+# EndPlug
+
+# EndPlugs
+
+# BeginOp
+
+ouput = input
+
+# EndOp

@@ -22,7 +22,26 @@ class ColorPalette(Enum):
     ERRORCOLOR: QtGui.QColor(234, 66, 74)
 
 
+QMENUSTYLE = f"""
+    QMenu {{
+        background-color: rgb(13, 14, 25);
+        border-radius: 20px;
+    }}
+
+    QMenu::item {{
+        color: rgb(143, 144, 160);
+        background-color: transparent;
+    }}
+
+    QMenu::item:selected {{
+        color: rgb(255, 255, 255);
+        background-color: rgb(64, 69, 102);
+    }}
+"""
+
+
 def GetQColorFromPalette(colorEnum : ColorPalette) -> QtGui.QColor:
     """
     """
     return QtGui.QColor(colorEnum.value)
+

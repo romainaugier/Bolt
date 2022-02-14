@@ -37,7 +37,7 @@ stderrAsStr = stderr.decode("utf-8")
 if len(stderrAsStr) > 0:
     FlashLogError(stderrAsStr)
 else:
-    FlashLogMessage(f"python : Finished executing script : {inscript}")
+    FlashLogMessage(f"Python : Finished executing script : {inscript}")
     FlashLogMessage(stdoutAsStr)
 
 # EndOp
