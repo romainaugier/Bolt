@@ -85,6 +85,7 @@ class GGraph(QtWidgets.QGraphicsView):
         self.plugEditor.move(self.rect().width() - self.plugEditor.getWidth() - 50, 50)
 
         self.cookThread = None
+        self.updateThread = None
         self.threadCanJoin.connect(lambda: self.joinGraphThread())
 
         self.selectedNodeChanged.connect(self.onSelectedNodeChange)
@@ -393,13 +394,41 @@ class GGraph(QtWidgets.QGraphicsView):
         self.graph.Cook()
         self.threadCanJoin.emit()
 
+    def updateNodeBadges(self) -> None:
+        """
+        """
+        for item in self.items():
+            if type(item) is GNode:
+                item.updateBadge()
+
+    def updateGraph(self) -> None:
+        """
+        Updates the graph interface, especially node states
+        Since we want to keep the core library dependency free,
+        we don't use qt signals to signal a node state change, so 
+        we run a thread in background updating graphical node states
+        """
+        while True:
+            with self.graph.GetLock():
+                if self.graph.IsCooked() or self.graph.HasError():
+                    self.updateNodeBadges()
+                    break
+
+            self.updateNodeBadges()
+
+            time.sleep(0.01)
+
     def launchGraphCooking(self) -> None:
         """
         Launches the thread that cooks the graph
         """
         self.isCookingMovie.start()
+
         self.cookThread = threading.Thread(target=self.cookGraph)
         self.cookThread.start()
+
+        self.updateThread = threading.Thread(target=self.updateGraph)
+        self.updateThread.start()
 
     def joinGraphThread(self) -> None:
         """
@@ -407,6 +436,7 @@ class GGraph(QtWidgets.QGraphicsView):
         """
         if self.cookThread is not None:
             self.cookThread.join()
+            self.updateThread.join()
             self.isCookingMovie.stop()
 
             self.finishedCooking.emit()

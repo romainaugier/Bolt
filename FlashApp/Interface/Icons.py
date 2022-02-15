@@ -34,6 +34,17 @@ class Icons():
         """
         return self.icons[name]
 
+    @staticmethod
+    def LoadAndGetIcon(name : str, size : int = 18) -> QtGui.QIcon:
+        """
+        """
+        iconFolderPath = f"{FLASHROOT}/Library/Icons"
+
+        for icon in os.listdir(iconFolderPath):
+            if name in icon:
+                return QtGui.QIcon(QtGui.QPixmap(f"{iconFolderPath}/{icon}").scaled(size, size))
+
+
     def AddPixmap(self, path : str) -> str:
         """
         Adds a pixmap to the pixmap library

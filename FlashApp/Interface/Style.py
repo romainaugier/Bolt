@@ -19,7 +19,9 @@ class ColorPalette(Enum):
     NOTIFICATIONS = QtGui.QColor(8, 8, 10)
     ACCENTCOLOR = QtGui.QColor(104, 240, 222)
     EXCLUDEDFILESCOLOR = QtGui.QColor(41, 43, 61)
-    ERRORCOLOR: QtGui.QColor(234, 66, 74)
+    ERRORCOLOR = QtGui.QColor(234, 66, 74)
+    WARNINGCOLOR = QtGui.QColor(255, 203, 107)
+    DONECOLOR = QtGui.QColor(195, 232, 141)
 
 
 QMENUSTYLE = f"""

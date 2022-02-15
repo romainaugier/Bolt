@@ -2,7 +2,7 @@
 
 # BeginAttr
 
-name = Mercs_LoadAlembic
+name = Mercs_LoadAlembics
 icon = $FLASH_ICONS/guerilla-render.png
 
 # EndAttr
@@ -11,10 +11,10 @@ icon = $FLASH_ICONS/guerilla-render.png
 
 # BeginPlug
 
-shortName = inabcfile
-longName = Alembic File
-defaultValue = ""
-type = str
+shortName = inabcfiles
+longName = Alembic Files
+defaultValue = [""]
+type = list
 exposed = False
 
 # EndPlug
@@ -34,14 +34,13 @@ type = str
 
 generatedScript = f"""import guerilla, os
 
-print("test")
+paths = {inabcfiles}
 
-path = "{inabcfile}"
+for path in paths:
+    name = os.path.basename(path)
 
-name = os.path.basename(path)
-
-with guerilla.Modifier() as mod:
-	mod.createref(name, path, options={{'prefixnodes':False,'containschildren':True}})
+    with guerilla.Modifier() as mod:
+        mod.createref(name, path, options={{ 'prefixnodes' : False,'containschildren' : True }})
 
 guerilla.Document().save()
 """

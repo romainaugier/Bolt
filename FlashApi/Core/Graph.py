@@ -17,9 +17,11 @@ class Graph():
         self.name = name
         self.savePath = ""
         self.hasError = False
+        self.isCooked = False
         self.nodes : list[Node] = []
         self.sortedNodes : list[Node] = []
         self.nodeCount = 0
+        self.lock = threading.Lock()
 
         self.UpdateEnv()
 
@@ -39,6 +41,11 @@ class Graph():
             list[Node]: nodes of the graph
         """
         return self.nodes
+
+    def GetLock(self) -> threading.Lock:
+        """
+        """
+        return self.lock
 
     def SetAllDirty(self) -> None:
         """
@@ -131,6 +138,7 @@ class Graph():
         """
         """
         self.hasError = False
+        self.isCooked = False
         self.SetAllDirty()
 
         self.logger.Log(LogLevel.DIAGNOSTIC, f"(Graph : {self.name}) : Cooking graph")
@@ -151,12 +159,24 @@ class Graph():
 
             if not self.hasError:
                 self.logger.Log(LogLevel.DIAGNOSTIC, f"(Graph : {self.name}) : Graph cooked")
+                with self.GetLock():
+                    self.isCooked = True
 
     def ReportError(self) -> None:
         """
         Emits an error
         """
         self.hasError = True
+
+    def HasError(self) -> bool:
+        """
+        """
+        return self.hasError
+
+    def IsCooked(self) -> bool:
+        """
+        """
+        return self.isCooked
 
     def AddNode(self, node : Node) -> None:
         """

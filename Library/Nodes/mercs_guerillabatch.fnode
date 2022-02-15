@@ -42,6 +42,16 @@ exposed = True
 
 # BeginPlug
 
+shortName = inenvironment
+longName = Environment
+defaultValue = { "GUERILLA" : "P:/GUERILLA/2.3.0.13_Romain", "GUERILLA_PYTHON_LIBRARY" : "P:/PYTHON/Python27_Romain/python27.dll", "PYTHONHOME" : "P:/PYTHON/Python27_Romain", "PYTHONPATH" : "P:/PYTHON/Python27_Romain/Lib", "PATH" : "%PYTHONHOME%;%PATH%", "DEADLINEPATH" : "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin", "OCIO" : "P:/COLOR/aces_1.2/config.ocio" }
+type = dict
+exposed = True
+
+# EndPlug
+
+# BeginPlug
+
 shortName = output
 longName = Output
 defaultValue = ""
@@ -74,7 +84,10 @@ else:
 
 FlashLogMessage(f"GuerillaBatch Command : {' '.join(command)}")
 
-process = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+env = os.environ.copy()
+env.update(inenvironment)
+
+process = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, env=env)
 
 stdout, stderr = process.communicate()
 

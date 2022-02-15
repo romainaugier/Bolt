@@ -120,16 +120,16 @@ class PlugWidget(QtWidgets.QWidget):
         self.valueChanged.emit()
 
 
-class PlugListWidgetInstance(QtWidgets.QWidget):
+class MultiPlugWidgetInstance(QtWidgets.QWidget):
     """
-    Class used to design instance of plug widgets for the list widget
-    (each instance is a list item)
+    Class used to generate widgets for a multiplug widget
+    (i.e a list of the same widgets, useful to manipulate lists, dicts...)
     """
 
     valueChanged = QtCore.pyqtSignal()
     needToBeClosed = QtCore.pyqtSignal(int)
 
-    def __init__(self, index : int, value, parent=None):
+    def __init__(self, index : int, label : str, value, parent=None):
         super().__init__(parent)
 
         self.index = index
@@ -140,29 +140,36 @@ class PlugListWidgetInstance(QtWidgets.QWidget):
         masterLayout.setSpacing(0)
         masterLayout.setContentsMargins(0, 0, 0, 0)
 
-        self.parmLongNameLabel = QtWidgets.QLabel(f"Item {index}")
-        self.parmLongNameLabel.setFont(QtGui.QFont("Helvetica", 8))
-        self.parmLongNameLabel.setStyleSheet(QColorToStyleSheet(GetQColorFromPalette(ColorPalette.FOREGROUND)))
-        self.parmLongNameLabel.setMinimumWidth(40)
-        self.parmLongNameLabel.setMinimumHeight(23)
-        self.labelSize = self.parmLongNameLabel.width()
-        masterLayout.addWidget(self.parmLongNameLabel)
+        self.label = QtWidgets.QLabel(label)
+        self.label.setFont(QtGui.QFont("Helvetica", 8))
+        self.label.setStyleSheet(QColorToStyleSheet(GetQColorFromPalette(ColorPalette.FOREGROUND)))
+        self.label.setMinimumWidth(40)
+        self.label.setMinimumHeight(23)
+        self.labelSize = self.label.width()
+        masterLayout.addWidget(self.label)
 
         masterLayout.addSpacing(5)
 
         self.editBox = LineEdit()
         self.editBox.setText(f"{value}")
+        self.editBox.setFont(QtGui.QFont("Helvetica", 8))
         self.editBox.editingFinished.connect(self.onValueChanged)
         masterLayout.addWidget(self.editBox)
         
         masterLayout.addSpacing(5)
 
-        self.closeButton = QtWidgets.QPushButton("X")
-        self.closeButton.setFixedSize(14, 14)
+        self.closeButton = QtWidgets.QPushButton("")
+        self.closeButton.setIcon(Icons.LoadAndGetIcon("multiplug-instance-close", 10))
+        self.closeButton.setFixedSize(10, 10)
         self.closeButton.clicked.connect(self.closeWidget)
         masterLayout.addWidget(self.closeButton)
 
         self.setLayout(masterLayout)
+
+    def setIndex(self, index : int) -> None:
+        """
+        """
+        self.index = index
 
     def onValueChanged(self) -> None:
         """
@@ -184,49 +191,94 @@ class PlugListWidgetInstance(QtWidgets.QWidget):
         except:
             value = text
 
-        return value
+        return value    
 
 
-class PlugDictWidgetInstance(PlugListWidgetInstance):
+class ListPlugWidgetInstance(MultiPlugWidgetInstance):
     """
+    List widget instance
     """
-    def __init__(self, index : int, key, value, parent=None):
-            super().__init__(parent)
-
-            self.index = index
-
-            masterLayout = QtWidgets.QHBoxLayout()
-
-            masterLayout.setAlignment(Qt.AlignTop)
-            masterLayout.setSpacing(0)
-            masterLayout.setContentsMargins(0, 0, 0, 0)
-
-            self.keyLabel = QtWidgets.QLabel(f"{key}")
-            self.keyLabel.setFont(QtGui.QFont("Helvetica", 8))
-            self.keyLabel.setStyleSheet(QColorToStyleSheet(GetQColorFromPalette(ColorPalette.FOREGROUND)))
-            self.keyLabel.setMinimumWidth(40)
-            self.keyLabel.setMinimumHeight(23)
-            self.labelSize = self.keyLabel.width()
-            masterLayout.addWidget(self.keyLabel)
-
-            masterLayout.addSpacing(5)
-
-            self.editBox = LineEdit()
-            self.editBox.setText(f"{value}")
-            self.editBox.editingFinished.connect(self.onValueChanged)
-            masterLayout.addWidget(self.editBox)
-            
-            masterLayout.addSpacing(5)
-
-            self.closeButton = QtWidgets.QPushButton("X")
-            self.closeButton.setFixedSize(14, 14)
-            self.closeButton.clicked.connect(self.closeWidget)
-            masterLayout.addWidget(self.closeButton)
-
-            self.setLayout(masterLayout)
+    pass
 
 
-class PlugListWidget(QtWidgets.QWidget):
+class DictPlugWidgetInstance(QtWidgets.QWidget):
+    """
+    Dict widget instance
+    """
+    
+    valueChanged = QtCore.pyqtSignal()
+    needToBeClosed = QtCore.pyqtSignal(int)
+
+    def __init__(self, index : int, label : str, value, parent=None):
+        super().__init__(parent)
+
+        self.index = index
+
+        masterLayout = QtWidgets.QHBoxLayout()
+
+        masterLayout.setAlignment(Qt.AlignTop)
+        masterLayout.setSpacing(0)
+        masterLayout.setContentsMargins(0, 0, 0, 0)
+
+        self.label = LineEdit()
+        self.label.setText(label)
+        self.label.setFont(QtGui.QFont("Helvetica", 8))
+        self.label.setStyleSheet(QColorToStyleSheet(GetQColorFromPalette(ColorPalette.FOREGROUND)))
+        self.labelSize = self.label.width()
+        masterLayout.addWidget(self.label)
+
+        masterLayout.addSpacing(5)
+
+        self.editBox = LineEdit()
+        self.editBox.setText(f"{value}")
+        self.editBox.setFont(QtGui.QFont("Helvetica", 8))
+        self.editBox.editingFinished.connect(self.onValueChanged)
+        masterLayout.addWidget(self.editBox)
+        
+        masterLayout.addSpacing(5)
+
+        self.closeButton = QtWidgets.QPushButton("")
+        self.closeButton.setIcon(Icons.LoadAndGetIcon("multiplug-instance-close", 10))
+        self.closeButton.setFixedSize(10, 10)
+        self.closeButton.clicked.connect(self.closeWidget)
+        masterLayout.addWidget(self.closeButton)
+
+        self.setLayout(masterLayout)
+
+    def setIndex(self, index : int) -> None:
+        """
+        """
+        self.index = index
+
+    def onValueChanged(self) -> None:
+        """
+        """
+        self.valueChanged.emit()
+
+    def closeWidget(self) -> None:
+        """
+        """
+        self.needToBeClosed.emit(self.index)
+
+    def getValue(self):
+        """
+        """
+        text = self.editBox.text()
+
+        try:
+            value = literal_eval(text)
+        except:
+            value = text
+
+        return value    
+
+    def getKey(self):
+        """
+        """
+        return self.label.text()
+
+
+class MultiPlugWidget(QtWidgets.QWidget):
     """
     Class used to design an editor for list plugs
     """
@@ -248,13 +300,13 @@ class PlugListWidget(QtWidgets.QWidget):
         topLayout.setSpacing(0)
         topLayout.setContentsMargins(0, 0, 0, 0)
 
-        self.parmLongNameLabel = QtWidgets.QLabel(self.plug.GetLongName())
-        self.parmLongNameLabel.setFont(QtGui.QFont("Helvetica", 8))
-        self.parmLongNameLabel.setStyleSheet(QColorToStyleSheet(GetQColorFromPalette(ColorPalette.FOREGROUND)))
-        self.parmLongNameLabel.setMinimumWidth(40)
-        self.parmLongNameLabel.setMinimumHeight(23)
-        self.labelSize = self.parmLongNameLabel.width()
-        topLayout.addWidget(self.parmLongNameLabel)
+        self.label = QtWidgets.QLabel(self.plug.GetLongName())
+        self.label.setFont(QtGui.QFont("Helvetica", 8))
+        self.label.setStyleSheet(QColorToStyleSheet(GetQColorFromPalette(ColorPalette.FOREGROUND)))
+        self.label.setMinimumWidth(40)
+        self.label.setMinimumHeight(23)
+        self.labelSize = self.label.width()
+        topLayout.addWidget(self.label)
 
         topLayout.addStretch()
 
@@ -278,6 +330,12 @@ class PlugListWidget(QtWidgets.QWidget):
 
         self.setLayout(self.masterLayout)
 
+        self.populateInstances()
+
+
+    def populateInstances(self):
+        """
+        """
         for item in self.plug.GetData():
             self.addInstance(item)
 
@@ -286,9 +344,9 @@ class PlugListWidget(QtWidgets.QWidget):
         """
         index = self.instanceLayout.count()
 
-        newInstance = PlugListWidgetInstance(index, value)
+        newInstance = MultiPlugWidgetInstance(index, f"Index {index}", value)
         newInstance.valueChanged.connect(self.onValueChange)
-        newInstance.needToBeClosed.connect(lambda: self.removeInstance(index))
+        newInstance.needToBeClosed.connect(self.removeInstance)
 
         self.instanceLayout.addWidget(newInstance)
 
@@ -300,8 +358,12 @@ class PlugListWidget(QtWidgets.QWidget):
     def removeInstance(self, index : int = None) -> None:
         """
         """
+        count = self.instanceLayout.count()
+
         if index is None:
-            index = self.instanceLayout.count() - 1
+            index = count - 1
+
+        if index < 0: return
         
         widget = self.instanceLayout.itemAt(index).widget()
 
@@ -311,6 +373,16 @@ class PlugListWidget(QtWidgets.QWidget):
         self.interfaceChanged.emit()
 
         self.onValueChange()
+       
+        for i in range(0, count):
+            item = self.instanceLayout.itemAt(i)
+
+            if item is not None:
+                widget = item.widget()
+
+                if widget is not None:
+                    widget.setIndex(i)
+                    widget.repaint()
 
     def onValueChange(self) -> None:
         """
@@ -330,6 +402,57 @@ class PlugListWidget(QtWidgets.QWidget):
 
         self.valueChanged.emit()
 
+
+class ListPlugWidget(MultiPlugWidget):
+    """
+    Class used to design an editor for list plugs
+    """
+    pass
+
+
+class DictPlugWidget(MultiPlugWidget):
+    """
+    Class used to design an editor for dict plugs
+    """
+    def populateInstances(self):    
+        """
+        """
+        for key, item in self.plug.GetData().items():
+            self.addInstance(key, item)
+
+    def addInstance(self, key, value = None) -> None:
+        """
+        """
+        index = self.instanceLayout.count()
+
+        newInstance = DictPlugWidgetInstance(index, f"{key}", value)
+        newInstance.valueChanged.connect(self.onValueChange)
+        newInstance.needToBeClosed.connect(self.removeInstance)
+
+        self.instanceLayout.addWidget(newInstance)
+
+        self.interfaceChanged.emit()
+
+        self.onValueChange()
+
+    def onValueChange(self) -> None:
+        """
+        """
+        itemCount = self.instanceLayout.count()
+
+        data = {}
+
+        for i in range(itemCount):
+            widget = self.instanceLayout.itemAt(i).widget()
+
+            if widget is not None:
+                key = widget.getKey()
+                value = widget.getValue()
+                data[key] = value
+
+        self.plug.SetData(data)
+
+        self.valueChanged.emit()
 
 class PlugEditor(QtWidgets.QWidget):
     """
@@ -492,7 +615,10 @@ class PlugEditor(QtWidgets.QWidget):
         for plugName, plug in self.node.GetInputs().items():
             if plug.IsExposed():
                 if plug.GetType() == PlugType.LIST:
-                    plugWidget = PlugListWidget(plug)
+                    plugWidget = ListPlugWidget(plug)
+                    plugWidget.interfaceChanged.connect(self.adjust)
+                elif plug.GetType() == PlugType.DICT:
+                    plugWidget = DictPlugWidget(plug)
                     plugWidget.interfaceChanged.connect(self.adjust)
                 else:
                     plugWidget = PlugWidget(plug)

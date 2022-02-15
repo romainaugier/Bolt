@@ -1,4 +1,4 @@
-import binascii, os, math, typing
+import binascii, os, math, time
 
 from enum import Enum
 
@@ -7,6 +7,7 @@ from PyQt5.QtCore import Qt
 
 from FlashApi.Core.Node import *
 from FlashApp.Interface.Icons import *
+from FlashApp.Interface.Style import ColorPalette, GetQColorFromPalette
 from FlashApp.Interface.Widgets import *
 
 class GNode():
@@ -55,8 +56,9 @@ class BadgeState(Enum):
     """
     DIRTY = 0
     COOKED = 1
-    WARNING = 2
-    ERROR = 3
+    COOKING = 2
+    WARNING = 3
+    ERROR = 4
 
 
 class Badge(QtWidgets.QGraphicsObject):
@@ -64,36 +66,109 @@ class Badge(QtWidgets.QGraphicsObject):
     Information badge that displays the cooking state of a node (cook, warning, error)
     """
 
-    def __init__(self, x : int, y : int, node : Node, iconsLib = Icons, parent = None) -> None:
+    startsCooking = QtCore.pyqtSignal(str)
+    stopsCooking = QtCore.pyqtSignal(str)
+
+    def __init__(self, x : int, y : int, node : Node, iconsLib : Icons, parent = None) -> None:
         """
         """
         super().__init__(parent=parent)
 
         self.id = binascii.hexlify(os.urandom(16)).hex()
 
+        self.size = 18
+
         self.node = node
-        self.iconsLibb = iconsLib
+        self.iconsLib = iconsLib
         self.state = BadgeState.DIRTY
         self.message = ""
 
-        self.setPos(x, y)
+        self.dirtyPixmap = self.iconsLib.GetPixmap("badge-dirty")
+        self.cookedPixmap = self.iconsLib.GetPixmap("badge-cooked")
+        self.warningPixmap = self.iconsLib.GetPixmap("badge-warning")
+        self.errorPixmap = self.iconsLib.GetPixmap("badge-error")
 
-    def updateState(self):
+        # self.cookingMovie = self.iconsLib.GetAnim("badge-cooking")
+        self.cookingMovie = QtGui.QMovie(f"{FLASHROOT}/Library/Icons/badge-cooking.gif")
+
+        self.setPos(x - self.size, y)
+
+        self.isHovered = False
+        self.setFlag(QtWidgets.QGraphicsItem.ItemIsSelectable, True)
+        self.setCacheMode(QtWidgets.QGraphicsItem.DeviceCoordinateCache)
+        self.setZValue(2)
+        self.setAcceptHoverEvents(True)
+
+    def updateState(self) -> None:
         """
         """
-        if self.node.HasError():
-            self.state = BadgeState.ERROR
-            self.message = self.node.GetErrorMessage()
-        elif self.node.HasWarning():
-            self.state = BadgeState.WARNING
-            self.message = self.node.GetWarningMessage()
-        elif self.node.IsDirty():
-            self.state = BadgeState.DIRTY
-            self.message = ""
-        elif self.node.IsCooked():
-            self.state = BadgeState.COOKED
-            self.message = ""
+        with self.node.GetLock():
+            if self.node.IsCooking():
+                self.state = BadgeState.COOKING
+                self.message = ""
+                if self.cookingMovie.state() == QtGui.QMovie.NotRunning:
+                    self.startsCooking.emit(self.node.GetID())
+            
+            elif self.node.HasError():
+                self.state = BadgeState.ERROR
+                self.message = self.node.GetErrorMessage()
+                if self.cookingMovie.state() == QtGui.QMovie.Running:
+                    self.stopsCooking.emit(self.node.GetID())
 
+            elif self.node.HasWarning():
+                self.state = BadgeState.WARNING
+                self.message = self.node.GetWarningMessage()
+                if self.cookingMovie.state() == QtGui.QMovie.Running:
+                    self.stopsCooking.emit(self.node.GetID())
+
+
+            elif self.node.IsDirty():
+                self.state = BadgeState.DIRTY
+                self.message = ""
+                if self.cookingMovie.state() == QtGui.QMovie.Running:
+                    self.stopsCooking.emit(self.node.GetID())
+                
+            elif self.node.IsCooked():
+                self.state = BadgeState.COOKED
+                self.message = ""
+                if self.cookingMovie.state() == QtGui.QMovie.Running:
+                    self.stopsCooking.emit(self.node.GetID())
+
+        self.update(self.boundingRect().left(), self.boundingRect().top(), self.boundingRect().width(), self.boundingRect().height())
+
+    def startMovie(self) -> None:
+        """
+        """
+        self.cookingMovie.start()
+
+    def stopMovie(self) -> None:
+        """
+        """
+        self.cookingMovie.stop()
+
+    def boundingRect(self) -> QtCore.QRectF:
+        return QtCore.QRectF(0, 0, self.size, self.size)
+
+    def paint(self, painter : QtGui.QPainter, option : QtWidgets.QStyleOptionGraphicsItem, widget : QtWidgets.QWidget) -> None:
+        """
+        """
+        painter.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
+        painter.setRenderHint(QtGui.QPainter.LosslessImageRendering)
+        painter.setRenderHint(QtGui.QPainter.HighQualityAntialiasing)
+
+        if self.state == BadgeState.ERROR:
+            painter.drawPixmap(0, 0, self.size, self.size, self.errorPixmap)
+        elif self.state == BadgeState.WARNING:
+            painter.drawPixmap(0, 0, self.size, self.size, self.warningPixmap)
+        elif self.state == BadgeState.DIRTY:
+            painter.drawPixmap(0, 0, self.size, self.size, self.dirtyPixmap)
+        elif self.state == BadgeState.COOKED:
+            painter.drawPixmap(0, 0, self.size, self.size, self.cookedPixmap)
+        elif self.state == BadgeState.COOKING:
+            pixmap = self.cookingMovie.currentPixmap()
+            mask = pixmap.createMaskFromColor(QtGui.QColor(0, 0, 0), QtCore.Qt.MaskInColor) 
+            pixmap.setMask(mask)
+            painter.drawPixmap(0, 0, self.size, self.size, pixmap)
 
 class GPlug(QtWidgets.QGraphicsObject):
     """
@@ -431,6 +506,11 @@ class GNode(QtWidgets.QGraphicsObject):
         self.numOuputs = numOutputs
         self.color = QtGui.QColor(self.internalNode.GetColor()[0], self.internalNode.GetColor()[1], self.internalNode.GetColor()[2])
 
+        self.badge = Badge(self.pos().x() + self.sizeX - 7, self.pos().y() + 7, self.getInternalNode(), self.iconsLib, parent=self)
+
+        self.badge.startsCooking.connect(lambda: (self.badge.startMovie()))
+        self.badge.stopsCooking.connect(lambda: (self.badge.stopMovie()))
+
         self.canMove = True
         self.isHovered = False
         self.setFlag(QtWidgets.QGraphicsItem.ItemIsFocusable, True)
@@ -477,6 +557,11 @@ class GNode(QtWidgets.QGraphicsObject):
 
         return None
 
+    def updateBadge(self) -> None:
+        """
+        """
+        self.badge.updateState()
+
     def getPixmap(self) -> QtGui.QPixmap:
         """
         """
@@ -509,21 +594,15 @@ class GNode(QtWidgets.QGraphicsObject):
 
         painter.setRenderHint(QtGui.QPainter.Antialiasing)
         
-        bodyColor = QtGui.QColor("#1A1C25")
+        bodyColor = GetQColorFromPalette(ColorPalette.ACTIVE)
 
         # Label
         path = QtGui.QPainterPath()
         path.setFillRule(Qt.WindingFill)
         path.addRoundedRect(QtCore.QRectF(0, 0, self.sizeX, self.labelSizeY), 10, 10)
         path.addRect(0, self.labelSizeY / 2, self.sizeX, self.labelSizeY / 2)
-        
-        labelGradient = QtGui.QLinearGradient()
-        labelGradient.setStart(0, 0)
-        labelGradient.setFinalStop(self.sizeX, self.labelSizeY)
-        labelGradient.setColorAt(0.0, bodyColor)
-        labelGradient.setColorAt(1.0, QtGui.QColor("#464B5D"))
 
-        painter.setBrush(QtGui.QColor("#1F2233"))
+        painter.setBrush(GetQColorFromPalette(ColorPalette.HIGHLIGHT))
         painter.setPen(Qt.NoPen)
         painter.drawPath(path.simplified())
 
@@ -538,7 +617,7 @@ class GNode(QtWidgets.QGraphicsObject):
             painter.drawPixmap(7, 7, pixMapWidth, pixMapWidth, self.pixMap)
 
         # Label name
-        painter.setPen(QtGui.QColor("#EEFFFF"))
+        painter.setPen(GetQColorFromPalette(ColorPalette.SELECTIONFOREGROUND))
         painter.setFont(QtGui.QFont("Helvetica", 10))
 
         fontRect = QtCore.QRect(14 + pixMapWidth, 6, self.sizeX - 10, self.labelSizeY - 10)

@@ -1,11 +1,11 @@
 from ast import literal_eval
 from enum import IntEnum
-from pickle import NONE
-import re, json, copy, os
+import re, json, copy, os, threading
 
 import FlashApi.Core.FileSystem as FileSystem
 from FlashApi.Core.Logger import *
 from FlashApi.Core.Environment import *
+from FlashApi.Utils.Timer import Timer
 
 # Pre declaration of classes
 
@@ -386,13 +386,16 @@ class Node():
         self.environment = copy.deepcopy(environment)
         self.logger = None
         self.isDirty = True
+        self.isCooking = False
         self.isCooked = False
+        self.cookTime = None
         self.hasError = False
         self.errorMessage = ""
         self.hasWarning = False
         self.warningMessage = ""
         self.inQueue = False
         self.inTempQueue = False
+        self.lock = threading.Lock()
         self.name = ""
         self.inputs : dict = {}
         self.outputs : dict = {}
@@ -424,6 +427,11 @@ class Node():
         """
         """
         self.logger = logger
+
+    def GetLock(self) -> threading.Lock:
+        """
+        """
+        return self.lock
 
     def GetInputCount(self) -> int:
         """
@@ -536,6 +544,13 @@ class Node():
             bool: cooked state of the node
         """
         return self.isCooked
+
+    def IsCooking(self) -> bool:
+        """
+        Returns:
+            bool: cooking state of the node
+        """
+        return self.isCooking 
 
     def SetInQueue(self, inQueue : bool = True) -> None:
         """
@@ -662,10 +677,16 @@ class Node():
         """
         Executes the node operation
         """
-        self.hasError = False
-        self.errorMessage = ""
-        self.hasWarning = False
-        self.warningMessage = ""
+        startTime = Timer.Start()
+
+        with self.GetLock():
+            self.isCooking = True
+            self.isCooked = False
+
+            self.hasError = False
+            self.errorMessage = ""
+            self.hasWarning = False
+            self.warningMessage = ""
 
         locals = {}
             
@@ -686,6 +707,9 @@ class Node():
         except Exception as err:
             self.ReportError()
             self.errorMessage = err
+            self.cookTime = None
+            self.isCooking = False
+            self.isCooked = False
             return
 
         # Get outputs         
@@ -693,8 +717,14 @@ class Node():
             if outputName in locals:
                 output.SetData(locals[outputName])
 
-        self.isDirty = False
-        self.isCooked = True
+        with self.GetLock():
+            self.isDirty = False
+            self.isCooking = False
+            self.isCooked = True
+
+        endTime = Timer.Stop()
+
+        self.cookTime = Timer.Time(startTime, endTime)
 
     def ReportError(self) -> None:
         """
