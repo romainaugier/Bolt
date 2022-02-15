@@ -343,7 +343,12 @@ class GGraph(QtWidgets.QGraphicsView):
         if connectInternally: 
             outputGPlug.getInternalPlug().Connect(inputGPlug.getInternalPlug())
 
-        self.logger.Log(LogLevel.DIAGNOSTIC, f"New Connection : {outputGPlug.getInternalPlug().GetShortName()} -> {inputGPlug.getInternalPlug().GetShortName()}")
+        outputNodeName = outputGPlug.getInternalPlug().GetNode().GetName()
+        outputPlugName = outputGPlug.getInternalPlug().GetShortName()
+        inputNodeName = inputGPlug.getInternalPlug().GetNode().GetName()
+        inputPlugName = inputGPlug.getInternalPlug().GetShortName()
+
+        self.logger.Log(LogLevel.DIAGNOSTIC, f"""New Connection : [{outputNodeName}] {outputPlugName} -> {inputPlugName} [{inputNodeName}] """)
 
         newEdge = Edge(outputGPlug, inputGPlug)
 

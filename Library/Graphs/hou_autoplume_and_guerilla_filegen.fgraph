@@ -305,69 +305,6 @@
       }
     },
     {
-      "name": "Mercs_GuerillaBatch",
-      "id": "3433613363326538646362333933646630333339656635613032653764616439",
-      "color": [
-        52,
-        115,
-        165
-      ],
-      "iconPath": "$FLASH_ICONS/guerilla-render.png",
-      "opCode": "# BeginOp\n\nimport subprocess, platform, os\n\nFlashLogMessage(f\"GuerillaBatch : Start executing script : {inscript}\")\n\nif platform.system == \"windows\":\n    command = [f\"{inguerilladir}/guerillaBatch\", \"--nogui\"] \n    \n    if os.path.exists(inguerillafile):\n        command.append(inguerillafile)\n    \n    command.append(inscript)\nelse:\n    command = [f\"{inguerilladir}/guerilla\", \"--nogui\"]\n\n    if os.path.exists(inguerillafile):\n        command.append(inguerillafile)\n    \n    command.append(inscript)\n\nFlashLogMessage(f\"GuerillaBatch Command : {' '.join(command)}\")\n\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE)\n\nstdout, stderr = process.communicate()\n\nstdoutAsStr = stdout.decode(\"utf-8\")\nstderrAsStr = stderr.decode(\"utf-8\")\n\nif len(stderrAsStr) > 0:\n    FlashLogError(stderrAsStr)\nelse:\n    FlashLogMessage(f\"GuerillaBatch : Finished executing script : {inscript}\")\n    FlashLogMessage(stdoutAsStr)\n\n",
-      "inputs": {
-        "inscript": [
-          {
-            "shortName": "inscript",
-            "longName": "Input Script Path",
-            "index": 0,
-            "isExposed": false,
-            "data": "",
-            "type": 7,
-            "connectionName": "outscript",
-            "connectionNodeId": "3866613930376633653030666438376365336132643939646666353234633933"
-          }
-        ],
-        "inguerilladir": [
-          {
-            "shortName": "inguerilladir",
-            "longName": "Input Guerilla Directory",
-            "index": 0,
-            "isExposed": true,
-            "data": "P:/GUERILLA/2.3.0.13_Romain",
-            "type": 7,
-            "connectionName": null,
-            "connectionNodeId": null
-          }
-        ],
-        "inguerillafile": [
-          {
-            "shortName": "inguerillafile",
-            "longName": "Input Guerilla File",
-            "index": 0,
-            "isExposed": false,
-            "data": "",
-            "type": 7,
-            "connectionName": "outfile",
-            "connectionNodeId": "3665313532376331633631333039643061383933303339346138346238316337"
-          }
-        ]
-      },
-      "outputs": {
-        "output": [
-          {
-            "shortName": "output",
-            "longName": "Output",
-            "index": 0,
-            "isExposed": false,
-            "data": "",
-            "type": 11,
-            "connectionName": null,
-            "connectionNodeId": null
-          }
-        ]
-      }
-    },
-    {
       "name": "Mercs_LoadAlembic",
       "id": "3635363031313561336437376338386364666564336561383933373661663361",
       "color": [
@@ -530,7 +467,7 @@
             "data": "",
             "type": 7,
             "connectionName": "inscript",
-            "connectionNodeId": "3433613363326538646362333933646630333339656635613032653764616439"
+            "connectionNodeId": "3935323466613630633934303831633564623565633263383533306466396532"
           }
         ]
       }
@@ -569,7 +506,90 @@
             "data": "",
             "type": 7,
             "connectionName": "inguerillafile",
-            "connectionNodeId": "3433613363326538646362333933646630333339656635613032653764616439"
+            "connectionNodeId": "3935323466613630633934303831633564623565633263383533306466396532"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Mercs_GuerillaBatch",
+      "id": "3935323466613630633934303831633564623565633263383533306466396532",
+      "color": [
+        52,
+        115,
+        165
+      ],
+      "iconPath": "$FLASH_ICONS/guerilla-render.png",
+      "opCode": "# BeginOp\n\nimport subprocess, platform, os\n\nFlashLogMessage(f\"GuerillaBatch : Start executing script : {inscript}\")\n\nif platform.system == \"windows\":\n    command = [f\"{inguerilladir}/guerillaBatch\", \"--nogui\"] \n    \n    if os.path.exists(inguerillafile):\n        command.append(inguerillafile)\n    \n    command.append(inscript)\nelse:\n    command = [f\"{inguerilladir}/guerilla\", \"--nogui\"]\n\n    if os.path.exists(inguerillafile):\n        command.append(inguerillafile)\n    \n    command.append(inscript)\n\nFlashLogMessage(f\"GuerillaBatch Command : {' '.join(command)}\")\n\nenv = os.environ.copy()\nenv.update(inenvironment)\n\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, env=env)\n\nstdout, stderr = process.communicate()\n\nstdoutAsStr = stdout.decode(\"utf-8\")\nstderrAsStr = stderr.decode(\"utf-8\")\n\nif len(stderrAsStr) > 0:\n    FlashLogError(stderrAsStr)\nelse:\n    FlashLogMessage(f\"GuerillaBatch : Finished executing script : {inscript}\")\n    FlashLogMessage(stdoutAsStr)\n\n",
+      "inputs": {
+        "inscript": [
+          {
+            "shortName": "inscript",
+            "longName": "Input Script Path",
+            "index": 0,
+            "isExposed": false,
+            "data": "",
+            "type": 7,
+            "connectionName": "outscript",
+            "connectionNodeId": "3866613930376633653030666438376365336132643939646666353234633933"
+          }
+        ],
+        "inguerilladir": [
+          {
+            "shortName": "inguerilladir",
+            "longName": "Input Guerilla Directory",
+            "index": 0,
+            "isExposed": true,
+            "data": "P:/GUERILLA/2.3.0.13_Romain",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ],
+        "inguerillafile": [
+          {
+            "shortName": "inguerillafile",
+            "longName": "Input Guerilla File",
+            "index": 0,
+            "isExposed": false,
+            "data": "",
+            "type": 7,
+            "connectionName": "outfile",
+            "connectionNodeId": "3665313532376331633631333039643061383933303339346138346238316337"
+          }
+        ],
+        "inenvironment": [
+          {
+            "shortName": "inenvironment",
+            "longName": "Environment",
+            "index": 0,
+            "isExposed": true,
+            "data": {
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain/Lib",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+            },
+            "type": 10,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "data": "",
+            "type": 11,
+            "connectionName": null,
+            "connectionNodeId": null
           }
         ]
       }
@@ -577,9 +597,9 @@
   ],
   "positions": [
     {
-      "id": "3131643436333461373436373530333866373836313233666163616238376230",
-      "x": -300.0,
-      "y": 200.0
+      "id": "3735353436343735666438666236653661613333393866363362343133623833",
+      "x": 150.0,
+      "y": 50.0
     },
     {
       "id": "3639373761653333306433666333343632306538633765363832323865623736",
@@ -587,13 +607,8 @@
       "y": 350.0
     },
     {
-      "id": "3433613363326538646362333933646630333339656635613032653764616439",
-      "x": 1600.0,
-      "y": 200.0
-    },
-    {
-      "id": "6135366438643231366639323433646433346137396433356136623138666337",
-      "x": 800.0,
+      "id": "3834313762356538326665333930356230393763316534313339376536366139",
+      "x": 50.0,
       "y": 200.0
     },
     {
@@ -602,14 +617,19 @@
       "y": 200.0
     },
     {
-      "id": "3834313762356538326665333930356230393763316534313339376536366139",
-      "x": 50.0,
-      "y": 200.0
+      "id": "3635363031313561336437376338386364666564336561383933373661663361",
+      "x": 450.0,
+      "y": 650.0
     },
     {
-      "id": "3735353436343735666438666236653661613333393866363362343133623833",
-      "x": 150.0,
-      "y": 50.0
+      "id": "3665313532376331633631333039643061383933303339346138346238316337",
+      "x": 1400.0,
+      "y": 400.0
+    },
+    {
+      "id": "6466373063366462383162663632376535356332303330396165323935316331",
+      "x": 1050.0,
+      "y": 200.0
     },
     {
       "id": "3834363533393562376436313334633635383965383861643139373561616434",
@@ -622,19 +642,19 @@
       "y": 200.0
     },
     {
-      "id": "3635363031313561336437376338386364666564336561383933373661663361",
-      "x": 450.0,
-      "y": 650.0
-    },
-    {
-      "id": "6466373063366462383162663632376535356332303330396165323935316331",
-      "x": 1050.0,
+      "id": "3131643436333461373436373530333866373836313233666163616238376230",
+      "x": -300.0,
       "y": 200.0
     },
     {
-      "id": "3665313532376331633631333039643061383933303339346138346238316337",
-      "x": 1400.0,
-      "y": 400.0
+      "id": "6135366438643231366639323433646433346137396433356136623138666337",
+      "x": 800.0,
+      "y": 200.0
+    },
+    {
+      "id": "3935323466613630633934303831633564623565633263383533306466396532",
+      "x": 1650.0,
+      "y": 200.0
     }
   ]
 }

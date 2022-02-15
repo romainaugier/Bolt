@@ -30,6 +30,16 @@ type = str
 
 # BeginPlug
 
+shortName = inframerange
+longName = Frame Range
+defaultValue = [100, 240]
+type = int2
+exposed = True
+
+# EndPlug
+
+# BeginPlug
+
 shortName = outscriptfile
 longName = Output Script File
 defaultValue = ""

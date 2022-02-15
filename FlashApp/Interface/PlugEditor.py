@@ -59,6 +59,8 @@ class PlugWidget(QtWidgets.QWidget):
             self.editBox1.editingFinished.connect(self.onValueChanged)
             self.editBox1.setText(f"{self.plug.GetData()[0]}")
             masterLayout.addWidget(self.editBox1)
+
+            masterLayout.addSpacing(5)
             
             self.editBox2 = LineEdit()
             self.editBox2.setText(f"{self.plug.GetData()[1]}")
@@ -72,10 +74,14 @@ class PlugWidget(QtWidgets.QWidget):
             self.editBox1.editingFinished.connect(self.onValueChanged)
             masterLayout.addWidget(self.editBox1)
             
+            masterLayout.addSpacing(5)
+            
             self.editBox2 = LineEdit()
             self.editBox2.setText(f"{self.plug.GetData()[1]}")
             self.editBox2.editingFinished.connect(self.onValueChanged)
             masterLayout.addWidget(self.editBox2)
+            
+            masterLayout.addSpacing(5)
             
             self.editBox3 = LineEdit()
             self.editBox3.setText(f"{self.plug.GetData()[2]}")

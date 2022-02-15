@@ -712,7 +712,7 @@ class GNode(QtWidgets.QGraphicsObject):
                 edge.adjust()   
 
 
-class Edge(QtWidgets.QGraphicsLineItem):
+class Edge(QtWidgets.QGraphicsItem):
     """
     """
     def __init__(self, source: GPlug, dest: GPlug, parent=None):
@@ -727,42 +727,75 @@ class Edge(QtWidgets.QGraphicsLineItem):
         self.source.addEdge(self)
         self.destination.addEdge(self)
 
+        self.firstPos = self.source.scenePos()
+        self.lastPos = self.destination.scenePos()
+
         self.isHovered = False
 
         self.setFlag(QtWidgets.QGraphicsItem.ItemIsFocusable, True)
         self.setFlag(QtWidgets.QGraphicsItem.ItemIsSelectable, True)
-        self.setZValue(-1)
-
-        self.setPen(QtGui.QPen(QtGui.QColor(255, 255, 255, 125), 1.0))
+        self.setZValue(20)
 
         self.adjust()
 
+    def getFirstPointOffset(self) -> float:
+        """
+        """
+        return self.source.boundingRect().width()
+
+    def getControlPointsOffet(self) -> float:
+        """
+        """
+        dist = math.sqrt((self.firstPos.x() - self.lastPos.x()) ** 2 + (self.firstPos.y() - self.lastPos.y()) ** 2)
+
+        return dist / 2
+
+    def boundingRect(self) -> QtCore.QRectF:
+        """
+        """
+        offset = self.getControlPointsOffet()
+
+        path = QtGui.QPainterPath()
+        path.moveTo(self.firstPos.x() + self.getFirstPointOffset(), self.firstPos.y() + 7.5)
+        path.cubicTo(QtCore.QPointF(self.firstPos.x() + self.getFirstPointOffset() + offset, self.firstPos.y() + 7.5),
+                     QtCore.QPointF(self.lastPos.x() - offset, self.lastPos.y() + 7.5),
+                     QtCore.QPointF(self.lastPos.x(), self.lastPos.y() + 7.5))
+
+        return path.boundingRect()
+
     # PAINTING
+
+    def paint(self, painter : QtGui.QPainter, option : QtWidgets.QStyleOptionGraphicsItem, widget : QtWidgets.QWidget) -> None:
+        """
+        """
+        offset = self.getControlPointsOffet()
+
+        path = QtGui.QPainterPath()
+        path.moveTo(self.firstPos.x() + self.getFirstPointOffset(), self.firstPos.y() + 7.5)
+        path.cubicTo(QtCore.QPointF(self.firstPos.x() + self.getFirstPointOffset() + offset, self.firstPos.y() + 7.5),
+                     QtCore.QPointF(self.lastPos.x() - offset, self.lastPos.y() + 7.5),
+                     QtCore.QPointF(self.lastPos.x(), self.lastPos.y() + 7.5))
+
+        gradient = QtGui.QLinearGradient()
+        gradient.setColorAt(0.0, self.source.color)
+        gradient.setColorAt(1.0, self.destination.color)
+        gradient.setStart(self.firstPos)
+        gradient.setFinalStop(self.lastPos)
+
+        pen = QtGui.QPen()
+        pen.setWidth(2)
+        pen.setBrush(gradient)
+        painter.setPen(pen)
+
+        painter.drawPath(path)
 
     def adjust(self):
         """
         """
         self.prepareGeometryChange()
 
-        first = self.source.scenePos()
-        last = self.destination.scenePos()
-
-        offset = self.source.radius / 2.0
-
-        offsetX = self.source.radius / 2.0 + self.source.labelRect.width() + self.source.textWOffset
-
-        gradient = QtGui.QLinearGradient()
-        gradient.setColorAt(0.0, self.source.color)
-        gradient.setColorAt(1.0, self.destination.color)
-        gradient.setStart(first)
-        gradient.setFinalStop(last)
-
-        pen = QtGui.QPen()
-        pen.setWidth(2)
-        pen.setBrush(gradient)
-        self.setPen(pen)
-
-        self.setLine(first.x() + offsetX, first.y() + offset, last.x() + offset, last.y() + offset)
+        self.firstPos = self.source.scenePos()
+        self.lastPos = self.destination.scenePos()
 
         self.update(self.boundingRect())
 
