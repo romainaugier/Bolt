@@ -4,6 +4,7 @@
 
 name = NK_NukeBatch
 icon = $FLASH_ICONS/nuke.png
+category = Nuke
 
 # EndAttr
 

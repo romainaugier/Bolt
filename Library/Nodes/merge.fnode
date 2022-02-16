@@ -4,6 +4,7 @@
 
 name = Merge
 icon = $FLASH_ICONS/merge.png
+category = Utility
 
 # EndAttr
 

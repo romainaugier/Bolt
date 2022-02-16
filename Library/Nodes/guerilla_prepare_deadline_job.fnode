@@ -1,0 +1,296 @@
+// All in one node that generates a script to prepare a scene to send to deadline for rendering
+// Generates everything deadlinecommand needs to submit the job
+
+# BeginAttr
+
+name = Guerilla_PrepareDeadlineJob
+icon = $FLASH_ICONS/guerilla-render.png
+category = Guerilla
+
+# EndAttr
+
+# BeginPlugs
+
+# BeginPlug
+
+shortName = inguerillafile
+longName = Scene File
+defaultValue = ""
+type = str
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = inenvironment
+longName = Environment
+defaultValue = { "GUERILLA" : "P:/GUERILLA/2.3.0.13_Romain", "GUERILLA_PYTHON_LIBRARY" : "P:/PYTHON/Python27_Romain/python27.dll", "PYTHONHOME" : "P:/PYTHON/Python27_Romain", "PYTHONPATH" : "P:/PYTHON/Python27_Romain/Lib", "PATH" : "%PYTHONHOME%;%PATH%", "DEADLINEPATH" : "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin", "OCIO" : "P:/COLOR/aces_1.2/config.ocio" }
+type = dict
+exposed = True
+
+# EndPlug
+
+# BeginPlug
+
+shortName = injoboptions
+longName = Job Options
+defaultValue = {"ChunkSize":1,"Comment":"","Department":"","Pool":"w456","SecondaryPool":"rdf","Group":"all","TaskTimeoutMinutes":0,"EnableAutoTimeout":False,"LimitConcurrentTasksToNumberOfCpus":True,"MachineLimit":0,"LimitGroups":"","OnJobComplete":"Nothing","Whitelist":"","JobDependencies":""}
+type = dict
+exposed = True
+
+# EndPlug
+
+# BeginPlug
+
+shortName = inrenderoptions
+longName = Render Options
+defaultValue = {"Type":"LD","SequenceName":"sequence","ShotName":"shot","Optims":True,"FrameRange":"100-240"}
+type = dict
+exposed = True
+
+# EndPlug
+
+# BeginPlug
+
+shortName = inrenderdir
+longName = Render Directory
+defaultValue = "Z:/OEUF/RENDER"
+type = str
+exposed = True
+
+# EndPlug
+
+# BeginPlug
+
+shortName = outribgenjobinfofile
+longName = Output Ribgen Job Info File
+defaultValue = ""
+type = str
+
+# EndPlug
+
+# BeginPlug
+
+shortName = outribgenplugininfofile
+longName = Output Ribgen Plugin Info File
+defaultValue = ""
+type = str
+
+# EndPlug
+
+# BeginPlug
+
+shortName = outrenderjobinfofile
+longName = Output Render Job Info File
+defaultValue = ""
+type = str
+
+# EndPlug
+
+# BeginPlug
+
+shortName = outrenderplugininfofile
+longName = Output Render Plugin Info File
+defaultValue = ""
+type = str
+
+# EndPlug
+
+# BeginPlug
+
+shortName = outrenderdir
+longName = Output Render Directory
+defaultValue = ""
+type = str
+
+# EndPlug
+
+# EndPlugs
+
+# BeginOp
+
+from datetime import datetime
+import re, os, subprocess, platform
+
+now = datetime.now()
+
+currentTimeStr = now.strftime('%m%d%Y_%H%M%S')
+
+# Setup job and batch name
+jobType = inrenderoptions["Type"]
+sequenceName = inrenderoptions["SequenceName"] 
+shotName = inrenderoptions["ShotName"]
+frameRange = inrenderoptions["FrameRange"]
+
+jobName = f"oeuf_{jobType}_{sequenceName}_{shotName}"
+batchName = f"{jobName}-{currentTimeStr}"
+
+if jobType == "LD":
+    injoboptions["Priority"] = 50
+elif jobType == "FML":
+    injoboptions["Priority"] = 75
+elif jobType == "HD":
+    injoboptions["Priority"] = 25
+
+renderDir = f"{inrenderdir}/{sequenceName}/{shotName}/LD1"
+
+if os.path.exists(renderDir):   
+    numPattern = r"(\d+)$"
+
+    match = re.search(numPattern, renderDir)
+
+    value = int(match.group()) + 1
+
+    renderDir = f"{renderDir[:match.start()]}{value}"
+
+    FlashLogMessage(f"RenderDir : {renderDir}")
+else:
+    os.makedirs(renderDir)
+
+renderFile = f"{renderDir}/render_{sequenceName}_{shotName}_$f.$x"
+
+# Setup job options
+injoboptions["Plugin"] = "Guerilla"
+injoboptions["Name"] = jobName
+injoboptions["BatchName"] = batchName
+injoboptions["Frames"] = frameRange
+injoboptions["OutputDirectory0"] = renderDir
+
+# Render Job Infos
+generatedRenderJobInfos = ""
+
+for key, item in injoboptions.items():
+    generatedRenderJobInfos += f"{key}={item}\n"
+
+# Ribgen Job Infos
+injoboptions["Name"] = f"{jobName}_ribgen"
+injoboptions["Frames"] = 0
+
+generatedRibgenJobInfos = ""
+
+for key, item in injoboptions.items():
+    generatedRibgenJobInfos += f"{key}={item}\n"
+
+# Generate Guerilla script
+
+generatedScript = f"""import guerilla, os
+import RomanoTools.Guerilla.Utils as utils
+
+utils.SetRange("{frameRange}")
+utils.SetOptims()
+
+if "{jobType}" == "LD":
+    utils.SetLowRenderParms()
+else:
+    utils.SetFinalRenderParms()
+
+prefNode = guerilla.Document().findchild("Preferences")
+
+prefNode.RenderfarmSequence.set("{jobName}")
+prefNode.DeferredRibGen.set(True)
+
+renderPass = guerilla.Document().findchild("RenderPass")
+renderPass.FileName.set("{renderFile}")
+
+sceneDir = guerilla.envcontext.getenv("SCENE_PATH")
+jobsDir = "{{}}/jobs".format(sceneDir)
+
+options = guerilla.renderoptions({{}})
+
+options["JobsDirectory"] = jobsDir
+options["DeferredFile"] = "{{}}/{{}}_ribgen_{{}}.gproject".format(jobsDir, options["FilePrefix"], options["RenderId"])
+
+scriptFiles = guerilla.render("none", options)
+
+ribgenScriptFile = scriptFiles[0].getscriptfile(0)
+renderScriptFile = scriptFiles[1].getscriptfile(0)
+
+print("RIBGEN_SCRIPT_FILE={{}}".format("{{}}/{{}}".format(jobsDir, ribgenScriptFile)))
+print("RENDER_SCRIPT_FILE={{}}".format("{{}}/{{}}".format(jobsDir, renderScriptFile)))
+
+guerilla.Document().save()
+"""
+
+# Start the guerilla scene and execute the script to prepare it
+
+tmpScriptFilePath = FlashTempScript()
+with open(tmpScriptFilePath, "w") as scriptFile:
+    scriptFile.write(generatedScript)
+
+FlashLogMessage(f"GuerillaBatch : Start executing script : {tmpScriptFilePath}")
+
+if platform.system == "windows":
+    command = [f"{inenvironment['GUERILLA']}/guerillaBatch", "--nogui"] 
+    
+    if os.path.exists(inguerillafile):
+        command.append(inguerillafile)
+    
+    command.append(tmpScriptFilePath)
+else:
+    command = [f"{inenvironment['GUERILLA']}/guerilla", "--nogui"]
+
+    if os.path.exists(inguerillafile):
+        command.append(inguerillafile)
+    
+    command.append(tmpScriptFilePath)
+
+FlashLogMessage(f"GuerillaBatch Command : {' '.join(command)}")
+
+env = os.environ.copy()
+env.update(inenvironment)
+
+process = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, env=env)
+
+stdout, stderr = process.communicate()
+
+stdoutAsStr = stdout.decode("utf-8")
+stderrAsStr = stderr.decode("utf-8")
+
+if len(stderrAsStr) > 0:
+    FlashLogError(stderrAsStr)
+else:
+    FlashLogMessage(f"GuerillaBatch : Finished executing script : {tmpScriptFilePath}")
+    FlashLogMessage(stdoutAsStr)
+
+# Get the generated guerilla scriptfiles paths
+
+ribgenScriptPattern = r"RIBGEN_SCRIPT_FILE=(\S+)"
+renderScriptPattern = r"RENDER_SCRIPT_FILE=(\S+)"
+
+ribGenScriptFilePath = re.findall(ribgenScriptPattern, stdoutAsStr)[0]
+renderScriptFilePath = re.findall(renderScriptPattern, stdoutAsStr)[0]
+
+tmpDirPath = FlashTempDir()
+
+# Render Job Infos
+renderJobInfoFile = f"{tmpDirPath}/render_job_info_{currentTimeStr}.job"
+
+with open(renderJobInfoFile, "w") as file:
+    file.write(generatedRenderJobInfos) 
+
+# Render Plugin Infos
+renderJobPluginFile = f"{tmpDirPath}/render_plugin_info_{currentTimeStr}.job"
+
+with open(renderJobPluginFile, "w") as file:
+    file.write(f"ScriptFile={renderScriptFilePath}\nScriptArgs=\"--frame={frameRange.split('-')[0]}\"")
+
+# Ribgen Job Infos
+ribgenJobInfoFile = f"{tmpDirPath}/ribgen_job_info_{currentTimeStr}.job"
+
+with open(ribgenJobInfoFile, "w") as file:
+    file.write(generatedRibgenJobInfos)
+
+# Ribgen Plugin Infos
+ribgenJobPluginFile = f"{tmpDirPath}/ribgen_plugin_info_{currentTimeStr}.job"
+
+with open(ribgenJobPluginFile, "w") as file:
+    file.write(f"ScriptFile={ribGenScriptFilePath}\nScriptArgs=")
+
+outribgenjobinfofile = ribgenJobInfoFile
+outribgenplugininfofile = ribgenJobPluginFile
+outrenderjobinfofile = renderJobInfoFile
+outrenderplugininfofile = renderJobPluginFile
+outrenderdir = renderDir
+
+# EndOp

@@ -5,6 +5,7 @@
 name = Debug
 color = [50, 222, 132]
 icon = $FLASH_ICONS/debug.png
+category = Debug
 
 # EndAttr
 

@@ -4,6 +4,7 @@
 
 name = Mercs_LoadAlembics
 icon = $FLASH_ICONS/guerilla-render.png
+category = Guerilla
 
 # EndAttr
 
@@ -31,6 +32,9 @@ type = str
 # EndPlugs
 
 # BeginOp
+
+if type(inabcfiles) is str:
+    inabcfiles = [inabcfiles]
 
 generatedScript = f"""import guerilla, os
 

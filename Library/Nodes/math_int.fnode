@@ -3,6 +3,7 @@
 # BeginAttr 
 
 name = Int
+category = Maths
 
 # EndAttr
 

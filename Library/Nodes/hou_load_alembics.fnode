@@ -4,6 +4,7 @@
 
 name = Hou_LoadAlembics
 icon = $FLASH_ICONS/houdini.png
+category = Houdini
 
 # EndAttr
 
@@ -31,6 +32,9 @@ type = str
 # EndPlugs
 
 # BeginOp
+
+if type(inabcfiles) is str:
+    inabcfiles = [inabcfiles]
 
 generatedScript = f"""import hou, os
 

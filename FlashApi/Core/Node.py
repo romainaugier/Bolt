@@ -48,6 +48,7 @@ class Parser():
         self.plugs : list[Plug] = []
         self.color = [0, 0, 0]
         self.iconPath = ""
+        self.category = ""
         self.opCode = ""
         
     @staticmethod
@@ -127,6 +128,11 @@ class Parser():
                 iconPath = lineSplit[1].strip()
                 self.iconPath = iconPath
                 
+            elif line.startswith("category"):
+                lineSplit = self.SplitEqual(line)
+                category = lineSplit[1].strip()
+                self.category = category
+
             elif line.startswith("# EndAttr"):
                 return lineIndex + 1
             
@@ -232,6 +238,7 @@ class Parser():
         definition["name"] = self.name
         definition["color"] = self.color
         definition["iconPath"] = self.iconPath
+        definition["category"] = self.category
         definition["opCode"] = self.opCode
         definition["plugs"] = self.plugs
 
@@ -401,6 +408,7 @@ class Node():
         self.outputs : dict = {}
         self.color : list[float] = []
         self.iconPath = ""
+        self.category = ""
         
         # The id is not set here as we will set a unique one for each node in the graph
         self.id = 0 
@@ -513,6 +521,13 @@ class Node():
             return self.environment.ReplaceInString(self.iconPath)
         else:
             return self.iconPath
+
+    def GetCategory(self) -> str:
+        """
+        Returns:
+            str: node category
+        """
+        return self.category
 
     def GetIconPathRaw(self) -> str:
         """
@@ -706,6 +721,7 @@ class Node():
             exec(self.opCompiledCode, globals, locals)
         except Exception as err:
             self.ReportError()
+            self.LogError(f"Error cooking node {self.GetName()}")
             self.errorMessage = err
             self.cookTime = None
             self.isCooking = False
@@ -770,7 +786,7 @@ class Node():
         Log an error to the passed logger. This function is made to be 
         used in the user code
         """
-        self.logger.Log(LogLevel.ERROR, f"(Node : {self.GetName()}) : {message}")
+        self.logger.Log(LogLevel.ERROR, f"(Node : {self.GetName()}) : {message}", getTraceback=True)
         self.errorMessage = message
 
         self.ReportError()
@@ -806,6 +822,7 @@ class Node():
         self.name = nodeDefinition["name"]
         self.color = nodeDefinition["color"]
         self.iconPath = nodeDefinition["iconPath"]
+        self.category = nodeDefinition["category"]
         self.opCode = nodeDefinition["opCode"]
 
         if not os.path.exists(self.GetIconPath()):

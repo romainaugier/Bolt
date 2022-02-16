@@ -5,6 +5,7 @@
 name = Hou_Hython
 color = [255, 87, 34]
 icon = $FLASH_ICONS/houdini.png
+category = Houdini
 
 # EndAttr
 

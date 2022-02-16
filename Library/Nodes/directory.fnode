@@ -6,6 +6,7 @@ name = Directory
 inputs = 0
 outputs = 1
 color = [255, 220, 106]
+category = Utility
 
 # EndAttr
 

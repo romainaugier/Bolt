@@ -4,6 +4,7 @@
 
 name = Hou_AutoPlume
 icon = $FLASH_ICONS/houdini.png
+category = Houdini
 
 # EndAttr
 

@@ -6,6 +6,7 @@
 name = Template                                 // Name of the node
 color = [255, 127, 64]                          // Color that will be used in the interface
 icon = $FLASH_ICONS/flash.png                   // Icons must be png files
+category = Debug                                // Category for the node
 
 # EndAttr                                       // End the attributes definition
 

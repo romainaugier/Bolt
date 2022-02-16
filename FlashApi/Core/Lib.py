@@ -38,7 +38,7 @@ class Lib():
                         tmpNode = Node(self.environment)
                         tmpNode.Load(f"{path}/{item}")
 
-                        self.nodePaths[tmpNode.GetName()] = f"{path}/{item}"
+                        self.nodePaths[f"{tmpNode.GetCategory()}/{tmpNode.GetName()}"] = f"{path}/{item}"
 
                         self.logger.Log(LogLevel.DEBUG, f"Loaded {tmpNode.GetName()}")
 

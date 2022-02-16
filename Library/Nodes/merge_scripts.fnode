@@ -5,6 +5,7 @@
 name = Merge_Scripts
 color = [52, 115, 165]
 icon = $FLASH_ICONS/python.png
+category = Utility
 
 # EndAttr
 

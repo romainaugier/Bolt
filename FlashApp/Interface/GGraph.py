@@ -66,10 +66,12 @@ class GGraph(QtWidgets.QGraphicsView):
         self.setScene(self.scene)
         self.setCacheMode(QtWidgets.QGraphicsView.CacheBackground)
         self.setViewportUpdateMode(QtWidgets.QGraphicsView.BoundingRectViewportUpdate)
-        self.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.TextAntialiasing | QtGui.QPainter.SmoothPixmapTransform)
+        self.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.TextAntialiasing | QtGui.QPainter.SmoothPixmapTransform | QtGui.QPainter.HighQualityAntialiasing)
         self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
         self.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
         self.setContextMenuPolicy(Qt.DefaultContextMenu)
+
+        self.setAcceptDrops(True)
 
         self.setMinimumSize(800, 800)
         self.gridSize = 50
@@ -162,6 +164,10 @@ class GGraph(QtWidgets.QGraphicsView):
         elif key == Qt.Key_Delete:
             self.deleteItem()
             self.plugEditor.setCurrentNode(None)
+        elif key == Qt.Key_Space:
+            globalPos = QtGui.QCursor.pos()
+            scenePos = self.mapToScene(self.mapFromGlobal(globalPos))
+            self.contextMenu(globalPos.x(), globalPos.y(), scenePos.x(), scenePos.y())
         
         return super().keyPressEvent(event)
 
@@ -231,6 +237,35 @@ class GGraph(QtWidgets.QGraphicsView):
 
         self.scale(scaleFactor, scaleFactor)
 
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasUrls:
+            event.accept()
+        else:
+            event.ignore()
+
+    def dragMoveEvent(self, event):
+        if event.mimeData().hasUrls:
+            event.setDropAction(QtCore.Qt.CopyAction)
+            event.accept()
+        else:
+            event.ignore()
+
+    def dropEvent(self, event):
+        if event.mimeData().hasUrls:
+            event.setDropAction(QtCore.Qt.CopyAction)
+            event.accept()
+
+            for url in event.mimeData().urls():
+                itemPath = url.toLocalFile()
+                
+                if os.path.isfile(itemPath):
+                    scenePos = self.mapToScene(self.mapFromGlobal(QtGui.QCursor.pos()))
+                    tmpGNode = self.addNode("Utility/File", scenePos)
+                    scenePos = QtCore.QPointF(scenePos.x() - tmpGNode.sizeX / 2, scenePos.y() - tmpGNode.sizeY / 2)
+                    tmpGNode.getInternalNode().SetPlugValue("infile", itemPath)
+        else:
+            event.ignore()
+
     # Menus
 
     @QtCore.pyqtSlot(list)
@@ -244,38 +279,56 @@ class GGraph(QtWidgets.QGraphicsView):
         clickedNode = self.getNodeById(data[0])
         clickedPlug = clickedNode.getInputGPlug(data[1])
 
+    def contextMenu(self, globalX : int, globalY : int, sceneX : int, sceneY : int) -> None:
+        """
+        """
+        position = QtCore.QPoint(globalX, globalY)
+
+        menu = ContextMenu()
+
+        newNodeMenu = menu.addMenu("Create Node")
+
+        nodeCategories = {}
+
+        for node in self.nodeLibrary.GetAvailableNodes():
+            nodeCategory, nodeType = node.split("/")
+
+            nodeCategoryMenu = nodeCategories.get(nodeCategory)
+
+            if nodeCategoryMenu is None:
+                nodeCategoryMenu = newNodeMenu.addMenu(nodeCategory)
+                nodeCategories[nodeCategory] = nodeCategoryMenu
+
+            newNodeAction = QtWidgets.QAction(nodeType, self)
+            newNodeAction.setData(node)
+            newNodeAction.triggered.connect(lambda: self.addNode(newNodeAction.sender().data(), QtCore.QPointF(float(sceneX), float(sceneY))))
+            nodeCategoryMenu.addAction(newNodeAction)
+
+        computeAction = menu.addAction("Cook")
+        computeAction.triggered.connect(lambda: self.launchGraphCooking())
+
+        reloadLibAction = menu.addAction("Reload Node Library")
+        reloadLibAction.triggered.connect(lambda: self.nodeLibrary.Reload())
+
+        debugAction = menu.addAction("Debug Graph")
+        debugAction.triggered.connect(lambda: self.debugGraph())
+
+        menu.exec_(position)
+
     def contextMenuEvent(self, event: QtGui.QContextMenuEvent) -> None:
         """
         """
         super().contextMenuEvent(event)
 
         if not event.isAccepted():
-            position = event.globalPos()
+            globalPos = event.globalPos()
+            scenePos = self.mapToScene(event.pos())
 
-            menu = ContextMenu()
-
-            newNodeMenu = menu.addMenu("Create Node")
-
-            for nodeType in self.nodeLibrary.GetAvailableNodes():
-                newNodeAction = QtWidgets.QAction(nodeType, self)
-                newNodeAction.setData(nodeType)
-                newNodeAction.triggered.connect(lambda: self.addNode(newNodeAction.sender().data(), QtCore.QPointF(self.mapToScene(event.pos()))))
-                newNodeMenu.addAction(newNodeAction)
-
-            computeAction = menu.addAction("Cook")
-            computeAction.triggered.connect(lambda: self.launchGraphCooking())
-
-            reloadLibAction = menu.addAction("Reload Node Library")
-            reloadLibAction.triggered.connect(lambda: self.nodeLibrary.Reload())
-
-            debugAction = menu.addAction("Debug Graph")
-            debugAction.triggered.connect(lambda: self.debugGraph())
-
-            menu.exec_(QtCore.QPoint(position.x(), position.y()))
+            self.contextMenu(globalPos.x(), globalPos.y(), scenePos.x(), scenePos.y())
 
     # GRAPH FUNCTIONS
 
-    def addNode(self, nodeType : str, position : QtCore.QPointF) -> None:
+    def addNode(self, nodeType : str, position : QtCore.QPointF) -> GNode:
         """
         """
         tmpInternalNode = self.nodeLibrary.Get(nodeType)
@@ -289,6 +342,8 @@ class GGraph(QtWidgets.QGraphicsView):
         self.scene.addItem(tmpGNode)
 
         self.hasBeenEdited.emit()
+
+        return tmpGNode
 
     def addNodeFromInternalGraph(self, node : Node) -> None:
         """

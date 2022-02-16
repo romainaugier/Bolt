@@ -126,7 +126,7 @@ class App(QtWidgets.QMainWindow):
         self.newGraphButton = QtWidgets.QPushButton("")
         self.newGraphButton.setIcon(self.icons.GetIcon("new-graph"))
         self.newGraphButton.setToolTip("Create New Graph")
-        self.newGraphButton.clicked.connect(lambda: self.graphTabs.addTab())
+        self.newGraphButton.clicked.connect(lambda: self.addGraph())
         shelfLayout.addWidget(self.newGraphButton)
 
         self.cookGraphButton = QtWidgets.QPushButton("")

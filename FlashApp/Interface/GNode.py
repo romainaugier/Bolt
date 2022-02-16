@@ -152,9 +152,11 @@ class Badge(QtWidgets.QGraphicsObject):
     def paint(self, painter : QtGui.QPainter, option : QtWidgets.QStyleOptionGraphicsItem, widget : QtWidgets.QWidget) -> None:
         """
         """
-        painter.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
-        painter.setRenderHint(QtGui.QPainter.LosslessImageRendering)
-        painter.setRenderHint(QtGui.QPainter.HighQualityAntialiasing)
+        painter.setRenderHints(QtGui.QPainter.Antialiasing | 
+                               QtGui.QPainter.LosslessImageRendering |
+                               QtGui.QPainter.TextAntialiasing | 
+                               QtGui.QPainter.SmoothPixmapTransform | 
+                               QtGui.QPainter.HighQualityAntialiasing)
 
         if self.state == BadgeState.ERROR:
             painter.drawPixmap(0, 0, self.size, self.size, self.errorPixmap)
@@ -239,6 +241,12 @@ class GPlug(QtWidgets.QGraphicsObject):
     def paint(self, painter : QtGui.QPainter, option : QtWidgets.QStyleOptionGraphicsItem, widget : QtWidgets.QWidget) -> None:
         """
         """
+        painter.setRenderHints(QtGui.QPainter.Antialiasing | 
+                               QtGui.QPainter.LosslessImageRendering |
+                               QtGui.QPainter.TextAntialiasing | 
+                               QtGui.QPainter.SmoothPixmapTransform | 
+                               QtGui.QPainter.HighQualityAntialiasing)
+
         pen = QtGui.QPen()
         pen.setBrush(Qt.black)
         pen.setWidth(0.01)
@@ -246,8 +254,6 @@ class GPlug(QtWidgets.QGraphicsObject):
         pen.setJoinStyle(Qt.RoundJoin)
 
         painter.setPen(Qt.NoPen)
-
-        painter.setRenderHint(QtGui.QPainter.Antialiasing)
 
         painter.setBrush(self.color)
 
@@ -442,7 +448,7 @@ class GNode(QtWidgets.QGraphicsObject):
         self.newPos = QtCore.QPointF()
         self.iconSize = 18
 
-        labelSizeX = GetFontRect(self.name, "Helvetica", 12).width() * 1.5 + 3 * self.iconSize
+        labelSizeX = GetFontRect(self.name, "Helvetica", 14).width() * 1.5 + 3 * self.iconSize
         inputNameSizeX = 0
         outputNameSizeX = 0
 
@@ -578,6 +584,12 @@ class GNode(QtWidgets.QGraphicsObject):
     def paint(self, painter : QtGui.QPainter, option : QtWidgets.QStyleOptionGraphicsItem, widget : QtWidgets.QWidget) -> None:
         """
         """
+        painter.setRenderHints(QtGui.QPainter.Antialiasing | 
+                               QtGui.QPainter.LosslessImageRendering |
+                               QtGui.QPainter.TextAntialiasing | 
+                               QtGui.QPainter.SmoothPixmapTransform | 
+                               QtGui.QPainter.HighQualityAntialiasing)
+
         ## Shadow
         shadowOffset = 10
         path = QtGui.QPainterPath()
@@ -591,8 +603,6 @@ class GNode(QtWidgets.QGraphicsObject):
         painter.drawPath(path.simplified())
         
         ## Body
-
-        painter.setRenderHint(QtGui.QPainter.Antialiasing)
         
         bodyColor = GetQColorFromPalette(ColorPalette.ACTIVE)
 
@@ -611,14 +621,11 @@ class GNode(QtWidgets.QGraphicsObject):
 
         if self.pixMap is not None:
             pixMapWidth = self.iconSize
-            painter.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
-            painter.setRenderHint(QtGui.QPainter.LosslessImageRendering)
-            painter.setRenderHint(QtGui.QPainter.HighQualityAntialiasing)
             painter.drawPixmap(7, 7, pixMapWidth, pixMapWidth, self.pixMap)
 
         # Label name
         painter.setPen(GetQColorFromPalette(ColorPalette.SELECTIONFOREGROUND))
-        painter.setFont(QtGui.QFont("Helvetica", 10))
+        painter.setFont(QtGui.QFont("Helvetica", 12))
 
         fontRect = QtCore.QRect(14 + pixMapWidth, 6, self.sizeX - 10, self.labelSizeY - 10)
         painter.drawText(fontRect, 0, self.name)
@@ -635,9 +642,6 @@ class GNode(QtWidgets.QGraphicsObject):
         painter.setBrush(bodyColor)
         painter.setPen(Qt.NoPen)
         painter.drawPath(path.simplified())
-        
-        # self.errorPixmap = self.iconsLib.GetPixmap("node-error")
-        # painter.drawPixmap(0, 0, 48, 48, self.errorPixmap)
 
     # EVENTS
 
@@ -768,6 +772,12 @@ class Edge(QtWidgets.QGraphicsItem):
     def paint(self, painter : QtGui.QPainter, option : QtWidgets.QStyleOptionGraphicsItem, widget : QtWidgets.QWidget) -> None:
         """
         """
+        painter.setRenderHints(QtGui.QPainter.Antialiasing | 
+                               QtGui.QPainter.LosslessImageRendering |
+                               QtGui.QPainter.TextAntialiasing | 
+                               QtGui.QPainter.SmoothPixmapTransform | 
+                               QtGui.QPainter.HighQualityAntialiasing)
+
         offset = self.getControlPointsOffet()
 
         path = QtGui.QPainterPath()
