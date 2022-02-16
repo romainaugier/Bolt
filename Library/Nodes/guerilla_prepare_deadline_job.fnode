@@ -25,7 +25,7 @@ exposed = False
 
 shortName = inenvironment
 longName = Environment
-defaultValue = { "GUERILLA" : "P:/GUERILLA/2.3.0.13_Romain", "GUERILLA_PYTHON_LIBRARY" : "P:/PYTHON/Python27_Romain/python27.dll", "PYTHONHOME" : "P:/PYTHON/Python27_Romain", "PYTHONPATH" : "P:/PYTHON/Python27_Romain/Lib", "PATH" : "%PYTHONHOME%;%PATH%", "DEADLINEPATH" : "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin", "OCIO" : "P:/COLOR/aces_1.2/config.ocio" }
+defaultValue = { "GUERILLA" : "P:/GUERILLA/2.3.0.13_Romain", "GUERILLA_PYTHON_LIBRARY" : "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain", "PYTHONHOME" : "P:/PYTHON/Python27_Romain", "PYTHONPATH" : "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib", "PATH" : "%PYTHONHOME%;%PATH%", "DEADLINEPATH" : "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin", "OCIO" : "P:/COLOR/aces_1.2/config.ocio" }
 type = dict
 exposed = True
 
