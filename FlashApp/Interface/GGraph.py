@@ -265,6 +265,7 @@ class GGraph(QtWidgets.QGraphicsView):
                     scenePos = self.mapToScene(self.mapFromGlobal(QtGui.QCursor.pos()))
                     tmpGNode = self.addNode("Utility/File", scenePos)
                     scenePos = QtCore.QPointF(scenePos.x() - tmpGNode.sizeX / 2, scenePos.y() - tmpGNode.sizeY / 2)
+                    tmpGNode.setPos(scenePos)
                     tmpGNode.getInternalNode().SetPlugValue("infile", itemPath)
         else:
             event.ignore()
