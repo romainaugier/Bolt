@@ -149,6 +149,7 @@ class GGraph(QtWidgets.QGraphicsView):
         """
         """
         self.plugEditor.move(self.rect().width() - self.plugEditor.getWidth() - 50, 50)
+        self.plugEditor.setMaxHeight(self.sceneRect().height() - 50)
         
         return super().resizeEvent(event)
 
@@ -202,28 +203,30 @@ class GGraph(QtWidgets.QGraphicsView):
             return super().mouseReleaseEvent(event)
 
     def eventFilter(self, obj: QtCore.QObject, event: QtCore.QEvent) -> bool:
-        if event.type() == QtCore.QEvent.Wheel:
-            oldPos = self.mapToScene(event.pos())
+        if not event.isAccepted():
 
-            if event.angleDelta().y() > 0:
-                # self.scaleView(1.01)
-                self.scale(1.01, 1.01)
-            else:
-                # self.scaleView(0.99)
-                self.scale(0.99, 0.99)
+            if event.type() == QtCore.QEvent.Wheel:
+                oldPos = self.mapToScene(event.pos())
 
-            newPos = self.mapToScene(event.pos())
+                if event.angleDelta().y() > 0:
+                    # self.scaleView(1.01)
+                    self.scale(1.01, 1.01)
+                else:
+                    # self.scaleView(0.99)
+                    self.scale(0.99, 0.99)
 
-            delta = newPos - oldPos
+                newPos = self.mapToScene(event.pos())
 
-            self.translate(delta.x(), delta.y())
+                delta = newPos - oldPos
 
-            return super().eventFilter(obj, event)
+                self.translate(delta.x(), delta.y())
 
-        elif event.type() == QtCore.QEvent.MouseButtonPress and event.button() == QtCore.Qt.LeftButton:
-            self.scene.clearSelection()
-            self.scene.selectedItems()
-            return super().eventFilter(obj, event)
+                return super().eventFilter(obj, event)
+
+            elif event.type() == QtCore.QEvent.MouseButtonPress and event.button() == QtCore.Qt.LeftButton:
+                self.scene.clearSelection()
+                self.scene.selectedItems()
+                return super().eventFilter(obj, event)
             
         return super().eventFilter(obj, event)
             

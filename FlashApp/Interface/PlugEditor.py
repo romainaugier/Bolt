@@ -473,10 +473,17 @@ class PlugEditor(QtWidgets.QWidget):
 
         self.iconsLib = iconsLib
 
-        self._width = 350
+        self._width = 400
+        self.maxHeight = 100
 
         self.setMinimumWidth(self._width)
         self.setMaximumWidth(self._width)
+
+        self.scrollArea = QtWidgets.QScrollArea(self)
+        self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setFrameShape(QtWidgets.QFrame.NoFrame)
 
         self.setSizePolicy(
             QtWidgets.QSizePolicy.MinimumExpanding,
@@ -507,6 +514,19 @@ class PlugEditor(QtWidgets.QWidget):
 
         self.masterLayout.addLayout(topLayout)
 
+        self.plugsMasterLayout = QtWidgets.QVBoxLayout()
+        self.plugsMasterLayout.setAlignment(Qt.AlignTop)
+        self.plugsMasterLayout.setSpacing(0)
+        self.plugsMasterLayout.setContentsMargins(0, 0, 0, 0)
+
+        self.masterLayout.addLayout(self.plugsMasterLayout)
+
+        sep = QHLine()
+        sep.setLineWidth(2)
+        sep.setMinimumWidth(self._width - 20)
+        sep.setColor(GetQColorFromPalette(ColorPalette.TEXT))
+        self.plugsMasterLayout.addWidget(sep)
+        
         self.plugsLayout = QtWidgets.QVBoxLayout()
         self.plugsLayout.setAlignment(Qt.AlignTop)
         self.plugsLayout.setSpacing(0)
@@ -518,8 +538,12 @@ class PlugEditor(QtWidgets.QWidget):
             QtWidgets.QSizePolicy.MinimumExpanding,
             QtWidgets.QSizePolicy.MinimumExpanding
         )
+
         self.plugsWidget.setLayout(self.plugsLayout)
-        self.masterLayout.addWidget(self.plugsWidget)
+
+        self.scrollArea.setWidget(self.plugsWidget)
+
+        self.plugsMasterLayout.addWidget(self.scrollArea)
 
         self.setLayout(self.masterLayout)
 
@@ -545,6 +569,7 @@ class PlugEditor(QtWidgets.QWidget):
             selection-color: rgb(255, 255, 255);
             selection-background-color : rgb(64, 69, 102);
         }
+
         QPushButton {
             color: rgb(143, 144, 160);
             background-color: rgba(74, 82, 107, 63);
@@ -558,6 +583,49 @@ class PlugEditor(QtWidgets.QWidget):
             color: rgb(143, 144, 160);
             background-color: rgba(74, 82, 107, 127);
         }
+
+        QScrollBar:vertical {
+            background-color: rgb(8, 8, 10);
+            width: 10px;
+            border: none;
+        }
+
+        QScrollBar::handle:vertical {
+            background-color: rgb(69, 74, 92);
+            width: 10px;
+            border-radius: 5px;
+        }
+
+        QScrollBar::add-line:vertical
+        {
+            margin: 0px 3px 0px 3px;
+            border-image: url(:/qss_icons/rc/right_arrow_disabled.png);
+            width: 10px;
+            height: 10px;
+            subcontrol-position: right;
+            subcontrol-origin: margin;
+        }
+        
+        QScrollBar::sub-line:vertical
+        {
+            margin: 0px 3px 0px 3px;
+            border-image: url(:/qss_icons/rc/left_arrow_disabled.png);
+            height: 10px;
+            width: 10px;
+            subcontrol-position: left;
+            subcontrol-origin: margin;
+        }
+
+        QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical
+        {
+            background: none;
+        }
+
+        QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical
+        {
+            background: none;
+        }
+
         """)
 
         self.resized.connect(self.adjust)
@@ -568,6 +636,19 @@ class PlugEditor(QtWidgets.QWidget):
         """
         """
         return self._width
+
+    def setMaxHeight(self, height : int) -> None:
+        """
+        """
+        self.maxHeight = height
+
+    def adjustScrollHeight(self) -> None:
+        """
+        """
+        plugsHeight = self.plugsWidget.height()
+        newHeight = plugsHeight if plugsHeight < self.maxHeight else self.maxHeight
+
+        self.scrollArea.setFixedHeight(newHeight)
 
     def roundCorners(self) -> None:
         """
@@ -582,18 +663,20 @@ class PlugEditor(QtWidgets.QWidget):
         """
         """
         QtCore.QTimer.singleShot(0, self.plugsWidget.adjustSize)
-        QtCore.QTimer.singleShot(5, self.adjustSize)
-        QtCore.QTimer.singleShot(10, self.updateGeometry)
-        QtCore.QTimer.singleShot(15, self.roundCorners)
+        QtCore.QTimer.singleShot(5, self.adjustScrollHeight)
+        # QtCore.QTimer.singleShot(10, self.plugsMasterLayout)
+        QtCore.QTimer.singleShot(15, self.adjustSize)
+        QtCore.QTimer.singleShot(20, self.updateGeometry)
+        QtCore.QTimer.singleShot(25, self.roundCorners)
 
     def showPlugsAndInfos(self) -> None:
         """
         """
-        if self.plugsWidget.isHidden():
-            self.plugsWidget.show()
+        if self.scrollArea.isHidden():
+            self.scrollArea.show()
             self.showButton.setIcon(self.iconsLib.GetIcon("arrow-down"))
         else:
-            self.plugsWidget.hide()
+            self.scrollArea.hide()
             self.showButton.setIcon(self.iconsLib.GetIcon("arrow-left"))
 
         self.resized.emit()
@@ -611,12 +694,6 @@ class PlugEditor(QtWidgets.QWidget):
         # layout = QtWidgets.QVBoxLayout()
 
         plugCount = 0
-
-        sep = QHLine()
-        sep.setLineWidth(2)
-        sep.setMinimumWidth(self._width - 20)
-        sep.setColor(GetQColorFromPalette(ColorPalette.TEXT))
-        self.plugsLayout.addWidget(sep)
 
         for plugName, plug in self.node.GetInputs().items():
             if plug.IsExposed():
@@ -670,3 +747,5 @@ class PlugEditor(QtWidgets.QWidget):
         """
         """
         self.plugChanged.emit()
+
+    # EVENTS        
