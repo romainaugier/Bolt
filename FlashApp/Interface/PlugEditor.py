@@ -474,17 +474,10 @@ class PlugEditor(QtWidgets.QWidget):
         self.iconsLib = iconsLib
 
         self._width = 400
-        self.maxHeight = 100
+        self.maxHeight = 50
 
         self.setMinimumWidth(self._width)
         self.setMaximumWidth(self._width)
-
-        self.scrollArea = QtWidgets.QScrollArea(self)
-        self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.scrollArea.setWidgetResizable(True)
-        self.scrollArea.setFrameShape(QtWidgets.QFrame.NoFrame)
-
         self.setSizePolicy(
             QtWidgets.QSizePolicy.MinimumExpanding,
             QtWidgets.QSizePolicy.MinimumExpanding
@@ -492,6 +485,17 @@ class PlugEditor(QtWidgets.QWidget):
 
         self.setAutoFillBackground(True)
         self.setAttribute(QtCore.Qt.WA_StyledBackground, True)
+
+        self.scrollArea = QtWidgets.QScrollArea(self)
+        self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.scrollArea.setMinimumWidth(self._width - 20)
+        self.scrollArea.setSizePolicy(
+            QtWidgets.QSizePolicy.MinimumExpanding,
+            QtWidgets.QSizePolicy.MinimumExpanding
+        )
 
         self.masterLayout = QtWidgets.QVBoxLayout()
         self.masterLayout.setAlignment(Qt.AlignTop)
@@ -518,6 +522,7 @@ class PlugEditor(QtWidgets.QWidget):
         self.plugsMasterLayout.setAlignment(Qt.AlignTop)
         self.plugsMasterLayout.setSpacing(0)
         self.plugsMasterLayout.setContentsMargins(0, 0, 0, 0)
+        self.plugsMasterLayout.setSizeConstraint(QtWidgets.QLayout.SetFixedSize)
 
         self.masterLayout.addLayout(self.plugsMasterLayout)
 
@@ -534,6 +539,7 @@ class PlugEditor(QtWidgets.QWidget):
         self.plugsLayout.setSizeConstraint(QtWidgets.QLayout.SetFixedSize)
 
         self.plugsWidget = QtWidgets.QWidget()
+        self.plugsWidget.setMinimumWidth(self._width - 20)
         self.plugsWidget.setSizePolicy(
             QtWidgets.QSizePolicy.MinimumExpanding,
             QtWidgets.QSizePolicy.MinimumExpanding
@@ -642,11 +648,16 @@ class PlugEditor(QtWidgets.QWidget):
         """
         self.maxHeight = height
 
-    def adjustScrollHeight(self) -> None:
+    def adjustScrollArea(self) -> None:
         """
         """
         plugsHeight = self.plugsWidget.height()
-        newHeight = plugsHeight if plugsHeight < self.maxHeight else self.maxHeight
+        if plugsHeight < self.maxHeight:
+            newHeight = plugsHeight 
+            self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        else:
+            newHeight = self.maxHeight
+            self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
 
         self.scrollArea.setFixedHeight(newHeight)
 
@@ -662,8 +673,8 @@ class PlugEditor(QtWidgets.QWidget):
     def adjust(self) -> None:
         """
         """
-        QtCore.QTimer.singleShot(0, self.plugsWidget.adjustSize)
-        QtCore.QTimer.singleShot(5, self.adjustScrollHeight)
+        QtCore.QTimer.singleShot(0, self.adjustScrollArea)
+        QtCore.QTimer.singleShot(5, self.plugsWidget.adjustSize)
         # QtCore.QTimer.singleShot(10, self.plugsMasterLayout)
         QtCore.QTimer.singleShot(15, self.adjustSize)
         QtCore.QTimer.singleShot(20, self.updateGeometry)
@@ -707,6 +718,7 @@ class PlugEditor(QtWidgets.QWidget):
                     plugWidget = PlugWidget(plug)
 
                 plugWidget.valueChanged.connect(self.onPlugChange)
+                plugWidget.setMinimumWidth(self._width - 35)
                 self.plugsLayout.addWidget(plugWidget)
 
                 plugCount += 1
@@ -749,3 +761,7 @@ class PlugEditor(QtWidgets.QWidget):
         self.plugChanged.emit()
 
     # EVENTS        
+
+    def wheelEvent(self, event: QtGui.QWheelEvent) -> None:
+        event.setAccepted(True)
+        return super().wheelEvent(event)

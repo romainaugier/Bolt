@@ -13,7 +13,7 @@ category = Utility
 
 shortName = input
 longName = Input Data
-default = None
+default = ""
 type = custom
 exposed = False
 
@@ -23,7 +23,7 @@ exposed = False
 
 shortName = output
 longName = Output Data
-default = None
+default = ""
 type = custom
 
 # EndPlug

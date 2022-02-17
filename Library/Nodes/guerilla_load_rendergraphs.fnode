@@ -1,8 +1,8 @@
-// Generates a script to load an alembic file into a gproject file
+// Generates a script to load rendergraphs into a gproject file
 
 # BeginAttr
 
-name = Mercs_LoadAlembics
+name = Guerilla_LoadRenderGraphs
 icon = $FLASH_ICONS/guerilla-render.png
 category = Guerilla
 
@@ -12,8 +12,8 @@ category = Guerilla
 
 # BeginPlug
 
-shortName = inabcfiles
-longName = Alembic Files
+shortName = inrgfiles
+longName = RenderGraph Files
 defaultValue = [""]
 type = list
 exposed = False
@@ -29,22 +29,33 @@ type = str
 
 # EndPlug
 
+# BeginPlug
+
+shortName = outscripttext
+longName = Output Script Text
+defaultValue = ""
+type = str
+
+# EndPlug
+
 # EndPlugs
 
 # BeginOp
 
-if type(inabcfiles) is str:
-    inabcfiles = [inabcfiles]
+if type(inrgfiles) is str:
+    inabcfiles = [inrgfiles]
 
 generatedScript = f"""import guerilla, os
 
-paths = {inabcfiles}
+paths = {inrgfiles}
 
 for path in paths:
     name = os.path.basename(path)
 
-    with guerilla.Modifier() as mod:
-        mod.createref(name, path, options={{ 'prefixnodes' : False,'containschildren' : True }})
+    loaded = guerilla.Document().loadfile(path)
+
+    if not loaded:
+        FlashLogWarning("Could not load {{}} in guerilla file".format(name))
 
 guerilla.Document().save()
 """
@@ -55,5 +66,6 @@ with open(tmpScriptFilePath, "w") as scriptFile:
     scriptFile.write(generatedScript)
 
 outscriptfile = tmpScriptFilePath
+outscripttext = generatedScript
 
 # EndOp

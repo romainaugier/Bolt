@@ -25,10 +25,20 @@ class Graph():
 
         self.UpdateEnv()
 
+    def SetName(self, name : str) -> None:
+        """
+        """
+        self.name = name
+
     def GetName(self) -> str:
         """
         """
         return self.name
+
+    def SetSavePath(self, path : str) -> None:
+        """
+        """
+        self.savePath = path
 
     def GetSavePath(self) -> str:
         """

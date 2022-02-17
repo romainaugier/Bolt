@@ -1,0 +1,1348 @@
+{
+  "nodes": [
+    {
+      "name": "File1",
+      "id": "3664653665643531326565333334666162306163363763383335376563383866",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "",
+      "opCode": "# BeginOp\n\noutfile = infile\n\n",
+      "inputs": {
+        "infile": [
+          {
+            "shortName": "infile",
+            "longName": "Input File Path",
+            "index": 0,
+            "isExposed": true,
+            "data": "Z:/OEUF/RnD/trees/rendergraphs/trees.grendergraph",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "data": "Z:/OEUF/RnD/trees/rendergraphs/trees.grendergraph",
+            "type": 7,
+            "connectionName": "input1",
+            "connectionNodeId": "3161316333353238636363303764326266343861336339623562393866303362"
+          }
+        ]
+      }
+    },
+    {
+      "name": "File2",
+      "id": "3264303135333733316435313330643337393837353063333365613332353036",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "",
+      "opCode": "# BeginOp\n\noutfile = infile\n\n",
+      "inputs": {
+        "infile": [
+          {
+            "shortName": "infile",
+            "longName": "Input File Path",
+            "index": 0,
+            "isExposed": true,
+            "data": "Z:/OEUF/RnD/trees/rendergraphs/lighting.grendergraph",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "data": "Z:/OEUF/RnD/trees/rendergraphs/lighting.grendergraph",
+            "type": 7,
+            "connectionName": "input2",
+            "connectionNodeId": "3739653564616437383731313965613534323662353530323534313765363031"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge",
+      "id": "3663336134383964396236376235636430336636613034393832616162643930",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/merge.png",
+      "opCode": "# BeginOp\n\nif type(input1) is list:\n    if type(input2) is list:\n        output = [*input1, *input2]\n    else:\n        output = [*input1, input2]\nelif type(input2) is list:\n    output = [input1, *input2]\nelse:\n    output = [input1, input2]\n\n",
+      "inputs": {
+        "input1": [
+          {
+            "shortName": "input1",
+            "longName": "Input 1",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "Z:/OEUF/RnD/trees/fbx/test_tree_2.abc",
+              "Z:/OEUF/RnD/trees/fbx/test_tree_3.abc"
+            ],
+            "type": 11,
+            "connectionName": "outfiles",
+            "connectionNodeId": "3238633131353863396330316631393362343339306661643630656138343538"
+          }
+        ],
+        "input2": [
+          {
+            "shortName": "input2",
+            "longName": "Input 2",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "Z:/OEUF/RnD/trees/export/leaves_pcloud2.abc",
+              "Z:/OEUF/RnD/trees/export/leaves_pcloud3.abc"
+            ],
+            "type": 11,
+            "connectionName": "outfiles",
+            "connectionNodeId": "3464393233346161346338383864356364616466363734363561316234346535"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "Z:/OEUF/RnD/trees/fbx/test_tree_2.abc",
+              "Z:/OEUF/RnD/trees/fbx/test_tree_3.abc",
+              "Z:/OEUF/RnD/trees/export/leaves_pcloud2.abc",
+              "Z:/OEUF/RnD/trees/export/leaves_pcloud3.abc"
+            ],
+            "type": 9,
+            "connectionName": "input1",
+            "connectionNodeId": "6561333464623061623031316539636437326538313230613863353533396130"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge1",
+      "id": "3161316333353238636363303764326266343861336339623562393866303362",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/merge.png",
+      "opCode": "# BeginOp\n\nif type(input1) is list:\n    if type(input2) is list:\n        output = [*input1, *input2]\n    else:\n        output = [*input1, input2]\nelif type(input2) is list:\n    output = [input1, *input2]\nelse:\n    output = [input1, input2]\n\n",
+      "inputs": {
+        "input1": [
+          {
+            "shortName": "input1",
+            "longName": "Input 1",
+            "index": 0,
+            "isExposed": false,
+            "data": "Z:/OEUF/RnD/trees/rendergraphs/trees.grendergraph",
+            "type": 11,
+            "connectionName": "outfile",
+            "connectionNodeId": "3664653665643531326565333334666162306163363763383335376563383866"
+          }
+        ],
+        "input2": [
+          {
+            "shortName": "input2",
+            "longName": "Input 2",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "Z:/OEUF/RnD/trees/rendergraphs/leaves2.grendergraph",
+              "Z:/OEUF/RnD/trees/rendergraphs/leaves3.grendergraph"
+            ],
+            "type": 11,
+            "connectionName": "outfiles",
+            "connectionNodeId": "6166303436363036373738396139373931636639643636346563333063653339"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "Z:/OEUF/RnD/trees/rendergraphs/trees.grendergraph",
+              "Z:/OEUF/RnD/trees/rendergraphs/leaves2.grendergraph",
+              "Z:/OEUF/RnD/trees/rendergraphs/leaves3.grendergraph"
+            ],
+            "type": 9,
+            "connectionName": "input1",
+            "connectionNodeId": "3739653564616437383731313965613534323662353530323534313765363031"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge2",
+      "id": "3739653564616437383731313965613534323662353530323534313765363031",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/merge.png",
+      "opCode": "# BeginOp\n\nif type(input1) is list:\n    if type(input2) is list:\n        output = [*input1, *input2]\n    else:\n        output = [*input1, input2]\nelif type(input2) is list:\n    output = [input1, *input2]\nelse:\n    output = [input1, input2]\n\n",
+      "inputs": {
+        "input1": [
+          {
+            "shortName": "input1",
+            "longName": "Input 1",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "Z:/OEUF/RnD/trees/rendergraphs/trees.grendergraph",
+              "Z:/OEUF/RnD/trees/rendergraphs/leaves2.grendergraph",
+              "Z:/OEUF/RnD/trees/rendergraphs/leaves3.grendergraph"
+            ],
+            "type": 11,
+            "connectionName": "output",
+            "connectionNodeId": "3161316333353238636363303764326266343861336339623562393866303362"
+          }
+        ],
+        "input2": [
+          {
+            "shortName": "input2",
+            "longName": "Input 2",
+            "index": 0,
+            "isExposed": false,
+            "data": "Z:/OEUF/RnD/trees/rendergraphs/lighting.grendergraph",
+            "type": 11,
+            "connectionName": "outfile",
+            "connectionNodeId": "3264303135333733316435313330643337393837353063333365613332353036"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "Z:/OEUF/RnD/trees/rendergraphs/trees.grendergraph",
+              "Z:/OEUF/RnD/trees/rendergraphs/leaves2.grendergraph",
+              "Z:/OEUF/RnD/trees/rendergraphs/leaves3.grendergraph",
+              "Z:/OEUF/RnD/trees/rendergraphs/lighting.grendergraph"
+            ],
+            "type": 9,
+            "connectionName": "inrgfiles",
+            "connectionNodeId": "6635303733383735623435326366333530666461303934616637333764376462"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Guerilla_LoadAlembics",
+      "id": "3439323436383931333034636336383438373266323133383636353337646230",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/guerilla-render.png",
+      "opCode": "# BeginOp\n\nif type(inabcfiles) is str:\n    inabcfiles = [inabcfiles]\n\ngeneratedScript = f\"\"\"import guerilla, os\n\npaths = {inabcfiles}\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    with guerilla.Modifier() as mod:\n        mod.createref(name, path, options={{ 'prefixnodes' : False,'containschildren' : True }})\n\nguerilla.Document().save()\n\"\"\"\n\ntmpScriptFilePath = FlashTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\noutscripttext = generatedScript\n\n",
+      "inputs": {
+        "inabcfiles": [
+          {
+            "shortName": "inabcfiles",
+            "longName": "Alembic Files",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "Z:/OEUF/RnD/trees/fbx/test_tree_2.abc",
+              "Z:/OEUF/RnD/trees/fbx/test_tree_3.abc",
+              "Z:/OEUF/RnD/trees/export/leaves_pcloud2.abc",
+              "Z:/OEUF/RnD/trees/export/leaves_pcloud3.abc",
+              "Z:/OEUF/RnD/trees/export/leave1.abc"
+            ],
+            "type": 9,
+            "connectionName": "output",
+            "connectionNodeId": "6561333464623061623031316539636437326538313230613863353533396130"
+          }
+        ]
+      },
+      "outputs": {
+        "outscriptfile": [
+          {
+            "shortName": "outscriptfile",
+            "longName": "Output Script File",
+            "index": 0,
+            "isExposed": false,
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Flash/6437336334323639623737643330363331386630653435343930313332343864.py",
+            "type": 7,
+            "connectionName": "inscript1",
+            "connectionNodeId": "3463383565626230356530353834653431343037323738316135363561383430"
+          }
+        ],
+        "outscripttext": [
+          {
+            "shortName": "outscripttext",
+            "longName": "Output Script Text",
+            "index": 0,
+            "isExposed": false,
+            "data": "import guerilla, os\n\npaths = ['Z:/OEUF/RnD/trees/fbx/test_tree_2.abc', 'Z:/OEUF/RnD/trees/fbx/test_tree_3.abc', 'Z:/OEUF/RnD/trees/export/leaves_pcloud2.abc', 'Z:/OEUF/RnD/trees/export/leaves_pcloud3.abc', 'Z:/OEUF/RnD/trees/export/leave1.abc']\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    with guerilla.Modifier() as mod:\n        mod.createref(name, path, options={ 'prefixnodes' : False,'containschildren' : True })\n\nguerilla.Document().save()\n",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "Guerilla_LoadRenderGraphs",
+      "id": "6635303733383735623435326366333530666461303934616637333764376462",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/guerilla-render.png",
+      "opCode": "# BeginOp\n\nif type(inrgfiles) is str:\n    inabcfiles = [inrgfiles]\n\ngeneratedScript = f\"\"\"import guerilla, os\n\npaths = {inrgfiles}\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    loaded = guerilla.Document().loadfile(path)\n\n    if not loaded:\n        FlashLogWarning(\"Could not load {{}} in guerilla file\".format(name))\n\nguerilla.Document().save()\n\"\"\"\n\ntmpScriptFilePath = FlashTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\noutscripttext = generatedScript\n\n",
+      "inputs": {
+        "inrgfiles": [
+          {
+            "shortName": "inrgfiles",
+            "longName": "RenderGraph Files",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "Z:/OEUF/RnD/trees/rendergraphs/trees.grendergraph",
+              "Z:/OEUF/RnD/trees/rendergraphs/leaves2.grendergraph",
+              "Z:/OEUF/RnD/trees/rendergraphs/leaves3.grendergraph",
+              "Z:/OEUF/RnD/trees/rendergraphs/lighting.grendergraph"
+            ],
+            "type": 9,
+            "connectionName": "output",
+            "connectionNodeId": "3739653564616437383731313965613534323662353530323534313765363031"
+          }
+        ]
+      },
+      "outputs": {
+        "outscriptfile": [
+          {
+            "shortName": "outscriptfile",
+            "longName": "Output Script File",
+            "index": 0,
+            "isExposed": false,
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Flash/3161306463323361363963656566303432303235323932343332613862393865.py",
+            "type": 7,
+            "connectionName": "inscript2",
+            "connectionNodeId": "3463383565626230356530353834653431343037323738316135363561383430"
+          }
+        ],
+        "outscripttext": [
+          {
+            "shortName": "outscripttext",
+            "longName": "Output Script Text",
+            "index": 0,
+            "isExposed": false,
+            "data": "import guerilla, os\n\npaths = ['Z:/OEUF/RnD/trees/rendergraphs/trees.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/leaves2.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/leaves3.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/lighting.grendergraph']\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    loaded = guerilla.Document().loadfile(path)\n\n    if not loaded:\n        FlashLogWarning(\"Could not load {} in guerilla file\".format(name))\n\nguerilla.Document().save()\n",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "File5",
+      "id": "3261333638336662643430353434623831373566663464323830636639623065",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "",
+      "opCode": "# BeginOp\n\noutfile = infile\n\n",
+      "inputs": {
+        "infile": [
+          {
+            "shortName": "infile",
+            "longName": "Input File Path",
+            "index": 0,
+            "isExposed": true,
+            "data": "Z:/OEUF/RnD/trees/lookdev/trees_lookdev.gproject",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "data": "Z:/OEUF/RnD/trees/lookdev/trees_lookdev.gproject",
+            "type": 7,
+            "connectionName": "indata",
+            "connectionNodeId": "6664373663373534373664343062316430616332653731383963393236373338"
+          },
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "data": "Z:/OEUF/RnD/trees/lookdev/trees_lookdev.gproject",
+            "type": 7,
+            "connectionName": "infilepath",
+            "connectionNodeId": "6265333735666532376330326663393665323930656563303130343230663538"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge_Scripts",
+      "id": "6336623032666262646333633062313634306532663366333138656539383934",
+      "color": [
+        52,
+        115,
+        165
+      ],
+      "iconPath": "$FLASH_ICONS/python.png",
+      "opCode": "# BeginOp\n\nimport os, re\n\nscript1 = inscript1\nscript2 = inscript2\n\nscriptsAreFile = False\n\nif os.path.exists(script1):\n    with open(script1, \"r\") as scriptFile1:\n        script1 = scriptFile1.read()\n\nif os.path.exists(script2):\n    with open(script2, \"r\") as scriptFile2:\n        script2 = scriptFile2.read()\n\nimportPatterns = re.compile(r\"import\\s.+|from\\s.+\")\n\nimportMatches1 = re.findall(importPatterns, script1)\n\nimportMatches2 = re.findall(importPatterns, script2)\n\nmodulesToImport = []\nmodulesToImportAs = {}\nmodulesToImportFrom = {}\n\nfor importMatch in importMatches1:\n    if importMatch.startswith(\"import\"):\n        if \"as\" in importMatch:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importList = importMatch.split(\"as\")\n\n            modulesToImportAs[importList[0].replace(\" \", \"\")] = importList[1].replace(\" \", \"\")\n        else:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importMatch = importMatch.replace(\" \", \"\")\n            importList = importMatch.split(\",\")\n\n            for imp in importList: \n                modulesToImport.append(imp)\n    \n    elif importMatch.startswith(\"from\"):\n        importMatch = importMatch.replace(\"from\", \"\")\n        importList = importMatch.split(\"import\")\n\n        module = importList[0].replace(\" \", \"\")\n\n        elements = importList[1].split(\",\")\n\n        moduleElements = []\n\n        for elem in elements:\n            moduleElements.append(elem.replace(\" \", \"\"))\n\n        modulesToImportFrom[module] = moduleElements\n\nfor importMatch in importMatches2:\n    if importMatch.startswith(\"import\"):\n        if \"as\" in importMatch:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importList = importMatch.split(\"as\")\n\n            moduleName = importList[0].replace(\" \", \"\")\n            moduleAlias = importList[1].replace(\" \", \"\")\n\n            if moduleName in modulesToImportAs:\n                if moduleAlias == modulesToImportAs[moduleName]:\n                    pass\n                else:\n                    script2 = re.sub(fr\"({moduleAlias})\\.\", f\"{modulesToImportAs[moduleName]}.\", script2)\n            elif moduleName in modulesToImport:\n                script2 = re.sub(fr\"({moduleAlias})\\.\", f\"{moduleName}.\", script2)\n            else:\n                modulesToImportAs[moduleName] = moduleAlias\n        else:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importMatch = importMatch.replace(\" \", \"\")\n            importList = importMatch.split(\",\")\n\n            for imp in importList: \n                if imp in modulesToImportAs:\n                    script1 = re.sub(fr\"({modulesToImportAs[imp]})\\.\", f\"{imp}.\", script1)\n                    modulesToImportAs.pop(imp)\n                if not imp in modulesToImport:\n                    modulesToImport.append(imp)\n    \n    elif importMatch.startswith(\"from\"):\n        importMatch = importMatch.replace(\"from\", \"\")\n        importList = importMatch.split(\"import\")\n\n        module = importList[0].replace(\" \", \"\")\n\n        elements = importList[1].split(\",\")\n\n        moduleElements = []\n\n        for elem in elements:\n            moduleElements.append(elem.replace(\" \", \"\"))\n\n        if module in modulesToImportFrom:\n            for mod in moduleElements:\n                if not mod in modulesToImportFrom[module]:\n                    modulesToImportFrom[module].append(mod)\n        else:\n            modulesToImportFrom[module] = moduleElements\n\nfor importMatch in importMatches1:\n    script1 = script1.replace(importMatch, \"$\")\n\nfor importMatch in importMatches2:\n    script2 = script2.replace(importMatch, \"$\")\n\ndollarPattern = re.compile(r\"(\\$\\n)+\")\n\nscript1 = re.sub(dollarPattern, \"# Script 1\\n\", script1)\nscript2 = re.sub(dollarPattern, \"# Script 2\\n\", script2)\n\nmodulesToImportAsStr = \"import \"\n\nfor i, module in enumerate(modulesToImport):\n    if i == 0:\n        modulesToImportAsStr += f\"{module}\"\n    else:\n        modulesToImportAsStr += f\", {module}\"\n\nmodulesToImportAsAsStr = \"\"\n\nfor moduleName, moduleAlias in modulesToImportAs.items():\n    modulesToImportAsAsStr += f\"import {moduleName} as {moduleAlias}\"\n\nmodulesToImportFromAsStr = \"\"\n\nfor moduleName, subModules in modulesToImportFrom.items():\n    subModulesToImportFrom = f\"from {moduleName} import \"\n\n    for i, subModule in enumerate(subModules):\n        if i == 0:\n            subModulesToImportFrom += f\"{subModule}\"\n        else:\n            subModulesToImportFrom += f\", {subModule}\"\n\n    modulesToImportFromAsStr += f\"{subModulesToImportFrom}\\n\"\n\nmergedScripts = f\"{modulesToImportAsStr}\\n{modulesToImportAsAsStr}\\n{modulesToImportFromAsStr}\\n{script1}\\n{script2}\"\n\ntmpScriptFilePath = FlashTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(mergedScripts) \n\noutscript = tmpScriptFilePath.replace(\"\\\\\", \"/\")\noutscripttext = mergedScripts\n\n",
+      "inputs": {
+        "inscript1": [
+          {
+            "shortName": "inscript1",
+            "longName": "Input Script 1",
+            "index": 0,
+            "isExposed": false,
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Flash/3739323063323465323236386465386361376636303135376332373134353561.py",
+            "type": 7,
+            "connectionName": "outscriptfile",
+            "connectionNodeId": "6265333735666532376330326663393665323930656563303130343230663538"
+          }
+        ],
+        "inscript2": [
+          {
+            "shortName": "inscript2",
+            "longName": "Input Script 2",
+            "index": 0,
+            "isExposed": false,
+            "data": "C:/Users/r.augier/AppData/Roaming/Flash/3032626432653336663961343237373262623963356137363735313434356234.py",
+            "type": 7,
+            "connectionName": "outscript",
+            "connectionNodeId": "3463383565626230356530353834653431343037323738316135363561383430"
+          }
+        ]
+      },
+      "outputs": {
+        "outscript": [
+          {
+            "shortName": "outscript",
+            "longName": "Output Script",
+            "index": 0,
+            "isExposed": false,
+            "data": "C:/Users/r.augier/AppData/Roaming/Flash/6361636336393763356137303762646663636264383538383062366331333035.py",
+            "type": 7,
+            "connectionName": "inscript",
+            "connectionNodeId": "3662373531373764306164663633646432633634313230366537313832653438"
+          }
+        ],
+        "outscripttext": [
+          {
+            "shortName": "outscripttext",
+            "longName": "Output Script Text",
+            "index": 0,
+            "isExposed": false,
+            "data": "import guerilla, os\nimport RomanoTools.Guerilla.Utils as utils\n\n# Script 1\n\n# Script 1\n\nutils.SetOptims()\nutils.SetRange(\"100-240\")\n\nrenderPass = guerilla.Document().findchild(\"RenderPass\")\n\nrenderPass.FileLayerName.set(\"$o_$n\")\n\nguerilla.Document().ProjectWidth.set(2048)\nguerilla.Document().ProjectHeight.set(858)\n\nguerilla.Document().save(\"Z:/OEUF/RnD/trees/lookdev/trees_lookdev.gproject\")\n\n# Script 2\n\n\n# Script 1\n\npaths = ['Z:/OEUF/RnD/trees/fbx/test_tree_2.abc', 'Z:/OEUF/RnD/trees/fbx/test_tree_3.abc', 'Z:/OEUF/RnD/trees/export/leaves_pcloud2.abc', 'Z:/OEUF/RnD/trees/export/leaves_pcloud3.abc', 'Z:/OEUF/RnD/trees/export/leave1.abc']\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    with guerilla.Modifier() as mod:\n        mod.createref(name, path, options={ 'prefixnodes' : False,'containschildren' : True })\n\nguerilla.Document().save()\n\n# Script 2\n\npaths = ['Z:/OEUF/RnD/trees/rendergraphs/trees.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/leaves2.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/leaves3.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/lighting.grendergraph']\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    loaded = guerilla.Document().loadfile(path)\n\n    if not loaded:\n        FlashLogWarning(\"Could not load {} in guerilla file\".format(name))\n\nguerilla.Document().save()\n",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge_Scripts1",
+      "id": "3463383565626230356530353834653431343037323738316135363561383430",
+      "color": [
+        52,
+        115,
+        165
+      ],
+      "iconPath": "$FLASH_ICONS/python.png",
+      "opCode": "# BeginOp\n\nimport os, re\n\nscript1 = inscript1\nscript2 = inscript2\n\nscriptsAreFile = False\n\nif os.path.exists(script1):\n    with open(script1, \"r\") as scriptFile1:\n        script1 = scriptFile1.read()\n\nif os.path.exists(script2):\n    with open(script2, \"r\") as scriptFile2:\n        script2 = scriptFile2.read()\n\nimportPatterns = re.compile(r\"import\\s.+|from\\s.+\")\n\nimportMatches1 = re.findall(importPatterns, script1)\n\nimportMatches2 = re.findall(importPatterns, script2)\n\nmodulesToImport = []\nmodulesToImportAs = {}\nmodulesToImportFrom = {}\n\nfor importMatch in importMatches1:\n    if importMatch.startswith(\"import\"):\n        if \"as\" in importMatch:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importList = importMatch.split(\"as\")\n\n            modulesToImportAs[importList[0].replace(\" \", \"\")] = importList[1].replace(\" \", \"\")\n        else:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importMatch = importMatch.replace(\" \", \"\")\n            importList = importMatch.split(\",\")\n\n            for imp in importList: \n                modulesToImport.append(imp)\n    \n    elif importMatch.startswith(\"from\"):\n        importMatch = importMatch.replace(\"from\", \"\")\n        importList = importMatch.split(\"import\")\n\n        module = importList[0].replace(\" \", \"\")\n\n        elements = importList[1].split(\",\")\n\n        moduleElements = []\n\n        for elem in elements:\n            moduleElements.append(elem.replace(\" \", \"\"))\n\n        modulesToImportFrom[module] = moduleElements\n\nfor importMatch in importMatches2:\n    if importMatch.startswith(\"import\"):\n        if \"as\" in importMatch:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importList = importMatch.split(\"as\")\n\n            moduleName = importList[0].replace(\" \", \"\")\n            moduleAlias = importList[1].replace(\" \", \"\")\n\n            if moduleName in modulesToImportAs:\n                if moduleAlias == modulesToImportAs[moduleName]:\n                    pass\n                else:\n                    script2 = re.sub(fr\"({moduleAlias})\\.\", f\"{modulesToImportAs[moduleName]}.\", script2)\n            elif moduleName in modulesToImport:\n                script2 = re.sub(fr\"({moduleAlias})\\.\", f\"{moduleName}.\", script2)\n            else:\n                modulesToImportAs[moduleName] = moduleAlias\n        else:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importMatch = importMatch.replace(\" \", \"\")\n            importList = importMatch.split(\",\")\n\n            for imp in importList: \n                if imp in modulesToImportAs:\n                    script1 = re.sub(fr\"({modulesToImportAs[imp]})\\.\", f\"{imp}.\", script1)\n                    modulesToImportAs.pop(imp)\n                if not imp in modulesToImport:\n                    modulesToImport.append(imp)\n    \n    elif importMatch.startswith(\"from\"):\n        importMatch = importMatch.replace(\"from\", \"\")\n        importList = importMatch.split(\"import\")\n\n        module = importList[0].replace(\" \", \"\")\n\n        elements = importList[1].split(\",\")\n\n        moduleElements = []\n\n        for elem in elements:\n            moduleElements.append(elem.replace(\" \", \"\"))\n\n        if module in modulesToImportFrom:\n            for mod in moduleElements:\n                if not mod in modulesToImportFrom[module]:\n                    modulesToImportFrom[module].append(mod)\n        else:\n            modulesToImportFrom[module] = moduleElements\n\nfor importMatch in importMatches1:\n    script1 = script1.replace(importMatch, \"$\")\n\nfor importMatch in importMatches2:\n    script2 = script2.replace(importMatch, \"$\")\n\ndollarPattern = re.compile(r\"(\\$\\n)+\")\n\nscript1 = re.sub(dollarPattern, \"# Script 1\\n\", script1)\nscript2 = re.sub(dollarPattern, \"# Script 2\\n\", script2)\n\nmodulesToImportAsStr = \"import \"\n\nfor i, module in enumerate(modulesToImport):\n    if i == 0:\n        modulesToImportAsStr += f\"{module}\"\n    else:\n        modulesToImportAsStr += f\", {module}\"\n\nmodulesToImportAsAsStr = \"\"\n\nfor moduleName, moduleAlias in modulesToImportAs.items():\n    modulesToImportAsAsStr += f\"import {moduleName} as {moduleAlias}\"\n\nmodulesToImportFromAsStr = \"\"\n\nfor moduleName, subModules in modulesToImportFrom.items():\n    subModulesToImportFrom = f\"from {moduleName} import \"\n\n    for i, subModule in enumerate(subModules):\n        if i == 0:\n            subModulesToImportFrom += f\"{subModule}\"\n        else:\n            subModulesToImportFrom += f\", {subModule}\"\n\n    modulesToImportFromAsStr += f\"{subModulesToImportFrom}\\n\"\n\nmergedScripts = f\"{modulesToImportAsStr}\\n{modulesToImportAsAsStr}\\n{modulesToImportFromAsStr}\\n{script1}\\n{script2}\"\n\ntmpScriptFilePath = FlashTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(mergedScripts) \n\noutscript = tmpScriptFilePath.replace(\"\\\\\", \"/\")\noutscripttext = mergedScripts\n\n",
+      "inputs": {
+        "inscript1": [
+          {
+            "shortName": "inscript1",
+            "longName": "Input Script 1",
+            "index": 0,
+            "isExposed": false,
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Flash/6437336334323639623737643330363331386630653435343930313332343864.py",
+            "type": 7,
+            "connectionName": "outscriptfile",
+            "connectionNodeId": "3439323436383931333034636336383438373266323133383636353337646230"
+          }
+        ],
+        "inscript2": [
+          {
+            "shortName": "inscript2",
+            "longName": "Input Script 2",
+            "index": 0,
+            "isExposed": false,
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Flash/3161306463323361363963656566303432303235323932343332613862393865.py",
+            "type": 7,
+            "connectionName": "outscriptfile",
+            "connectionNodeId": "6635303733383735623435326366333530666461303934616637333764376462"
+          }
+        ]
+      },
+      "outputs": {
+        "outscript": [
+          {
+            "shortName": "outscript",
+            "longName": "Output Script",
+            "index": 0,
+            "isExposed": false,
+            "data": "C:/Users/r.augier/AppData/Roaming/Flash/3032626432653336663961343237373262623963356137363735313434356234.py",
+            "type": 7,
+            "connectionName": "inscript2",
+            "connectionNodeId": "6336623032666262646333633062313634306532663366333138656539383934"
+          }
+        ],
+        "outscripttext": [
+          {
+            "shortName": "outscripttext",
+            "longName": "Output Script Text",
+            "index": 0,
+            "isExposed": false,
+            "data": "import guerilla, os\n\n\n# Script 1\n\npaths = ['Z:/OEUF/RnD/trees/fbx/test_tree_2.abc', 'Z:/OEUF/RnD/trees/fbx/test_tree_3.abc', 'Z:/OEUF/RnD/trees/export/leaves_pcloud2.abc', 'Z:/OEUF/RnD/trees/export/leaves_pcloud3.abc', 'Z:/OEUF/RnD/trees/export/leave1.abc']\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    with guerilla.Modifier() as mod:\n        mod.createref(name, path, options={ 'prefixnodes' : False,'containschildren' : True })\n\nguerilla.Document().save()\n\n# Script 2\n\npaths = ['Z:/OEUF/RnD/trees/rendergraphs/trees.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/leaves2.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/leaves3.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/lighting.grendergraph']\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    loaded = guerilla.Document().loadfile(path)\n\n    if not loaded:\n        FlashLogWarning(\"Could not load {} in guerilla file\".format(name))\n\nguerilla.Document().save()\n",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "Guerilla_GuerillaBatch",
+      "id": "3662373531373764306164663633646432633634313230366537313832653438",
+      "color": [
+        52,
+        115,
+        165
+      ],
+      "iconPath": "$FLASH_ICONS/guerilla-render.png",
+      "opCode": "# BeginOp\n\nimport subprocess, platform, os\n\nFlashLogMessage(f\"GuerillaBatch : Start executing script : {inscript}\")\n\nif platform.system == \"windows\":\n    command = [f\"{inenvironment['GUERILLA']}/guerillaBatch\", \"--nogui\"] \n    \n    if os.path.exists(inguerillafile):\n        command.append(inguerillafile)\n    \n    command.append(inscript)\nelse:\n    command = [f\"{inenvironment['GUERILLA']}/guerilla\", \"--nogui\"]\n\n    if os.path.exists(inguerillafile):\n        command.append(inguerillafile)\n    \n    command.append(inscript)\n\nFlashLogMessage(f\"GuerillaBatch Command : {' '.join(command)}\")\n\nenv = os.environ.copy()\nenv.update(inenvironment)\n\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, env=env)\n\nstdout, stderr = process.communicate()\n\nstdoutAsStr = stdout.decode(\"utf-8\")\nstderrAsStr = stderr.decode(\"utf-8\")\n\nif len(stderrAsStr) > 0:\n    FlashLogError(stderrAsStr)\nelse:\n    FlashLogMessage(f\"GuerillaBatch : Finished executing script : {inscript}\")\n    FlashLogMessage(stdoutAsStr)\n\n",
+      "inputs": {
+        "inscript": [
+          {
+            "shortName": "inscript",
+            "longName": "Input Script Path",
+            "index": 0,
+            "isExposed": false,
+            "data": "C:/Users/r.augier/AppData/Roaming/Flash/6361636336393763356137303762646663636264383538383062366331333035.py",
+            "type": 7,
+            "connectionName": "outscript",
+            "connectionNodeId": "6336623032666262646333633062313634306532663366333138656539383934"
+          }
+        ],
+        "inguerillafile": [
+          {
+            "shortName": "inguerillafile",
+            "longName": "Input Guerilla File",
+            "index": 0,
+            "isExposed": true,
+            "data": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ],
+        "inenvironment": [
+          {
+            "shortName": "inenvironment",
+            "longName": "Environment",
+            "index": 0,
+            "isExposed": false,
+            "data": {
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+            },
+            "type": 10,
+            "connectionName": "outenvironment",
+            "connectionNodeId": "6165373736323139363338326235366363363839613932346536656334623935"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "data": "",
+            "type": 11,
+            "connectionName": "input2",
+            "connectionNodeId": "3865306131326238623733623765383235323164663433333863323931393035"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Oeuf_GuerillaEnv",
+      "id": "6165373736323139363338326235366363363839613932346536656334623935",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/volcan.png",
+      "opCode": "# BeginOp\n\noutenvironment = inenvironment\n\n",
+      "inputs": {
+        "inenvironment": [
+          {
+            "shortName": "inenvironment",
+            "longName": "Environment",
+            "index": 0,
+            "isExposed": true,
+            "data": {
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+            },
+            "type": 10,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outenvironment": [
+          {
+            "shortName": "outenvironment",
+            "longName": "Output Environment",
+            "index": 0,
+            "isExposed": false,
+            "data": {
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+            },
+            "type": 10,
+            "connectionName": "inenvironment",
+            "connectionNodeId": "3662373531373764306164663633646432633634313230366537313832653438"
+          },
+          {
+            "shortName": "outenvironment",
+            "longName": "Output Environment",
+            "index": 0,
+            "isExposed": false,
+            "data": {
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+            },
+            "type": 10,
+            "connectionName": "indata",
+            "connectionNodeId": "6462616535356663653161316332353830623130346138373834363939376662"
+          }
+        ]
+      }
+    },
+    {
+      "name": "File6",
+      "id": "3433666238336364396337643364346634346233333034303565313663346663",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "",
+      "opCode": "# BeginOp\n\noutfile = infile\n\n",
+      "inputs": {
+        "infile": [
+          {
+            "shortName": "infile",
+            "longName": "Input File Path",
+            "index": 0,
+            "isExposed": true,
+            "data": "Z:/OEUF/RnD/trees/export/leave1.abc",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "data": "Z:/OEUF/RnD/trees/export/leave1.abc",
+            "type": 7,
+            "connectionName": "input2",
+            "connectionNodeId": "6561333464623061623031316539636437326538313230613863353533396130"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge3",
+      "id": "6561333464623061623031316539636437326538313230613863353533396130",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/merge.png",
+      "opCode": "# BeginOp\n\nif type(input1) is list:\n    if type(input2) is list:\n        output = [*input1, *input2]\n    else:\n        output = [*input1, input2]\nelif type(input2) is list:\n    output = [input1, *input2]\nelse:\n    output = [input1, input2]\n\n",
+      "inputs": {
+        "input1": [
+          {
+            "shortName": "input1",
+            "longName": "Input 1",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "Z:/OEUF/RnD/trees/fbx/test_tree_2.abc",
+              "Z:/OEUF/RnD/trees/fbx/test_tree_3.abc",
+              "Z:/OEUF/RnD/trees/export/leaves_pcloud2.abc",
+              "Z:/OEUF/RnD/trees/export/leaves_pcloud3.abc"
+            ],
+            "type": 11,
+            "connectionName": "output",
+            "connectionNodeId": "3663336134383964396236376235636430336636613034393832616162643930"
+          }
+        ],
+        "input2": [
+          {
+            "shortName": "input2",
+            "longName": "Input 2",
+            "index": 0,
+            "isExposed": false,
+            "data": "Z:/OEUF/RnD/trees/export/leave1.abc",
+            "type": 11,
+            "connectionName": "outfile",
+            "connectionNodeId": "3433666238336364396337643364346634346233333034303565313663346663"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "Z:/OEUF/RnD/trees/fbx/test_tree_2.abc",
+              "Z:/OEUF/RnD/trees/fbx/test_tree_3.abc",
+              "Z:/OEUF/RnD/trees/export/leaves_pcloud2.abc",
+              "Z:/OEUF/RnD/trees/export/leaves_pcloud3.abc",
+              "Z:/OEUF/RnD/trees/export/leave1.abc"
+            ],
+            "type": 9,
+            "connectionName": "inabcfiles",
+            "connectionNodeId": "3439323436383931333034636336383438373266323133383636353337646230"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Switch",
+      "id": "3865306131326238623733623765383235323164663433333863323931393035",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "",
+      "opCode": "# BeginOp\n\nif inswitchindex == 0:\n    output = input1\nelse:\n    output = input2\n\n",
+      "inputs": {
+        "input1": [
+          {
+            "shortName": "input1",
+            "longName": "Input 1",
+            "index": 0,
+            "isExposed": false,
+            "data": "Z:/OEUF/RnD/trees/lookdev/trees_lookdev.gproject",
+            "type": 11,
+            "connectionName": "outdata",
+            "connectionNodeId": "6664373663373534373664343062316430616332653731383963393236373338"
+          }
+        ],
+        "input2": [
+          {
+            "shortName": "input2",
+            "longName": "Input 2",
+            "index": 0,
+            "isExposed": false,
+            "data": "",
+            "type": 11,
+            "connectionName": "output",
+            "connectionNodeId": "3662373531373764306164663633646432633634313230366537313832653438"
+          }
+        ],
+        "inswitchindex": [
+          {
+            "shortName": "inswitchindex",
+            "longName": "Switch Index",
+            "index": 0,
+            "isExposed": true,
+            "data": 0,
+            "type": 1,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "data": "Z:/OEUF/RnD/trees/lookdev/trees_lookdev.gproject",
+            "type": 11,
+            "connectionName": "inguerillafile",
+            "connectionNodeId": "3662633031323461373736396132343233643435633838366163663638336562"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Debug",
+      "id": "6664373663373534373664343062316430616332653731383963393236373338",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$FLASH_ICONS/debug.png",
+      "opCode": "# BeginOp\n\nFlashLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "data": "Z:/OEUF/RnD/trees/lookdev/trees_lookdev.gproject",
+            "type": 11,
+            "connectionName": "outfile",
+            "connectionNodeId": "3261333638336662643430353434623831373566663464323830636639623065"
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "data": "Z:/OEUF/RnD/trees/lookdev/trees_lookdev.gproject",
+            "type": 11,
+            "connectionName": "input1",
+            "connectionNodeId": "3865306131326238623733623765383235323164663433333863323931393035"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Debug1",
+      "id": "6462616535356663653161316332353830623130346138373834363939376662",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$FLASH_ICONS/debug.png",
+      "opCode": "# BeginOp\n\nFlashLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "data": {
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+            },
+            "type": 11,
+            "connectionName": "outenvironment",
+            "connectionNodeId": "6165373736323139363338326235366363363839613932346536656334623935"
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "data": {
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+            },
+            "type": 11,
+            "connectionName": "inenvironment",
+            "connectionNodeId": "3662633031323461373736396132343233643435633838366163663638336562"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Guerilla_StartGuerilla",
+      "id": "3662633031323461373736396132343233643435633838366163663638336562",
+      "color": [
+        52,
+        115,
+        165
+      ],
+      "iconPath": "$FLASH_ICONS/guerilla-render.png",
+      "opCode": "# BeginOp\n\nimport subprocess, os\n\nFlashLogMessage(f\"Guerilla : Start session\")\n\ncommand = [f\"{inenvironment['GUERILLA']}/guerilla\"] \n\nif os.path.exists(inguerillafile):\n    FlashLogMessage(f\"Guerilla : File : {inguerillafile}\")\n    command.append(inguerillafile)\n\nif os.path.exists(inscript):\n    FlashLogMessage(f\"Guerilla : Script : {inscript}\")\n    command.append(inscript)\n\nFlashLogMessage(f\"Guerilla Command : {' '.join(command)}\")\n\nenv = os.environ.copy()\nenv.update(inenvironment)\n\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, env=env)\n\nstdout, stderr = process.communicate()\n\nstdoutAsStr = stdout.decode(\"utf-8\")\nstderrAsStr = stderr.decode(\"utf-8\")\n\nif len(stderrAsStr) > 0:\n    FlashLogError(stderrAsStr)\nelse:\n    FlashLogMessage(f\"Guerilla : Finished session\")\n    FlashLogMessage(stdoutAsStr)\n\n",
+      "inputs": {
+        "inscript": [
+          {
+            "shortName": "inscript",
+            "longName": "Input Script Path",
+            "index": 0,
+            "isExposed": true,
+            "data": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ],
+        "inguerillafile": [
+          {
+            "shortName": "inguerillafile",
+            "longName": "Input Guerilla File",
+            "index": 0,
+            "isExposed": false,
+            "data": "Z:/OEUF/RnD/trees/lookdev/trees_lookdev.gproject",
+            "type": 7,
+            "connectionName": "output",
+            "connectionNodeId": "3865306131326238623733623765383235323164663433333863323931393035"
+          }
+        ],
+        "inenvironment": [
+          {
+            "shortName": "inenvironment",
+            "longName": "Environment",
+            "index": 0,
+            "isExposed": false,
+            "data": {
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+            },
+            "type": 10,
+            "connectionName": "outdata",
+            "connectionNodeId": "6462616535356663653161316332353830623130346138373834363939376662"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "data": "",
+            "type": 11,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "Guerilla_CreateScene1",
+      "id": "6265333735666532376330326663393665323930656563303130343230663538",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/guerilla-render.png",
+      "opCode": "# BeginOp\n\nimport os\n\nif os.path.exists(infilepath):\n    os.remove(infilepath)\n\ngeneratedScript = f\"\"\"import guerilla\n\nimport RomanoTools.Guerilla.Utils as utils\n\nutils.SetOptims()\nutils.SetRange(\"{inframerange[0]}-{inframerange[1]}\")\n\nrenderPass = guerilla.Document().findchild(\"RenderPass\")\n\nrenderPass.FileLayerName.set(\"$o_$n\")\n\nguerilla.Document().ProjectWidth.set(2048)\nguerilla.Document().ProjectHeight.set(858)\n\nguerilla.Document().save(\"{infilepath}\")\n\"\"\"\n\ntmpScriptFilePath = FlashTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\noutscripttext = generatedScript\n\n",
+      "inputs": {
+        "infilepath": [
+          {
+            "shortName": "infilepath",
+            "longName": "Guerilla File Path",
+            "index": 0,
+            "isExposed": false,
+            "data": "Z:/OEUF/RnD/trees/lookdev/trees_lookdev.gproject",
+            "type": 7,
+            "connectionName": "outfile",
+            "connectionNodeId": "3261333638336662643430353434623831373566663464323830636639623065"
+          }
+        ],
+        "inframerange": [
+          {
+            "shortName": "inframerange",
+            "longName": "Frame Range",
+            "index": 0,
+            "isExposed": true,
+            "data": [
+              100,
+              240
+            ],
+            "type": 2,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfilepath": [
+          {
+            "shortName": "outfilepath",
+            "longName": "Output FilePath",
+            "index": 0,
+            "isExposed": false,
+            "data": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ],
+        "outscriptfile": [
+          {
+            "shortName": "outscriptfile",
+            "longName": "Output Script File",
+            "index": 0,
+            "isExposed": false,
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Flash/3739323063323465323236386465386361376636303135376332373134353561.py",
+            "type": 7,
+            "connectionName": "inscript1",
+            "connectionNodeId": "6336623032666262646333633062313634306532663366333138656539383934"
+          }
+        ],
+        "outscripttext": [
+          {
+            "shortName": "outscripttext",
+            "longName": "Output Script Text",
+            "index": 0,
+            "isExposed": false,
+            "data": "import guerilla\n\nimport RomanoTools.Guerilla.Utils as utils\n\nutils.SetOptims()\nutils.SetRange(\"100-240\")\n\nrenderPass = guerilla.Document().findchild(\"RenderPass\")\n\nrenderPass.FileLayerName.set(\"$o_$n\")\n\nguerilla.Document().ProjectWidth.set(2048)\nguerilla.Document().ProjectHeight.set(858)\n\nguerilla.Document().save(\"Z:/OEUF/RnD/trees/lookdev/trees_lookdev.gproject\")\n",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "Files",
+      "id": "3238633131353863396330316631393362343339306661643630656138343538",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "",
+      "opCode": "# BeginOp\n\noutfiles = infiles\n\n",
+      "inputs": {
+        "infiles": [
+          {
+            "shortName": "infiles",
+            "longName": "Input Files Path",
+            "index": 0,
+            "isExposed": true,
+            "data": [
+              "Z:/OEUF/RnD/trees/fbx/test_tree_2.abc",
+              "Z:/OEUF/RnD/trees/fbx/test_tree_3.abc"
+            ],
+            "type": 9,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfiles": [
+          {
+            "shortName": "outfiles",
+            "longName": "Output Files Path",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "Z:/OEUF/RnD/trees/fbx/test_tree_2.abc",
+              "Z:/OEUF/RnD/trees/fbx/test_tree_3.abc"
+            ],
+            "type": 9,
+            "connectionName": "input1",
+            "connectionNodeId": "3663336134383964396236376235636430336636613034393832616162643930"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Files1",
+      "id": "3464393233346161346338383864356364616466363734363561316234346535",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "",
+      "opCode": "# BeginOp\n\noutfiles = infiles\n\n",
+      "inputs": {
+        "infiles": [
+          {
+            "shortName": "infiles",
+            "longName": "Input Files Path",
+            "index": 0,
+            "isExposed": true,
+            "data": [
+              "Z:/OEUF/RnD/trees/export/leaves_pcloud2.abc",
+              "Z:/OEUF/RnD/trees/export/leaves_pcloud3.abc"
+            ],
+            "type": 9,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfiles": [
+          {
+            "shortName": "outfiles",
+            "longName": "Output Files Path",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "Z:/OEUF/RnD/trees/export/leaves_pcloud2.abc",
+              "Z:/OEUF/RnD/trees/export/leaves_pcloud3.abc"
+            ],
+            "type": 9,
+            "connectionName": "input2",
+            "connectionNodeId": "3663336134383964396236376235636430336636613034393832616162643930"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Files2",
+      "id": "6166303436363036373738396139373931636639643636346563333063653339",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "",
+      "opCode": "# BeginOp\n\noutfiles = infiles\n\n",
+      "inputs": {
+        "infiles": [
+          {
+            "shortName": "infiles",
+            "longName": "Input Files Path",
+            "index": 0,
+            "isExposed": true,
+            "data": [
+              "Z:/OEUF/RnD/trees/rendergraphs/leaves2.grendergraph",
+              "Z:/OEUF/RnD/trees/rendergraphs/leaves3.grendergraph"
+            ],
+            "type": 9,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfiles": [
+          {
+            "shortName": "outfiles",
+            "longName": "Output Files Path",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "Z:/OEUF/RnD/trees/rendergraphs/leaves2.grendergraph",
+              "Z:/OEUF/RnD/trees/rendergraphs/leaves3.grendergraph"
+            ],
+            "type": 9,
+            "connectionName": "input2",
+            "connectionNodeId": "3161316333353238636363303764326266343861336339623562393866303362"
+          }
+        ]
+      }
+    }
+  ],
+  "positions": [
+    {
+      "id": "3865306131326238623733623765383235323164663433333863323931393035",
+      "x": 3100.0,
+      "y": -250.0
+    },
+    {
+      "id": "6561333464623061623031316539636437326538313230613863353533396130",
+      "x": 850.0,
+      "y": 50.0
+    },
+    {
+      "id": "6664373663373534373664343062316430616332653731383963393236373338",
+      "x": 2900.0,
+      "y": -550.0
+    },
+    {
+      "id": "6462616535356663653161316332353830623130346138373834363939376662",
+      "x": 3100.0,
+      "y": 50.0
+    },
+    {
+      "id": "3662633031323461373736396132343233643435633838366163663638336562",
+      "x": 3450.0,
+      "y": -250.0
+    },
+    {
+      "id": "3664653665643531326565333334666162306163363763383335376563383866",
+      "x": 300.0,
+      "y": 550.0
+    },
+    {
+      "id": "3264303135333733316435313330643337393837353063333365613332353036",
+      "x": 300.0,
+      "y": 850.0
+    },
+    {
+      "id": "3739653564616437383731313965613534323662353530323534313765363031",
+      "x": 850.0,
+      "y": 650.0
+    },
+    {
+      "id": "3439323436383931333034636336383438373266323133383636353337646230",
+      "x": 1100.0,
+      "y": 50.0
+    },
+    {
+      "id": "3261333638336662643430353434623831373566663464323830636639623065",
+      "x": 850.0,
+      "y": -550.0
+    },
+    {
+      "id": "6336623032666262646333633062313634306532663366333138656539383934",
+      "x": 2000.0,
+      "y": -250.0
+    },
+    {
+      "id": "6635303733383735623435326366333530666461303934616637333764376462",
+      "x": 1100.0,
+      "y": 650.0
+    },
+    {
+      "id": "3463383565626230356530353834653431343037323738316135363561383430",
+      "x": 1600.0,
+      "y": 50.0
+    },
+    {
+      "id": "3662373531373764306164663633646432633634313230366537313832653438",
+      "x": 2500.0,
+      "y": -250.0
+    },
+    {
+      "id": "3433666238336364396337643364346634346233333034303565313663346663",
+      "x": 300.0,
+      "y": 350.0
+    },
+    {
+      "id": "6165373736323139363338326235366363363839613932346536656334623935",
+      "x": 2000.0,
+      "y": 250.0
+    },
+    {
+      "id": "3663336134383964396236376235636430336636613034393832616162643930",
+      "x": 600.0,
+      "y": 50.0
+    },
+    {
+      "id": "3161316333353238636363303764326266343861336339623562393866303362",
+      "x": 635.2820315342803,
+      "y": 547.8202543597812
+    },
+    {
+      "id": "6265333735666532376330326663393665323930656563303130343230663538",
+      "x": 1100.0,
+      "y": -250.0
+    },
+    {
+      "id": "6166303436363036373738396139373931636639643636346563333063653339",
+      "x": 300.0,
+      "y": 700.0
+    },
+    {
+      "id": "3238633131353863396330316631393362343339306661643630656138343538",
+      "x": 300.0,
+      "y": 50.0
+    },
+    {
+      "id": "3464393233346161346338383864356364616466363734363561316234346535",
+      "x": 300.0,
+      "y": 200.0
+    }
+  ]
+}

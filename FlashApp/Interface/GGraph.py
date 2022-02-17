@@ -88,6 +88,7 @@ class GGraph(QtWidgets.QGraphicsView):
 
         self.cookThread = None
         self.updateThread = None
+        self.updateTimer = None
         self.threadCanJoin.connect(lambda: self.joinGraphThread())
 
         self.selectedNodeChanged.connect(self.onSelectedNodeChange)
@@ -177,6 +178,10 @@ class GGraph(QtWidgets.QGraphicsView):
             self.startPos = event.pos()
             self.prevPos = event.pos()
             self.pan = True
+        elif event.button() == QtCore.Qt.LeftButton:
+            self.scene.clearSelection()
+            self.scene.selectedItems()
+            return super().mousePressEvent(event)
         else:
             return super().mousePressEvent(event)
 
@@ -202,33 +207,16 @@ class GGraph(QtWidgets.QGraphicsView):
         else:
             return super().mouseReleaseEvent(event)
 
-    def eventFilter(self, obj: QtCore.QObject, event: QtCore.QEvent) -> bool:
+    def wheelEvent(self, event: QtGui.QWheelEvent) -> None:
         if not event.isAccepted():
+            if event.angleDelta().y() > 0:
+                # self.scaleView(1.01)
+                self.scale(1.05, 1.05)
+            else:
+                # self.scaleView(0.99)
+                self.scale(0.95, 0.95)
 
-            if event.type() == QtCore.QEvent.Wheel:
-                oldPos = self.mapToScene(event.pos())
-
-                if event.angleDelta().y() > 0:
-                    # self.scaleView(1.01)
-                    self.scale(1.01, 1.01)
-                else:
-                    # self.scaleView(0.99)
-                    self.scale(0.99, 0.99)
-
-                newPos = self.mapToScene(event.pos())
-
-                delta = newPos - oldPos
-
-                self.translate(delta.x(), delta.y())
-
-                return super().eventFilter(obj, event)
-
-            elif event.type() == QtCore.QEvent.MouseButtonPress and event.button() == QtCore.Qt.LeftButton:
-                self.scene.clearSelection()
-                self.scene.selectedItems()
-                return super().eventFilter(obj, event)
-            
-        return super().eventFilter(obj, event)
+        return super().wheelEvent(event)
             
     def scaleView(self, scaleFactor: float) -> None:
         """
@@ -491,8 +479,11 @@ class GGraph(QtWidgets.QGraphicsView):
         self.cookThread = threading.Thread(target=self.cookGraph)
         self.cookThread.start()
 
-        self.updateThread = threading.Thread(target=self.updateGraph)
-        self.updateThread.start()
+        self.updateTimer = QtCore.QTimer(self, interval=20, timeout=self.updateNodeBadges)
+        self.updateTimer.start()
+        
+        # self.updateThread = threading.Thread(target=self.updateGraph)
+        # self.updateThread.start()
 
     def joinGraphThread(self) -> None:
         """
@@ -500,13 +491,15 @@ class GGraph(QtWidgets.QGraphicsView):
         """
         if self.cookThread is not None:
             self.cookThread.join()
-            self.updateThread.join()
+            self.updateTimer.stop()
             self.isCookingMovie.stop()
 
             self.finishedCooking.emit()
 
             if self.graph.hasError:
                 self.errorCooking.emit()
+
+        self.updateNodeBadges()
 
     def debugGraph(self) -> None:
         """
@@ -526,6 +519,11 @@ class GGraph(QtWidgets.QGraphicsView):
         Args:
             filePath (str): path to save the file
         """
+        name, _ = os.path.splitext(os.path.basename(filePath))
+        
+        self.graph.SetName(name)
+        self.graph.SetSavePath(filePath)
+
         graphSerialized = self.graph.Serialize()
 
         graphDict = json.loads(graphSerialized)

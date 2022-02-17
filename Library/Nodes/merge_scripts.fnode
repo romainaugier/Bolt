@@ -41,6 +41,15 @@ exposed = False
 
 # EndPlug
 
+# BeginPlug
+
+shortName = outscripttext
+longName = Output Script Text
+defaultValue = ""
+type = str
+
+# EndPlug
+
 # EndPlugs
 
 # BeginOp
@@ -195,5 +204,6 @@ with open(tmpScriptFilePath, "w") as scriptFile:
     scriptFile.write(mergedScripts) 
 
 outscript = tmpScriptFilePath.replace("\\", "/")
+outscripttext = mergedScripts
 
 # EndOp

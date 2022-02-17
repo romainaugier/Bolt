@@ -27,7 +27,7 @@ shortName = inenvironment
 longName = Environment
 defaultValue = { "GUERILLA" : "P:/GUERILLA/2.3.0.13_Romain", "GUERILLA_PYTHON_LIBRARY" : "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain", "PYTHONHOME" : "P:/PYTHON/Python27_Romain", "PYTHONPATH" : "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib", "PATH" : "%PYTHONHOME%;%PATH%", "DEADLINEPATH" : "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin", "OCIO" : "P:/COLOR/aces_1.2/config.ocio" }
 type = dict
-exposed = True
+exposed = False
 
 # EndPlug
 
@@ -45,9 +45,9 @@ exposed = True
 
 shortName = inrenderoptions
 longName = Render Options
-defaultValue = {"Type":"LD","SequenceName":"sequence","ShotName":"shot","Optims":True,"FrameRange":"100-240"}
+defaultValue = {"Type":"LD","Team":"oeuf","SequenceName":"sequence","ShotName":"shot","Optims":True,"FrameRange":"100-240"}
 type = dict
-exposed = True
+exposed = False
 
 # EndPlug
 
@@ -118,12 +118,13 @@ now = datetime.now()
 currentTimeStr = now.strftime('%m%d%Y_%H%M%S')
 
 # Setup job and batch name
+teamName = inrenderoptions["Team"]
 jobType = inrenderoptions["Type"]
 sequenceName = inrenderoptions["SequenceName"] 
 shotName = inrenderoptions["ShotName"]
 frameRange = inrenderoptions["FrameRange"]
 
-jobName = f"oeuf_{jobType}_{sequenceName}_{shotName}"
+jobName = f"{teamName}_{jobType}_{sequenceName}_{shotName}"
 batchName = f"{jobName}-{currentTimeStr}"
 
 if jobType == "LD":
@@ -133,9 +134,9 @@ elif jobType == "FML":
 elif jobType == "HD":
     injoboptions["Priority"] = 25
 
-renderDir = f"{inrenderdir}/{sequenceName}/{shotName}/LD1"
+renderDir = f"{inrenderdir}/{sequenceName}/{shotName}/{jobType}1"
 
-if os.path.exists(renderDir):   
+while os.path.exists(renderDir):   
     numPattern = r"(\d+)$"
 
     match = re.search(numPattern, renderDir)
@@ -144,9 +145,8 @@ if os.path.exists(renderDir):
 
     renderDir = f"{renderDir[:match.start()]}{value}"
 
-    FlashLogMessage(f"RenderDir : {renderDir}")
-else:
-    os.makedirs(renderDir)
+os.makedirs(renderDir)
+FlashLogMessage(f"RenderDir : {renderDir}")
 
 renderFile = f"{renderDir}/render_{sequenceName}_{shotName}_$f.$x"
 

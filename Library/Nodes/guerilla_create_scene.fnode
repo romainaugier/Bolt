@@ -1,0 +1,94 @@
+// Generates a script to create a guerilla scene at the given path
+
+# BeginAttr
+
+name = Guerilla_CreateScene
+icon = $FLASH_ICONS/guerilla-render.png
+category = Guerilla
+
+# EndAttr
+
+# BeginPlugs
+
+# BeginPlug
+
+shortName = infilepath
+longName = Guerilla File Path
+defaultValue = ""
+type = str
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = inframerange
+longName = Frame Range
+defaultValue = [100, 240]
+type = int2
+exposed = True
+
+# EndPlug
+
+# BeginPlug
+
+shortName = outfilepath
+longName = Output FilePath
+defaultValue = ""
+type = str
+
+# EndPlug
+
+# BeginPlug
+
+shortName = outscriptfile
+longName = Output Script File
+defaultValue = ""
+type = str
+
+# EndPlug
+
+# BeginPlug
+
+shortName = outscripttext
+longName = Output Script Text
+defaultValue = ""
+type = str
+
+# EndPlug
+
+# EndPlugs
+
+# BeginOp
+
+import os
+
+if os.path.exists(infilepath):
+    os.remove(infilepath)
+
+generatedScript = f"""import guerilla
+
+import RomanoTools.Guerilla.Utils as utils
+
+utils.SetOptims()
+utils.SetRange("{inframerange[0]}-{inframerange[1]}")
+
+renderPass = guerilla.Document().findchild("RenderPass")
+
+renderPass.FileLayerName.set("$o_$n")
+
+guerilla.Document().ProjectWidth.set(2048)
+guerilla.Document().ProjectHeight.set(858)
+
+guerilla.Document().save("{infilepath}")
+"""
+
+tmpScriptFilePath = FlashTempScript()
+
+with open(tmpScriptFilePath, "w") as scriptFile:
+    scriptFile.write(generatedScript)
+
+outscriptfile = tmpScriptFilePath
+outscripttext = generatedScript
+
+# EndOp

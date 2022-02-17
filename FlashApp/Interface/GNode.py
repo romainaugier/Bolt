@@ -738,7 +738,7 @@ class Edge(QtWidgets.QGraphicsItem):
 
         self.setFlag(QtWidgets.QGraphicsItem.ItemIsFocusable, True)
         self.setFlag(QtWidgets.QGraphicsItem.ItemIsSelectable, True)
-        self.setZValue(20)
+        self.setZValue(-1)
 
         self.adjust()
 

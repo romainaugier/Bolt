@@ -43,6 +43,14 @@ type = list
 
 # BeginOp
 
-output = [input1, input2]
+if type(input1) is list:
+    if type(input2) is list:
+        output = [*input1, *input2]
+    else:
+        output = [*input1, input2]
+elif type(input2) is list:
+    output = [input1, *input2]
+else:
+    output = [input1, input2]
 
 # EndOp

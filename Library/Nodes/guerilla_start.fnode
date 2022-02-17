@@ -1,8 +1,8 @@
-// Calls guerilla --nogui with a generated script file passed in the first input
+// Opens Guerilla with a file and a script passed
 
 # BeginAttr
 
-name = Mercs_GuerillaBatch
+name = Guerilla_StartGuerilla
 color = [52, 115, 165]
 icon = $FLASH_ICONS/guerilla-render.png
 category = Guerilla
@@ -23,16 +23,6 @@ exposed = False
 
 # BeginPlug
 
-shortName = inguerilladir
-longName = Input Guerilla Directory
-defaultValue = "P:/GUERILLA/2.3.0.13_Romain"
-type = str
-exposed = True
-
-# EndPlug
-
-# BeginPlug
-
 shortName = inguerillafile
 longName = Input Guerilla File
 defaultValue = ""
@@ -47,7 +37,7 @@ shortName = inenvironment
 longName = Environment
 defaultValue = { "GUERILLA" : "P:/GUERILLA/2.3.0.13_Romain", "GUERILLA_PYTHON_LIBRARY" : "P:/PYTHON/Python27_Romain/python27.dll", "PYTHONHOME" : "P:/PYTHON/Python27_Romain", "PYTHONPATH" : "P:/PYTHON/Python27_Romain/Lib", "PATH" : "%PYTHONHOME%;%PATH%", "DEADLINEPATH" : "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin", "OCIO" : "P:/COLOR/aces_1.2/config.ocio" }
 type = dict
-exposed = True
+exposed = False
 
 # EndPlug
 
@@ -64,26 +54,21 @@ type = custom
 
 # BeginOp
 
-import subprocess, platform, os
+import subprocess, os
 
-FlashLogMessage(f"GuerillaBatch : Start executing script : {inscript}")
+FlashLogMessage(f"Guerilla : Start session")
 
-if platform.system == "windows":
-    command = [f"{inguerilladir}/guerillaBatch", "--nogui"] 
-    
-    if os.path.exists(inguerillafile):
-        command.append(inguerillafile)
-    
-    command.append(inscript)
-else:
-    command = [f"{inguerilladir}/guerilla", "--nogui"]
+command = [f"{inenvironment['GUERILLA']}/guerilla"] 
 
-    if os.path.exists(inguerillafile):
-        command.append(inguerillafile)
-    
+if os.path.exists(inguerillafile):
+    FlashLogMessage(f"Guerilla : File : {inguerillafile}")
+    command.append(inguerillafile)
+
+if os.path.exists(inscript):
+    FlashLogMessage(f"Guerilla : Script : {inscript}")
     command.append(inscript)
 
-FlashLogMessage(f"GuerillaBatch Command : {' '.join(command)}")
+FlashLogMessage(f"Guerilla Command : {' '.join(command)}")
 
 env = os.environ.copy()
 env.update(inenvironment)
@@ -98,7 +83,7 @@ stderrAsStr = stderr.decode("utf-8")
 if len(stderrAsStr) > 0:
     FlashLogError(stderrAsStr)
 else:
-    FlashLogMessage(f"GuerillaBatch : Finished executing script : {inscript}")
+    FlashLogMessage(f"Guerilla : Finished session")
     FlashLogMessage(stdoutAsStr)
 
 # EndOp

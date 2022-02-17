@@ -1,0 +1,60 @@
+// Returns the first input if True, else the second input
+
+# BeginAttr
+
+name = If
+category = Utility
+
+# EndAttr
+
+# BeginPlugs
+
+# BeginPlug
+
+shortName = input1
+longName = Input 1
+defaultValue = None
+type = custom
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = input2
+longName = Input 2
+defaultValue = None
+type = custom
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = incondition
+longName = Condition
+defaultValue = True
+type = bool
+exposed = True
+
+# EndPlug
+
+# BeginPlug
+
+shortName = output
+longName = Output
+defaultValue = None
+type = custom
+
+# EndPlug
+
+# EndPlugs
+
+# BeginOp
+
+if condition:
+    output = input1
+else:
+    output = input2
+
+# EndOp
