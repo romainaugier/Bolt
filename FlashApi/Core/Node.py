@@ -1,6 +1,6 @@
 from ast import literal_eval
 from enum import IntEnum
-import re, json, copy, os, threading
+import re, copy, os, threading
 
 import FlashApi.Core.FileSystem as FileSystem
 from FlashApi.Core.Logger import *
@@ -146,6 +146,8 @@ class Parser():
         tmpValue = None
         tmpType = None
         tmpExposed = False
+        tmpHidden = False
+        tmpExposedToGraph = False
 
         while True:
             parmLine = lines[lineIndex]
@@ -160,6 +162,8 @@ class Parser():
                         if parmLine.startswith("# EndPlug"):
                             newPlug = Plug(tmpShortName, tmpLongName, None, tmpValue, tmpType)
                             newPlug.SetExposed(tmpExposed)
+                            newPlug.SetHidden(tmpHidden)
+                            newPlug.SetExposedToGraph(tmpExposedToGraph)
                             self.plugs.append(newPlug)
 
                             tmpShortName = ""
@@ -167,6 +171,8 @@ class Parser():
                             tmpValue = None
                             tmpType = None
                             tmpExposed = False
+                            tmpExposedToGraph = False
+                            tmpHidden = False
 
                             lineIndex += 1
                         
@@ -191,6 +197,14 @@ class Parser():
                         elif parmLine.startswith("exposed"):
                             lineSplit = self.SplitEqual(parmLine)
                             tmpExposed = True if "True" in lineSplit[1].strip() else False
+                        
+                        elif parmLine.startswith("exposedToGraph"):
+                            lineSplit = self.SplitEqual(parmLine)
+                            tmpExposedToGraph = True if "True" in lineSplit[1].strip() else False
+                        
+                        elif parmLine.startswith("hidden"):
+                            lineSplit = self.SplitEqual(parmLine)
+                            tmpHidden = True if "True" in lineSplit[1].strip() else False
                         
                         lineIndex += 1
 
@@ -247,6 +261,13 @@ class Parser():
 class Plug():
     """
     A Plug represents a node input or output
+
+    A Plug has multiple attributes that defines how it can behave in the graph :
+    - Exposed = The plug is not connectable to other plugs but can be set as a parameter. Exposed plugs must be input plugs
+    - Hidden = The plug is not connectable to other plugs and does not appear in the interface, but can be set as a parameter 
+               will be exposed
+    - Exposed To Graph = The plug is not connectable to other plugs but can be set as a parameter and also as a parameter of the graph.
+                         It can be useful when you have to deal with large graphs to expose the few important parameters of the nodes
     """
     def __init__(self, shortName : str, longName : str, parentNode : Node, data = None, dataType : PlugType = None, index : int = 0, connectedPlug : Plug = None):
         """
@@ -263,6 +284,8 @@ class Plug():
         self.data = data
         self.type : PlugType = dataType
         self.isExposed = False
+        self.isExposedToGraph = False
+        self.isHidden = False
 
     def GetShortName(self) -> str:
         """
@@ -320,6 +343,44 @@ class Plug():
         """
         self.isExposed = isExposed
 
+    def IsExposedToGraph(self) -> bool:
+        """
+        Returns:
+            bool: True if the plug is exposed to graph
+        """
+        return self.isExposedToGraph
+
+    def SetExposedToGraph(self, exposedToGraph : bool = True) -> None:
+        """
+        Sets the plug graph exposition state
+
+        Args:
+            exposedToGraph (bool, optional): state of graph exposition. Defaults to True.
+        """
+        if exposedToGraph and not self.isExposed:
+            self.SetExposed()
+
+        self.isExposedToGraph = exposedToGraph
+
+    def IsHidden(self) -> bool:
+        """
+        Returns:
+            bool: True if the plug is hidden
+        """
+        return self.isHidden
+
+    def SetHidden(self, isHidden : bool = True) -> None:
+        """
+        Sets the plug to be hidden or not
+
+        Args:
+            isHiddent (bool, optional): hidden state of the plug. Defaults to True.
+        """
+        if isHidden and not self.isExposed:
+            self.SetHidden()
+
+        self.isHidden = isHidden
+
     def IsConnected(self) -> bool:
         """
         Returns:
@@ -368,7 +429,9 @@ class Plug():
             plug (Plug): plug to connect the current plug to
         """
         if plug is not None:
-            if self.IsExposed() or plug.IsExposed():
+            if (self.IsExposed() or plug.IsExposed() or 
+                self.IsExposedToGraph() or plug.IsExposedToGraph() or
+                self.IsHidden() or plug.IsHidden()):
                 return
             elif plug.GetNode().GetID() == self.GetNode().GetID():
                 return
@@ -395,6 +458,21 @@ class Node():
         self.isDirty = True
         self.isCooking = False
         self.isCooked = False
+
+        # Nodes can be disabled so the graph will bypass them
+        # If a node is disabled, all its outputs will have the value
+        # of the input 1
+        self.isDisabled = False
+        
+        # Special case for if begin/end nodes
+        self.isIfBegin = False
+        self.isIfEnd = False
+        self.isInsideIfBlock = False
+        
+        # Special case for forloop begin/end nodes
+        self.isForBegin = False
+        self.isForEnd = False
+
         self.cookTime = None
         self.hasError = False
         self.errorMessage = ""
@@ -475,6 +553,22 @@ class Node():
             str: opcode of the node
         """
         return self.opCode
+    
+    def ReloadOpCode(self) -> None:
+        """
+        Reloads the opcode from the definition file
+        """
+        tmpNode = Node()
+        tmpNode.Load(self.definitionPath)
+        
+        self.SetOpCode(tmpNode.GetOpCode())
+        self.Compile()
+    
+    def Compile(self) -> None:
+        """
+        Compiles the node code to fasten the code execution
+        """
+        self.opCompiledCode = compile(self.opCode, "compiledCode", "exec")
 
     def SetID(self, id : str) -> None:
         """
@@ -560,12 +654,29 @@ class Node():
         """
         return self.isCooked
 
+    def SetCooked(self, isCooked : bool = True) -> None:
+        """
+        """
+        self.isCooked = isCooked
+
     def IsCooking(self) -> bool:
         """
         Returns:
             bool: cooking state of the node
         """
-        return self.isCooking 
+        return self.isCooking
+
+    def IsDisabled(self) -> bool:
+        """
+        Returns:
+            bool: disabled state of the node
+        """ 
+        return self.isDisabled
+
+    def SetDisabled(self, isDisabled : bool = True) -> None:
+        """
+        """
+        self.isDisabled = isDisabled
 
     def SetInQueue(self, inQueue : bool = True) -> None:
         """
@@ -638,6 +749,19 @@ class Node():
 
         return False
     
+    def HasNoInputsConnected(self) -> bool:
+        """
+        Checks if the node has no inputs connectedPlugs
+
+        Returns:
+            bool:
+        """
+        for name, input in self.inputs.items():
+            if input.IsConnected() and not input.IsExposed():
+                return False
+
+        return True
+    
     def SetInput(self, plug : Plug, name : str = None, index : int = None) -> None:
         """
         Set the input of the node at the given plug
@@ -681,6 +805,19 @@ class Node():
             list: list of the output plugs
         """
         return self.outputs
+    
+    def HasNoOutputsConnected(self) -> bool:
+        """
+        Checks if the node has no outputs connected
+
+        Returns:
+            bool:
+        """
+        for name, output in self.outputs.items():
+            if output.IsConnected() and not output.IsExposed():
+                return False
+
+        return True
 
     def SetPlugValue(self, plugName : str, value) -> None:
         """
@@ -691,56 +828,64 @@ class Node():
     def Cook(self) -> None:
         """
         Executes the node operation
+        If the node is disabled, we just pass the first input value to all the outputs
         """
-        startTime = Timer.Start()
+        if not self.IsDisabled():
+            startTime = Timer.Start()
 
-        with self.GetLock():
-            self.isCooking = True
-            self.isCooked = False
+            with self.GetLock():
+                self.isCooking = True
+                self.isCooked = False
 
-            self.hasError = False
-            self.errorMessage = ""
-            self.hasWarning = False
-            self.warningMessage = ""
+                self.hasError = False
+                self.errorMessage = ""
+                self.hasWarning = False
+                self.warningMessage = ""
 
-        locals = {}
+            locals = {}
+                
+            for inputName, input in self.inputs.items():
+                input.UpdateInputs()
+                locals[inputName] = input.GetData()
+                
+            globals = { "FlashTempDir" : FileSystem.GetRoamingDataDir,
+                        "FlashTempScript" : FileSystem.GetNewRandomPyFile,
+                        "FlashLogError" : self.LogError,
+                        "FlashLogWarning" : self.LogWarning,
+                        "FlashLogMessage" : self.LogMessage,
+                        "FlashError" : self.ReportError,
+                        "FlashWarning" : self.ReportWarning }
             
-        for inputName, input in self.inputs.items():
-            input.UpdateInputs()
-            locals[inputName] = input.GetData()
-            
-        globals = { "FlashTempDir" : FileSystem.GetRoamingDataDir,
-                    "FlashTempScript" : FileSystem.GetNewRandomPyFile,
-                    "FlashLogError" : self.LogError,
-                    "FlashLogWarning" : self.LogWarning,
-                    "FlashLogMessage" : self.LogMessage,
-                    "FlashError" : self.ReportError,
-                    "FlashWarning" : self.ReportWarning }
-        
-        try:
-            exec(self.opCompiledCode, globals, locals)
-        except Exception as err:
-            self.ReportError()
-            self.LogError(f"Error cooking node {self.GetName()}")
-            self.errorMessage = err
-            self.cookTime = None
-            self.isCooking = False
-            self.isCooked = False
-            return
+            try:
+                exec(self.opCompiledCode, globals, locals)
+            except Exception as err:
+                self.ReportError()
+                self.LogError(f"Error cooking node {self.GetName()}")
+                self.errorMessage = err
+                self.cookTime = None
+                self.isCooking = False
+                self.isCooked = False
+                return
 
-        # Get outputs         
-        for outputName, output in self.outputs.items():
-            if outputName in locals:
-                output.SetData(locals[outputName])
+            # Get outputs         
+            for outputName, output in self.outputs.items():
+                if outputName in locals:
+                    output.SetData(locals[outputName])
 
-        with self.GetLock():
-            self.isDirty = False
-            self.isCooking = False
-            self.isCooked = True
+            with self.GetLock():
+                self.isDirty = False
+                self.isCooking = False
+                self.isCooked = True
 
-        endTime = Timer.Stop()
+            endTime = Timer.Stop()
 
-        self.cookTime = Timer.Time(startTime, endTime)
+            self.cookTime = Timer.Time(startTime, endTime)
+        else:
+            firstInput = self.GetInput(index=0)
+            firstInput.UpdateInputs()
+
+            for outputName, output in self.outputs.items():
+                output.SetData(firstInput.GetData())
 
     def ReportError(self) -> None:
         """
@@ -808,6 +953,78 @@ class Node():
         """
         self.logger.Log(LogLevel.MESSAGE, f"(Node : {self.GetName()}) : {message}")
         
+    # Special functions for blocks (if/for)
+    
+    def IsInsideIfBlock(self) -> bool:
+        """
+        """
+        return self.isInsideIfBlock
+    
+    def SetInsideIfBlock(self) -> None:
+        """
+        """
+        self.isInsideIfBlock = True
+    
+    def IsIfBeginBlock(self) -> bool:
+        """
+        """
+        return self.isIfBegin
+    
+    def SetIfBeginBlock(self) -> None:
+        """
+        """
+        self.isIfBegin = True
+    
+    def IsIfEndBlock(self) -> bool:
+        """
+        """
+        return self.isIfEnd
+    
+    def SetIfEndBlock(self) -> None:
+        """
+        """
+        self.isIfEnd = True
+    
+    def IsForBeginBlock(self) -> bool:
+        """
+        """
+        return self.isForBegin
+    
+    def IsForEndBlock(self) -> bool:
+        """
+        """
+        return self.isForEnd
+    
+    def SetAssociatedBlockBegin(self, nodeId : str) -> None:
+        """
+        If this node is an end block, sets the associated begin block id
+
+        Args:
+            nodeId (str): associated if block begin node id
+        """
+        self.associatedBlockBeginId = nodeId
+        
+    def GetAssociatedBlockBegin(self) -> str:
+        """
+        """
+        return self.associatedBlockBeginId
+        
+    def SetAssociatedBlockEnd(self, nodeId : str) -> None:
+        """
+        If this node is an begin block, sets the associated end blocks
+
+        Args:
+            nodeId (str): associated if block end node if
+        """
+        self.associatedBlockEndId = nodeId
+        
+    def GetAssociatedBlockEnd(self) -> str:
+        """
+        """
+        return self.associatedBlockEndId
+    
+    # I/O Functions
+        
     def Load(self, nodeDefinitionPath : str) -> None:
         """
         Loads a node definition and compiles the op code
@@ -815,6 +1032,8 @@ class Node():
         Args:
             nodeDefinitionPath (str): path to the node definition file
         """
+        self.definitionPath = nodeDefinitionPath
+        
         parser = Parser()
 
         nodeDefinition = parser.Parse(nodeDefinitionPath)
@@ -854,6 +1073,20 @@ class Node():
         nodeAsDict["color"] = self.GetColor()
         nodeAsDict["iconPath"] = self.GetIconPathRaw()
         nodeAsDict["opCode"] = self.GetOpCode()
+        
+        if self.IsIfBeginBlock():
+            nodeAsDict["isIfBegin"] = True
+            nodeAsDict["associatedEndBlockId"] = self.GetAssociatedBlockEnd()
+        else:
+            nodeAsDict["isIfBegin"] = False
+            nodeAsDict["associatedEndBlockId"] = None
+            
+        if self.IsIfEndBlock():
+            nodeAsDict["isIfEnd"] = True
+            nodeAsDict["associatedBeginBlockId"] = self.GetAssociatedBlockBegin()
+        else:
+            nodeAsDict["isIfEnd"] = False
+            nodeAsDict["associatedBeginBlockId"] = None
 
         nodeAsDict["inputs"] = {}
         nodeAsDict["outputs"] = {}
@@ -924,6 +1157,14 @@ class Node():
         self.SetColor(nodeAsDict["color"])
         self.SetIconPath(nodeAsDict["iconPath"])
         self.SetOpCode(nodeAsDict["opCode"])
+        
+        if "isIfBegin" in nodeAsDict or "isIfEnd" in nodeAsDict:
+            if nodeAsDict["isIfBegin"]: 
+                self.SetIfBeginBlock()
+                self.SetAssociatedBlockEnd(nodeAsDict["associatedEndBlockId"])
+            elif nodeAsDict["isIfEnd"]: 
+                self.SetIfEndBlock()
+                self.SetAssociatedBlockBegin(nodeAsDict["associatedBeginBlockId"])
 
         for inputName, input in nodeAsDict["inputs"].items():
             input = input[0]
@@ -941,11 +1182,7 @@ class Node():
 
         self.Compile()
         
-    def Compile(self) -> None:
-        """
-        Compiles the node code to fasten the code execution
-        """
-        self.opCompiledCode = compile(self.opCode, "compiledCode", "exec")
+    # Env Functions
 
     def UpdateEnv(self, environment : Environment = None) -> None:
         """

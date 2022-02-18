@@ -48,6 +48,7 @@ class PlugWidget(QtWidgets.QWidget):
             masterLayout.addWidget(self.editBox1)
 
         if (self.plugType == PlugType.BOOL):
+            masterLayout.addStretch()
             self.editBox1 = QtWidgets.QCheckBox()
             self.editBox1.setChecked(self.plug.GetData())
             self.editBox1.stateChanged.connect(self.onValueChanged)
@@ -500,6 +501,17 @@ class PlugEditor(QtWidgets.QWidget):
         self.masterLayout = QtWidgets.QVBoxLayout()
         self.masterLayout.setAlignment(Qt.AlignTop)
         
+        self.plugEditorLabel = IconLabel(self.iconsLib.GetPixmap("plug-editor"), "Plugs Editor")
+        self.masterLayout.addWidget(self.plugEditorLabel)
+        
+        self.masterLayout.addSpacing(10)
+        
+        sep = QHLine()
+        sep.setLineWidth(2)
+        sep.setMinimumWidth(self._width - 20)
+        sep.setColor(GetQColorFromPalette(ColorPalette.TEXT))
+        self.masterLayout.addWidget(sep)
+        
         topLayout = QtWidgets.QHBoxLayout()
         topLayout.setSpacing(0)
         topLayout.setContentsMargins(0, 0, 0, 0)
@@ -525,12 +537,6 @@ class PlugEditor(QtWidgets.QWidget):
         self.plugsMasterLayout.setSizeConstraint(QtWidgets.QLayout.SetFixedSize)
 
         self.masterLayout.addLayout(self.plugsMasterLayout)
-
-        sep = QHLine()
-        sep.setLineWidth(2)
-        sep.setMinimumWidth(self._width - 20)
-        sep.setColor(GetQColorFromPalette(ColorPalette.TEXT))
-        self.plugsMasterLayout.addWidget(sep)
         
         self.plugsLayout = QtWidgets.QVBoxLayout()
         self.plugsLayout.setAlignment(Qt.AlignTop)
@@ -565,6 +571,18 @@ class PlugEditor(QtWidgets.QWidget):
         QLabel {
             color: rgb(143, 144, 160);
             border-radius: 0px;
+        }
+        
+        QCheckBox {
+            border: none;
+        }
+        
+        QCheckBox::indicator::unchecked {
+            background-color: rgb(234, 66, 74);
+        }
+        
+        QCheckBox::indicator::checked {
+            background-color: rgb(195, 232, 141);
         }
 
         QLineEdit {

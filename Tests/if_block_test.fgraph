@@ -1,0 +1,2036 @@
+{
+  "nodes": [
+    {
+      "name": "If_Begin",
+      "id": "3335633931643732333437653738363430303030643262653836376236646630",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "",
+      "opCode": "# BeginOp\n\noutput = input\n\n",
+      "isIfBegin": true,
+      "associatedEndBlockId": "6533613932316233373863353465623935356636653236633137646363303139",
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "input": [
+          {
+            "shortName": "input",
+            "longName": "Input",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "",
+              ""
+            ],
+            "type": 11,
+            "connectionName": "output",
+            "connectionNodeId": "3739386231643366346262646663646465313039616361303539363434663361"
+          }
+        ],
+        "incondition": [
+          {
+            "shortName": "incondition",
+            "longName": "Condition",
+            "index": 0,
+            "isExposed": true,
+            "data": true,
+            "type": 8,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "",
+              ""
+            ],
+            "type": 11,
+            "connectionName": "indata",
+            "connectionNodeId": "3737613031623436393264343135353937343738613733653066336136383233"
+          }
+        ]
+      }
+    },
+    {
+      "name": "If_End",
+      "id": "6533613932316233373863353465623935356636653236633137646363303139",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "",
+      "opCode": "# BeginOp\n\noutput = input\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": true,
+      "associatedBeginBlockId": "3335633931643732333437653738363430303030643262653836376236646630",
+      "inputs": {
+        "input": [
+          {
+            "shortName": "input",
+            "longName": "Input",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "",
+              "",
+              "",
+              ""
+            ],
+            "type": 11,
+            "connectionName": "output",
+            "connectionNodeId": "6435363434353830393066313764353932653462636534363231333361666265"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "",
+              "",
+              "",
+              ""
+            ],
+            "type": 11,
+            "connectionName": "input2",
+            "connectionNodeId": "3731303665323938646632323335346530646166323137613861663966623137"
+          }
+        ]
+      }
+    },
+    {
+      "name": "File",
+      "id": "3535383838353132313264343336396534313063623732346161656132653435",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "",
+      "opCode": "# BeginOp\n\noutfile = infile\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infile": [
+          {
+            "shortName": "infile",
+            "longName": "Input File Path",
+            "index": 0,
+            "isExposed": true,
+            "data": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "data": "",
+            "type": 7,
+            "connectionName": "input1",
+            "connectionNodeId": "3739386231643366346262646663646465313039616361303539363434663361"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge",
+      "id": "3739386231643366346262646663646465313039616361303539363434663361",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/merge.png",
+      "opCode": "# BeginOp\n\nif type(input1) is list:\n    if type(input2) is list:\n        output = [*input1, *input2]\n    else:\n        output = [*input1, input2]\nelif type(input2) is list:\n    output = [input1, *input2]\nelse:\n    output = [input1, input2]\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "input1": [
+          {
+            "shortName": "input1",
+            "longName": "Input 1",
+            "index": 0,
+            "isExposed": false,
+            "data": "",
+            "type": 11,
+            "connectionName": "outfile",
+            "connectionNodeId": "3535383838353132313264343336396534313063623732346161656132653435"
+          }
+        ],
+        "input2": [
+          {
+            "shortName": "input2",
+            "longName": "Input 2",
+            "index": 0,
+            "isExposed": false,
+            "data": "",
+            "type": 11,
+            "connectionName": "outfile",
+            "connectionNodeId": "3936336537373239313830326133306230663137653833343066613166376135"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "",
+              ""
+            ],
+            "type": 9,
+            "connectionName": "input",
+            "connectionNodeId": "3335633931643732333437653738363430303030643262653836376236646630"
+          }
+        ]
+      }
+    },
+    {
+      "name": "File1",
+      "id": "3936336537373239313830326133306230663137653833343066613166376135",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "",
+      "opCode": "# BeginOp\n\noutfile = infile\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infile": [
+          {
+            "shortName": "infile",
+            "longName": "Input File Path",
+            "index": 0,
+            "isExposed": true,
+            "data": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "data": "",
+            "type": 7,
+            "connectionName": "input2",
+            "connectionNodeId": "3739386231643366346262646663646465313039616361303539363434663361"
+          }
+        ]
+      }
+    },
+    {
+      "name": "If_Begin1",
+      "id": "3030343430363138636531326635623363303662306230366538396361326335",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "",
+      "opCode": "# BeginOp\n\noutput = input\n\n",
+      "isIfBegin": true,
+      "associatedEndBlockId": "3861363230636335383137623630643339633632376139663163616333323932",
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "input": [
+          {
+            "shortName": "input",
+            "longName": "Input",
+            "index": 0,
+            "isExposed": false,
+            "data": "",
+            "type": 11,
+            "connectionName": "outdata",
+            "connectionNodeId": "6663343166623434383233366461373834613139386637376465373038303837"
+          }
+        ],
+        "incondition": [
+          {
+            "shortName": "incondition",
+            "longName": "Condition",
+            "index": 0,
+            "isExposed": true,
+            "data": true,
+            "type": 8,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "data": "",
+            "type": 11,
+            "connectionName": "indata",
+            "connectionNodeId": "6432616436303238376239363436353263336633616431363739623566396436"
+          }
+        ]
+      }
+    },
+    {
+      "name": "If_End1",
+      "id": "3861363230636335383137623630643339633632376139663163616333323932",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "",
+      "opCode": "# BeginOp\n\noutput = input\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": true,
+      "associatedBeginBlockId": "3030343430363138636531326635623363303662306230366538396361326335",
+      "inputs": {
+        "input": [
+          {
+            "shortName": "input",
+            "longName": "Input",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              {
+                "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+                "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+                "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+                "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+                "PATH": "%PYTHONHOME%;%PATH%",
+                "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+                "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+              },
+              "",
+              "Hello from if block valid"
+            ],
+            "type": 11,
+            "connectionName": "output",
+            "connectionNodeId": "3238353466343430373232376665393634363562313037633765393735366263"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              {
+                "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+                "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+                "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+                "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+                "PATH": "%PYTHONHOME%;%PATH%",
+                "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+                "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+              },
+              "",
+              "Hello from if block valid"
+            ],
+            "type": 11,
+            "connectionName": "input1",
+            "connectionNodeId": "3731303665323938646632323335346530646166323137613861663966623137"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Sleep",
+      "id": "6432616436303238376239363436353263336633616431363739623566396436",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$FLASH_ICONS/debug.png",
+      "opCode": "# BeginOp\n\nimport time\n\nFlashLogMessage(f\"Sleeping for {intime} seconds\")\n\ntime.sleep(intime)\n\noutdata = indata\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "data": "",
+            "type": 11,
+            "connectionName": "output",
+            "connectionNodeId": "3030343430363138636531326635623363303662306230366538396361326335"
+          }
+        ],
+        "intime": [
+          {
+            "shortName": "intime",
+            "longName": "Sleeping Time",
+            "index": 0,
+            "isExposed": true,
+            "data": 2,
+            "type": 1,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "data": "",
+            "type": 11,
+            "connectionName": "input1",
+            "connectionNodeId": "3565313034353762383534316665666630666637366133656432353830653136"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge1",
+      "id": "3565313034353762383534316665666630666637366133656432353830653136",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/merge.png",
+      "opCode": "# BeginOp\n\nif type(input1) is list:\n    if type(input2) is list:\n        output = [*input1, *input2]\n    else:\n        output = [*input1, input2]\nelif type(input2) is list:\n    output = [input1, *input2]\nelse:\n    output = [input1, input2]\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "input1": [
+          {
+            "shortName": "input1",
+            "longName": "Input 1",
+            "index": 0,
+            "isExposed": false,
+            "data": "",
+            "type": 11,
+            "connectionName": "outdata",
+            "connectionNodeId": "6432616436303238376239363436353263336633616431363739623566396436"
+          }
+        ],
+        "input2": [
+          {
+            "shortName": "input2",
+            "longName": "Input 2",
+            "index": 0,
+            "isExposed": false,
+            "data": "Hello from if block valid",
+            "type": 11,
+            "connectionName": "outdata",
+            "connectionNodeId": "6562663562343466653132633631653461313834613461646631363634356231"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "",
+              "Hello from if block valid"
+            ],
+            "type": 9,
+            "connectionName": "input2",
+            "connectionNodeId": "3238353466343430373232376665393634363562313037633765393735366263"
+          }
+        ]
+      }
+    },
+    {
+      "name": "File2",
+      "id": "6630303835393430353534653237313664313636303838303437663164643561",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "",
+      "opCode": "# BeginOp\n\noutfile = infile\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infile": [
+          {
+            "shortName": "infile",
+            "longName": "Input File Path",
+            "index": 0,
+            "isExposed": true,
+            "data": "Hello from if block valid",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "data": "Hello from if block valid",
+            "type": 7,
+            "connectionName": "indata",
+            "connectionNodeId": "6562663562343466653132633631653461313834613461646631363634356231"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Files",
+      "id": "6236353339623532313563333636666337333266616630613231353762366366",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "",
+      "opCode": "# BeginOp\n\noutfiles = infiles\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infiles": [
+          {
+            "shortName": "infiles",
+            "longName": "Input Files Path",
+            "index": 0,
+            "isExposed": true,
+            "data": "",
+            "type": 9,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfiles": [
+          {
+            "shortName": "outfiles",
+            "longName": "Output Files Path",
+            "index": 0,
+            "isExposed": false,
+            "data": "",
+            "type": 9,
+            "connectionName": "indata",
+            "connectionNodeId": "6663343166623434383233366461373834613139386637376465373038303837"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge2",
+      "id": "3731303665323938646632323335346530646166323137613861663966623137",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/merge.png",
+      "opCode": "# BeginOp\n\nif type(input1) is list:\n    if type(input2) is list:\n        output = [*input1, *input2]\n    else:\n        output = [*input1, input2]\nelif type(input2) is list:\n    output = [input1, *input2]\nelse:\n    output = [input1, input2]\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "input1": [
+          {
+            "shortName": "input1",
+            "longName": "Input 1",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              {
+                "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+                "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+                "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+                "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+                "PATH": "%PYTHONHOME%;%PATH%",
+                "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+                "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+              },
+              "",
+              "Hello from if block valid"
+            ],
+            "type": 11,
+            "connectionName": "output",
+            "connectionNodeId": "3861363230636335383137623630643339633632376139663163616333323932"
+          }
+        ],
+        "input2": [
+          {
+            "shortName": "input2",
+            "longName": "Input 2",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "",
+              "",
+              "",
+              ""
+            ],
+            "type": 11,
+            "connectionName": "output",
+            "connectionNodeId": "6533613932316233373863353465623935356636653236633137646363303139"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              {
+                "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+                "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+                "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+                "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+                "PATH": "%PYTHONHOME%;%PATH%",
+                "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+                "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+              },
+              "",
+              "Hello from if block valid",
+              "",
+              "",
+              "",
+              ""
+            ],
+            "type": 9,
+            "connectionName": "input",
+            "connectionNodeId": "3861633138643733313034643764306431333865373162363435666438353037"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Debug",
+      "id": "3737613031623436393264343135353937343738613733653066336136383233",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$FLASH_ICONS/debug.png",
+      "opCode": "# BeginOp\n\nFlashLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "",
+              ""
+            ],
+            "type": 11,
+            "connectionName": "output",
+            "connectionNodeId": "3335633931643732333437653738363430303030643262653836376236646630"
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "",
+              ""
+            ],
+            "type": 11,
+            "connectionName": "indata",
+            "connectionNodeId": "3736616336333765646234643561663762313237623936313565633537353632"
+          },
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "",
+              ""
+            ],
+            "type": 11,
+            "connectionName": "indata",
+            "connectionNodeId": "6338363065393031323735643065363163663230363063383163636365343739"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Sleep1",
+      "id": "3162313331626537326666366338333632303166346533626337323734343631",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$FLASH_ICONS/debug.png",
+      "opCode": "# BeginOp\n\nimport time\n\nFlashLogMessage(f\"Sleeping for {intime} seconds\")\n\ntime.sleep(intime)\n\noutdata = indata\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "",
+              ""
+            ],
+            "type": 11,
+            "connectionName": "outdata",
+            "connectionNodeId": "3736616336333765646234643561663762313237623936313565633537353632"
+          }
+        ],
+        "intime": [
+          {
+            "shortName": "intime",
+            "longName": "Sleeping Time",
+            "index": 0,
+            "isExposed": true,
+            "data": 5,
+            "type": 1,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "",
+              ""
+            ],
+            "type": 11,
+            "connectionName": "input1",
+            "connectionNodeId": "6435363434353830393066313764353932653462636534363231333361666265"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Sleep2",
+      "id": "6663343166623434383233366461373834613139386637376465373038303837",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$FLASH_ICONS/debug.png",
+      "opCode": "# BeginOp\n\nimport time\n\nFlashLogMessage(f\"Sleeping for {intime} seconds\")\n\ntime.sleep(intime)\n\noutdata = indata\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "data": "",
+            "type": 11,
+            "connectionName": "outfiles",
+            "connectionNodeId": "6236353339623532313563333636666337333266616630613231353762366366"
+          }
+        ],
+        "intime": [
+          {
+            "shortName": "intime",
+            "longName": "Sleeping Time",
+            "index": 0,
+            "isExposed": true,
+            "data": 1,
+            "type": 1,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "data": "",
+            "type": 11,
+            "connectionName": "input",
+            "connectionNodeId": "3030343430363138636531326635623363303662306230366538396361326335"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Debug1",
+      "id": "3439303835663163343664393837663731383538633938646136303430326466",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$FLASH_ICONS/debug.png",
+      "opCode": "# BeginOp\n\nFlashLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "data": "",
+            "type": 11,
+            "connectionName": "output",
+            "connectionNodeId": "3663623438643032383163336564623835306663363632613034323863353338"
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "data": "",
+            "type": 11,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "Debug2",
+      "id": "6562663562343466653132633631653461313834613461646631363634356231",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$FLASH_ICONS/debug.png",
+      "opCode": "# BeginOp\n\nFlashLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "data": "Hello from if block valid",
+            "type": 11,
+            "connectionName": "outfile",
+            "connectionNodeId": "6630303835393430353534653237313664313636303838303437663164643561"
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "data": "Hello from if block valid",
+            "type": 11,
+            "connectionName": "input2",
+            "connectionNodeId": "3565313034353762383534316665666630666637366133656432353830653136"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge3",
+      "id": "3238353466343430373232376665393634363562313037633765393735366263",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/merge.png",
+      "opCode": "# BeginOp\n\nif type(input1) is list:\n    if type(input2) is list:\n        output = [*input1, *input2]\n    else:\n        output = [*input1, input2]\nelif type(input2) is list:\n    output = [input1, *input2]\nelse:\n    output = [input1, input2]\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "input1": [
+          {
+            "shortName": "input1",
+            "longName": "Input 1",
+            "index": 0,
+            "isExposed": false,
+            "data": {
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+            },
+            "type": 11,
+            "connectionName": "outdata",
+            "connectionNodeId": "3965366236633733626630653138323539333065353765303161313238393966"
+          }
+        ],
+        "input2": [
+          {
+            "shortName": "input2",
+            "longName": "Input 2",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "",
+              "Hello from if block valid"
+            ],
+            "type": 11,
+            "connectionName": "output",
+            "connectionNodeId": "3565313034353762383534316665666630666637366133656432353830653136"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              {
+                "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+                "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+                "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+                "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+                "PATH": "%PYTHONHOME%;%PATH%",
+                "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+                "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+              },
+              "",
+              "Hello from if block valid"
+            ],
+            "type": 9,
+            "connectionName": "input",
+            "connectionNodeId": "3861363230636335383137623630643339633632376139663163616333323932"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Oeuf_GuerillaEnv",
+      "id": "6233666332383330626635646665373036646463386439373866323830353231",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/volcan.png",
+      "opCode": "# BeginOp\n\noutenvironment = inenvironment\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inenvironment": [
+          {
+            "shortName": "inenvironment",
+            "longName": "Environment",
+            "index": 0,
+            "isExposed": true,
+            "data": {
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+            },
+            "type": 10,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outenvironment": [
+          {
+            "shortName": "outenvironment",
+            "longName": "Output Environment",
+            "index": 0,
+            "isExposed": false,
+            "data": {
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+            },
+            "type": 10,
+            "connectionName": "indata",
+            "connectionNodeId": "3764316366636435343236326531646633366665303630636665383133636134"
+          }
+        ]
+      }
+    },
+    {
+      "name": "If_Begin2",
+      "id": "3861633138643733313034643764306431333865373162363435666438353037",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "",
+      "opCode": "# BeginOp\n\noutput = input\n\n",
+      "isIfBegin": true,
+      "associatedEndBlockId": "3663623438643032383163336564623835306663363632613034323863353338",
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "input": [
+          {
+            "shortName": "input",
+            "longName": "Input",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              {
+                "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+                "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+                "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+                "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+                "PATH": "%PYTHONHOME%;%PATH%",
+                "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+                "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+              },
+              "",
+              "Hello from if block valid",
+              "",
+              "",
+              "",
+              ""
+            ],
+            "type": 11,
+            "connectionName": "output",
+            "connectionNodeId": "3731303665323938646632323335346530646166323137613861663966623137"
+          }
+        ],
+        "incondition": [
+          {
+            "shortName": "incondition",
+            "longName": "Condition",
+            "index": 0,
+            "isExposed": true,
+            "data": false,
+            "type": 8,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              {
+                "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+                "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+                "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+                "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+                "PATH": "%PYTHONHOME%;%PATH%",
+                "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+                "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+              },
+              "",
+              "Hello from if block valid",
+              "",
+              "",
+              "",
+              ""
+            ],
+            "type": 11,
+            "connectionName": "input1",
+            "connectionNodeId": "6136343838653131663238303939623862376137336431323764633534353631"
+          }
+        ]
+      }
+    },
+    {
+      "name": "If_End2",
+      "id": "3663623438643032383163336564623835306663363632613034323863353338",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "",
+      "opCode": "# BeginOp\n\noutput = input\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": true,
+      "associatedBeginBlockId": "3861633138643733313034643764306431333865373162363435666438353037",
+      "inputs": {
+        "input": [
+          {
+            "shortName": "input",
+            "longName": "Input",
+            "index": 0,
+            "isExposed": false,
+            "data": "",
+            "type": 11,
+            "connectionName": "outfile",
+            "connectionNodeId": "6565653861623533316466346530366133303230373265656636643430373631"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "data": "",
+            "type": 11,
+            "connectionName": "indata",
+            "connectionNodeId": "3439303835663163343664393837663731383538633938646136303430326466"
+          }
+        ]
+      }
+    },
+    {
+      "name": "NK_NukeBatch",
+      "id": "6565653861623533316466346530366133303230373265656636643430373631",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/nuke.png",
+      "opCode": "# BeginOp\n\nimport subprocess, os\n\nFlashLogMessage(f\"NukeBatch : Start executing script : {inscript}\")\n\ncommand = [f\"{innukebindir}/nuke\", \"-x\", innukefile, \"-F\", f\"{inframerange[0]}-{inframerange[1]}\"]\n\nFlashLogMessage(f\"NukeBatch Command : {' '.join(command)}\")\n\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE)\nstdout, stderr = process.communicate()\n\nstdoutAsStr = stdout.decode(\"utf-8\")\nstderrAsStr = stderr.decode(\"utf-8\")\n\nif len(stderrAsStr) > 0:\n    FlashLogError(stderrAsStr)\nelse:\n    FlashLogMessage(f\"NukeBatch : Finished executing file : {innukefile}\")\n    FlashLogMessage(stdoutAsStr)\n\noutfile = innukefile\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "innukefile": [
+          {
+            "shortName": "innukefile",
+            "longName": "Nuke File",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              {
+                "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+                "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+                "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+                "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+                "PATH": "%PYTHONHOME%;%PATH%",
+                "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+                "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+              },
+              "",
+              "Hello from if block valid",
+              "",
+              "",
+              "",
+              "",
+              null
+            ],
+            "type": 7,
+            "connectionName": "output",
+            "connectionNodeId": "6136343838653131663238303939623862376137336431323764633534353631"
+          }
+        ],
+        "inframerange": [
+          {
+            "shortName": "inframerange",
+            "longName": "Frame Range",
+            "index": 0,
+            "isExposed": true,
+            "data": [
+              100,
+              240
+            ],
+            "type": 2,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ],
+        "innukebindir": [
+          {
+            "shortName": "innukebindir",
+            "longName": "Nuke Binary Directory",
+            "index": 0,
+            "isExposed": true,
+            "data": "C:/Program Files/Nuke",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File",
+            "index": 0,
+            "isExposed": false,
+            "data": "",
+            "type": 7,
+            "connectionName": "input",
+            "connectionNodeId": "3663623438643032383163336564623835306663363632613034323863353338"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Sleep3",
+      "id": "3736616336333765646234643561663762313237623936313565633537353632",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$FLASH_ICONS/debug.png",
+      "opCode": "# BeginOp\n\nimport time\n\nFlashLogMessage(f\"Sleeping for {intime} seconds\")\n\ntime.sleep(intime)\n\noutdata = indata\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "",
+              ""
+            ],
+            "type": 11,
+            "connectionName": "outdata",
+            "connectionNodeId": "3737613031623436393264343135353937343738613733653066336136383233"
+          }
+        ],
+        "intime": [
+          {
+            "shortName": "intime",
+            "longName": "Sleeping Time",
+            "index": 0,
+            "isExposed": true,
+            "data": 1,
+            "type": 1,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "",
+              ""
+            ],
+            "type": 11,
+            "connectionName": "indata",
+            "connectionNodeId": "3162313331626537326666366338333632303166346533626337323734343631"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Debug3",
+      "id": "3965366236633733626630653138323539333065353765303161313238393966",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$FLASH_ICONS/debug.png",
+      "opCode": "# BeginOp\n\nFlashLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "data": {
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+            },
+            "type": 11,
+            "connectionName": "outdata",
+            "connectionNodeId": "3764316366636435343236326531646633366665303630636665383133636134"
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "data": {
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+            },
+            "type": 11,
+            "connectionName": "input1",
+            "connectionNodeId": "3238353466343430373232376665393634363562313037633765393735366263"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Sleep4",
+      "id": "3764316366636435343236326531646633366665303630636665383133636134",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$FLASH_ICONS/debug.png",
+      "opCode": "# BeginOp\n\nimport time\n\nFlashLogMessage(f\"Sleeping for {intime} seconds\")\n\ntime.sleep(intime)\n\noutdata = indata\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "data": {
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+            },
+            "type": 11,
+            "connectionName": "outenvironment",
+            "connectionNodeId": "6233666332383330626635646665373036646463386439373866323830353231"
+          }
+        ],
+        "intime": [
+          {
+            "shortName": "intime",
+            "longName": "Sleeping Time",
+            "index": 0,
+            "isExposed": true,
+            "data": 1,
+            "type": 1,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "data": {
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+            },
+            "type": 11,
+            "connectionName": "indata",
+            "connectionNodeId": "3965366236633733626630653138323539333065353765303161313238393966"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge4",
+      "id": "6136343838653131663238303939623862376137336431323764633534353631",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/merge.png",
+      "opCode": "# BeginOp\n\nif type(input1) is list:\n    if type(input2) is list:\n        output = [*input1, *input2]\n    else:\n        output = [*input1, input2]\nelif type(input2) is list:\n    output = [input1, *input2]\nelse:\n    output = [input1, input2]\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "input1": [
+          {
+            "shortName": "input1",
+            "longName": "Input 1",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              {
+                "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+                "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+                "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+                "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+                "PATH": "%PYTHONHOME%;%PATH%",
+                "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+                "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+              },
+              "",
+              "Hello from if block valid",
+              "",
+              "",
+              "",
+              ""
+            ],
+            "type": 11,
+            "connectionName": "output",
+            "connectionNodeId": "3861633138643733313034643764306431333865373162363435666438353037"
+          }
+        ],
+        "input2": [
+          {
+            "shortName": "input2",
+            "longName": "Input 2",
+            "index": 0,
+            "isExposed": false,
+            "data": null,
+            "type": 11,
+            "connectionName": "output",
+            "connectionNodeId": "3364353633313234316239303765663736626332386364663463386337303065"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              {
+                "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+                "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+                "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+                "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+                "PATH": "%PYTHONHOME%;%PATH%",
+                "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+                "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+              },
+              "",
+              "Hello from if block valid",
+              "",
+              "",
+              "",
+              "",
+              null
+            ],
+            "type": 9,
+            "connectionName": "innukefile",
+            "connectionNodeId": "6565653861623533316466346530366133303230373265656636643430373631"
+          }
+        ]
+      }
+    },
+    {
+      "name": "File3",
+      "id": "3037666233326661336634363731333438326338336239653262393464623639",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "",
+      "opCode": "# BeginOp\n\noutfile = infile\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infile": [
+          {
+            "shortName": "infile",
+            "longName": "Input File Path",
+            "index": 0,
+            "isExposed": true,
+            "data": "Hello from if block not valid",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "data": "Hello from if block not valid",
+            "type": 7,
+            "connectionName": "indata",
+            "connectionNodeId": "6135396333653431356136336366633237333463396138363035326235333664"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Null",
+      "id": "3364353633313234316239303765663736626332386364663463386337303065",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "",
+      "opCode": "# BeginOp\n\nouput = input\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "input": [
+          {
+            "shortName": "input",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "data": "Hello from if block not valid",
+            "type": 11,
+            "connectionName": "outdata",
+            "connectionNodeId": "6135396333653431356136336366633237333463396138363035326235333664"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "data": null,
+            "type": 11,
+            "connectionName": "input2",
+            "connectionNodeId": "6136343838653131663238303939623862376137336431323764633534353631"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Debug4",
+      "id": "6135396333653431356136336366633237333463396138363035326235333664",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$FLASH_ICONS/debug.png",
+      "opCode": "# BeginOp\n\nFlashLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "data": "Hello from if block not valid",
+            "type": 11,
+            "connectionName": "outfile",
+            "connectionNodeId": "3037666233326661336634363731333438326338336239653262393464623639"
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "data": "Hello from if block not valid",
+            "type": 11,
+            "connectionName": "input",
+            "connectionNodeId": "3364353633313234316239303765663736626332386364663463386337303065"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge5",
+      "id": "6435363434353830393066313764353932653462636534363231333361666265",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/merge.png",
+      "opCode": "# BeginOp\n\nif type(input1) is list:\n    if type(input2) is list:\n        output = [*input1, *input2]\n    else:\n        output = [*input1, input2]\nelif type(input2) is list:\n    output = [input1, *input2]\nelse:\n    output = [input1, input2]\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "input1": [
+          {
+            "shortName": "input1",
+            "longName": "Input 1",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "",
+              ""
+            ],
+            "type": 11,
+            "connectionName": "outdata",
+            "connectionNodeId": "3162313331626537326666366338333632303166346533626337323734343631"
+          }
+        ],
+        "input2": [
+          {
+            "shortName": "input2",
+            "longName": "Input 2",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "",
+              ""
+            ],
+            "type": 11,
+            "connectionName": "outdata",
+            "connectionNodeId": "3435336430373162653739626633363138636366383963633066613065623535"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "",
+              "",
+              "",
+              ""
+            ],
+            "type": 9,
+            "connectionName": "input",
+            "connectionNodeId": "6533613932316233373863353465623935356636653236633137646363303139"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Debug5",
+      "id": "6338363065393031323735643065363163663230363063383163636365343739",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$FLASH_ICONS/debug.png",
+      "opCode": "# BeginOp\n\nFlashLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "",
+              ""
+            ],
+            "type": 11,
+            "connectionName": "outdata",
+            "connectionNodeId": "3737613031623436393264343135353937343738613733653066336136383233"
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "",
+              ""
+            ],
+            "type": 11,
+            "connectionName": "indata",
+            "connectionNodeId": "3435336430373162653739626633363138636366383963633066613065623535"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Sleep5",
+      "id": "3435336430373162653739626633363138636366383963633066613065623535",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$FLASH_ICONS/debug.png",
+      "opCode": "# BeginOp\n\nimport time\n\nFlashLogMessage(f\"Sleeping for {intime} seconds\")\n\ntime.sleep(intime)\n\noutdata = indata\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "",
+              ""
+            ],
+            "type": 11,
+            "connectionName": "outdata",
+            "connectionNodeId": "6338363065393031323735643065363163663230363063383163636365343739"
+          }
+        ],
+        "intime": [
+          {
+            "shortName": "intime",
+            "longName": "Sleeping Time",
+            "index": 0,
+            "isExposed": true,
+            "data": 1,
+            "type": 1,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "data": [
+              "",
+              ""
+            ],
+            "type": 11,
+            "connectionName": "input2",
+            "connectionNodeId": "6435363434353830393066313764353932653462636534363231333361666265"
+          }
+        ]
+      }
+    }
+  ],
+  "tracker": null,
+  "positions": [
+    {
+      "id": "3335633931643732333437653738363430303030643262653836376236646630",
+      "x": -90.44038617173231,
+      "y": 339.1514481439963
+    },
+    {
+      "id": "6533613932316233373863353465623935356636653236633137646363303139",
+      "x": 1454.30987673472,
+      "y": 323.0519586246471
+    },
+    {
+      "id": "3535383838353132313264343336396534313063623732346161656132653435",
+      "x": -687.3469349051657,
+      "y": 318.04869137059205
+    },
+    {
+      "id": "3739386231643366346262646663646465313039616361303539363434663361",
+      "x": -349.70282653069836,
+      "y": 354.224845839285
+    },
+    {
+      "id": "3936336537373239313830326133306230663137653833343066613166376135",
+      "x": -641.1670060455356,
+      "y": 846.2593395964401
+    },
+    {
+      "id": "3030343430363138636531326635623363303662306230366538396361326335",
+      "x": -85.91836686314579,
+      "y": -104.00644409749214
+    },
+    {
+      "id": "3861363230636335383137623630643339633632376139663163616333323932",
+      "x": 1418.5354752950907,
+      "y": -79.84131083518744
+    },
+    {
+      "id": "6432616436303238376239363436353263336633616431363739623566396436",
+      "x": 275.8431778237836,
+      "y": -99.48442478890549
+    },
+    {
+      "id": "3565313034353762383534316665666630666637366133656432353830653136",
+      "x": 587.8625101162603,
+      "y": -88.9330464022034
+    },
+    {
+      "id": "6630303835393430353534653237313664313636303838303437663164643561",
+      "x": 146.81759556761912,
+      "y": 153.12996709650722
+    },
+    {
+      "id": "6236353339623532313563333636666337333266616630613231353762366366",
+      "x": -569.7744328819138,
+      "y": -104.00644409749218
+    },
+    {
+      "id": "3731303665323938646632323335346530646166323137613861663966623137",
+      "x": 1889.5509978698058,
+      "y": 155.25599626147383
+    },
+    {
+      "id": "3737613031623436393264343135353937343738613733653066336136383233",
+      "x": 246.68828065212784,
+      "y": 379.0184822663569
+    },
+    {
+      "id": "3162313331626537326666366338333632303166346533626337323734343631",
+      "x": 837.4865439702777,
+      "y": 322.5740898462338
+    },
+    {
+      "id": "6663343166623434383233366461373834613139386637376465373038303837",
+      "x": -329.0259663126737,
+      "y": -96.8705890666754
+    },
+    {
+      "id": "3439303835663163343664393837663731383538633938646136303430326466",
+      "x": 3384.9545718652885,
+      "y": 153.79908766654438
+    },
+    {
+      "id": "6562663562343466653132633631653461313834613461646631363634356231",
+      "x": 394.9668295407221,
+      "y": 120.35686478599547
+    },
+    {
+      "id": "3238353466343430373232376665393634363562313037633765393735366263",
+      "x": 1068.734578081474,
+      "y": -135.10211007607535
+    },
+    {
+      "id": "6233666332383330626635646665373036646463386439373866323830353231",
+      "x": -65.33338325356712,
+      "y": -632.3406547593343
+    },
+    {
+      "id": "3861633138643733313034643764306431333865373162363435666438353037",
+      "x": 2154.732454936751,
+      "y": 150.73826163751673
+    },
+    {
+      "id": "3663623438643032383163336564623835306663363632613034323863353338",
+      "x": 3047.227010655496,
+      "y": 144.43297634768868
+    },
+    {
+      "id": "6565653861623533316466346530366133303230373265656636643430373631",
+      "x": 2734.500378840407,
+      "y": 148.35622717066
+    },
+    {
+      "id": "3736616336333765646234643561663762313237623936313565633537353632",
+      "x": 608.6301407840673,
+      "y": 321.0848804035349
+    },
+    {
+      "id": "3965366236633733626630653138323539333065353765303161313238393966",
+      "x": 723.6402780828598,
+      "y": -285.7451354481036
+    },
+    {
+      "id": "3764316366636435343236326531646633366665303630636665383133636134",
+      "x": 420.5477956985552,
+      "y": -592.3845294248462
+    },
+    {
+      "id": "6136343838653131663238303939623862376137336431323764633534353631",
+      "x": 2489.576788606174,
+      "y": 148.42047568695426
+    },
+    {
+      "id": "3037666233326661336634363731333438326338336239653262393464623639",
+      "x": 1694.4670974260614,
+      "y": 770.3729452322866
+    },
+    {
+      "id": "3364353633313234316239303765663736626332386364663463386337303065",
+      "x": 2215.7056727552463,
+      "y": 480.59963555775664
+    },
+    {
+      "id": "6135396333653431356136336366633237333463396138363035326235333664",
+      "x": 1971.872034126678,
+      "y": 754.4707514086844
+    },
+    {
+      "id": "6435363434353830393066313764353932653462636534363231333361666265",
+      "x": 1163.5439064120274,
+      "y": 300.21594540935666
+    },
+    {
+      "id": "6338363065393031323735643065363163663230363063383163636365343739",
+      "x": 691.1820806940643,
+      "y": 589.4822650061094
+    },
+    {
+      "id": "3435336430373162653739626633363138636366383963633066613065623535",
+      "x": 909.6483514311527,
+      "y": 587.598935085962
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+// End if block
+
+# BeginAttr
+
+name = If_End
+category = Utility
+
+# EndAttr
+
+# BeginPlugs
+
+# BeginPlug
+
+shortName = input
+longName = Input
+defaultValue = None
+type = custom
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = output
+longName = Output
+defaultValue = None
+type = custom
+
+# EndPlug
+
+# EndPlugs
+
+# BeginOp
+
+output = input
+
+# EndOp

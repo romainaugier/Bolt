@@ -25,16 +25,16 @@ def GetPlugColor(plugType : PlugType) -> QtGui.QColor:
     Plug types available
     """
     if plugType == PlugType.INT: return QtGui.QColor("#89ddff")
-    if plugType == PlugType.INT2: return QtGui.QColor("#89ddff")
-    if plugType == PlugType.INT3: return QtGui.QColor("#89ddff")
-    if plugType == PlugType.FLOAT: return QtGui.QColor("#80cbc4")
-    if plugType == PlugType.FLOAT2: return QtGui.QColor("#80cbc4")
-    if plugType == PlugType.FLOAT3: return QtGui.QColor("#80cbc4")
-    if plugType == PlugType.STR: return QtGui.QColor("#c3e88d")
-    if plugType == PlugType.BOOL: return QtGui.QColor("#eeffff")
-    if plugType == PlugType.LIST: return QtGui.QColor("#f78c6c")
-    if plugType == PlugType.DICT: return QtGui.QColor("#c792ea")
-    if plugType == PlugType.CUSTOM: return QtGui.QColor("#f07178")
+    elif plugType == PlugType.INT2: return QtGui.QColor("#89ddff")
+    elif plugType == PlugType.INT3: return QtGui.QColor("#89ddff")
+    elif plugType == PlugType.FLOAT: return QtGui.QColor("#80cbc4")
+    elif plugType == PlugType.FLOAT2: return QtGui.QColor("#80cbc4")
+    elif plugType == PlugType.FLOAT3: return QtGui.QColor("#80cbc4")
+    elif plugType == PlugType.STR: return QtGui.QColor("#c3e88d")
+    elif plugType == PlugType.BOOL: return QtGui.QColor("#eeffff")
+    elif plugType == PlugType.LIST: return QtGui.QColor("#f78c6c")
+    elif plugType == PlugType.DICT: return QtGui.QColor("#c792ea")
+    elif plugType == PlugType.CUSTOM: return QtGui.QColor("#f07178")
 
 
 def GetFontRect(text : str, font : str, size : int) -> QtCore.QRect:
@@ -281,12 +281,16 @@ class GPlug(QtWidgets.QGraphicsObject):
         """
         self.isHovered = True
         self.update()
+        
+        return super().hoverEnterEvent(ev)
     
     def hoverLeaveEvent(self, ev) -> None:
         """
         """
         self.isHovered = False
         self.update()
+        
+        return super().hoverLeaveEvent(ev)
 
     def mousePressEvent(self, event: 'QGraphicsSceneMouseEvent') -> None:
         if event.buttons() & QtCore.Qt.RightButton:
@@ -315,7 +319,7 @@ class GPlug(QtWidgets.QGraphicsObject):
 
         self.closestGPlug = closestGPlug
 
-        return super().mousePressEvent(event)
+        return super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event : 'QGraphicsSceneMouseEvent') -> None:
         if self.closestGPlug is not None and not self.closestGPlug.id == self.id:
@@ -365,7 +369,7 @@ class GPlug(QtWidgets.QGraphicsObject):
 
         if self.getInternalPlug().IsConnected():
             disconnectAction = menu.addAction("Disconnect")
-            # disconnectAction.triggered.connect(lambda: self.deleteEdges())
+            disconnectAction.triggered.connect(lambda: self.deleteEdges())
 
         if self.isInput:
             if self.getInternalPlug().IsExposed():
@@ -377,9 +381,7 @@ class GPlug(QtWidgets.QGraphicsObject):
                 unexposeAction.triggered.connect(self.expose)
                 menu.addAction(unexposeAction)
 
-        # menu.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-
-        action = menu.exec(QtCore.QPoint(position.x(), position.y()))
+        menu.exec(QtCore.QPoint(position.x(), position.y()))
 
         event.setAccepted(True)
 
@@ -419,7 +421,7 @@ class GPlug(QtWidgets.QGraphicsObject):
             edge.source.edges.remove(edge)
             edge.destination.edges.remove(edge)
 
-            self.scene.removeItem(edge)
+            self.graph.deleteItem(edge)
 
 class GNode(QtWidgets.QGraphicsObject):
     """
@@ -429,6 +431,10 @@ class GNode(QtWidgets.QGraphicsObject):
     plugHasBeenClicked = QtCore.pyqtSignal(list)
 
     def __init__(self, node : Node, name : str, graph : GGraph, iconsLib : Icons):
+        """
+        GNode constructor
+        Sets up the dependent objects (badge and plugs)
+        """
         super().__init__()
         
         self.internalNode = node
@@ -525,6 +531,8 @@ class GNode(QtWidgets.QGraphicsObject):
         self.setCacheMode(QtWidgets.QGraphicsItem.DeviceCoordinateCache)
         self.setZValue(1)
         self.setAcceptHoverEvents(True)
+        
+        self.setToolTip(f"{self.getInternalNode().GetName()}")
 
     # NODE UTILS
 
@@ -545,22 +553,30 @@ class GNode(QtWidgets.QGraphicsObject):
         """
         return self.outputGPlugs
 
-    def getInputGPlug(self, name : str) -> GPlug:
+    def getInputGPlug(self, name : str = None, index : int = None) -> GPlug:
         """
         """
-        for gplug in self.inputGPlugs:
-            if gplug.getInternalPlug().GetShortName() == name:
-                return gplug
+        if name is not None:
+            for gplug in self.inputGPlugs:
+                if gplug.getInternalPlug().GetShortName() == name:
+                    return gplug
+
+        if index is not None:
+            return list(self.inputGPlugs)[index]
 
         return None
     
-    def getOutputGPlug(self, name : str) -> GPlug:
+    def getOutputGPlug(self, name : str = None, index : int = None) -> GPlug:
         """
         """
-        for gplug in self.outputGPlugs:
-            if gplug.getInternalPlug().GetShortName() == name:
-                return gplug
+        if name is not None:
+            for gplug in self.outputGPlugs:
+                if gplug.getInternalPlug().GetShortName() == name:
+                    return gplug
 
+        if index is not None:
+            return list(self.outputGPlugs)[index]
+        
         return None
 
     def updateBadge(self) -> None:
@@ -578,6 +594,14 @@ class GNode(QtWidgets.QGraphicsObject):
         """
         adjust = 10
         return QtCore.QRectF(-adjust, -adjust, self.sizeX + adjust * 2, self.sizeY + adjust * 2)
+    
+    def cook(self) -> None:
+        """
+        """
+        if self.getInternalNode().IsCooked():
+            self.graph.launchGraphCooking(lastNodeToCook=self.getInternalNode().GetID(), skipCookedNodes=False)
+        else:
+            self.graph.launchGraphCooking(lastNodeToCook=self.getInternalNode().GetID())
 
     # PAINT
 
@@ -594,9 +618,7 @@ class GNode(QtWidgets.QGraphicsObject):
         shadowOffset = 10
         path = QtGui.QPainterPath()
         path.setFillRule(Qt.WindingFill)
-        path.addRoundedRect(QtCore.QRectF(shadowOffset, shadowOffset, self.sizeX, self.labelSizeY), 10, 10)
-        path.addRoundedRect(QtCore.QRectF(shadowOffset, self.labelSizeY, self.sizeX, self.sizeY - self.labelSizeY + shadowOffset), 10, 10)
-        path.addRect(shadowOffset, self.labelSizeY, self.sizeX, self.sizeY / 2)
+        path.addRoundedRect(QtCore.QRectF(shadowOffset, shadowOffset, self.sizeX, self.sizeY), 10, 10)
 
         painter.setPen(Qt.NoPen)
         painter.setBrush(QtGui.QColor(0, 0, 0, 60))
@@ -636,28 +658,69 @@ class GNode(QtWidgets.QGraphicsObject):
         path.addRoundedRect(QtCore.QRectF(0, self.labelSizeY, self.sizeX, self.sizeY - self.labelSizeY), 10, 10)
         path.addRect(0, self.labelSizeY, self.sizeX, self.sizeY / 2)
 
-        if self.isHovered or self.isSelected():
-            pass
-
         painter.setBrush(bodyColor)
         painter.setPen(Qt.NoPen)
         painter.drawPath(path.simplified())
+        
+        if self.isSelected():
+            painter.setPen(GetQColorFromPalette(ColorPalette.WARNINGCOLOR))
+            
+            selectionPath = QtGui.QPainterPath()
+            selectionPath.addRoundedRect(QtCore.QRectF(0, 0, self.sizeX, self.sizeY), 10, 10)
+            
+            painter.setBrush(Qt.transparent)
+            painter.drawPath(selectionPath)
 
     # EVENTS
+    
+    def contextMenuEvent(self, event: QtGui.QContextMenuEvent) -> None:
+        """
+        """
+        super().contextMenuEvent(event)
+        
+        position = event.screenPos()
+
+        menu = ContextMenu()
+        
+        cookAction = QtWidgets.QAction("Cook")
+        cookAction.setToolTip("Cook the graph up to this node")
+        cookAction.triggered.connect(lambda: self.cook())
+        menu.addAction(cookAction)
+        
+        infoAction = QtWidgets.QAction("Infos")
+        infoAction.triggered.connect(lambda: self.graph.showNodeInfosPanel(self))
+        menu.addAction(infoAction)
+        
+        reloadOpCode = QtWidgets.QAction("Reload Op Code")
+        reloadOpCode.setToolTip("Reloads the op code from the file definition")
+        reloadOpCode.triggered.connect(lambda: self.getInternalNode().ReloadOpCode())
+        menu.addAction(reloadOpCode)
+        
+        deleteAction = QtWidgets.QAction("Delete")
+        deleteAction.setToolTip("Delete this node from the graph")
+        deleteAction.triggered.connect(lambda: self.graph.deleteNode(self))
+        menu.addAction(deleteAction)
+
+        menu.exec(QtCore.QPoint(position.x(), position.y()))
+        
+        event.setAccepted(True)
 
     @QtCore.pyqtSlot(list)
     def onPlugClicked(self, data : list) -> None:
-        # print(data)
         self.plugHasBeenClicked.emit(data)
         self.hasBeenSelected.emit(self.getInternalNode().GetID())
 
     def hoverEnterEvent(self, ev):
         self.isHovered = True
         self.update()
+        
+        return super().hoverEnterEvent(ev)
 
     def hoverLeaveEvent(self, ev):
         self.isHovered = False
         self.update()
+        
+        return super().hoverLeaveEvent(ev)
 
     def mousePressEvent(self, ev):
         pos = ev.pos()
@@ -670,7 +733,7 @@ class GNode(QtWidgets.QGraphicsObject):
                 item.setZValue(1)
             
             for item in self.graph.items():
-                if type(item) is Edge: item.setZValue(-1)
+                if type(item) is GEdge: item.setZValue(-1)
 
             self.setZValue(2)
 
@@ -679,11 +742,15 @@ class GNode(QtWidgets.QGraphicsObject):
         else:
             self.canMove = True
 
-    def mouseMoveEvent(self, event):
+    def mouseMoveEvent(self, event : QtGui.QMouseEvent):
+        """
+        """     
         if self.canMove and event.buttons() & Qt.LeftButton:
+            self.scene().movingNode = self
+            
             origCursorPos = event.lastScenePos()
             updatedCursorPos = event.scenePos()
-
+            
             origPosition = self.scenePos()
 
             updatedCursorX = updatedCursorPos.x() - origCursorPos.x() + origPosition.x()
@@ -698,9 +765,14 @@ class GNode(QtWidgets.QGraphicsObject):
                 self.setPos(updatedCursorX, updatedCursorY)
             
             self.adjustEdges()
-        
+            
         else:
             return super().mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event : QtGui.QMouseEvent) -> None:
+        """
+        """
+        self.scene().movingNode = None
 
     # CHANGE
 
@@ -716,7 +788,7 @@ class GNode(QtWidgets.QGraphicsObject):
                 edge.adjust()   
 
 
-class Edge(QtWidgets.QGraphicsItem):
+class GEdge(QtWidgets.QGraphicsPathItem):
     """
     """
     def __init__(self, source: GPlug, dest: GPlug, parent=None):
@@ -725,6 +797,7 @@ class Edge(QtWidgets.QGraphicsItem):
         self.id = binascii.hexlify(os.urandom(16)).hex()
 
         self.setAcceptHoverEvents(True)
+        self.setFlag(QtWidgets.QGraphicsItem.ItemSendsGeometryChanges, True)
 
         self.source = source
         self.destination = dest
@@ -746,6 +819,16 @@ class Edge(QtWidgets.QGraphicsItem):
         """
         """
         return self.source.boundingRect().width()
+    
+    def getSourcePlug(self) -> GPlug:
+        """
+        """
+        return self.source
+    
+    def getDestinationPlug(self) -> GPlug:
+        """
+        """
+        return self.destination
 
     def getControlPointsOffet(self) -> float:
         """
@@ -753,8 +836,8 @@ class Edge(QtWidgets.QGraphicsItem):
         dist = math.sqrt((self.firstPos.x() - self.lastPos.x()) ** 2 + (self.firstPos.y() - self.lastPos.y()) ** 2)
 
         return dist / 2
-
-    def boundingRect(self) -> QtCore.QRectF:
+    
+    def buildPath(self) -> QtGui.QPainterPath:
         """
         """
         offset = self.getControlPointsOffet()
@@ -765,7 +848,17 @@ class Edge(QtWidgets.QGraphicsItem):
                      QtCore.QPointF(self.lastPos.x() - offset, self.lastPos.y() + 7.5),
                      QtCore.QPointF(self.lastPos.x(), self.lastPos.y() + 7.5))
 
-        return path.boundingRect()
+        return path
+    
+    def shape(self):
+        """
+        """
+        path = self.buildPath()
+        
+        stroke = QtGui.QPainterPathStroker()
+        stroke.setWidth(20)
+        
+        return stroke.createStroke(path)
 
     # PAINTING
 
@@ -778,13 +871,7 @@ class Edge(QtWidgets.QGraphicsItem):
                                QtGui.QPainter.SmoothPixmapTransform | 
                                QtGui.QPainter.HighQualityAntialiasing)
 
-        offset = self.getControlPointsOffet()
-
-        path = QtGui.QPainterPath()
-        path.moveTo(self.firstPos.x() + self.getFirstPointOffset(), self.firstPos.y() + 7.5)
-        path.cubicTo(QtCore.QPointF(self.firstPos.x() + self.getFirstPointOffset() + offset, self.firstPos.y() + 7.5),
-                     QtCore.QPointF(self.lastPos.x() - offset, self.lastPos.y() + 7.5),
-                     QtCore.QPointF(self.lastPos.x(), self.lastPos.y() + 7.5))
+        path = self.buildPath()
 
         gradient = QtGui.QLinearGradient()
         gradient.setColorAt(0.0, self.source.color)
@@ -807,7 +894,9 @@ class Edge(QtWidgets.QGraphicsItem):
         self.firstPos = self.source.scenePos()
         self.lastPos = self.destination.scenePos()
 
-        self.update(self.boundingRect())
+        rect = self.shape().boundingRect()
+
+        self.update(rect)
 
     # EVENTS
 
@@ -821,10 +910,13 @@ class Edge(QtWidgets.QGraphicsItem):
         """
         """
         self.isHovered = True
-        self.adjust()
+        
+    def hoverMoveEvent(self, event) -> None:
+        """
+        """
+        pass
 
     def hoverLeaveEvent(self, event) -> None:
         """
         """
         self.isHovered = False
-        self.adjust()

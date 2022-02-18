@@ -14,10 +14,16 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
     """
     Reimplementation of the graphics scene
     """
+    
+    hasBeenEdited = QtCore.pyqtSignal()
+    
     def __init__(self, parent=None) -> None:
         """
         """
         super(QtWidgets.QGraphicsScene, self).__init__(parent)
+        
+        self.movingNode = None
+        
 
 class GGraph(QtWidgets.QGraphicsView):
     """
@@ -57,6 +63,15 @@ class GGraph(QtWidgets.QGraphicsView):
 
         # Graphic nodes
         self.gNodes = []
+        
+        # When a node is moved around the scene, we try to connect it
+        # to the edges it hovers
+        self.movingNodeCanConnect = False
+        self.movingNodeConnectionSourcePlug = None
+        self.movingNodeConnectionDestinationPlug = None
+        self.movingNodeConnectionInputPlug = None
+        self.movingNodeConnectionOutputPlug = None
+        self.movingNodeConnectionEdgeToDelete = None
 
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -65,7 +80,8 @@ class GGraph(QtWidgets.QGraphicsView):
         self.scene.setSceneRect(0, 0, 800, 800)
         self.setScene(self.scene)
         self.setCacheMode(QtWidgets.QGraphicsView.CacheBackground)
-        self.setViewportUpdateMode(QtWidgets.QGraphicsView.BoundingRectViewportUpdate)
+        # self.setViewportUpdateMode(QtWidgets.QGraphicsView.BoundingRectViewportUpdate)
+        self.setViewportUpdateMode(QtWidgets.QGraphicsView.FullViewportUpdate)
         self.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.TextAntialiasing | QtGui.QPainter.SmoothPixmapTransform | QtGui.QPainter.HighQualityAntialiasing)
         self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
         self.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
@@ -92,6 +108,8 @@ class GGraph(QtWidgets.QGraphicsView):
         self.threadCanJoin.connect(lambda: self.joinGraphThread())
 
         self.selectedNodeChanged.connect(self.onSelectedNodeChange)
+        self.hasBeenEdited.connect(lambda: (self.graph.SetAllDirty(), self.updateNodeBadges()))
+        self.scene.hasBeenEdited.connect(lambda: self.hasBeenEdited.emit())
 
         QtWidgets.QApplication.instance().installEventFilter(self)
 
@@ -132,6 +150,14 @@ class GGraph(QtWidgets.QGraphicsView):
         painter.drawLines(gridLines)
 
     # UTILS
+
+    def showPlugEditor(self) -> None:
+        """
+        """
+        if self.plugEditor.isHidden():
+            self.plugEditor.show()
+        else:
+            self.plugEditor.hide()
 
     @QtCore.pyqtSlot(str)
     def onNodeSelectionChange(self, nodeId : str) -> None:
@@ -197,13 +223,32 @@ class GGraph(QtWidgets.QGraphicsView):
             self.setSceneRect(self.sceneRect().translated(deltaX, deltaY))
 
             self.prevPos = event.pos()
-        else:
-            return super().mouseMoveEvent(event)
+            
+        items = self.items(event.pos())
+            
+        # Handle when a node is passed on an edge and connect it to the two nodes
+            
+        self.movingNodeCanConnect = False
+            
+        for item in items:
+            if type(item) is GEdge:
+                nodeToConnect = self.scene.movingNode
+                
+                if nodeToConnect is not None:
+                    self.movingNodeCanConnect = True
+                    edge = item
+                    
+                    self.prepareMovingNodeConnection(edge)
+            
+        return super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event: QtGui.QMouseEvent) -> None:
         if event.button() == QtCore.Qt.MiddleButton and self.startPos is not None:
             self.startPos = None
             self.pan = False
+        elif self.movingNodeCanConnect:
+            self.completeMovingNodeConnection()
+            return super().mouseReleaseEvent(event)
         else:
             return super().mouseReleaseEvent(event)
 
@@ -317,25 +362,109 @@ class GGraph(QtWidgets.QGraphicsView):
             scenePos = self.mapToScene(event.pos())
 
             self.contextMenu(globalPos.x(), globalPos.y(), scenePos.x(), scenePos.y())
+            
+    # NODES FUNCTIONS
+    
+    def showNodeInfosPanel(self, node : GNode) -> None:
+        """_summary_
+
+        Args:
+            node (GNode): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        pass
+    
+    def prepareMovingNodeConnection(self, edge : GEdge) -> None:
+        """
+        """
+        nodeToConnect = self.scene.movingNode
+        
+        self.movingNodeCanConnect = True
+        
+        self.movingNodeConnectionSourcePlug = edge.getSourcePlug()
+        self.movingNodeConnectionDestinationPlug = edge.getDestinationPlug()
+        
+        self.movingNodeConnectionInputPlug = nodeToConnect.getInputGPlug(index=0)
+        self.movingNodeConnectionOutputPlug = nodeToConnect.getOutputGPlug(index=0)
+        
+        self.movingNodeConnectionEdgeToDelete = edge
+            
+    def completeMovingNodeConnection(self) -> None:
+        """
+        """
+        if self.movingNodeConnectionInputPlug is not None:
+            inputEdge = self.addEdge(self.movingNodeConnectionSourcePlug, self.movingNodeConnectionInputPlug)
+            
+        if self.movingNodeConnectionOutputPlug is not None:
+            outputEdge = self.addEdge(self.movingNodeConnectionOutputPlug, self.movingNodeConnectionDestinationPlug)    
+        
+        self.deleteEdge(self.movingNodeConnectionEdgeToDelete)
+        
+        # Cleanup
+        
+        self.movingNodeConnectionSourcePlug = None
+        self.movingNodeConnectionDestinationPlug = None
+        
+        self.movingNodeConnectionInputPlug = None
+        self.movingNodeConnectionOutputPlug = None
+        
+        self.movingNodeConnectionEdgeToDelete = None
 
     # GRAPH FUNCTIONS
 
     def addNode(self, nodeType : str, position : QtCore.QPointF) -> GNode:
         """
         """
-        tmpInternalNode = self.nodeLibrary.Get(nodeType)
-        tmpInternalNode.SetEnv(self.graph.GetEnv())
-        self.graph.AddNode(tmpInternalNode)
+        if "If_Block" in nodeType:
+            nodesPath = self.nodeLibrary.GetPath(nodeType)
+            
+            tmpBeginInternalNode = Node(self.graph.GetEnv())
+            tmpBeginInternalNode.Load(nodesPath[0])
+            tmpBeginInternalNode.SetIfBeginBlock()
+            
+            tmpEndInternalNode = Node(self.graph.GetEnv())
+            tmpEndInternalNode.Load(nodesPath[1])
+            tmpEndInternalNode.SetIfEndBlock()
+            
+            self.graph.AddNode(tmpBeginInternalNode)
+            self.graph.AddNode(tmpEndInternalNode)
+            
+            tmpBeginInternalNode.SetAssociatedBlockEnd(tmpEndInternalNode.GetID())
+            tmpEndInternalNode.SetAssociatedBlockBegin(tmpBeginInternalNode.GetID())
+            
+            tmpBeginGNode = GNode(tmpBeginInternalNode, "", self, self.iconsLib)
+            tmpBeginGNode.hasBeenSelected.connect(self.onNodeSelectionChange)
+            tmpBeginGNode.setPos(position)
+            
+            self.scene.addItem(tmpBeginGNode)
+            
+            tmpEndGNode = GNode(tmpEndInternalNode, "", self, self.iconsLib)
+            tmpEndGNode.hasBeenSelected.connect(self.onNodeSelectionChange)
+            tmpEndGNode.setPos(position.x() + 400, position.y())
+            
+            self.scene.addItem(tmpEndGNode)
+            
+            self.addEdge(tmpBeginGNode.getOutputGPlug(index=0), tmpEndGNode.getInputGPlug(index=0))
+            
+            self.hasBeenEdited.emit()
+            
+            return tmpBeginGNode
+        else:
+            tmpInternalNode = self.nodeLibrary.Get(nodeType)
+            tmpInternalNode.SetEnv(self.graph.GetEnv())
+            self.graph.AddNode(tmpInternalNode)
 
-        tmpGNode = GNode(tmpInternalNode, "", self, self.iconsLib)
-        tmpGNode.hasBeenSelected.connect(self.onNodeSelectionChange)
-        tmpGNode.setPos(position)
+            tmpGNode = GNode(tmpInternalNode, "", self, self.iconsLib)
+            tmpGNode.hasBeenSelected.connect(self.onNodeSelectionChange)
+            tmpGNode.setPos(position)
 
-        self.scene.addItem(tmpGNode)
+            self.scene.addItem(tmpGNode)
 
-        self.hasBeenEdited.emit()
+            self.hasBeenEdited.emit()
 
-        return tmpGNode
+            return tmpGNode
 
     def addNodeFromInternalGraph(self, node : Node) -> None:
         """
@@ -374,7 +503,6 @@ class GGraph(QtWidgets.QGraphicsView):
         gNode = self.getNodeById(nodeId)
 
         self.plugEditor.setCurrentNode(gNode)
-        # self.plugEditorProxy.update(self.plugEditorProxy.boundingRect())
 
     def getNodeById(self, nodeId : str) -> GNode:
         """
@@ -384,7 +512,7 @@ class GGraph(QtWidgets.QGraphicsView):
                 if item.id == nodeId:
                     return item
 
-    def addEdge(self, outputGPlug: GPlug, inputGPlug: GPlug, connectInternally : bool = True) -> None:
+    def addEdge(self, outputGPlug: GPlug, inputGPlug: GPlug, connectInternally : bool = True) -> GEdge:
         """
         """
         if connectInternally: 
@@ -397,13 +525,15 @@ class GGraph(QtWidgets.QGraphicsView):
 
         self.logger.Log(LogLevel.DIAGNOSTIC, f"""New Connection : [{outputNodeName}] {outputPlugName} -> {inputPlugName} [{inputNodeName}] """)
 
-        newEdge = Edge(outputGPlug, inputGPlug)
+        newEdge = GEdge(outputGPlug, inputGPlug)
 
         self.scene.addItem(newEdge)
 
         self.hasBeenEdited.emit()
+        
+        return newEdge
 
-    def deleteEdge(self, edge: Edge) -> None:
+    def deleteEdge(self, edge: GEdge) -> None:
         """
         """
         edge.source.getInternalPlug().Disconnect(edge.destination.getInternalPlug())
@@ -419,31 +549,42 @@ class GGraph(QtWidgets.QGraphicsView):
         """
         """
         for item in self.items():
-            if type(item) is Edge:
+            if type(item) is GEdge:
                 item.adjust()
 
-    def deleteItem(self) -> None:
+    def deleteItem(self, item=None) -> None:
         """
         """
-        items = self.scene.selectedItems()
-
-        if len(items) > 0: 
-            item = items[0]
-            
+        if item is not None:
             if type(item) is GNode:
                 self.deleteNode(item)
             elif type(item) is GPlug:
                 node = item.node
                 self.deleteNode(node)
-            elif type(item) is Edge:
+            elif type(item) is GEdge:
                 self.deleteEdge(item)
+        
+        else:
+            items = self.scene.selectedItems()
 
-    def cookGraph(self) -> None:
+            if len(items) > 0: 
+                item = items[0]
+            
+                if type(item) is GNode:
+                    self.deleteNode(item)
+                elif type(item) is GPlug:
+                    node = item.node
+                    self.deleteNode(node)
+                elif type(item) is GEdge:
+                    self.deleteEdge(item)
+            
+
+    def cookGraph(self, lastNodeToCook : str = None, skipCookedNodes : bool = True) -> None:
         """
         Cooks the graph
         """
         self.startCooking.emit()
-        self.graph.Cook()
+        self.graph.Cook(lastNodeToCook, skipCookedNodes)
         self.threadCanJoin.emit()
 
     def updateNodeBadges(self) -> None:
@@ -453,37 +594,17 @@ class GGraph(QtWidgets.QGraphicsView):
             if type(item) is GNode:
                 item.updateBadge()
 
-    def updateGraph(self) -> None:
-        """
-        Updates the graph interface, especially node states
-        Since we want to keep the core library dependency free,
-        we don't use qt signals to signal a node state change, so 
-        we run a thread in background updating graphical node states
-        """
-        while True:
-            with self.graph.GetLock():
-                if self.graph.IsCooked() or self.graph.HasError():
-                    self.updateNodeBadges()
-                    break
-
-            self.updateNodeBadges()
-
-            time.sleep(0.01)
-
-    def launchGraphCooking(self) -> None:
+    def launchGraphCooking(self, lastNodeToCook : str = None, skipCookedNodes : bool = True) -> None:
         """
         Launches the thread that cooks the graph
         """
         self.isCookingMovie.start()
 
-        self.cookThread = threading.Thread(target=self.cookGraph)
+        self.cookThread = threading.Thread(target=self.cookGraph, args=(lastNodeToCook, skipCookedNodes, ))
         self.cookThread.start()
 
         self.updateTimer = QtCore.QTimer(self, interval=20, timeout=self.updateNodeBadges)
         self.updateTimer.start()
-        
-        # self.updateThread = threading.Thread(target=self.updateGraph)
-        # self.updateThread.start()
 
     def joinGraphThread(self) -> None:
         """
@@ -511,6 +632,17 @@ class GGraph(QtWidgets.QGraphicsView):
 
         print("Sorted Nodes : ")
         print(json.dumps([node.GetName() for node in self.graph.sortedNodes], indent=4))
+        
+        print("Found If Blocks : ")
+        for blockName, nodes in self.graph.ifBlocks.items():
+            blockBegin = self.graph.GetNodeWithID(blockName)
+            print(f"Block Begin [{blockBegin.GetName()}]")
+            
+            for node in nodes:
+                print(f"- {self.graph.GetNodeWithID(node).GetName()}")
+                
+            blockEnd = self.graph.GetNodeWithID(blockBegin.GetAssociatedBlockEnd())
+            print(f"Block End [{blockEnd.GetName()}]")
 
     def saveGraph(self, filePath : str) -> None:
         """
@@ -577,7 +709,7 @@ class GGraph(QtWidgets.QGraphicsView):
             elif type(item) is GPlug:
                 node = item.node
                 self.deleteNode(node)
-            elif type(item) is Edge:
+            elif type(item) is GEdge:
                 self.deleteEdge(item)
 
         for node in self.graph.GetNodes():
@@ -599,60 +731,61 @@ class GGraph(QtWidgets.QGraphicsView):
         """
         """
         self.graph.Sort()
+        
+        if not self.graph.HasError():
+            nodesNeedLayout = True
 
-        nodesNeedLayout = True
+            iterations = 0
 
-        iterations = 0
+            while nodesNeedLayout == True:
+            # while iterations < 2:
+                for i, node in enumerate(self.graph.sortedNodes):
+                    gNode = self.getNodeById(node.GetID())
 
-        while nodesNeedLayout == True:
-        # while iterations < 2:
-            for i, node in enumerate(self.graph.sortedNodes):
+                    gNodePos = gNode.pos() + QtCore.QPointF(gNode.sizeX / 2, gNode.sizeY / 2)
+
+                    if gNode.getInternalNode().GetOutputCount() > 0:
+                        output = gNode.getInternalNode().GetOutput(index=0)
+
+                        if output.IsConnected():
+                            outGPlug = gNode.getOutputGPlug(output.GetShortName())
+                            otherGNode = self.getNodeById(output.GetConnections()[0].GetNode().GetID())
+
+                            inGPlug = otherGNode.getInputGPlug(output.GetConnections()[0].GetShortName())
+
+                            pluggedNode = self.getNodeById(inGPlug.getInternalPlug().GetNode().GetID())
+                            newPos = pluggedNode.pos() 
+                            gNode.setPos(newPos.x() - 50 - pluggedNode.sizeX, newPos.y())
+                            gNode.adjustEdges()
+
+                    for item in self.scene.items():
+                        if type(item) is not GNode or item.id == gNode.id:
+                            continue
+
+                        itemPos = item.scenePos()
+                        itemPos = QtCore.QPointF(itemPos.x() + item.sizeX / 2, itemPos.y() + item.sizeY / 2)
+
+                        if abs(itemPos.x() - gNodePos.x()) < (gNode.sizeX / 2):
+                            item.setPos(itemPos.x() + 100 + gNode.sizeX / 2, itemPos.y())
+                            nodesNeedLayout = True
+                            gNode.adjustEdges()
+                            item.adjustEdges()
+                        elif abs(itemPos.y() - gNodePos.y()) < (gNode.sizeY / 2):
+                            item.setPos(itemPos.x(), itemPos.y() + gNode.sizeY / 2 + 100)
+                            nodesNeedLayout = True
+                            gNode.adjustEdges()
+                            item.adjustEdges()
+                        else:
+                            nodesNeedLayout = False
+
+                iterations += 1
+
+            
+
+            for node in self.graph.sortedNodes:
                 gNode = self.getNodeById(node.GetID())
 
-                gNodePos = gNode.pos() + QtCore.QPointF(gNode.sizeX / 2, gNode.sizeY / 2)
+            scene = self.scene
+            rect = scene.sceneRect()
 
-                if gNode.getInternalNode().GetOutputCount() > 0:
-                    output = gNode.getInternalNode().GetOutput(index=0)
-
-                    if output.IsConnected():
-                        outGPlug = gNode.getOutputGPlug(output.GetShortName())
-                        otherGNode = self.getNodeById(output.GetConnections()[0].GetNode().GetID())
-
-                        inGPlug = otherGNode.getInputGPlug(output.GetConnections()[0].GetShortName())
-
-                        pluggedNode = self.getNodeById(inGPlug.getInternalPlug().GetNode().GetID())
-                        newPos = pluggedNode.pos() 
-                        gNode.setPos(newPos.x() - 50 - pluggedNode.sizeX, newPos.y())
-                        gNode.adjustEdges()
-
-                for item in self.scene.items():
-                    if type(item) is not GNode or item.id == gNode.id:
-                        continue
-
-                    itemPos = item.scenePos()
-                    itemPos = QtCore.QPointF(itemPos.x() + item.sizeX / 2, itemPos.y() + item.sizeY / 2)
-
-                    if abs(itemPos.x() - gNodePos.x()) < (gNode.sizeX / 2):
-                        item.setPos(itemPos.x() + 100 + gNode.sizeX / 2, itemPos.y())
-                        nodesNeedLayout = True
-                        gNode.adjustEdges()
-                        item.adjustEdges()
-                    elif abs(itemPos.y() - gNodePos.y()) < (gNode.sizeY / 2):
-                        item.setPos(itemPos.x(), itemPos.y() + gNode.sizeY / 2 + 100)
-                        nodesNeedLayout = True
-                        gNode.adjustEdges()
-                        item.adjustEdges()
-                    else:
-                        nodesNeedLayout = False
-
-            iterations += 1
-
-        
-
-        for node in self.graph.sortedNodes:
-            gNode = self.getNodeById(node.GetID())
-
-        scene = self.scene
-        rect = scene.sceneRect()
-
-        self.scaleView(0.5)
+            self.scaleView(0.5)

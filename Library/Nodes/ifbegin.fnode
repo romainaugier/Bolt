@@ -1,8 +1,8 @@
-// Returns the first input if True, else the second input
+// Begin if block
 
 # BeginAttr
 
-name = If
+name = If_Begin
 category = Utility
 
 # EndAttr
@@ -11,18 +11,8 @@ category = Utility
 
 # BeginPlug
 
-shortName = input1
-longName = Input 1
-defaultValue = None
-type = custom
-exposed = False
-
-# EndPlug
-
-# BeginPlug
-
-shortName = input2
-longName = Input 2
+shortName = input
+longName = Input
 defaultValue = None
 type = custom
 exposed = False
@@ -52,9 +42,6 @@ type = custom
 
 # BeginOp
 
-if condition:
-    output = input1
-else:
-    output = input2
+output = input
 
 # EndOp

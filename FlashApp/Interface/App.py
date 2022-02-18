@@ -206,6 +206,9 @@ class App(QtWidgets.QMainWindow):
         
         self.layoutGraphSc = QtWidgets.QShortcut(QtGui.QKeySequence("L"), self)
         self.layoutGraphSc.activated.connect(lambda: self.layoutGraph())
+        
+        self.showPlugEditorSc = QtWidgets.QShortcut(QtGui.QKeySequence("P"), self)
+        self.showPlugEditorSc.activated.connect(lambda: self.showPlugEditor())
 
         # Init at least one graph
         self.addGraph()
@@ -239,7 +242,7 @@ class App(QtWidgets.QMainWindow):
         if index is None:
             index = self.graphTabs.getActiveTabIndex()
 
-        self.graphTabs.tabs.widget(index).layout.itemAt(0).widget().launchGraphCooking()
+        self.graphTabs.tabs.widget(index).layout.itemAt(0).widget().launchGraphCooking(skipCookedNodes=False)
 
     def saveGraph(self, index : int = None, forceName : bool = False) -> None:
         """
@@ -288,4 +291,16 @@ class App(QtWidgets.QMainWindow):
             index = self.graphTabs.getActiveTabIndex()
 
         self.graphTabs.tabs.widget(index).layout.itemAt(0).widget().layoutGraph()
+        
+    def showPlugEditor(self, index : int = None) -> None:
+        """
+        Shows/Hides the plug editor of the current graphTabs
+
+        Args:
+            index (int, optional): index of the graph to show/hide the plug editor. Defaults to None.
+        """
+        if index is None:
+            index = self.graphTabs.getActiveTabIndex()
+
+        self.graphTabs.tabs.widget(index).layout.itemAt(0).widget().showPlugEditor()
         

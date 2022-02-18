@@ -31,10 +31,29 @@ class Lib():
         """
         Load the nodes path
         """
+        foundIfNode = False
+        foundForNode = False
+        
         for path in self.path:
             if os.path.exists(path):
                 for item in os.listdir(path):
                     if item.endswith(".fnode"):
+                        if "if" in item:
+                            if not foundIfNode:
+                                foundIfNode = True
+                                
+                                self.nodePaths[f"Utility/If_Block"] = [f"{path}/ifbegin.fnode", f"{path}/ifend.fnode"]
+                                
+                            continue
+                        
+                        if "for" in item:
+                            if not foundForNode:
+                                foundForNode = True
+                                
+                                self.nodePaths[f"Utility/For_Block"] = [f"{path}/forbegin.fnode", f"{path}/forend.fnode"]
+                                
+                            continue
+                        
                         tmpNode = Node(self.environment)
                         tmpNode.Load(f"{path}/{item}")
 
@@ -73,5 +92,13 @@ class Lib():
             newNode.Load(self.nodePaths[nodeName])
             newNode.SetLogger(self.logger)
             return newNode
+        else:
+            return None
+
+    def GetPath(self, nodeName : str) -> str:
+        """
+        """
+        if nodeName in self.nodePaths:
+            return self.nodePaths[nodeName]
         else:
             return None
