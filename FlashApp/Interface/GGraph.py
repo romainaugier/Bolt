@@ -141,7 +141,7 @@ class GBlock(QtWidgets.QGraphicsObject):
         p = leftMostIndex
         q = 0
 
-        maxIters = 200
+        maxIters = 50
 
         iter = 0
 
@@ -174,7 +174,7 @@ class GBlock(QtWidgets.QGraphicsObject):
         self.updateShape()
         # self.setZValue(-100)
         self.update(self.boundingRect())
-        self.gGraph.update()
+        self.gGraph.update(self.pos().x(), self.pos().y(), self.pos().x() + self.boundingRect().width(), self.pos().y() + self.boundingRect().height())
 
     def paint(self, painter : QtGui.QPainter, option : QtWidgets.QStyleOptionGraphicsItem, widget : QtWidgets.QWidget):
         """
