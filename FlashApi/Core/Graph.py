@@ -1,5 +1,7 @@
 import binascii, os, time, threading, json, copy
 
+from functools import lru_cache
+
 from FlashApi.Core.Node import *
 from FlashApi.Core.Logger import *
 from FlashApi.Core.Environment import *
@@ -25,7 +27,7 @@ class Tracker():
         """
         self.graph = graph
 
-        self.cookedNodes : list[Node] = []
+        self.cookedNodes : list = []
 
     def Update(self) -> None:
         """
@@ -40,7 +42,7 @@ class Tracker():
         """
         self.cookedNodes.clear()
 
-    def GetNodesState(self) -> list[int]:
+    def GetNodesState(self) -> list:
         """
         """
         if len(self.cookedNodes) > 0:
@@ -63,8 +65,8 @@ class Graph():
         self.isCooked = False
         self.stopCook = False
         self.cookTime = None
-        self.nodes : list[Node] = []
-        self.sortedNodes : list[Node] = []
+        self.nodes : list = []
+        self.sortedNodes : list = []
         self.ifBlocks : dict = {}
         self.nodeCount = 0
         self.lock = threading.Lock()
@@ -92,7 +94,7 @@ class Graph():
         """
         return self.savePath
 
-    def GetNodes(self) -> list[Node]:
+    def GetNodes(self) -> list:
         """
         Returns:
             list[Node]: nodes of the graph
@@ -165,6 +167,7 @@ class Graph():
         node.SetInQueue()
         self.sortedNodes.insert(0, node)
         
+    @lru_cache(maxsize=10)
     def FindIfBeginBlock(self, node : Node, beginBlock : Node, endBlock : Node, comingFromNoOutput : bool = False) -> bool:
         """
         """
@@ -179,6 +182,10 @@ class Graph():
                         return True
                     elif connectedNode == endBlock:
                         return False
+                    elif connectedNode.IsIfBeginBlock():
+                        if node.IsIfEndBlock() and connectedNode.GetID() == node.GetAssociatedBlockBegin():
+                            continue
+                        return False
                     elif connectedNode.HasNoInputsConnected():
                         if comingFromNoOutput: return False
                         
@@ -191,6 +198,7 @@ class Graph():
         
         return foundBeginBlock
     
+    @lru_cache(maxsize=10)
     def FindIfEndBlock(self, node : Node, beginBlock : Node, endBlock : Node, comingFromNoInput : bool = False) -> bool:
         """
         """
@@ -205,6 +213,12 @@ class Graph():
                         return True
                     elif connectedNode == beginBlock:
                         return False
+                    elif connectedNode.IsIfEndBlock():
+                        if node.IsIfBeginBlock():# and connectedNode.GetID() == node.GetAssociatedBlockEnd():
+                            print(connectedNode.GetName())
+                            continue
+                        else:
+                            return False
                     elif connectedNode.HasNoOutputsConnected():
                         if comingFromNoInput: return False
                         
@@ -215,7 +229,7 @@ class Graph():
                         if foundEndBlock:
                             return True
         
-        return foundEndBlock
+        return foundEndBlock        
         
     def FindNodesInIfBlock(self, silent : bool = False) -> None:
         """
@@ -241,8 +255,8 @@ class Graph():
                     return
                         
         for node in self.nodes:
-            if node.IsInsideIfBlock():
-                continue
+            # if node.IsInsideIfBlock():
+            #     continue
             
             for block in self.ifBlocks:     
                 beginBlock = self.GetNodeWithID(block)
@@ -270,15 +284,21 @@ class Graph():
                     if not silent:
                         if foundEnd and not foundBegin:
                             self.ReportError()
-                            self.logger.Log(LogLevel.ERROR, f"(Graph : {self.name}) : Error in if block sorting. Node [{node.GetName()}] is connected to an end block but not to a begin block.")
+                            self.logger.Log(LogLevel.ERROR, 
+                                            (f"(Graph : {self.name}) : Error in if block sorting. "
+                                             f"Node [{node.GetName()}] is connected to an end block "
+                                             f"but not to a begin block [{endBlock.GetName()}]."))
                             return
                         elif foundBegin and not foundEnd:
                             self.ReportError()
-                            self.logger.Log(LogLevel.ERROR, f"(Graph : {self.name}) : Error in if block sorting. Node [{node.GetName()}] is connected to a begin block but not to an end block.")
+                            self.logger.Log(LogLevel.ERROR, 
+                                            f"(Graph : {self.name}) : Error in if block sorting. "
+                                            f"Node [{node.GetName()}] is connected to a begin block "
+                                            f"but not to an end block [{beginBlock.GetName()}].")
                             return
                         elif foundBegin and foundEnd and node.HasNoInputsConnected():
                             self.ReportError()
-                            self.logger.Log(LogLevel.ERROR, f"(Graph : {self.name}) : Error in if block sorting. Node [{node.GetName()}] is connected to an end block but not to a begin block.")
+                            self.logger.Log(LogLevel.ERROR, f"(Graph : {self.name}) : Error in if block sorting. Node [{node.GetName()}] has no inputs.")
                             return
 
         findEnd = Timer.Stop()
@@ -481,6 +501,14 @@ class Graph():
         for output in node.GetOutputs().values():
             for connection in output.GetConnections():
                 output.Disconnect(connection)
+                
+        if node.IsInsideIfBlock():
+            print("remove node")
+            
+            for blockName, blockNodes in self.ifBlocks.items():
+                if node.GetID() in blockNodes:
+                    blockNodes.remove(node.GetID())
+                    break
 
         self.nodes.remove(node)
 

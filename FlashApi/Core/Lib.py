@@ -68,7 +68,7 @@ class Lib():
         self.nodePaths.clear()
         self.Load()
 
-    def GetAvailableNodes(self) -> list[str]:
+    def GetAvailableNodes(self) -> list:
         """
         Returns a list with the available node types
 

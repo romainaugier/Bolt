@@ -1,106 +1,121 @@
-[
-  {
-    "name": "Debug",
-    "id": "6531346664383833643235653239313630303536346464356462613538333564",
-    "color": [
-      50,
-      222,
-      132
-    ],
-    "iconPath": "",
-    "opCode": "# BeginOp\n\nFlashLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
-    "inputs": {
-      "indata": [
-        {
-          "shortName": "indata",
-          "longName": "Input Data",
-          "index": 0,
-          "isExposed": false,
-          "data": "C:\\Users\\augie\\Documents\\Flash\\Tests/test_script.py",
-          "type": 11,
-          "connectionName": "outfile",
-          "connectionNodeId": "3865313431323637393463316133313839633130653835346531623136623533"
-        }
-      ]
+{
+  "nodes": [
+    {
+      "name": "Debug",
+      "id": "3865303635326139313162323862393238383634363565383266393131383536",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$FLASH_ICONS/debug.png",
+      "opCode": "# BeginOp\n\nFlashLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "data": "D:\\dev\\Flash\\Tests/test_script.py",
+            "type": 11,
+            "connectionName": "outfile",
+            "connectionNodeId": "3263623236376232346362343838393238356366636633303439666336353662"
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "data": "D:\\dev\\Flash\\Tests/test_script.py",
+            "type": 11,
+            "connectionName": "inscript",
+            "connectionNodeId": "3133653365356366663065333833366634383033303666383032626362373566"
+          }
+        ]
+      }
     },
-    "outputs": {
-      "outdata": [
-        {
-          "shortName": "outdata",
-          "longName": "Output Data",
-          "index": 0,
-          "isExposed": false,
-          "data": "C:\\Users\\augie\\Documents\\Flash\\Tests/test_script.py",
-          "type": 11,
-          "connectionName": "inscript",
-          "connectionNodeId": "6337383963323662323664336361313933323934346564343439653264636532"
-        }
-      ]
+    {
+      "name": "Python",
+      "id": "3133653365356366663065333833366634383033303666383032626362373566",
+      "color": [
+        52,
+        115,
+        165
+      ],
+      "iconPath": "$FLASH_ICONS/python.png",
+      "opCode": "# BeginOp\n\nimport subprocess\n\nFlashLogMessage(f\"Python : Start executing script : {inscript}\")\n\nprocess = subprocess.Popen([\"python\", inscript], stdout = subprocess.PIPE, stderr = subprocess.PIPE)\nstdout, stderr = process.communicate()\n\nstdoutAsStr = stdout.decode(\"utf-8\")\nstderrAsStr = stderr.decode(\"utf-8\")\n\nif len(stderrAsStr) > 0:\n    FlashLogError(stderrAsStr)\nelse:\n    FlashLogMessage(f\"Python : Finished executing script : {inscript}\")\n    FlashLogMessage(stdoutAsStr)\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inscript": [
+          {
+            "shortName": "inscript",
+            "longName": "Input Script Path",
+            "index": 0,
+            "isExposed": false,
+            "data": "D:\\dev\\Flash\\Tests/test_script.py",
+            "type": 7,
+            "connectionName": "outdata",
+            "connectionNodeId": "3865303635326139313162323862393238383634363565383266393131383536"
+          }
+        ]
+      },
+      "outputs": {}
+    },
+    {
+      "name": "File",
+      "id": "3263623236376232346362343838393238356366636633303439666336353662",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "",
+      "opCode": "# BeginOp\n\noutfile = infile\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infile": [
+          {
+            "shortName": "infile",
+            "longName": "Input File Path",
+            "index": 0,
+            "isExposed": true,
+            "data": "D:\\dev\\Flash\\Tests/test_script.py",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "data": "D:\\dev\\Flash\\Tests/test_script.py",
+            "type": 7,
+            "connectionName": "indata",
+            "connectionNodeId": "3865303635326139313162323862393238383634363565383266393131383536"
+          }
+        ]
+      }
     }
-  },
-  {
-    "name": "Python",
-    "id": "6337383963323662323664336361313933323934346564343439653264636532",
-    "color": [
-      52,
-      115,
-      165
-    ],
-    "iconPath": "",
-    "opCode": "# BeginOp\n\nimport subprocess\n\nFlashLogMessage(f\"Python : Start executing script : {inscript}\")\n\nprocess = subprocess.Popen([\"python\", inscript], stdout = subprocess.PIPE, stderr = subprocess.PIPE)\nstdout, stderr = process.communicate()\n\nstdoutAsStr = stdout.decode(\"utf-8\")\nstderrAsStr = stderr.decode(\"utf-8\")\n\nif len(stderrAsStr) > 0:\n    FlashLogError(stderrAsStr)\nelse:\n    FlashLogMessage(f\"python : Finished executing script : {inscript}\")\n    FlashLogMessage(stdoutAsStr)\n\n",
-    "inputs": {
-      "inscript": [
-        {
-          "shortName": "inscript",
-          "longName": "Input Script Path",
-          "index": 0,
-          "isExposed": false,
-          "data": "C:\\Users\\augie\\Documents\\Flash\\Tests/test_script.py",
-          "type": 7,
-          "connectionName": "outdata",
-          "connectionNodeId": "6531346664383833643235653239313630303536346464356462613538333564"
-        }
-      ]
-    },
-    "outputs": {}
-  },
-  {
-    "name": "File",
-    "id": "3865313431323637393463316133313839633130653835346531623136623533",
-    "color": [
-      255,
-      220,
-      106
-    ],
-    "iconPath": "",
-    "opCode": "# BeginOp\n\noutfile = infile\n\n",
-    "inputs": {
-      "infile": [
-        {
-          "shortName": "infile",
-          "longName": "Input File Path",
-          "index": 0,
-          "isExposed": true,
-          "data": "C:\\Users\\augie\\Documents\\Flash\\Tests/test_script.py",
-          "type": 7,
-          "connectionName": null,
-          "connectionNodeId": null
-        }
-      ]
-    },
-    "outputs": {
-      "outfile": [
-        {
-          "shortName": "outfile",
-          "longName": "Output File Path",
-          "index": 0,
-          "isExposed": false,
-          "data": "C:\\Users\\augie\\Documents\\Flash\\Tests/test_script.py",
-          "type": 7,
-          "connectionName": "indata",
-          "connectionNodeId": "6531346664383833643235653239313630303536346464356462613538333564"
-        }
-      ]
-    }
-  }
-]
+  ],
+  "tracker": null
+}

@@ -16,60 +16,28 @@ def PrintSeps():
 if __name__ == "__main__":
     logger = Logger(level=LogLevel.DEBUG)
     
-    logger.Log(LogLevel.DEBUG, "Testing Flash API...")
-
-    logger.Log(LogLevel.DEBUG, "Testing template node...")
+    logger.Log(LogLevel.DEBUG, "Testing Flash API...") 
     
-    PrintSeps()
-
-    node = Node()
-    node.Load(f"{FLASHROOT}/Library/Nodes/template.fnode")
-    node.SetLogger(logger)
-
-    for inputName, input in node.GetInputs().items():
-        print(inputName, input.GetLongName(), input.GetData(), input.GetType())
-    
-    for outputName, output in node.GetOutputs().items():
-        print(outputName, output.GetLongName(), output.GetData(), output.GetType())
-
-    PrintSeps()
-
-    logger.Log(LogLevel.DEBUG, "Cooking template node...")
-
-    node.Cook()
-    
-    PrintSeps()
-
-    logger.Log(LogLevel.DEBUG, "Setting plug values in template node and re cooking it...")
-
-    node.SetPlugValue("inint", 10)
-    node.SetPlugValue("infloat", 58.0)
-    node.SetPlugValue("instring", "Flash Test")
-    node.SetPlugValue("inbool", False)
-    node.SetPlugValue("incustom", node)
-    node.SetPlugValue("indict", { "newdict" : True })
-
-    node.Cook()
-
     PrintSeps()
 
     logger.Log(LogLevel.DEBUG, "Testing node library...")
 
-    nodeLibrary = Lib(logger)
+    environment = Environment()
+    nodeLibrary = Lib(logger, environment)
     nodeLibrary.Load()
 
     PrintSeps()
 
     logger.Log(LogLevel.DEBUG, "Testing graph...")
 
-    graph = Graph(logger, "new")
+    graph = Graph(logger, environment, "new")
 
-    fileNode = nodeLibrary.Get("File")
+    fileNode = nodeLibrary.Get("Utility/File")
     fileNode.SetPlugValue("infile", f"{TESTDIR}/test_script.py")
 
-    debugNode = nodeLibrary.Get("Debug")
+    debugNode = nodeLibrary.Get("Debug/Debug")
 
-    pythonNode = nodeLibrary.Get("Python")
+    pythonNode = nodeLibrary.Get("Python/Python")
 
     logger.Log(LogLevel.DEBUG, "Adding nodes...")
 
@@ -93,7 +61,7 @@ if __name__ == "__main__":
 
     logger.Log(LogLevel.DEBUG, "Cooking graph...")
 
-    graph.Cook()
+    # graph.Cook()
 
     PrintSeps()
 
@@ -142,4 +110,14 @@ if __name__ == "__main__":
 
     graph.Cook()
 
+    PrintSeps()
+    
+    logger.Log(LogLevel.DEBUG, "Loading if block graph...")
+    
+    ifGraph = f"{TESTDIR}/if_block_test.fgraph"
+    
+    graph.LoadFromFile(ifGraph)
+    
+    graph.Sort()
+    
     PrintSeps()

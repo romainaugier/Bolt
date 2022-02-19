@@ -45,14 +45,14 @@ class Parser():
         self.name = None
         self.inputCount = 0
         self.outputCount = 0
-        self.plugs : list[Plug] = []
+        self.plugs : list = []
         self.color = [0, 0, 0]
         self.iconPath = ""
         self.category = ""
         self.opCode = ""
         
     @staticmethod
-    def CleanBrackets(text) -> list[str]:
+    def CleanBrackets(text) -> list:
         """
         """
         clean1 = text.replace("[", "")
@@ -61,7 +61,7 @@ class Parser():
         return clean2
 
     @staticmethod
-    def SplitEqual(text) -> list[str]:
+    def SplitEqual(text) -> list:
         """
         """
         return text.split("=")
@@ -276,7 +276,7 @@ class Plug():
         self.longName : str = longName
         self.parentNode : Node = parentNode
         self.index : int = index
-        self.connectedPlugs : list[Plug] = []
+        self.connectedPlugs : list = []
 
         if connectedPlug is not None:
             self.connectedPlugs.append(connectedPlug)
@@ -391,7 +391,7 @@ class Plug():
         else:
             return False
     
-    def GetConnections(self) -> list[Plug]:
+    def GetConnections(self) -> list:
         """
         Returns:
             Plug: plug that the current plug is connected to (on another node)
@@ -484,7 +484,7 @@ class Node():
         self.name = ""
         self.inputs : dict = {}
         self.outputs : dict = {}
-        self.color : list[float] = []
+        self.color : list = []
         self.iconPath = ""
         self.category = ""
         self.nodeType = ""
@@ -584,7 +584,7 @@ class Node():
         """
         return self.id
 
-    def SetColor(self, color : list[float]) -> None:
+    def SetColor(self, color : list) -> None:
         """
         Set the node rgb color (for interface)
 
@@ -594,7 +594,7 @@ class Node():
         assert(len(color) == 3)
         self.color = color
 
-    def GetColor(self) -> list[float]:
+    def GetColor(self) -> list:
         """
         Returns:
             list[float]: node rgb color

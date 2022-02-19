@@ -738,6 +738,11 @@ class GGraph(QtWidgets.QGraphicsView):
                 self.deleteEdge(edge)
 
         self.graph.RemoveNode(node.getInternalNode())
+        
+        for block in self.gBlocks:
+            if node in block.nodes:
+                block.nodes.remove(node)
+                break
 
         self.scene.removeItem(node)
 
