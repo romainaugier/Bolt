@@ -429,6 +429,7 @@ class GNode(QtWidgets.QGraphicsObject):
 
     hasBeenSelected = QtCore.pyqtSignal(str)
     plugHasBeenClicked = QtCore.pyqtSignal(list)
+    hasMoved = QtCore.pyqtSignal()
 
     def __init__(self, node : Node, name : str, graph : GGraph, iconsLib : Icons):
         """
@@ -733,7 +734,7 @@ class GNode(QtWidgets.QGraphicsObject):
                 item.setZValue(1)
             
             for item in self.graph.items():
-                if type(item) is GEdge: item.setZValue(-1)
+                if type(item) is GEdge: item.setZValue(0)
 
             self.setZValue(2)
 
@@ -746,6 +747,7 @@ class GNode(QtWidgets.QGraphicsObject):
         """
         """     
         if self.canMove and event.buttons() & Qt.LeftButton:
+            self.hasMoved.emit()
             self.scene().movingNode = self
             
             origCursorPos = event.lastScenePos()
@@ -811,7 +813,7 @@ class GEdge(QtWidgets.QGraphicsPathItem):
 
         self.setFlag(QtWidgets.QGraphicsItem.ItemIsFocusable, True)
         self.setFlag(QtWidgets.QGraphicsItem.ItemIsSelectable, True)
-        self.setZValue(-1)
+        self.setZValue(0)
 
         self.adjust()
 
