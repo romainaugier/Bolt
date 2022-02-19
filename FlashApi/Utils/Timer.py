@@ -19,4 +19,4 @@ class Timer():
     def Time(start : float, end : float) -> float:
         """
         """
-        return start - end
+        return end - start

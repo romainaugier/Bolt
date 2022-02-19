@@ -1,4 +1,5 @@
 import json, threading
+from winreg import QueryReflectionKey
 
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtCore import Qt
@@ -180,12 +181,6 @@ class GBlock(QtWidgets.QGraphicsObject):
         """
         """
         pass
-        # polygon = QtGui.QPolygon(self.hullPoints)
-
-        # painter.setBrush(QtGui.QColor(104, 240, 222, 63))
-        # painter.setPen(QtGui.QPen(QtGui.QColor(104, 240, 222, 127)))
-
-        # painter.drawPolygon(polygon)
 
 class GraphicsScene(QtWidgets.QGraphicsScene):
     """
@@ -253,6 +248,10 @@ class GGraph(QtWidgets.QGraphicsView):
         self.movingNodeConnectionInputPlug = None
         self.movingNodeConnectionOutputPlug = None
         self.movingNodeConnectionEdgeToDelete = None
+        
+        # When a node is clicked and moved while Alt is pressed, duplicate this node on 
+        # mouse release
+        self.nodeToDuplicate = None
 
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -289,7 +288,6 @@ class GGraph(QtWidgets.QGraphicsView):
 
         self.selectedNodeChanged.connect(self.onSelectedNodeChange)
         self.hasBeenEdited.connect(lambda: (self.graph.SetAllDirty(), self.updateNodeBadges(), self.updateBlocks()))
-        self.scene.hasBeenEdited.connect(lambda: self.hasBeenEdited.emit())
 
         QtWidgets.QApplication.instance().installEventFilter(self)
 
@@ -393,10 +391,21 @@ class GGraph(QtWidgets.QGraphicsView):
             self.prevPos = event.pos()
             self.pan = True
         elif event.button() == QtCore.Qt.LeftButton:
-            self.scene.clearSelection()
-            self.scene.selectedItems()
+            if QtGui.QGuiApplication.keyboardModifiers() & Qt.AltModifier:
+                items = self.scene.selectedItems()
+                
+                if len(items) == 0:
+                    items = self.items(event.pos())
+                    
+                if len(items) == 0:
+                    return super().mousePressEvent(event)
+                else:
+                    self.nodeToDuplicate = items[0] if type(items[0]) is GNode else None
 
-            return super().mousePressEvent(event)
+            else:
+                self.scene.clearSelection()
+                self.scene.selectedItems()
+                return super().mousePressEvent(event)
         else:
             return super().mousePressEvent(event)
 
@@ -413,21 +422,21 @@ class GGraph(QtWidgets.QGraphicsView):
 
             self.prevPos = event.pos()
             
-        items = self.items(event.pos())
+        else:    
+            # Handle when a node is passed on an edge and connect it to the two nodes
+            items = self.items(event.pos())
             
-        # Handle when a node is passed on an edge and connect it to the two nodes
-            
-        self.movingNodeCanConnect = False
-            
-        for item in items:
-            if type(item) is GEdge:
-                nodeToConnect = self.scene.movingNode
+            self.movingNodeCanConnect = False
                 
-                if nodeToConnect is not None:
-                    self.movingNodeCanConnect = True
-                    edge = item
+            for item in items:
+                if type(item) is GEdge:
+                    nodeToConnect = self.scene.movingNode
                     
-                    self.prepareMovingNodeConnection(edge)
+                    if nodeToConnect is not None:
+                        self.movingNodeCanConnect = True
+                        edge = item
+                        
+                        self.prepareMovingNodeConnection(edge)
             
         return super().mouseMoveEvent(event)
 
@@ -435,9 +444,16 @@ class GGraph(QtWidgets.QGraphicsView):
         if event.button() == QtCore.Qt.MiddleButton and self.startPos is not None:
             self.startPos = None
             self.pan = False
+        
         elif self.movingNodeCanConnect:
             self.completeMovingNodeConnection()
             return super().mouseReleaseEvent(event)
+        
+        elif self.nodeToDuplicate is not None:
+            pos = self.mapToScene(event.pos().x() - self.nodeToDuplicate.sizeX / 2, event.pos().y() - self.nodeToDuplicate.sizeY / 2)
+            self.addNode(self.nodeToDuplicate.getInternalNode().GetNodeType(), pos)
+            self.nodeToDuplicate = None
+        
         else:
             return super().mouseReleaseEvent(event)
 
@@ -572,7 +588,7 @@ class GGraph(QtWidgets.QGraphicsView):
 
                 self.addBlock(blockBeginNode, blockEndNode)
 
-        for blockId, blockNodes in self.graph.ifBlocks.items(): 
+        for blockId, blockNodes in self.graph.ifBlocks.items():  
             for gBlock in self.gBlocks:
                 if blockId == gBlock.blockId:
                     for blockNode in blockNodes:
@@ -610,6 +626,8 @@ class GGraph(QtWidgets.QGraphicsView):
     def completeMovingNodeConnection(self) -> None:
         """
         """
+        self.blockSignals(True)
+        
         if self.movingNodeConnectionInputPlug is not None:
             inputEdge = self.addEdge(self.movingNodeConnectionSourcePlug, self.movingNodeConnectionInputPlug)
             
@@ -627,6 +645,10 @@ class GGraph(QtWidgets.QGraphicsView):
         self.movingNodeConnectionOutputPlug = None
         
         self.movingNodeConnectionEdgeToDelete = None
+        
+        self.blockSignals(False)
+        
+        self.hasBeenEdited.emit()
 
     # GRAPH FUNCTIONS
 
@@ -705,6 +727,8 @@ class GGraph(QtWidgets.QGraphicsView):
     def deleteNode(self, node: GNode) -> None:
         """
         """
+        self.blockSignals(True)
+        
         for sock in node.inputGPlugs:
             for edge in sock.edges[:]:
                 self.deleteEdge(edge)
@@ -716,6 +740,8 @@ class GGraph(QtWidgets.QGraphicsView):
         self.graph.RemoveNode(node.getInternalNode())
 
         self.scene.removeItem(node)
+
+        self.blockSignals(False)
 
         self.hasBeenEdited.emit()
 
@@ -796,7 +822,7 @@ class GGraph(QtWidgets.QGraphicsView):
                 blockToDelete = block
 
         if blockToDelete is not None:
-            self.blocks.remove(blockToDelete)
+            self.gBlocks.remove(blockToDelete)
 
             self.scene.removeItem(blockToDelete)
 
@@ -946,7 +972,7 @@ class GGraph(QtWidgets.QGraphicsView):
                 gNode.setPos(x, y)
                 gNode.adjustEdges()
 
-        self.updateBlocks()
+        self.hasBeenEdited.emit()
 
     def constructGraphFromInternalGraph(self) -> None:
         """

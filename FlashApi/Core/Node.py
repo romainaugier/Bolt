@@ -487,6 +487,7 @@ class Node():
         self.color : list[float] = []
         self.iconPath = ""
         self.category = ""
+        self.nodeType = ""
         
         # The id is not set here as we will set a unique one for each node in the graph
         self.id = 0 
@@ -622,6 +623,13 @@ class Node():
             str: node category
         """
         return self.category
+    
+    def GetNodeType(self) -> str:
+        """
+        Returns:
+            str: node type
+        """
+        return self.nodeType
 
     def GetIconPathRaw(self) -> str:
         """
@@ -1043,6 +1051,7 @@ class Node():
         self.iconPath = nodeDefinition["iconPath"]
         self.category = nodeDefinition["category"]
         self.opCode = nodeDefinition["opCode"]
+        self.nodeType = f"{self.category}/{self.name}"
 
         if not os.path.exists(self.GetIconPath()):
             self.iconPath = ""

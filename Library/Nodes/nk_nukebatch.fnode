@@ -57,7 +57,7 @@ import subprocess, os
 
 FlashLogMessage(f"NukeBatch : Start executing script : {inscript}")
 
-command = [f"{innukebindir}/nuke", "-x", innukefile, "-F", f"{inframerange[0]}-{inframerange[1]}"]
+command = [f"{innukebindir}/nuke", "-F", f"{inframerange[0]}-{inframerange[1]}", "-x", innukefile]
 
 FlashLogMessage(f"NukeBatch Command : {' '.join(command)}")
 

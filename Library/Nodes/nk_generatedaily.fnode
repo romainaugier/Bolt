@@ -1,0 +1,25 @@
+# BeginAttr
+
+name = Nk_GenerateDaily
+icon = $FLASH_ICONS/nuke.png
+category = Nuke
+
+# EndAttr
+
+# BeginOp
+
+import nuke
+
+nuke.scriptOpen("D:/test.nk")
+
+path = "Z:/OEUF/RENDER/sequence/shot/LD2"
+
+seqs = nuke.getFileNameList(path)
+
+if len(seqs) > 0:
+    read = nuke.toNode("MAIN_READ")
+    read.knob("file").fromUserText(path + "/" + seqs[0])
+
+nuke.scriptSave("D:/test2.nk")
+
+# EndOp

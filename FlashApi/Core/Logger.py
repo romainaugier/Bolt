@@ -1,31 +1,39 @@
-import sys, time, traceback
+import sys, time, traceback, colorama, platform
 from datetime import datetime
 
-class Level():
-    def __init__(self, val, desc):
-        self.value = val
-        self.description = desc
+if platform.system() == 'Windows':
+    colorama.init()
 
-    def __new__(cls, val, desc):
+class Level():
+    def __init__(self, levelIndex, levelDesc, levelColor):
+        self.index = levelIndex
+        self.description = levelDesc
+        self.color = levelColor
+
+    def __new__(cls, val, desc, col):
         member = object.__new__(cls)
-        member.value = val
+        member.index = val
         member.description = desc
+        member.color = col
         return member
 
     def GetAsString(self):
         return self.description
 
     def Get(self):
-        return self.value
+        return self.index
+    
+    def GetAsColor(self):
+        return self.color
 
 
 class LogLevel(Level):
-    ERROR = Level(0, "ERROR")
-    WARNING = Level(1, "WARNING")
-    MESSAGE = Level(2, "MESSAGE")
-    VERBOSE = Level(3, "VERBOSE")
-    DIAGNOSTIC = Level(4, "DIAGNOSTIC")
-    DEBUG = Level(5, "DEBUG")
+    ERROR = Level(0, "ERROR", colorama.Fore.RED)
+    WARNING = Level(1, "WARNING", colorama.Fore.YELLOW)
+    MESSAGE = Level(2, "MESSAGE", colorama.Fore.WHITE)
+    VERBOSE = Level(3, "VERBOSE", colorama.Fore.WHITE)
+    DIAGNOSTIC = Level(4, "DIAGNOSTIC", colorama.Fore.GREEN)
+    DEBUG = Level(5, "DEBUG", colorama.Fore.WHITE)
 
 
 class Logger():
@@ -57,7 +65,7 @@ class Logger():
 
             tracebackMessage = traceback.format_exc() + "\n" if getTraceback else ""
 
-            message = "[{0}] {1} : {2}\n{3}".format(level.GetAsString(), current_time, input, tracebackMessage)
+            message = "{0}[{1}] {2} : {3}\n{4}".format(level.GetAsColor(), level.GetAsString(), current_time, input, tracebackMessage)
             
             if self.logToConsole: 
                 sys.stdout.write(message)

@@ -1,0 +1,87 @@
+// Executes a python script in nuke with optional command lines arguments
+// For example, if you want to open a .nk file, pass it as an argument to the command line
+
+// If you want to get the saved nuke file, you need to print it to stdout and this node will catch any print that matches
+// OUTPUTFILE=D:/dir/folder/file.nk
+
+# BeginAttr
+
+name = NK_NukePy
+icon = $FLASH_ICONS/nuke.png
+category = Nuke
+
+# EndAttr
+
+# BeginPlugs
+
+# BeginPlug
+
+shortName = inscriptfile
+longName = Script File
+defaultValue = ""
+type = str
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = inargs
+longName = Script Arguments
+defaultValue = []
+type = list
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = innukebindir
+longName = Nuke Binary Directory
+defaultValue = "C:/Program Files/Nuke"
+type = str
+exposed = True
+
+# EndPlug
+
+# BeginPlug
+
+shortName = outfile
+longName = Output File
+defaultValue = ""
+type = str
+
+# EndPlug
+
+# EndPlugs
+
+# BeginOp
+
+import subprocess, os
+
+FlashLogMessage(f"NukeBatch : Start executing script : {inscript}")
+
+command = [f"{innukebindir}/nuke", "--nukex", inscriptfile]
+
+for arg in inargs:
+    command.append(arg)
+
+FlashLogMessage(f"NukeBatch Command : {' '.join(command)}")
+
+process = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+stdout, stderr = process.communicate()
+
+stdoutAsStr = stdout.decode("utf-8")
+stderrAsStr = stderr.decode("utf-8")
+
+if len(stderrAsStr) > 0:
+    FlashLogError(stderrAsStr)
+else:
+    FlashLogMessage(f"NukeBatch : Finished executing file : {innukefile}")
+    FlashLogMessage(stdoutAsStr)
+
+    for line in stdoutAsStr.splitlines():
+        if line.startswith("OUTPUTFILE"):
+            outfile = line.split("=")[1].strip()
+
+# EndOp

@@ -1,0 +1,88 @@
+#! C:/Program Files/Nuke13.0v5/nuke-13.0.5.dll -nx
+#write_info MAIN_WRITE file:"" format:"2048 858 1" chans:":rgba.red:rgba.green:rgba.blue:" framerange:"1 120" fps:"0" colorspace:"Output - Rec.709" datatype:"unknown" transfer:"unknown" views:"main" colorManagement:"OCIO"
+version 13.0 v5
+define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
+<layout version="1.0">
+    <window x="-1920" y="0" w="1918" h="1128" maximized="1" screen="1">
+        <splitter orientation="1">
+            <split size="40"/>
+            <dock id="" hideTitles="1" activePageId="Toolbar.1">
+                <page id="Toolbar.1"/>
+            </dock>
+            <split size="1255" stretch="1"/>
+            <splitter orientation="2">
+                <split size="638"/>
+                <dock id="" activePageId="Viewer.1">
+                    <page id="Viewer.1"/>
+                </dock>
+                <split size="448"/>
+                <dock id="" activePageId="DAG.1" focus="true">
+                    <page id="DAG.1"/>
+                    <page id="Curve Editor.1"/>
+                    <page id="DopeSheet.1"/>
+                </dock>
+            </splitter>
+            <split size="615"/>
+            <dock id="" activePageId="Properties.1">
+                <page id="Properties.1"/>
+                <page id="uk.co.thefoundry.backgroundrenderview.1"/>
+            </dock>
+        </splitter>
+    </window>
+    <window x="140" y="304" w="1255" h="641" screen="0">
+        <splitter orientation="2">
+            <split size="641"/>
+            <dock id="" activePageId="uk.co.thefoundry.scripteditor.1">
+                <page id="uk.co.thefoundry.scripteditor.1"/>
+            </dock>
+        </splitter>
+    </window>
+</layout>
+}
+Root {
+ inputs 0
+ name D:/dev/Flash/Library/Templates/Nuke/generate_daily.nk
+ last_frame 120
+ lock_range true
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ proxy_type scale
+ proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+ colorManagement OCIO
+ OCIO_config custom
+ customOCIOConfigPath P:/COLOR/aces_1.2/config.ocio
+ defaultViewerLUT "OCIO LUTs"
+ workingSpaceLUT scene_linear
+ monitorLut ACES/sRGB
+ monitorOutLUT "sRGB (ACES)"
+ int8Lut matte_paint
+ int16Lut texture_paint
+ logLut compositing_log
+ floatLut scene_linear
+}
+Read {
+ inputs 0
+ file_type exr
+ format "2048 858 0 0 2048 858 1 "
+ last 120
+ origlast 120
+ origset true
+ name MAIN_READ
+ xpos 110
+ ypos -73
+}
+set N52a75c00 [stack 0]
+Viewer {
+ frame_range 1-120
+ viewerProcess "sRGB (ACES)"
+ name Viewer1
+ xpos 271
+ ypos 65
+}
+push $N52a75c00
+Write {
+ colorspace "Output - Rec.709"
+ create_directories true
+ name MAIN_WRITE
+ xpos 110
+ ypos 113
+}
