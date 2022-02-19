@@ -174,16 +174,18 @@ class GBlock(QtWidgets.QGraphicsObject):
         self.updateShape()
         # self.setZValue(-100)
         self.update(self.boundingRect())
+        self.gGraph.update()
 
     def paint(self, painter : QtGui.QPainter, option : QtWidgets.QStyleOptionGraphicsItem, widget : QtWidgets.QWidget):
         """
         """
-        polygon = QtGui.QPolygon(self.hullPoints)
+        pass
+        # polygon = QtGui.QPolygon(self.hullPoints)
 
-        painter.setBrush(QtGui.QColor(104, 240, 222, 63))
-        painter.setPen(QtGui.QPen(QtGui.QColor(104, 240, 222, 127)))
+        # painter.setBrush(QtGui.QColor(104, 240, 222, 63))
+        # painter.setPen(QtGui.QPen(QtGui.QColor(104, 240, 222, 127)))
 
-        painter.drawPolygon(polygon)
+        # painter.drawPolygon(polygon)
 
 class GraphicsScene(QtWidgets.QGraphicsScene):
     """
@@ -326,6 +328,14 @@ class GGraph(QtWidgets.QGraphicsView):
             gridLines.append(QtCore.QLineF(rect.left(), y, rect.right(), y))
 
         painter.drawLines(gridLines)
+
+        for block in self.gBlocks: 
+            polygon = QtGui.QPolygon(block.hullPoints)
+
+            painter.setBrush(QtGui.QColor(104, 240, 222, 43))
+            painter.setPen(QtGui.QPen(QtGui.QColor(104, 240, 222, 255)))
+
+            painter.drawPolygon(polygon)
 
     # UTILS
 

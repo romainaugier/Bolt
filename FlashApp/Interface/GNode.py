@@ -648,7 +648,7 @@ class GNode(QtWidgets.QGraphicsObject):
 
         # Label name
         painter.setPen(GetQColorFromPalette(ColorPalette.SELECTIONFOREGROUND))
-        painter.setFont(QtGui.QFont("Helvetica", 12))
+        painter.setFont(QtGui.QFont("Helvetica", 10))
 
         fontRect = QtCore.QRect(14 + pixMapWidth, 6, self.sizeX - 10, self.labelSizeY - 10)
         painter.drawText(fontRect, 0, self.name)
