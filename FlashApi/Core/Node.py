@@ -1,6 +1,6 @@
 from ast import literal_eval
 from enum import IntEnum
-import re, copy, os, threading
+import re, copy, os, threading, io
 
 import FlashApi.Core.FileSystem as FileSystem
 from FlashApi.Core.Logger import *
@@ -32,6 +32,34 @@ class PlugType(IntEnum):
     LIST = 9
     DICT = 10
     CUSTOM = 11
+
+def GetPlugTypeAsStr(plugType : PlugType) -> str:
+    """
+    """
+    if plugType == PlugType.INT:
+        return "int"
+    elif plugType == PlugType.INT2:
+        return "int2"
+    elif plugType == PlugType.INT3:
+        return "int3"
+    elif plugType == PlugType.FLOAT:
+        return "float"
+    elif plugType == PlugType.FLOAT2:
+        return "float2"
+    elif plugType == PlugType.FLOAT3:
+        return "float3"
+    elif plugType == PlugType.STR:
+        return "str"
+    elif plugType == PlugType.BOOL:
+        return "bool"
+    elif plugType == PlugType.LIST:
+        return "list"
+    elif plugType == PlugType.DICT:
+        return "dict"
+    elif plugType == PlugType.CUSTOM:
+        return "custom"
+    else:
+        return "custom"
 
 # Definitions of classes
 
@@ -282,6 +310,7 @@ class Plug():
             self.connectedPlugs.append(connectedPlug)
 
         self.data = data
+        self.defaultData = data
         self.type : PlugType = dataType
         self.isExposed = False
         self.isExposedToGraph = False
@@ -411,6 +440,13 @@ class Plug():
             Any: data of the plug
         """
         return self.data
+    
+    def GetDefaultData(self):
+        """
+        Returns:
+            Any: default data of the plug
+        """
+        return self.defaultData
 
     def SetData(self, data) -> None:
         """
@@ -420,6 +456,12 @@ class Plug():
             data (any): data to set
         """
         self.data = data
+        
+    def SetDefaultData(self, data) -> None:
+        """
+        Sets the default data of this plug
+        """
+        self.defaultData = data
     
     def Connect(self, plug : Plug) -> None:
         """
@@ -488,6 +530,7 @@ class Node():
         self.iconPath = ""
         self.category = ""
         self.nodeType = ""
+        self.definitionPath = ""
         
         # The id is not set here as we will set a unique one for each node in the graph
         self.id = 0 
@@ -616,6 +659,11 @@ class Node():
             return self.environment.ReplaceInString(self.iconPath)
         else:
             return self.iconPath
+
+    def SetCategory(self, category : str) -> None:
+        """
+        """
+        self.category = category
 
     def GetCategory(self) -> str:
         """
@@ -1067,6 +1115,11 @@ class Node():
         self.UpdateEnv()
 
         self.Compile()
+        
+    def GetDefinitionPath(self) -> str:
+        """
+        """
+        return self.definitionPath
 
     def ToDict(self) -> dict:
         """
@@ -1078,6 +1131,7 @@ class Node():
         nodeAsDict = {}
 
         nodeAsDict["name"] = self.GetName()
+        nodeAsDict["category"] = self.GetCategory()
         nodeAsDict["id"] = self.GetID()
         nodeAsDict["color"] = self.GetColor()
         nodeAsDict["iconPath"] = self.GetIconPathRaw()
@@ -1110,7 +1164,10 @@ class Node():
                                                                         "longName" : input.GetLongName(),
                                                                         "index" : input.GetIndex(),
                                                                         "isExposed" : input.IsExposed(),
+                                                                        "isHidden" : input.IsHidden(),
+                                                                        "isExposedToGraph" : input.IsExposedToGraph(),
                                                                         "data" : input.GetData(), 
+                                                                        "defaultData" : input.GetDefaultData(),
                                                                         "type" : input.GetType(),
                                                                         "connectionName" : connection.GetShortName(), 
                                                                         "connectionNodeId" : connection.GetNode().GetID() })
@@ -1119,7 +1176,10 @@ class Node():
                                                                "longName" : input.GetLongName(),
                                                                "index" : input.GetIndex(),
                                                                "isExposed" : input.IsExposed(),
+                                                               "isHidden" : input.IsHidden(),
+                                                               "isExposedToGraph" : input.IsExposedToGraph(),
                                                                "data" : input.GetData(), 
+                                                               "defaultData" : input.GetDefaultData(),
                                                                "type" : input.GetType(),
                                                                "connectionName" : None,
                                                                "connectionNodeId" : None }]
@@ -1134,7 +1194,10 @@ class Node():
                                                                     "longName" : output.GetLongName(),
                                                                     "index" : output.GetIndex(),
                                                                     "isExposed" : output.IsExposed(),
+                                                                    "isHidden" : output.IsHidden(),
+                                                                    "isExposedToGraph" : output.IsExposedToGraph(),
                                                                     "data" : output.GetData(), 
+                                                                    "defaultData" : output.GetDefaultData(),
                                                                     "type" : output.GetType(),
                                                                     "connectionName" : connection.GetShortName(), 
                                                                     "connectionNodeId" : connection.GetNode().GetID() })
@@ -1143,7 +1206,10 @@ class Node():
                                                                  "longName" : output.GetLongName(),
                                                                  "index" : output.GetIndex(),
                                                                  "isExposed" : output.IsExposed(),
+                                                                 "isHidden" : output.IsHidden(),
+                                                                 "isExposedToGraph" : output.IsExposedToGraph(),
                                                                  "data" : output.GetData(), 
+                                                                 "defaultData" : output.GetDefaultData(),
                                                                  "type" : output.GetType(),
                                                                  "connectionName" : None, 
                                                                  "connectionNodeId" : None }]
@@ -1162,6 +1228,7 @@ class Node():
         self.SetDirty()
 
         self.SetName(nodeAsDict["name"])
+        self.SetCategory(nodeAsDict["category"])
         self.SetID(nodeAsDict["id"])
         self.SetColor(nodeAsDict["color"])
         self.SetIconPath(nodeAsDict["iconPath"])
@@ -1177,19 +1244,82 @@ class Node():
 
         for inputName, input in nodeAsDict["inputs"].items():
             input = input[0]
-            tmpPlug = Plug(input["shortName"], input["longName"], self, input["data"], input["type"])
+            tmpPlug = Plug(input["shortName"], input["longName"], self, input["defaultData"], input["type"])
+            tmpPlug.SetData(input["data"])
             tmpPlug.SetExposed(input["isExposed"])
+            tmpPlug.SetHidden(input["isHidden"])
+            tmpPlug.SetExposedToGraph(input["isExposedToGraph"])
             tmpPlug.SetIndex(input["index"])
             self.inputs[inputName] = tmpPlug
 
         for outputName, output in nodeAsDict["outputs"].items():
             output = output[0]
-            tmpPlug = Plug(output["shortName"], output["longName"], self, output["data"], output["type"])
+            tmpPlug = Plug(output["shortName"], output["longName"], self, output["defaultData"], output["type"])
+            tmpPlug.SetData(output["data"])
             tmpPlug.SetExposed(output["isExposed"])
+            tmpPlug.SetHidden(input["isHidden"])
+            tmpPlug.SetExposedToGraph(input["isExposedToGraph"])
             tmpPlug.SetIndex(output["index"])
             self.outputs[outputName] = tmpPlug
 
         self.Compile()
+        
+    def ToFile(self) -> str:
+        """
+        Returns the node content as a string definition used in node files
+
+        Returns:
+            str: node content as file
+        """
+        nodeAsDict = self.ToDict()
+        
+        stream = io.StringIO("")
+        
+        stream.write("// Node Definition automatically generated by Flash\n\n")
+        
+        # Attributes
+        stream.write("# BeginAttr\n\n")
+        stream.write(f"name = {nodeAsDict['name']}\n")
+        stream.write(f"category = {nodeAsDict['category']}\n")
+        stream.write(f"color = {nodeAsDict['color']}\n")
+        stream.write(f"icon = {nodeAsDict['iconPath']}\n")
+        stream.write("\n# EndAttr\n\n")
+        
+        # Plugs
+        stream.write("# BeginPlugs\n")
+        
+        for inputName, input in nodeAsDict["inputs"].items():
+            input = input[0]
+            stream.write("\n# BeginPlug\n\n")
+            stream.write(f"shortName = {input['shortName']}\n")
+            stream.write(f"longName = {input['longName']}\n")
+            stream.write(f"defaultValue = {input['data']}\n")
+            stream.write(f"type = {GetPlugTypeAsStr(input['type'])}\n")
+            stream.write(f"exposed = {input['isExposed']}\n")
+            stream.write(f"hidden = {input['isHidden']}\n")
+            stream.write(f"exposedToGraph = {input['isExposedToGraph']}\n")
+            stream.write("\n# EndPlug\n")
+
+        for outputName, output in nodeAsDict["outputs"].items():
+            output = output[0]
+            stream.write("\n# BeginPlug\n\n")
+            stream.write(f"shortName = {output['shortName']}\n")
+            stream.write(f"longName = {output['longName']}\n")
+            stream.write(f"defaultValue = {output['data']}\n")
+            stream.write(f"type = {GetPlugTypeAsStr(output['type'])}\n")
+            stream.write(f"exposed = {output['isExposed']}\n")
+            stream.write(f"hidden = {output['isHidden']}\n")
+            stream.write(f"exposedToGraph = {output['isExposedToGraph']}\n")
+            stream.write("\n# EndPlug\n")
+        
+        stream.write("\n# EndPlugs\n\n")
+        
+        # OpCode
+        stream.write("# BeginOp\n\n")
+        stream.write(nodeAsDict["opCode"])
+        stream.write("\n# EndOp\n")
+        
+        return stream.getvalue()
         
     # Env Functions
 

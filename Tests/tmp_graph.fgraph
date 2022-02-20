@@ -2,7 +2,8 @@
   "nodes": [
     {
       "name": "Debug",
-      "id": "3865303635326139313162323862393238383634363565383266393131383536",
+      "category": "Debug",
+      "id": "3634303962656335633734373763633865383737646231313636316262656136",
       "color": [
         50,
         222,
@@ -21,10 +22,12 @@
             "longName": "Input Data",
             "index": 0,
             "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
             "data": "D:\\dev\\Flash\\Tests/test_script.py",
             "type": 11,
             "connectionName": "outfile",
-            "connectionNodeId": "3263623236376232346362343838393238356366636633303439666336353662"
+            "connectionNodeId": "3634613466666363346439343637363533666533626465383435376139633439"
           }
         ]
       },
@@ -35,17 +38,20 @@
             "longName": "Output Data",
             "index": 0,
             "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
             "data": "D:\\dev\\Flash\\Tests/test_script.py",
             "type": 11,
             "connectionName": "inscript",
-            "connectionNodeId": "3133653365356366663065333833366634383033303666383032626362373566"
+            "connectionNodeId": "6265313532326666386332656365396266613737636231613639393037393266"
           }
         ]
       }
     },
     {
       "name": "Python",
-      "id": "3133653365356366663065333833366634383033303666383032626362373566",
+      "category": "Python",
+      "id": "6265313532326666386332656365396266613737636231613639393037393266",
       "color": [
         52,
         115,
@@ -64,10 +70,12 @@
             "longName": "Input Script Path",
             "index": 0,
             "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
             "data": "D:\\dev\\Flash\\Tests/test_script.py",
             "type": 7,
             "connectionName": "outdata",
-            "connectionNodeId": "3865303635326139313162323862393238383634363565383266393131383536"
+            "connectionNodeId": "3634303962656335633734373763633865383737646231313636316262656136"
           }
         ]
       },
@@ -75,7 +83,8 @@
     },
     {
       "name": "File",
-      "id": "3263623236376232346362343838393238356366636633303439666336353662",
+      "category": "Utility",
+      "id": "3634613466666363346439343637363533666533626465383435376139633439",
       "color": [
         255,
         220,
@@ -94,6 +103,8 @@
             "longName": "Input File Path",
             "index": 0,
             "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
             "data": "D:\\dev\\Flash\\Tests/test_script.py",
             "type": 7,
             "connectionName": null,
@@ -108,10 +119,12 @@
             "longName": "Output File Path",
             "index": 0,
             "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
             "data": "D:\\dev\\Flash\\Tests/test_script.py",
             "type": 7,
             "connectionName": "indata",
-            "connectionNodeId": "3865303635326139313162323862393238383634363565383266393131383536"
+            "connectionNodeId": "3634303962656335633734373763633865383737646231313636316262656136"
           }
         ]
       }

@@ -59,7 +59,7 @@ class Lib():
 
                         self.nodePaths[f"{tmpNode.GetCategory()}/{tmpNode.GetName()}"] = f"{path}/{item}"
 
-                        self.logger.Log(LogLevel.DEBUG, f"Loaded {tmpNode.GetName()}")
+                        self.logger.Log(LogLevel.DEBUG, f"Loaded node : {tmpNode.GetCategory()}/{tmpNode.GetName()}")
 
     def Reload(self) -> None:
         """

@@ -194,3 +194,94 @@ class LineEdit(QtWidgets.QLineEdit):
                     self.editingFinished.emit()
         else:
             event.ignore()
+            
+        
+class LabeledLineEdit(QtWidgets.QWidget):
+    """
+    """
+    def __init__(self, labelText : str, defaultText : str = "", parent = None) -> None:
+        super().__init__(parent=parent)
+
+        self.mainLayout = QtWidgets.QHBoxLayout()
+        self.mainLayout.setSpacing(0)
+        self.mainLayout.setAlignment(QtCore.Qt.AlignLeft)
+        self.mainLayout.setContentsMargins(0, 0, 0, 0)
+        
+        self.mainLabel = QtWidgets.QLabel(labelText)
+        self.mainLayout.addWidget(self.mainLabel)
+        
+        self.mainLineEdit = LineEdit()
+        self.mainLineEdit.setText(defaultText)
+        self.mainLayout.addWidget(self.mainLineEdit)
+        
+        self.setLayout(self.mainLayout)
+        
+    def getLabel(self) -> QtWidgets.QLabel:
+        """
+        """
+        return self.mainLabel
+    
+    def getLineEdit(self) -> LineEdit:
+        """
+        """
+        return self.mainLineEdit
+
+
+class LabeledComboBox(QtWidgets.QWidget):
+    """
+    """
+    def __init__(self, labelText : str, parent = None) -> None:
+        super().__init__(parent=parent)
+
+        self.mainLayout = QtWidgets.QHBoxLayout()
+        self.mainLayout.setSpacing(0)
+        self.mainLayout.setAlignment(QtCore.Qt.AlignLeft)
+        self.mainLayout.setContentsMargins(0, 0, 0, 0)
+        
+        self.mainLabel = QtWidgets.QLabel(labelText)
+        self.mainLayout.addWidget(self.mainLabel)
+        
+        self.mainComboBox = QtWidgets.QComboBox()
+        self.mainLayout.addWidget(self.mainComboBox)
+        
+        self.setLayout(self.mainLayout)
+        
+    def getLabel(self) -> QtWidgets.QLabel:
+        """
+        """
+        return self.mainLabel
+    
+    def getComboBox(self) -> QtWidgets.QComboBox:
+        """
+        """
+        return self.mainComboBox
+
+
+class LabeledCheckBox(QtWidgets.QWidget):
+    """
+    """
+    def __init__(self, labelText : str, parent = None) -> None:
+        super().__init__(parent=parent)
+
+        self.mainLayout = QtWidgets.QHBoxLayout()
+        self.mainLayout.setSpacing(0)
+        self.mainLayout.setAlignment(QtCore.Qt.AlignLeft)
+        self.mainLayout.setContentsMargins(0, 0, 0, 0)
+        
+        self.mainLabel = QtWidgets.QLabel(labelText)
+        self.mainLayout.addWidget(self.mainLabel)
+        
+        self.mainCheckBox = QtWidgets.QCheckBox()
+        self.mainLayout.addWidget(self.mainCheckBox)
+        
+        self.setLayout(self.mainLayout)
+        
+    def getLabel(self) -> QtWidgets.QLabel:
+        """
+        """
+        return self.mainLabel
+    
+    def getCheckBox(self) -> QtWidgets.QCheckBox:
+        """
+        """
+        return self.mainCheckBox

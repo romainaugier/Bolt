@@ -501,7 +501,7 @@ class PlugEditor(QtWidgets.QWidget):
         self.masterLayout = QtWidgets.QVBoxLayout()
         self.masterLayout.setAlignment(Qt.AlignTop)
         
-        self.plugEditorLabel = IconLabel(self.iconsLib.GetPixmap("plug-editor"), "Plugs Editor")
+        self.plugEditorLabel = IconLabel(self.iconsLib.GetPixmap("plug"), "Plugs Editor")
         self.masterLayout.addWidget(self.plugEditorLabel)
         
         self.masterLayout.addSpacing(10)

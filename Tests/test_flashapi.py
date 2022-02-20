@@ -27,6 +27,14 @@ if __name__ == "__main__":
     nodeLibrary.Load()
 
     PrintSeps()
+    
+    logger.Log(LogLevel.DEBUG, "Testing node to file...")
+    
+    templateNode = nodeLibrary.Get("Debug/Template")
+    
+    print(templateNode.ToFile())
+    
+    PrintSeps()
 
     logger.Log(LogLevel.DEBUG, "Testing graph...")
 

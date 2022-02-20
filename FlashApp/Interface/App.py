@@ -8,6 +8,7 @@ from FlashApi.Core.Logger import *
 from FlashApi.Core.Environment import *
 from FlashApp.Interface.Utils import *
 from FlashApp.Interface.Widgets import *
+from FlashApp.Interface.NodeEditor import *
 
 
 class GraphTabs(QtWidgets.QWidget):
@@ -106,6 +107,8 @@ class App(QtWidgets.QMainWindow):
         self.environment = Environment()
 
         self.nodeLib = Lib(self.logger, self.environment)
+        
+        self.nodeEditor = NodeEditor()
 
         self.icons = Icons()
 
@@ -303,4 +306,10 @@ class App(QtWidgets.QMainWindow):
             index = self.graphTabs.getActiveTabIndex()
 
         self.graphTabs.tabs.widget(index).layout.itemAt(0).widget().showPlugEditor()
+        
+    def showNodeEditor(self) -> None:
+        """
+        Show the node properties editor
+        """
+        self.nodeEditor.show()
         

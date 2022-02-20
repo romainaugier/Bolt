@@ -5,4 +5,7 @@ class Expression():
     pass
 
 class ExprEvaluator():
+    """
+    Evaluates expressions in plugs
+    """
     pass
