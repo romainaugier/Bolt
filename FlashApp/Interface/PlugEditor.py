@@ -3,7 +3,6 @@ from ast import literal_eval
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt
 
-from FlashApi.Core.Node import *
 from FlashApp.Interface.GNode import *
 from FlashApp.Interface.Icons import *
 from FlashApp.Interface.Widgets import *

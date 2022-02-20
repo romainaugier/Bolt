@@ -3,12 +3,12 @@ import os
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from FlashApp.Interface.Icons import *
+from FlashApp.Interface.NodeEditor import *
 from FlashApp.Interface.GGraph import *
 from FlashApi.Core.Logger import *
 from FlashApi.Core.Environment import *
 from FlashApp.Interface.Utils import *
 from FlashApp.Interface.Widgets import *
-from FlashApp.Interface.NodeEditor import *
 
 
 class GraphTabs(QtWidgets.QWidget):
@@ -108,9 +108,9 @@ class App(QtWidgets.QMainWindow):
 
         self.nodeLib = Lib(self.logger, self.environment)
         
-        self.nodeEditor = NodeEditor()
-
         self.icons = Icons()
+        
+        self.nodeEditor = NodeEditorWindow(self.icons, parent=self)
 
         self.setWindowTitle("Flash")
   
@@ -165,6 +165,7 @@ class App(QtWidgets.QMainWindow):
         self.createNewNodeButton = QtWidgets.QPushButton("")
         self.createNewNodeButton.setIcon(self.icons.GetIcon("new-node"))
         self.createNewNodeButton.setToolTip("Create a new node type\nOpens the node properties editor")
+        self.createNewNodeButton.clicked.connect(self.openNodeEditor)
         shelfLayout.addWidget(self.createNewNodeButton)
 
         self.modifySelectedNodeButton = QtWidgets.QPushButton("")
@@ -307,9 +308,23 @@ class App(QtWidgets.QMainWindow):
 
         self.graphTabs.tabs.widget(index).layout.itemAt(0).widget().showPlugEditor()
         
-    def showNodeEditor(self) -> None:
+    def openNodeEditor(self) -> None:
         """
         Show the node properties editor
         """
+        index = self.graphTabs.getActiveTabIndex()
+        
+        gGraph : GGraph = self.graphTabs.tabs.widget(index).layout.itemAt(0).widget()
+        
+        currentGraphSelection = gGraph.scene.selectedItems() 
+        
+        node = None
+        
+        if len(currentGraphSelection) > 0:
+            if type(currentGraphSelection[0]) is GNode:
+                node = currentGraphSelection[0].getInternalNode()
+        
+        self.nodeEditor.setNodeToEdit(node)
+        
         self.nodeEditor.show()
         

@@ -1,12 +1,6 @@
 from PyQt5 import QtCore, QtWidgets
 
-from FlashApi.Core.Node import *
-from FlashApp.Interface.Icons import *
-from FlashApp.Interface.Widgets import *
-from FlashApp.Interface.Utils import *
-from FlashApp.Interface.Style import *
 from FlashApp.Interface.PlugEditor import *
-
 
 class AttributeEditor(QtWidgets.QWidget):
     """
@@ -20,15 +14,23 @@ class AttributeEditor(QtWidgets.QWidget):
         masterLayout = QtWidgets.QVBoxLayout()
         
         self.savePathWidget = LabeledLineEdit("Save Path", "")
+        self.savePathWidget.getLabel().setMinimumWidth(60)
+        self.savePathWidget.getLineEdit().setMinimumWidth(200)
         masterLayout.addWidget(self.savePathWidget)
         
         self.nameWidget = LabeledLineEdit("Name", "")
+        self.nameWidget.getLabel().setMinimumWidth(60)
+        self.nameWidget.getLineEdit().setMinimumWidth(200)
         masterLayout.addWidget(self.nameWidget)
         
         self.iconWidget = LabeledLineEdit("Icon", "")
+        self.iconWidget.getLabel().setMinimumWidth(60)
+        self.iconWidget.getLineEdit().setMinimumWidth(200)
         masterLayout.addWidget(self.iconWidget)
         
         self.categoryWidget = LabeledLineEdit("Category", "")
+        self.categoryWidget.getLabel().setMinimumWidth(60)
+        self.categoryWidget.getLineEdit().setMinimumWidth(200)
         masterLayout.addWidget(self.categoryWidget)
         
         self.setNodeToEdit(nodeToEdit)
@@ -81,6 +83,7 @@ class PlugPropertiesEditor(QtWidgets.QWidget):
     """
     
     plugDataChanged = QtCore.pyqtSignal(dict)
+    newPlugAdded = QtCore.pyqtSignal(dict)
     
     def __init__(self, plugData : dict = None, parent = None):
         """
@@ -88,6 +91,7 @@ class PlugPropertiesEditor(QtWidgets.QWidget):
         super().__init__(parent=parent)
         
         masterLayout = QtWidgets.QVBoxLayout()
+        masterLayout.setAlignment(QtCore.Qt.AlignTop)
         
         self.shortNameWidget = LabeledLineEdit("Short Name", "")
         self.shortNameWidget.getLineEdit().editingFinished.connect(self.dataChanged)
@@ -145,7 +149,7 @@ class PlugPropertiesEditor(QtWidgets.QWidget):
         self.exposedWidget.getCheckBox().setChecked(exposed)
         self.exposedWidget.getCheckBox().setChecked(hidden)
         self.exposedWidget.getCheckBox().setChecked(exposedToGraph)
-        # plugData["defaultValue"] TODO
+        # plugData["defaultValue"] 
         
     def getPlugData(self) -> dict:
         """
@@ -159,11 +163,14 @@ class PlugPropertiesEditor(QtWidgets.QWidget):
         plugData["hidden"] = self.exposedWidget.getCheckBox().isChecked()
         plugData["exposedToGraph"] = self.exposedWidget.getCheckBox().isChecked()
         
+        return plugData
+        
     def dataChanged(self) -> None:
         """
         """
         self.plugDataChanged.emit(self.getPlugData())
     
+
 class PlugsEditor(QtWidgets.QWidget):
     """
     Interface to edit the plugs of a node
@@ -176,6 +183,8 @@ class PlugsEditor(QtWidgets.QWidget):
         masterLayout = QtWidgets.QHBoxLayout()
         
         self.plugsView = QtWidgets.QListView()
+        self.plugsView.setMaximumWidth(350)
+        self.plugsView.setFrameStyle(QtWidgets.QFrame.NoFrame)
         self.plugsView.clicked.connect(self.updatePlug)
         masterLayout.addWidget(self.plugsView)
         
@@ -184,6 +193,8 @@ class PlugsEditor(QtWidgets.QWidget):
         self.propertiesEditor = PlugPropertiesEditor()
         masterLayout.addWidget(self.propertiesEditor)
         
+        self.populateList(nodeToEdit)
+        
         self.setLayout(masterLayout)
         
     def populateList(self, nodeToEdit : Node = None) -> None:
@@ -191,48 +202,55 @@ class PlugsEditor(QtWidgets.QWidget):
         """
         self.model.clear()
         
-        for inPlugName, inPlug in nodeToEdit.GetInputs().items():
-            item = QtGui.QStandardItem(inPlug.GetShortName())
-            
-            plugDataPacked = {
-                "shortName" : inPlug.GetShortName(),
-                "longName" : inPlug.GetLongName(),
-                "defaultValue" : inPlug.GetDefaultValue(),
-                "type" : inPlug.GetType(),
-                "exposed" : inPlug.IsExposed(),
-                "hidden" : inPlug.IsHidden(),
-                "exposedToGraph" : inPlug.IsExposedToGraph(),
-            }
-            
-            item.setData(plugDataPacked, 256)
-            
-            self.model.appendRow(item)
+        if nodeToEdit is not None:
         
-        for outPlugName, outPlug in nodeToEdit.GetOutputs().items():
-            item = QtGui.QStandardItem(outPlug.GetShortName())
+            for inPlugName, inPlug in nodeToEdit.GetInputs().items():
+                item = QtGui.QStandardItem(inPlug.GetShortName())
+                
+                plugDataPacked = {
+                    "shortName" : inPlug.GetShortName(),
+                    "longName" : inPlug.GetLongName(),
+                    "defaultValue" : inPlug.GetDefaultData(),
+                    "type" : inPlug.GetType(),
+                    "exposed" : inPlug.IsExposed(),
+                    "hidden" : inPlug.IsHidden(),
+                    "exposedToGraph" : inPlug.IsExposedToGraph(),
+                }
+                
+                item.setData(plugDataPacked, 256)
+                
+                self.model.appendRow(item)
             
-            plugDataPacked = {
-                "shortName" : outPlug.GetShortName(),
-                "longName" : outPlug.GetLongName(),
-                "defaultValue" : outPlug.GetDefaultValue(),
-                "type" : outPlug.GetType(),
-                "exposed" : outPlug.IsExposed(),
-                "hidden" : outPlug.IsHidden(),
-                "exposedToGraph" : outPlug.IsExposedToGraph(),
-            }
-            
-            item.setData(plugDataPacked, 256)
-            
-            self.model.appendRow(item)
+            for outPlugName, outPlug in nodeToEdit.GetOutputs().items():
+                item = QtGui.QStandardItem(outPlug.GetShortName())
+                
+                plugDataPacked = {
+                    "shortName" : outPlug.GetShortName(),
+                    "longName" : outPlug.GetLongName(),
+                    "defaultValue" : outPlug.GetDefaultData(),
+                    "type" : outPlug.GetType(),
+                    "exposed" : outPlug.IsExposed(),
+                    "hidden" : outPlug.IsHidden(),
+                    "exposedToGraph" : outPlug.IsExposedToGraph(),
+                }
+                
+                item.setData(plugDataPacked, 256)
+                
+                self.model.appendRow(item)
             
         self.plugsView.setModel(self.model)
         
     def updatePlug(self, index) -> None:
         """
         """
-        item = self.model().item(index.row(), index.column())
+        item = self.model.item(index.row(), index.column())
         data = item.data(256)
         self.propertiesEditor.updatePlugData(data)
+
+    def setNodeToEdit(self, nodeToEdit : Node = None) -> None:
+        """
+        """
+        self.populateList(nodeToEdit)
 
 
 class OpEditor(QtWidgets.QWidget):
@@ -243,7 +261,12 @@ class OpEditor(QtWidgets.QWidget):
         """
         """
         super().__init__(parent=parent)
+        pass
     
+    def setNodeToEdit(self, nodeToEdit : Node = None) -> None:
+        """
+        """
+        pass
 
 class NodeEditor(QtWidgets.QWidget):
     """
@@ -261,22 +284,54 @@ class NodeEditor(QtWidgets.QWidget):
         self.attributeEditor = AttributeEditor(nodeToEdit)
         masterLayout.addWidget(self.attributeEditor)
         
-        self.tabs = QtWidgets.QTabWidget()
+        self.editTabs = QtWidgets.QTabWidget()
         
-        self.plugPropertiesEditor = PlugPropertiesEditor()
-        self.tabs.addTab(self.plugPropertiesEditor, self.iconsLib.GetIcon("plugs"), "Plugs")
-        self.tabs.setIconSize(QtCore.QSize(14, 14))
+        self.plugsEditor = PlugsEditor()
+        self.editTabs.addTab(self.plugsEditor, self.iconsLib.GetIcon("plug"), "Plugs")
+        self.editTabs.setIconSize(QtCore.QSize(14, 14))
         
         self.opEditor = OpEditor()
-        self.tabs.addTab(self.opEditor, self.iconsLib.GetIcon("python"), "Op")
-        self.tabs.setIconSize(QtCore.QSize(14, 14))
+        self.editTabs.addTab(self.opEditor, self.iconsLib.GetIcon("python"), "Op")
+        self.editTabs.setIconSize(QtCore.QSize(14, 14))
         
-        masterLayout.addWidget(self.tabs)
+        masterLayout.addWidget(self.editTabs)
+        
+        buttonsLayout = QtWidgets.QHBoxLayout()
+        buttonsLayout.setAlignment(QtCore.Qt.AlignRight)
+        
+        self.saveButton = QtWidgets.QPushButton("Save")
+        self.saveButton.setMaximumHeight(25)
+        self.saveButton.clicked.connect(self.saveNode)
+        buttonsLayout.addWidget(self.saveButton)
+        
+        self.closeButton = QtWidgets.QPushButton("Close")
+        self.closeButton.setMaximumHeight(25)
+        self.closeButton.clicked.connect(self.closeWindow)
+        buttonsLayout.addWidget(self.closeButton)
+        
+        masterLayout.addLayout(buttonsLayout)
         
         self.setLayout(masterLayout)
         
+    def setNodeToEdit(self, nodeToEdit : Node = None) -> None:
+        """
+        """
+        self.attributeEditor.setNodeToEdit(nodeToEdit)
+        self.plugsEditor.setNodeToEdit(nodeToEdit)
+        self.opEditor.setNodeToEdit(nodeToEdit)
+        
+    def saveNode(self) -> None:
+        """
+        """
+        pass
+    
+    def closeWindow(self) -> None:
+        """
+        """
+        pass
+        
 
-class NodeEditorWindow(QtGui.QMainWindow):
+class NodeEditorWindow(QtWidgets.QMainWindow):
     """
     """
     def __init__(self, iconsLib : Icons, nodeToEdit : Node = None, parent=None) -> None:
@@ -286,4 +341,23 @@ class NodeEditorWindow(QtGui.QMainWindow):
         
         self.editor = NodeEditor(iconsLib, nodeToEdit)
         
+        name = "Node Properties"
+        
+        if nodeToEdit is not None:
+            name = f"Node Properties : {nodeToEdit.GetName()}"
+        
+        self.setWindowTitle(name)
+        
         self.setCentralWidget(self.editor)
+        
+    def setNodeToEdit(self, nodeToEdit : Node = None) -> None:
+        """
+        """
+        self.editor.setNodeToEdit(nodeToEdit)
+        
+        name = "Node Properties"
+        
+        if nodeToEdit is not None:
+            name = f"Node Properties : {nodeToEdit.GetName()}"
+        
+        self.setWindowTitle(name)

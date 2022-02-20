@@ -38,7 +38,7 @@ class Lib():
             if os.path.exists(path):
                 for item in os.listdir(path):
                     if item.endswith(".fnode"):
-                        if "if" in item:
+                        if item.startswith("if"):
                             if not foundIfNode:
                                 foundIfNode = True
                                 
@@ -46,7 +46,7 @@ class Lib():
                                 
                             continue
                         
-                        if "for" in item:
+                        if item.startswith("for"):
                             if not foundForNode:
                                 foundForNode = True
                                 

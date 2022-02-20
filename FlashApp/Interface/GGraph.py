@@ -1,5 +1,4 @@
 import json, threading
-from winreg import QueryReflectionKey
 
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtCore import Qt
@@ -10,10 +9,6 @@ from FlashApi.Core.Graph import *
 from FlashApi.Core.Logger import *
 from FlashApp.Interface.Icons import *
 from FlashApp.Interface.PlugEditor import *
-
-
-class GGraph:
-    pass
 
 
 class GBlock(QtWidgets.QGraphicsObject):

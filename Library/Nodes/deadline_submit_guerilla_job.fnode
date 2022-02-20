@@ -1,6 +1,6 @@
 // Submits a guerilla job to deadline using : 
 // deadlinecommand -Multi -job ribgen_job_info.job ribgen_plugin_info.job -job -dependsOnPrevious render_job_info.job render_plugin_info.job
-//and outputs the job id if the job has been submitted successfully
+// and outputs the job id if the job has been submitted successfully
 
 # BeginAttr
 

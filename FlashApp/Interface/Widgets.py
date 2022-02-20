@@ -41,7 +41,7 @@ class IconLabel(QtWidgets.QWidget):
     """
     """
 
-    IconSize = QtCore.QSize(20, 20)
+    IconSize = QtCore.QSize(24, 24)
     HSpacing = 10
 
     def __init__(self, pixmap : QtGui.QPixmap, text : str, finalStretch : bool = True):
@@ -210,6 +210,8 @@ class LabeledLineEdit(QtWidgets.QWidget):
         self.mainLabel = QtWidgets.QLabel(labelText)
         self.mainLayout.addWidget(self.mainLabel)
         
+        self.mainLayout.addSpacing(20)
+        
         self.mainLineEdit = LineEdit()
         self.mainLineEdit.setText(defaultText)
         self.mainLayout.addWidget(self.mainLineEdit)
@@ -230,7 +232,7 @@ class LabeledLineEdit(QtWidgets.QWidget):
 class LabeledComboBox(QtWidgets.QWidget):
     """
     """
-    def __init__(self, labelText : str, parent = None) -> None:
+    def __init__(self, labelText : str, stretch : bool = True, parent = None) -> None:
         super().__init__(parent=parent)
 
         self.mainLayout = QtWidgets.QHBoxLayout()
@@ -240,6 +242,9 @@ class LabeledComboBox(QtWidgets.QWidget):
         
         self.mainLabel = QtWidgets.QLabel(labelText)
         self.mainLayout.addWidget(self.mainLabel)
+        
+        if stretch: 
+            self.mainLayout.addStretch()
         
         self.mainComboBox = QtWidgets.QComboBox()
         self.mainLayout.addWidget(self.mainComboBox)
@@ -260,7 +265,7 @@ class LabeledComboBox(QtWidgets.QWidget):
 class LabeledCheckBox(QtWidgets.QWidget):
     """
     """
-    def __init__(self, labelText : str, parent = None) -> None:
+    def __init__(self, labelText : str, stretch : bool = True, parent = None) -> None:
         super().__init__(parent=parent)
 
         self.mainLayout = QtWidgets.QHBoxLayout()
@@ -270,6 +275,9 @@ class LabeledCheckBox(QtWidgets.QWidget):
         
         self.mainLabel = QtWidgets.QLabel(labelText)
         self.mainLayout.addWidget(self.mainLabel)
+        
+        if stretch:
+            self.mainLayout.addStretch()
         
         self.mainCheckBox = QtWidgets.QCheckBox()
         self.mainLayout.addWidget(self.mainCheckBox)

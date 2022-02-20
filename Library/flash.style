@@ -21,6 +21,11 @@ QListWidget {
 	background-color: rgba(255, 255, 255, 10);
 }
 
+QListView {
+	color: rgba(255, 255, 255, 150);
+	background-color: rgba(255, 255, 255, 10);
+}
+
 QLabel {
 	color: rgb(143, 144, 160);
 }
@@ -93,3 +98,62 @@ QTabBar::tab:selected {
 QTabBar::tab:!selected {                           
 	background: solid rgb(41, 43, 61);
 }   
+
+QScrollBar:vertical {
+	background-color: rgb(8, 8, 10);
+	width: 10px;
+	border: none;
+}
+
+QScrollBar::handle:vertical {
+	background-color: rgb(69, 74, 92);
+	width: 10px;
+	border-radius: 5px;
+}
+
+QScrollBar::add-line:vertical
+{
+	margin: 0px 3px 0px 3px;
+	border-image: url(:/qss_icons/rc/right_arrow_disabled.png);
+	width: 10px;
+	height: 10px;
+	subcontrol-position: right;
+	subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:vertical
+{
+	margin: 0px 3px 0px 3px;
+	border-image: url(:/qss_icons/rc/left_arrow_disabled.png);
+	height: 10px;
+	width: 10px;
+	subcontrol-position: left;
+	subcontrol-origin: margin;
+}
+
+QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical
+{
+	background: none;
+}
+
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical
+{
+	background: none;
+}
+
+QCheckBox {
+	border: none;
+}
+
+QCheckBox::indicator::unchecked {
+	background-color: rgb(234, 66, 74);
+}
+
+QCheckBox::indicator::checked {
+	background-color: rgb(195, 232, 141);
+}
+
+QCombobox {
+	color: rgb(143, 144, 160);
+	background-color: rgb((8, 8, 10);
+}
