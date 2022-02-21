@@ -70,6 +70,11 @@ class AttributeEditor(QtWidgets.QWidget):
         """
         """
         return self.categoryWidget.getLineEdit().text()
+
+    def cleanup(self) -> None:
+        """
+        """
+        pass
     
     
 class PlugPropertiesEditor(QtWidgets.QWidget):
@@ -124,14 +129,14 @@ class PlugPropertiesEditor(QtWidgets.QWidget):
             exposed = plugData["isExposed"]
             hidden = plugData["isHidden"]
             exposedToGraph = plugData["isExposedToGraph"]
-            self.show()
+            self.setDisabled(False)
         else:
             longName = ""
             type = 0
             exposed = False
             hidden = False
             exposedToGraph = False
-            self.hide()
+            self.setDisabled(True)
         
         self.longNameWidget.getLineEdit().setText(longName)
         self.typeWidget.getComboBox().setCurrentIndex(type)
@@ -156,6 +161,27 @@ class PlugPropertiesEditor(QtWidgets.QWidget):
         """
         """
         self.plugDataChanged.emit(self.getPlugData())
+
+    def cleanup(self) -> None:
+        """
+        """
+        self.blockSignals(True)
+
+        longName = ""
+        type = 0
+        exposed = False
+        hidden = False
+        exposedToGraph = False
+        
+        self.longNameWidget.getLineEdit().setText(longName)
+        self.typeWidget.getComboBox().setCurrentIndex(type)
+        self.exposedWidget.getCheckBox().setChecked(exposed)
+        self.exposedWidget.getCheckBox().setChecked(hidden)
+        self.exposedWidget.getCheckBox().setChecked(exposedToGraph)
+        
+        self.setDisabled(True)
+
+        self.blockSignals(False)
     
 
 class PlugsEditor(QtWidgets.QWidget):
@@ -177,11 +203,11 @@ class PlugsEditor(QtWidgets.QWidget):
         self.plugsView.setMaximumWidth(350)
         self.plugsView.setFrameStyle(QtWidgets.QFrame.NoFrame)
         self.plugsView.installEventFilter(self)
-        self.plugsView.itemChanged.connect(self.plugNameChanged)
         self.plugsView.clicked.connect(self.updatePlug)
         masterLayout.addWidget(self.plugsView)
         
         self.propertiesEditor = PlugPropertiesEditor()
+        self.propertiesEditor.plugDataChanged.connect(self.plugDataChanged)
         masterLayout.addWidget(self.propertiesEditor)
         
         self.populateListFromNode(nodeToEditAsDict)
@@ -197,6 +223,7 @@ class PlugsEditor(QtWidgets.QWidget):
         for inPlugName, inPlug in nodeToEditAsDict["inputs"].items():
             input = inPlug[0]
             item = QtWidgets.QListWidgetItem(input["shortName"])
+            item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
             item.setIcon(self.iconsLib.GetIcon("input"))
             
             item.setData(256, input)
@@ -208,6 +235,7 @@ class PlugsEditor(QtWidgets.QWidget):
         for outPlugName, outPlug in nodeToEditAsDict["outputs"].items():
             output = outPlug[0]
             item = QtWidgets.QListWidgetItem(output["shortName"])
+            item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
             item.setIcon(self.iconsLib.GetIcon("output"))
             
             item.setData(256, output)
@@ -223,10 +251,11 @@ class PlugsEditor(QtWidgets.QWidget):
         data = item.data(256)
         self.propertiesEditor.updatePlugData(data)
         
-    def plugNameChanged(self) -> None:
+    @QtCore.pyqtSlot(dict)
+    def plugDataChanged(self, data : dict) -> None:
         """
         """
-        print(self.plugsView.currentItem())
+        self.plugsView.currentItem().setData(256, data)
 
     def setNodeToEdit(self, nodeToEdit : Node) -> None:
         """
@@ -242,16 +271,18 @@ class PlugsEditor(QtWidgets.QWidget):
             newName = Increment(newName)
         
         newInput = {
-        "shortName" : newName,
-        "longName" : "New Input",
-        "index" : 0,
-        "isExposed" : False,
-        "isHidden" : False,
-        "isExposedToGraph" : False,
-        "defaultData" : "",
-        "type" : 7 }
+                    "shortName" : newName,
+                    "longName" : "New Input",
+                    "index" : 0,
+                    "isExposed" : False,
+                    "isHidden" : False,
+                    "isExposedToGraph" : False,
+                    "defaultData" : "",
+                    "type" : 7
+                   }
         
         item = QtWidgets.QListWidgetItem(newInput["shortName"])
+        item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
         item.setIcon(self.iconsLib.GetIcon("input"))
         
         item.setData(256, newInput)
@@ -267,21 +298,42 @@ class PlugsEditor(QtWidgets.QWidget):
             newName = Increment(newName)
         
         newOutput = {
-        "shortName" : newName,
-        "longName" : "New Output",
-        "index" : 0,
-        "isExposed" : False,
-        "isHidden" : False,
-        "isExposedToGraph" : False,
-        "defaultData" : "",
-        "type" : 7 }
+                     "shortName" : newName,
+                     "longName" : "New Output",
+                     "index" : 0,
+                     "isExposed" : False,
+                     "isHidden" : False,
+                     "isExposedToGraph" : False,
+                     "defaultData" : "",
+                     "type" : 7 
+                    }
         
         item = QtWidgets.QListWidgetItem(newOutput["shortName"])
+        item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
         item.setIcon(self.iconsLib.GetIcon("output"))
         
         item.setData(256, newOutput)
         
         self.plugsView.addItem(item)
+
+    def getItems(self):
+        """
+        """
+        for i in range(self.plugsView.count()):
+            yield self.plugsView.item(i)
+
+    def getPlugs(self) -> dict:
+        """
+        """
+        plugs = {}
+
+        for item in self.getItems():
+            plugName = item.text()
+            plugData = item.data(256)
+
+            plugs[plugName] = plugData
+
+        return plugs
         
     def eventFilter(self, source : QtCore.QObject, event : QtCore.QEvent) -> None:
         """
@@ -300,8 +352,22 @@ class PlugsEditor(QtWidgets.QWidget):
             menu.addAction(newOutputAction)
             
             menu.exec_(event.globalPos())
+
+        elif event.type() == QtCore.QEvent.KeyPress and event.key() == QtCore.Qt.Key_Delete:
+            items = self.plugsView.selectedItems()
+
+            for item in items:
+                self.plugsView.takeItem(self.plugsView.row(item))
+
+            self.propertiesEditor.cleanup()
             
         return super().eventFilter(source, event)
+
+    def cleanup(self) -> None:
+        """
+        """
+        self.plugsView.clear()
+        self.propertiesEditor.cleanup()
 
 
 class OpEditor(QtWidgets.QWidget):
@@ -315,6 +381,11 @@ class OpEditor(QtWidgets.QWidget):
         pass
     
     def setNodeToEdit(self, nodeToEditAsDict : dict) -> None:
+        """
+        """
+        pass
+
+    def cleanup(self) -> None:
         """
         """
         pass
@@ -409,7 +480,11 @@ class NodeEditor(QtWidgets.QWidget):
         tmpNode = Node(tmpEnv)
         tmpNode.FromDict(self.nodeToEditAsDict)
         
-        print(tmpNode.ToFile())
+        plugs = self.plugsEditor.getPlugs()
+
+        print(plugs)
+
+        # print(tmpNode.ToFile())
         
         self.needToClose.emit()
     
@@ -417,6 +492,10 @@ class NodeEditor(QtWidgets.QWidget):
         """
         """
         self.needToClose.emit()
+
+        self.attributeEditor.cleanup()
+        self.plugsEditor.cleanup()
+        self.opEditor.cleanup()
         
 
 class NodeEditorWindow(QtWidgets.QMainWindow):
