@@ -1,21 +1,21 @@
 #! C:/Program Files/Nuke13.0v5/nuke-13.0.5.dll -nx
-#write_info MAIN_WRITE file:"" format:"2048 858 1" chans:":rgba.red:rgba.green:rgba.blue:" framerange:"1 120" fps:"0" colorspace:"Output - Rec.709" datatype:"unknown" transfer:"unknown" views:"main" colorManagement:"OCIO"
+#write_info MAIN_WRITE file:"D:/output.mov" format:"2048 858 1" chans:":rgba.red:rgba.green:rgba.blue:" framerange:"1 120" fps:"0" colorspace:"Output - Rec.709" datatype:"unknown" transfer:"unknown" views:"main" colorManagement:"OCIO"
 version 13.0 v5
 define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
 <layout version="1.0">
-    <window x="-1920" y="0" w="1918" h="1128" maximized="1" screen="1">
+    <window x="-1" y="-8" w="1920" h="1137" maximized="1" screen="0">
         <splitter orientation="1">
             <split size="40"/>
             <dock id="" hideTitles="1" activePageId="Toolbar.1">
                 <page id="Toolbar.1"/>
             </dock>
-            <split size="1255" stretch="1"/>
+            <split size="1257" stretch="1"/>
             <splitter orientation="2">
-                <split size="638"/>
+                <split size="643"/>
                 <dock id="" activePageId="Viewer.1">
                     <page id="Viewer.1"/>
                 </dock>
-                <split size="448"/>
+                <split size="452"/>
                 <dock id="" activePageId="DAG.1" focus="true">
                     <page id="DAG.1"/>
                     <page id="Curve Editor.1"/>
@@ -26,14 +26,6 @@ define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
             <dock id="" activePageId="Properties.1">
                 <page id="Properties.1"/>
                 <page id="uk.co.thefoundry.backgroundrenderview.1"/>
-            </dock>
-        </splitter>
-    </window>
-    <window x="140" y="304" w="1255" h="641" screen="0">
-        <splitter orientation="2">
-            <split size="641"/>
-            <dock id="" activePageId="uk.co.thefoundry.scripteditor.1">
-                <page id="uk.co.thefoundry.scripteditor.1"/>
             </dock>
         </splitter>
     </window>
@@ -62,6 +54,7 @@ Root {
 Read {
  inputs 0
  file_type exr
+ file Z:/OEUF/RENDER/sequence/shot/LD2/render_sequence_shot_#.exr
  format "2048 858 0 0 2048 858 1 "
  last 120
  origlast 120
@@ -70,18 +63,35 @@ Read {
  xpos 110
  ypos -73
 }
-set N52a75c00 [stack 0]
+set Nee679800 [stack 0]
 Viewer {
+ frame 1
  frame_range 1-120
  viewerProcess "sRGB (ACES)"
  name Viewer1
  xpos 271
  ypos 65
 }
-push $N52a75c00
+push $Nee679800
 Write {
+ file D:/output.mov
  colorspace "Output - Rec.709"
+ file_type mov
+ mov64_format "mov (QuickTime / MOV)"
+ mov64_codec h264
+ mov_h264_codec_profile "High 4:2:0 8-bit"
+ mov64_pixel_format {{0}}
+ mov64_quality High
+ mov64_fast_start true
+ mov64_write_timecode true
+ mov64_gop_size 12
+ mov64_b_frames 0
+ mov64_bitrate 28000
+ mov64_bitrate_tolerance 0
+ mov64_quality_min 1
+ mov64_quality_max 3
  create_directories true
+ checkHashOnRead false
  name MAIN_WRITE
  xpos 110
  ypos 113

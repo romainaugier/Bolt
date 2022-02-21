@@ -6,20 +6,83 @@ category = Nuke
 
 # EndAttr
 
+# BeginPlugs
+
+# BeginPlug
+
+shortName = inrenderdir
+longName = Render Directory
+defaultValue = ""
+type = str
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = innuketemplate
+longName = Nuke Template File
+defaultValue = ""
+type = str
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = outscriptfile
+longName = Script File
+defaultValue = ""
+type = str
+
+# EndPlug
+
+# BeginPlug
+
+shortName = outrenderdir
+longName = Render Directory
+defaultValue = ""
+type = str
+
+# EndPlug
+
+# EndPlugs
+
 # BeginOp
 
-import nuke
+generatedScript = f"""import nuke, os, sys
 
-nuke.scriptOpen("D:/test.nk")
+nuke.scriptOpen("{innuketemplate}")
 
-path = "Z:/OEUF/RENDER/sequence/shot/LD2"
+seqs = nuke.getFileNameList("{inrenderdir}")
 
-seqs = nuke.getFileNameList(path)
+outputfile = "{inrenderdir}/daily/daily.mov"
 
 if len(seqs) > 0:
-    read = nuke.toNode("MAIN_READ")
-    read.knob("file").fromUserText(path + "/" + seqs[0])
+    if not os.path.exists(outputfile):
+        os.makedirs(os.path.dirname(outputfile))
 
-nuke.scriptSave("D:/test2.nk")
+    read = nuke.toNode("MAIN_READ")
+    read.knob("file").fromUserText("{inrenderdir}/" + seqs[0])
+
+    write = nuke.toNode("MAIN_WRITE")
+    write.knob("file").fromUserText(outputfile)
+
+    first = int(read.knob("first").getValue())
+    last = int(read.knob("last").getValue())
+
+    nuke.execute("MAIN_WRITE", start=first, end=last, incr=1)
+
+else:
+    sys.stderr.write("[ERROR] Nk_GenerateDaily : No file sequence found")
+
+"""
+
+tmpScriptFilePath = FlashTempScript()
+
+with open(tmpScriptFilePath, "w") as file:
+    file.write(generatedScript)
+
+outscriptfile = tmpScriptFilePath
 
 # EndOp

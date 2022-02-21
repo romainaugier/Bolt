@@ -167,7 +167,7 @@ class Graph():
         node.SetInQueue()
         self.sortedNodes.insert(0, node)
         
-    @lru_cache(maxsize=10)
+    # @lru_cache(maxsize=10)
     def FindIfBeginBlock(self, node : Node, beginBlock : Node, endBlock : Node, comingFromNoOutput : bool = False) -> bool:
         """
         """
@@ -198,7 +198,7 @@ class Graph():
         
         return foundBeginBlock
     
-    @lru_cache(maxsize=10)
+    # @lru_cache(maxsize=10)
     def FindIfEndBlock(self, node : Node, beginBlock : Node, endBlock : Node, comingFromNoInput : bool = False) -> bool:
         """
         """
@@ -255,8 +255,8 @@ class Graph():
                     return
                         
         for node in self.nodes:
-            # if node.IsInsideIfBlock():
-            #     continue
+            if node.IsInsideIfBlock():
+                continue
             
             for block in self.ifBlocks:     
                 beginBlock = self.GetNodeWithID(block)
@@ -373,13 +373,17 @@ class Graph():
         Handles an if block, i.e when the graph is being cooked and an if block is encountered, test the condition and if it is true,
         cook the if block, else jump to the end of the block
         """
+        node.GetInput(name="incondition").UpdateInputs()
         condition = node.GetInput(name="incondition").GetData()
         
         if condition:
             return
         else:
             for blockNode in self.ifBlocks[node.GetID()]:
-                self.sortedNodes.pop(self.sortedNodes.index(self.GetNodeWithID(blockNode)))
+                nodeToRemove = self.GetNodeWithID(blockNode)
+                
+                if nodeToRemove in self.sortedNodes:
+                    self.sortedNodes.pop(self.sortedNodes.index(nodeToRemove))
 
     def Cook(self, lastNodeToCook : str = None, skipCookedNodes : bool = True) -> None:
         """

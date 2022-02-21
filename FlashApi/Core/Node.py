@@ -602,7 +602,7 @@ class Node():
         """
         Reloads the opcode from the definition file
         """
-        tmpNode = Node()
+        tmpNode = Node(self.environment)
         tmpNode.Load(self.definitionPath)
         
         self.SetOpCode(tmpNode.GetOpCode())
@@ -1120,6 +1120,11 @@ class Node():
         """
         """
         return self.definitionPath
+    
+    def SetDefinitionPath(self, path : str) -> None:
+        """
+        """
+        self.definitionPath = path
 
     def ToDict(self) -> dict:
         """
@@ -1135,6 +1140,7 @@ class Node():
         nodeAsDict["id"] = self.GetID()
         nodeAsDict["color"] = self.GetColor()
         nodeAsDict["iconPath"] = self.GetIconPathRaw()
+        nodeAsDict["definitionPath"] = self.GetDefinitionPath()
         nodeAsDict["opCode"] = self.GetOpCode()
         
         if self.IsIfBeginBlock():
@@ -1233,6 +1239,9 @@ class Node():
         self.SetColor(nodeAsDict["color"])
         self.SetIconPath(nodeAsDict["iconPath"])
         self.SetOpCode(nodeAsDict["opCode"])
+        
+        if "definitionPath" in nodeAsDict:
+            self.SetDefinitionPath(nodeAsDict["definitionPath"])
         
         if "isIfBegin" in nodeAsDict or "isIfEnd" in nodeAsDict:
             if nodeAsDict["isIfBegin"]: 

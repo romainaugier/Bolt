@@ -59,9 +59,9 @@ type = str
 
 import subprocess, os
 
-FlashLogMessage(f"NukeBatch : Start executing script : {inscript}")
+FlashLogMessage(f"NukeBatch : Start executing script : {inscriptfile}")
 
-command = [f"{innukebindir}/nuke", "--nukex", inscriptfile]
+command = [f"{innukebindir}", "-t", inscriptfile]
 
 for arg in inargs:
     command.append(arg)
@@ -77,7 +77,7 @@ stderrAsStr = stderr.decode("utf-8")
 if len(stderrAsStr) > 0:
     FlashLogError(stderrAsStr)
 else:
-    FlashLogMessage(f"NukeBatch : Finished executing file : {innukefile}")
+    FlashLogMessage(f"NukeBatch : Finished executing script")
     FlashLogMessage(stdoutAsStr)
 
     for line in stdoutAsStr.splitlines():
