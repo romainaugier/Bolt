@@ -38,7 +38,7 @@ exposed = False
 
 shortName = innukebindir
 longName = Nuke Binary Directory
-defaultValue = "C:/Program Files/Nuke"
+defaultValue = "C:/Program Files/Nuke13.0v5/Nuke13.0.exe"
 type = str
 exposed = True
 

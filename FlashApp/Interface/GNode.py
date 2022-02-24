@@ -24,17 +24,17 @@ def GetPlugColor(plugType : PlugType) -> QtGui.QColor:
     """
     Plug types available
     """
-    if plugType == PlugType.INT: return QtGui.QColor("#89ddff")
-    elif plugType == PlugType.INT2: return QtGui.QColor("#89ddff")
-    elif plugType == PlugType.INT3: return QtGui.QColor("#89ddff")
-    elif plugType == PlugType.FLOAT: return QtGui.QColor("#80cbc4")
-    elif plugType == PlugType.FLOAT2: return QtGui.QColor("#80cbc4")
-    elif plugType == PlugType.FLOAT3: return QtGui.QColor("#80cbc4")
-    elif plugType == PlugType.STR: return QtGui.QColor("#c3e88d")
-    elif plugType == PlugType.BOOL: return QtGui.QColor("#eeffff")
-    elif plugType == PlugType.LIST: return QtGui.QColor("#f78c6c")
-    elif plugType == PlugType.DICT: return QtGui.QColor("#c792ea")
-    elif plugType == PlugType.CUSTOM: return QtGui.QColor("#f07178")
+    if plugType == PlugType.INT: return GetQColorFromPalette(ColorPalette.BLUECOLOR)
+    elif plugType == PlugType.INT2: return GetQColorFromPalette(ColorPalette.BLUECOLOR)
+    elif plugType == PlugType.INT3: return GetQColorFromPalette(ColorPalette.BLUECOLOR)
+    elif plugType == PlugType.FLOAT: return GetQColorFromPalette(ColorPalette.CYANCOLOR)
+    elif plugType == PlugType.FLOAT2: return GetQColorFromPalette(ColorPalette.CYANCOLOR)
+    elif plugType == PlugType.FLOAT3: return GetQColorFromPalette(ColorPalette.CYANCOLOR)
+    elif plugType == PlugType.STR: return GetQColorFromPalette(ColorPalette.GREENCOLOR)
+    elif plugType == PlugType.BOOL: return GetQColorFromPalette(ColorPalette.WHITECOLOR)
+    elif plugType == PlugType.LIST: return GetQColorFromPalette(ColorPalette.ORANGECOLOR)
+    elif plugType == PlugType.DICT: return GetQColorFromPalette(ColorPalette.PURPLECOLOR)
+    elif plugType == PlugType.CUSTOM: return GetQColorFromPalette(ColorPalette.REDCOLOR)
 
 
 def GetFontRect(text : str, font : str, size : int) -> QtCore.QRect:
@@ -157,6 +157,11 @@ class Badge(QtWidgets.QGraphicsObject):
                                QtGui.QPainter.TextAntialiasing | 
                                QtGui.QPainter.SmoothPixmapTransform | 
                                QtGui.QPainter.HighQualityAntialiasing)
+        
+        alpha = 1.0
+        
+        if self.node.IsDisabled():
+            alpha = 0.3
 
         if self.state == BadgeState.ERROR:
             painter.drawPixmap(0, 0, self.size, self.size, self.errorPixmap)
@@ -170,6 +175,7 @@ class Badge(QtWidgets.QGraphicsObject):
             pixmap = self.cookingMovie.currentPixmap()
             mask = pixmap.createMaskFromColor(QtGui.QColor(0, 0, 0), QtCore.Qt.MaskInColor) 
             pixmap.setMask(mask)
+            painter.setOpacity(alpha)
             painter.drawPixmap(0, 0, self.size, self.size, pixmap)
 
 class GPlug(QtWidgets.QGraphicsObject):
@@ -254,13 +260,19 @@ class GPlug(QtWidgets.QGraphicsObject):
         pen.setJoinStyle(Qt.RoundJoin)
 
         painter.setPen(Qt.NoPen)
+        
+        color = self.color
+        
+        if self.getInternalPlug().GetNode().IsDisabled():
+            color = self.color
+            color.setAlpha(78)
 
-        painter.setBrush(self.color)
+        painter.setBrush(color)
 
         if self.isInput:
             painter.drawEllipse(0, 0, self.radius, self.radius)
 
-            painter.setPen(self.color)
+            painter.setPen(color)
             painter.setFont(QtGui.QFont("Helvetica", 8))
 
             fontRect = QtCore.QRect(self.radius + self.textWOffset, 0, self.labelRect.width(), self.radius)
@@ -268,7 +280,7 @@ class GPlug(QtWidgets.QGraphicsObject):
         else:
             painter.drawEllipse(self.labelRect.width() + self.textWOffset, 0, self.radius, self.radius)
 
-            painter.setPen(self.color)
+            painter.setPen(color)
             painter.setFont(QtGui.QFont("Helvetica", 8))
 
             fontRect = QtCore.QRect(0, 0, self.labelRect.width() + self.textWOffset, self.radius)
@@ -543,6 +555,22 @@ class GNode(QtWidgets.QGraphicsObject):
             Node: internal node
         """
         return self.internalNode
+    
+    def reloadNode(self) -> None:
+        """
+        """
+        definitionPath = self.getInternalNode().GetDefinitionPath()
+        
+        self.getInternalNode().Load(definitionPath)
+        
+        self = GNode(self.getInternalNode(), self.getInternalNode().GetName(), self.graph, self.iconsLib)
+        
+        QtCore.QTimer.singleShot(10, self.updateAfterReload)
+        
+    def updateAfterReload(self) -> None:
+        """
+        """
+        self.update(self.boundingRect())
 
     def getInputGPlugs(self):
         """
@@ -671,6 +699,28 @@ class GNode(QtWidgets.QGraphicsObject):
             
             painter.setBrush(Qt.transparent)
             painter.drawPath(selectionPath)
+            
+        if self.getInternalNode().IsDisabled():
+            path = QtGui.QPainterPath()
+            path.setFillRule(Qt.WindingFill)
+            path.addRoundedRect(QtCore.QRectF(0, 0, self.sizeX, self.sizeY), 10, 10)
+
+            painter.setPen(Qt.NoPen)
+            
+            disabledColor = QtGui.QColor(0, 0, 0)
+            disabledColor.setAlpha(100)
+            
+            painter.setBrush(disabledColor)
+            painter.drawPath(path.simplified())
+            
+    def updateGPlugs(self) -> None:
+        """
+        """
+        for plug in self.inputGPlugs:
+            plug.update(plug.boundingRect())
+        
+        for plug in self.outputGPlugs:
+            plug.update(plug.boundingRect())
 
     # EVENTS
     
@@ -696,6 +746,16 @@ class GNode(QtWidgets.QGraphicsObject):
         reloadOpCode.setToolTip("Reloads the op code from the file definition")
         reloadOpCode.triggered.connect(lambda: self.getInternalNode().ReloadOpCode())
         menu.addAction(reloadOpCode)
+        
+        reload = QtWidgets.QAction("Reload")
+        reload.setToolTip("Reloads the whole node from the file definition and resets plugs values")
+        reload.triggered.connect(lambda: self.reloadNode())
+        menu.addAction(reload)
+        
+        disableActionName = "Enable" if self.getInternalNode().IsDisabled() else "Disable"
+        disable = QtWidgets.QAction(disableActionName)
+        disable.triggered.connect(lambda: (self.getInternalNode().SetDisabled(True), self.updateBadge(), self.updateGPlugs()))
+        menu.addAction(disable)
         
         deleteAction = QtWidgets.QAction("Delete")
         deleteAction.setToolTip("Delete this node from the graph")

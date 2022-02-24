@@ -222,17 +222,17 @@ class Parser():
                             lineSplit = self.SplitEqual(parmLine)
                             tmpType = self.GetPlugType(lineSplit[1].strip())
 
-                        elif parmLine.startswith("exposed"):
+                        elif parmLine.startswith("exposed "):
                             lineSplit = self.SplitEqual(parmLine)
-                            tmpExposed = True if "True" in lineSplit[1].strip() else False
+                            tmpExposed = True if "True" in lineSplit[1] else False
                         
                         elif parmLine.startswith("exposedToGraph"):
                             lineSplit = self.SplitEqual(parmLine)
-                            tmpExposedToGraph = True if "True" in lineSplit[1].strip() else False
+                            tmpExposedToGraph = True if "True" in lineSplit[1] else False
                         
                         elif parmLine.startswith("hidden"):
                             lineSplit = self.SplitEqual(parmLine)
-                            tmpHidden = True if "True" in lineSplit[1].strip() else False
+                            tmpHidden = True if "True" in lineSplit[1] else False
                         
                         lineIndex += 1
 
@@ -403,10 +403,10 @@ class Plug():
         Sets the plug to be hidden or not
 
         Args:
-            isHiddent (bool, optional): hidden state of the plug. Defaults to True.
+            isHidden (bool, optional): hidden state of the plug. Defaults to True.
         """
         if isHidden and not self.isExposed:
-            self.SetHidden()
+            self.SetExposed(True)
 
         self.isHidden = isHidden
 
@@ -672,6 +672,11 @@ class Node():
         """
         return self.category
     
+    def SetNodeType(self, type : str) -> None:
+        """
+        """
+        self.nodeType = type
+    
     def GetNodeType(self) -> str:
         """
         Returns:
@@ -732,7 +737,7 @@ class Node():
     def SetDisabled(self, isDisabled : bool = True) -> None:
         """
         """
-        self.isDisabled = isDisabled
+        self.isDisabled = not self.isDisabled
 
     def SetInQueue(self, inQueue : bool = True) -> None:
         """
@@ -1141,7 +1146,9 @@ class Node():
         nodeAsDict["color"] = self.GetColor()
         nodeAsDict["iconPath"] = self.GetIconPathRaw()
         nodeAsDict["definitionPath"] = self.GetDefinitionPath()
+        nodeAsDict["nodeType"] = self.GetNodeType()
         nodeAsDict["opCode"] = self.GetOpCode()
+        nodeAsDict["disabled"] = self.IsDisabled()
         
         if self.IsIfBeginBlock():
             nodeAsDict["isIfBegin"] = True
@@ -1238,10 +1245,14 @@ class Node():
         self.SetID(nodeAsDict["id"])
         self.SetColor(nodeAsDict["color"])
         self.SetIconPath(nodeAsDict["iconPath"])
+        self.SetNodeType(nodeAsDict["nodeType"])
         self.SetOpCode(nodeAsDict["opCode"])
         
         if "definitionPath" in nodeAsDict:
             self.SetDefinitionPath(nodeAsDict["definitionPath"])
+        
+        if "disabled" in nodeAsDict:
+            self.isDisabled = nodeAsDict["disabled"]
         
         if "isIfBegin" in nodeAsDict or "isIfEnd" in nodeAsDict:
             if nodeAsDict["isIfBegin"]: 
@@ -1299,6 +1310,10 @@ class Node():
         
         for inputName, input in nodeAsDict["inputs"].items():
             input = input[0]
+            
+            if input["type"] == 7:
+                input["data"] = f"\"{input['data']}\""
+            
             stream.write("\n# BeginPlug\n\n")
             stream.write(f"shortName = {input['shortName']}\n")
             stream.write(f"longName = {input['longName']}\n")
@@ -1311,6 +1326,10 @@ class Node():
 
         for outputName, output in nodeAsDict["outputs"].items():
             output = output[0]
+            
+            if output["type"] == 7:
+                output["data"] = f"\"{output['data']}\""
+            
             stream.write("\n# BeginPlug\n\n")
             stream.write(f"shortName = {output['shortName']}\n")
             stream.write(f"longName = {output['longName']}\n")

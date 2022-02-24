@@ -22,9 +22,9 @@ exposed = False
 
 shortName = innuketemplate
 longName = Nuke Template File
-defaultValue = ""
+defaultValue = "D:/dev/Flash/Library/Templates/Nuke/generate_daily.nk"
 type = str
-exposed = False
+exposed = True
 
 # EndPlug
 

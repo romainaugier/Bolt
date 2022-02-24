@@ -282,7 +282,7 @@ class GGraph(QtWidgets.QGraphicsView):
         self.threadCanJoin.connect(lambda: self.joinGraphThread())
 
         self.selectedNodeChanged.connect(self.onSelectedNodeChange)
-        self.hasBeenEdited.connect(lambda: (self.graph.SetAllDirty(), self.updateNodeBadges(), self.updateBlocks()))
+        self.hasBeenEdited.connect(lambda: (self.stopGraphCooking(), self.graph.SetAllDirty(), self.updateNodeBadges(), self.updateBlocks()))
 
         QtWidgets.QApplication.instance().installEventFilter(self)
 
@@ -344,12 +344,16 @@ class GGraph(QtWidgets.QGraphicsView):
     def onNodeSelectionChange(self, nodeId : str) -> None:
         self.selectedNodeChanged.emit(nodeId)
 
-    def getAnimationLogoMovie(self) -> QtGui.QMovie:
+    def getAnimationLogoMovie(self) -> QtGui.QPixmap:
         """     
         Returns:
             QtGui.QMovie: movie
         """
-        return self.isCookingMovie
+        pixmap = self.isCookingMovie.currentPixmap()
+        mask = pixmap.createMaskFromColor(QtGui.QColor(0, 0, 0), QtCore.Qt.MaskInColor)
+        pixmap.setMask(mask)
+        
+        return pixmap
 
     # EVENTS
 
@@ -731,15 +735,43 @@ class GGraph(QtWidgets.QGraphicsView):
         for sock in node.outputGPlugs:
             for edge in sock.edges[:]:
                 self.deleteEdge(edge)
-
+                
+        if node.getInternalNode().IsIfBeginBlock():
+            node2 = self.getNodeById(node.getInternalNode().GetAssociatedBlockEnd())
+            self.graph.ifBlocks.pop(node.getInternalNode().GetID())
+        elif node.getInternalNode().IsIfEndBlock():
+            node2 = self.getNodeById(node.getInternalNode().GetAssociatedBlockBegin())
+            self.graph.ifBlocks.pop(node2.getInternalNode().GetID())
+        else:
+            node2 = None
+            
         self.graph.RemoveNode(node.getInternalNode())
+        
+        if node2 is not None: 
+            for sock in node2.inputGPlugs:
+                for edge in sock.edges[:]:
+                    self.deleteEdge(edge)
+            
+            for sock in node2.outputGPlugs:
+                for edge in sock.edges[:]:
+                    self.deleteEdge(edge)
+                    
+            self.graph.RemoveNode(node2.getInternalNode())
         
         for block in self.gBlocks:
             if node in block.nodes:
                 block.nodes.remove(node)
                 break
 
+        if node2 is not None:
+            for block in self.gBlocks:
+                if node2 in block.nodes:
+                    block.nodes.remove(node2)
+                    break
+
         self.scene.removeItem(node)
+        
+        if node2 is not None: self.scene.removeItem(node2)
 
         self.blockSignals(False)
 
@@ -860,6 +892,11 @@ class GGraph(QtWidgets.QGraphicsView):
         self.startCooking.emit()
         self.graph.Cook(lastNodeToCook, skipCookedNodes)
         self.threadCanJoin.emit()
+        
+    def stopGraphCooking(self) -> None:
+        """
+        """
+        self.graph.StopCook()
 
     def updateNodeBadges(self) -> None:
         """
@@ -970,9 +1007,11 @@ class GGraph(QtWidgets.QGraphicsView):
 
                 gNode = self.getNodeById(id)
                 gNode.setPos(x, y)
-                gNode.adjustEdges()
 
-        self.hasBeenEdited.emit()
+        self.updateAllEdges()
+        self.updateNodeBadges()
+        self.updateBlocks()
+        # self.hasBeenEdited.emit()
 
     def constructGraphFromInternalGraph(self) -> None:
         """

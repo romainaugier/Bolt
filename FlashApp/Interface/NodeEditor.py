@@ -1,3 +1,5 @@
+from ast import literal_eval
+
 from PyQt5 import QtCore, QtWidgets
 
 from FlashApi.Utils.String import Increment
@@ -77,6 +79,202 @@ class AttributeEditor(QtWidgets.QWidget):
         pass
     
     
+class PlugValueWidget(QtWidgets.QWidget):
+    """
+    """
+
+    valueChanged = QtCore.pyqtSignal(object)
+
+    def __init__(self, plugType : int, data = None, parent=None):
+        super(QtWidgets.QWidget, self).__init__(parent)
+
+        self.plugType = plugType
+        
+        if data is None: 
+            data = ""
+            
+            if self.plugType == PlugType.INT2 or self.plugType == PlugType.FLOAT2:
+                data = ["", ""]
+            elif self.plugType == PlugType.INT3 or self.plugType == PlugType.FLOAT3:
+                data = ["", "", ""]
+            elif self.plugType == PlugType.BOOL:
+                data = False
+
+        self.masterLayout = QtWidgets.QHBoxLayout()
+
+        self.masterLayout.setAlignment(Qt.AlignTop)
+        self.masterLayout.setSpacing(0)
+        self.masterLayout.setContentsMargins(0, 0, 0, 0)
+
+        self.masterLayout.addSpacing(10)
+
+        self.setLayout(self.masterLayout)
+
+        self.setData(plugType, data)
+        
+    def setData(self, plugType : PlugType, data = None) -> None:
+        """
+        """
+        self.plugType = plugType
+        
+        if data is None: 
+            data = ""
+            
+            if self.plugType == PlugType.INT2 or self.plugType == PlugType.FLOAT2:
+                data = ["", ""]
+            elif self.plugType == PlugType.INT3 or self.plugType == PlugType.FLOAT3:
+                data = ["", "", ""]
+            elif self.plugType == PlugType.BOOL:
+                data = False
+        
+        if not type(data) is list and (self.plugType == PlugType.INT2 or self.plugType == PlugType.FLOAT2):
+            data = ["", ""]
+        elif not type(data) is list and (self.plugType == PlugType.INT3 or self.plugType == PlugType.FLOAT3):
+            data = ["", "", ""]
+        elif not type(data) is bool and self.plugType == PlugType.BOOL:
+            data = False
+        
+        if self.masterLayout is not None:
+            while self.masterLayout.count():
+                item = self.masterLayout.itemAt(0)
+                
+                if isinstance(item, QtWidgets.QWidgetItem):
+                    item.widget().setParent(None)
+                    # item.widget().close()
+                elif isinstance(item, QtWidgets.QSpacerItem):
+                    self.masterLayout.removeItem(item)
+
+        if (self.plugType == PlugType.STR or 
+            self.plugType == PlugType.INT or 
+            self.plugType == PlugType.FLOAT):
+            self.editBox1 = LineEdit()
+            self.editBox1.setText(f"{data}")
+            self.editBox1.editingFinished.connect(self.onValueChanged)
+            self.masterLayout.addWidget(self.editBox1)
+
+        if (self.plugType == PlugType.BOOL):
+            self.masterLayout.addStretch()
+            self.editBox1 = QtWidgets.QCheckBox()
+            self.editBox1.setChecked(data)
+            self.editBox1.stateChanged.connect(self.onValueChanged)
+            self.masterLayout.addWidget(self.editBox1)
+
+        elif (self.plugType == PlugType.INT2 or 
+              self.plugType == PlugType.FLOAT2):
+            self.editBox1 = LineEdit()
+            self.editBox1.editingFinished.connect(self.onValueChanged)
+            self.editBox1.setText(f"{data[0]}")
+            self.masterLayout.addWidget(self.editBox1)
+
+            self.masterLayout.addSpacing(5)
+            
+            self.editBox2 = LineEdit()
+            self.editBox2.setText(f"{data[1]}")
+            self.editBox2.editingFinished.connect(self.onValueChanged)
+            self.masterLayout.addWidget(self.editBox2)
+        
+        elif (self.plugType == PlugType.INT3 or 
+              self.plugType == PlugType.FLOAT3):
+            self.editBox1 = LineEdit()
+            self.editBox1.setText(f"{data[0]}")
+            self.editBox1.editingFinished.connect(self.onValueChanged)
+            self.masterLayout.addWidget(self.editBox1)
+            
+            self.masterLayout.addSpacing(5)
+            
+            self.editBox2 = LineEdit()
+            self.editBox2.setText(f"{data[1]}")
+            self.editBox2.editingFinished.connect(self.onValueChanged)
+            self.masterLayout.addWidget(self.editBox2)
+            
+            self.masterLayout.addSpacing(5)
+            
+            self.editBox3 = LineEdit()
+            self.editBox3.setText(f"{data[2]}")
+            self.editBox3.editingFinished.connect(self.onValueChanged)
+            self.masterLayout.addWidget(self.editBox3)
+
+    def onValueChanged(self) -> None:
+        """
+        Handles the change of a value
+        """
+        if (self.plugType == PlugType.STR):
+            editBoxValue1 = self.editBox1.text()
+            self.valueChanged.emit(editBoxValue1)
+
+        elif (self.plugType == PlugType.BOOL):
+            editBoxValue1 = self.editBox1.isChecked()
+            self.valueChanged.emit(editBoxValue1)
+
+        elif (self.plugType == PlugType.INT or
+            self.plugType == PlugType.FLOAT):
+            try:
+                editBoxValue1 = literal_eval(f"{self.editBox1.text()}")
+
+                self.valueChanged.emit(editBoxValue1)
+            except:
+                self.valueChanged.emit(0)
+
+        elif (self.plugType == PlugType.INT2 or 
+              self.plugType == PlugType.FLOAT2):
+            try:
+                editBoxValue1 = literal_eval(f"{self.editBox1.text()}")
+                editBoxValue2 = literal_eval(f"{self.editBox2.text()}")
+                
+                self.valueChanged.emit([editBoxValue1, editBoxValue2])
+            except:
+                self.valueChanged.emit([0, 0])
+        
+        elif (self.plugType == PlugType.INT3 or 
+              self.plugType == PlugType.FLOAT3):
+            try:
+                editBoxValue1 = literal_eval(f"{self.editBox1.text()}")
+                editBoxValue2 = literal_eval(f"{self.editBox2.text()}")
+                editBoxValue3 = literal_eval(f"{self.editBox3.text()}")
+                
+                self.valueChanged.emit([editBoxValue1, editBoxValue2, editBoxValue3])
+            except:
+                self.valueChanged.emit([0, 0, 0])
+        
+    def getValue(self):
+        """
+        """
+        if (self.plugType == PlugType.STR):
+            editBoxValue1 = self.editBox1.text()
+            return editBoxValue1
+
+        elif (self.plugType == PlugType.BOOL):
+            editBoxValue1 = self.editBox1.isChecked()
+            return editBoxValue1
+
+        elif (self.plugType == PlugType.INT or
+            self.plugType == PlugType.FLOAT):
+            try:
+                editBoxValue1 = literal_eval(f"{self.editBox1.text()}")
+                return editBoxValue1
+            except:
+                return 0
+
+        elif (self.plugType == PlugType.INT2 or 
+              self.plugType == PlugType.FLOAT2):
+            try:
+                editBoxValue1 = literal_eval(f"{self.editBox1.text()}")
+                editBoxValue2 = literal_eval(f"{self.editBox2.text()}")
+                return [editBoxValue1, editBoxValue2]
+            except:
+                return [0, 0]
+        
+        elif (self.plugType == PlugType.INT3 or 
+              self.plugType == PlugType.FLOAT3):
+            try:
+                editBoxValue1 = literal_eval(f"{self.editBox1.text()}")
+                editBoxValue2 = literal_eval(f"{self.editBox2.text()}")
+                editBoxValue3 = literal_eval(f"{self.editBox3.text()}")
+                return [editBoxValue1, editBoxValue2, editBoxValue3]
+            except:
+                return [0, 0, 0]
+    
+    
 class PlugPropertiesEditor(QtWidgets.QWidget):
     """
     Interface to edit the properties of a plug
@@ -101,7 +299,8 @@ class PlugPropertiesEditor(QtWidgets.QWidget):
                                                 "FLOAT","FLOAT2","FLOAT3",
                                                 "STR","BOOL",
                                                 "LIST","DICT","CUSTOM"])
-        self.typeWidget.getComboBox().currentIndexChanged.connect(self.dataChanged)
+        self.typeWidget.getComboBox().setMinimumWidth(100)
+        self.typeWidget.getComboBox().currentIndexChanged.connect(lambda: (self.dataChanged(), self.updateValueWidget()))
         masterLayout.addWidget(self.typeWidget)
         
         self.exposedWidget = LabeledCheckBox("Exposed")
@@ -116,6 +315,17 @@ class PlugPropertiesEditor(QtWidgets.QWidget):
         self.exposedToGraphWidget.getCheckBox().stateChanged.connect(self.dataChanged)
         masterLayout.addWidget(self.exposedToGraphWidget)
         
+        valueLayout = QtWidgets.QHBoxLayout()
+        self.valueLabel = QtWidgets.QLabel("Default Value")
+        valueLayout.addWidget(self.valueLabel)
+        
+        valueLayout.addSpacing(5)
+        
+        self.valueWidget = PlugValueWidget(1)
+        self.valueWidget.valueChanged.connect(self.valueChanged)
+        valueLayout.addWidget(self.valueWidget)
+        masterLayout.addLayout(valueLayout)
+        
         self.updatePlugData(plugData)
         
         self.setLayout(masterLayout)
@@ -129,6 +339,7 @@ class PlugPropertiesEditor(QtWidgets.QWidget):
             exposed = plugData["isExposed"]
             hidden = plugData["isHidden"]
             exposedToGraph = plugData["isExposedToGraph"]
+            data = plugData["defaultData"]
             self.setDisabled(False)
         else:
             longName = ""
@@ -136,13 +347,20 @@ class PlugPropertiesEditor(QtWidgets.QWidget):
             exposed = False
             hidden = False
             exposedToGraph = False
+            data = None
             self.setDisabled(True)
         
         self.longNameWidget.getLineEdit().setText(longName)
         self.typeWidget.getComboBox().setCurrentIndex(type)
         self.exposedWidget.getCheckBox().setChecked(exposed)
-        self.exposedWidget.getCheckBox().setChecked(hidden)
-        self.exposedWidget.getCheckBox().setChecked(exposedToGraph)
+        self.hiddenWidget.getCheckBox().setChecked(hidden)
+        self.exposedToGraphWidget.getCheckBox().setChecked(exposedToGraph)
+        self.valueWidget.setData(type + 1, data)
+        
+    def updateValueWidget(self) -> None:
+        """
+        """
+        self.valueWidget.setData(self.typeWidget.getComboBox().currentIndex() + 1)
         
     def getPlugData(self) -> dict:
         """
@@ -152,12 +370,19 @@ class PlugPropertiesEditor(QtWidgets.QWidget):
         plugData["longName"] = self.longNameWidget.getLineEdit().text()
         plugData["type"] = self.typeWidget.getComboBox().currentIndex() + 1
         plugData["isExposed"] = self.exposedWidget.getCheckBox().isChecked()
-        plugData["isHidden"] = self.exposedWidget.getCheckBox().isChecked()
-        plugData["isExposedToGraph"] = self.exposedWidget.getCheckBox().isChecked()
+        plugData["isHidden"] = self.hiddenWidget.getCheckBox().isChecked()
+        plugData["isExposedToGraph"] = self.exposedToGraphWidget.getCheckBox().isChecked()
+        plugData["defaultData"] = self.valueWidget.getValue()
         
         return plugData
         
     def dataChanged(self) -> None:
+        """
+        """
+        self.plugDataChanged.emit(self.getPlugData())
+    
+    @QtCore.pyqtSlot(object)
+    def valueChanged(self, data : object = None) -> None:
         """
         """
         self.plugDataChanged.emit(self.getPlugData())
@@ -176,8 +401,8 @@ class PlugPropertiesEditor(QtWidgets.QWidget):
         self.longNameWidget.getLineEdit().setText(longName)
         self.typeWidget.getComboBox().setCurrentIndex(type)
         self.exposedWidget.getCheckBox().setChecked(exposed)
-        self.exposedWidget.getCheckBox().setChecked(hidden)
-        self.exposedWidget.getCheckBox().setChecked(exposedToGraph)
+        self.hiddenWidget.getCheckBox().setChecked(hidden)
+        self.exposedToGraphWidget.getCheckBox().setChecked(exposedToGraph)
         
         self.setDisabled(True)
 
@@ -267,13 +492,20 @@ class PlugsEditor(QtWidgets.QWidget):
         """
         newName = "innewinput"
         
-        while newName in self.plugs: 
+        hasName = True
+        
+        while hasName: 
             newName = Increment(newName)
+            
+            hasName = False
+            
+            for plug in self.getItems():
+                if newName == plug.text():
+                    hasName = True
         
         newInput = {
                     "shortName" : newName,
                     "longName" : "New Input",
-                    "index" : 0,
                     "isExposed" : False,
                     "isHidden" : False,
                     "isExposedToGraph" : False,
@@ -294,13 +526,20 @@ class PlugsEditor(QtWidgets.QWidget):
         """
         newName = "outnewinput"
         
-        while newName in self.plugs: 
+        hasName = True
+        
+        while hasName: 
             newName = Increment(newName)
+            
+            hasName = False
+            
+            for plug in self.getItems():
+                if newName == plug.text():
+                    hasName = True
         
         newOutput = {
                      "shortName" : newName,
                      "longName" : "New Output",
-                     "index" : 0,
                      "isExposed" : False,
                      "isHidden" : False,
                      "isExposedToGraph" : False,
@@ -330,6 +569,9 @@ class PlugsEditor(QtWidgets.QWidget):
         for item in self.getItems():
             plugName = item.text()
             plugData = item.data(256)
+            
+            if not "shortName" in plugData:
+                plugData["shortName"] = plugName
 
             plugs[plugName] = plugData
 
@@ -358,6 +600,7 @@ class PlugsEditor(QtWidgets.QWidget):
 
             for item in items:
                 self.plugsView.takeItem(self.plugsView.row(item))
+                del item
 
             self.propertiesEditor.cleanup()
             
@@ -370,6 +613,18 @@ class PlugsEditor(QtWidgets.QWidget):
         self.propertiesEditor.cleanup()
 
 
+CODEEDITORSYNTAXHIGHLIGHT = {
+    "string" : Format(GetQColorFromPalette(ColorPalette.STRINGSCOLOR)),
+    "keyword" : Format(GetQColorFromPalette(ColorPalette.KEYWORDSCOLOR)),
+    "operator" : Format(GetQColorFromPalette(ColorPalette.OPERATORSCOLOR)),
+    "brace" : Format(GetQColorFromPalette(ColorPalette.FOREGROUND)),
+    "self" : Format(GetQColorFromPalette(ColorPalette.OPERATORSCOLOR)),
+    "defclass" : Format(GetQColorFromPalette(ColorPalette.FUNCTIONSCOLOR)),
+    "numbers" : Format(GetQColorFromPalette(ColorPalette.NUMBERSCOLOR)),
+    "comment" : Format(GetQColorFromPalette(ColorPalette.COMMENTSCOLOR))
+}
+
+
 class OpEditor(QtWidgets.QWidget):
     """
     Interface that enable to type the python opcode of the node
@@ -378,17 +633,38 @@ class OpEditor(QtWidgets.QWidget):
         """
         """
         super().__init__(parent=parent)
-        pass
+        
+        self.masterLayout = QtWidgets.QVBoxLayout()
+        
+        self.codeEditor = PyCodeEditor(CODEEDITORSYNTAXHIGHLIGHT, QtGui.QFont("Source Code Pro", 10))
+        self.codeEditor.setFrameStyle(QtWidgets.QFrame.NoFrame)
+        self.codeEditor.setMinimumSize(800, 1000)
+        self.codeEditor.setStyleSheet(CODEEDITORSTYLE)
+        self.codeEditor.setLineHighlightColor(GetQColorFromPalette(ColorPalette.HIGHLIGHT))
+        self.codeEditor.setLineIndicesTextColor(GetQColorFromPalette(ColorPalette.DISABLED))
+        self.codeEditor.setLineIndicesBgColor(GetQColorFromPalette(ColorPalette.BACKGROUND))
+        
+        self.codeEditor.appendPlainText(nodeToEditAsDict["opCode"])
+        
+        self.masterLayout.addWidget(self.codeEditor)
+        
+        self.setLayout(self.masterLayout)
     
     def setNodeToEdit(self, nodeToEditAsDict : dict) -> None:
         """
         """
-        pass
+        self.nodeToEditAsDict = nodeToEditAsDict
+        self.codeEditor.setPlainText(self.nodeToEditAsDict["opCode"])
 
     def cleanup(self) -> None:
         """
         """
-        pass
+        self.codeEditor.setPlainText("")
+        
+    def getCode(self) -> str:
+        """
+        """
+        return self.codeEditor.toPlainText()
 
 class NodeEditor(QtWidgets.QWidget):
     """
@@ -462,6 +738,7 @@ class NodeEditor(QtWidgets.QWidget):
                                       "iconPath" : "$FLASH_ICONS/flash.png",
                                       "category" : "NewCategory",
                                       "definitionPath" : "$FLASH_LIB/Nodes/new_node.fnode", 
+                                      "nodeType" : "NewCategory/NewNode",
                                       "id" : "0",
                                       "color" : [0, 0, 0], 
                                       "opCode" : "",
@@ -475,18 +752,66 @@ class NodeEditor(QtWidgets.QWidget):
     def saveNode(self) -> None:
         """
         """
-        tmpEnv = Environment()
+        tmpEnv = self.environment
+
+        self.nodeToEditAsDict["name"] = self.attributeEditor.getName()
+        self.nodeToEditAsDict["category"] = self.attributeEditor.getCategory()
+        self.nodeToEditAsDict["iconPath"] = self.attributeEditor.getIcon()
+        self.nodeToEditAsDict["definitionPath"] = self.attributeEditor.getSavePath()
         
-        tmpNode = Node(tmpEnv)
-        tmpNode.FromDict(self.nodeToEditAsDict)
+        self.nodeToEditAsDict["nodeType"] = f"{self.nodeToEditAsDict['category']}/{self.nodeToEditAsDict['name']}"
+        
+        self.nodeToEditAsDict["opCode"] = self.opEditor.getCode()
+        
+        self.nodeToEditAsDict["inputs"] = {}
+        self.nodeToEditAsDict["outputs"] = {}
         
         plugs = self.plugsEditor.getPlugs()
 
-        print(plugs)
+        i = 0
+        for plugName, plugData in plugs.items():
+            if plugName.startswith("in"):
+                self.nodeToEditAsDict["inputs"][plugName] = [{ "shortName" : plugData["shortName"],
+                                                               "longName" : plugData["longName"],
+                                                               "index" : i,
+                                                               "isExposed" : plugData["isExposed"],
+                                                               "isHidden" : plugData["isHidden"],
+                                                               "isExposedToGraph" : plugData["isExposedToGraph"],
+                                                               "data" : plugData["defaultData"],
+                                                               "defaultData" : plugData["defaultData"],
+                                                               "type" : plugData["type"],
+                                                               "connectionName" : None,
+                                                               "connectionNodeId" : None }]
+                
+                i += 1
+              
+        i = 0  
+        for plugName, plugData in plugs.items():
+            if plugName.startswith("out"):
+                self.nodeToEditAsDict["outputs"][plugName] = [{ "shortName" : plugData["shortName"],
+                                                               "longName" : plugData["longName"],
+                                                               "index" : i,
+                                                               "isExposed" : plugData["isExposed"],
+                                                               "isHidden" : plugData["isHidden"],
+                                                               "isExposedToGraph" : plugData["isExposedToGraph"],
+                                                               "data" : plugData["defaultData"],
+                                                               "defaultData" : plugData["defaultData"],
+                                                               "type" : plugData["type"],
+                                                               "connectionName" : None,
+                                                               "connectionNodeId" : None }]
+                
+                i += 1
 
-        # print(tmpNode.ToFile())
+        tmpNode = Node(tmpEnv)
+        tmpNode.FromDict(self.nodeToEditAsDict)
         
-        self.needToClose.emit()
+        savePath = self.nodeToEditAsDict["definitionPath"]
+        
+        if self.environment.SearchInString(savePath):
+            savePath = self.environment.ReplaceInString(savePath)
+        
+        with open(savePath, "w") as file:
+            file.write(tmpNode.ToFile())
     
     def closeWindow(self) -> None:
         """
@@ -501,12 +826,14 @@ class NodeEditor(QtWidgets.QWidget):
 class NodeEditorWindow(QtWidgets.QMainWindow):
     """
     """
-    def __init__(self, iconsLib : Icons, nodeToEdit : Node = None, parent=None) -> None:
+    def __init__(self, iconsLib : Icons, environment : Environment, nodeToEdit : Node = None, parent=None) -> None:
         """
         """
         super().__init__(parent=parent)
         
-        self.editor = NodeEditor(iconsLib, nodeToEdit)
+        self.environment = environment
+        
+        self.editor = NodeEditor(iconsLib, self.environment, nodeToEdit)
         self.editor.needToClose.connect(lambda: self.close())
         
         self.setMinimumSize(900, 800)

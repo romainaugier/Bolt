@@ -1,0 +1,1620 @@
+{
+  "nodes": [
+    {
+      "name": "Extract_Framerange",
+      "category": "Utility",
+      "id": "6538613937343662303835616438626663316265303936323865336637656331",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/util.png",
+      "definitionPath": "D:/dev/FLash/Library/Nodes/extract_framerange.fnode",
+      "nodeType": "Utility/Extract_Framerange",
+      "opCode": "# BeginOp\n\nframerange = inshotspecs[\"FrameRange\"].split(\"-\")\n\noutframerange = [int(framerange[0]),int(framerange[1])]\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inshotspecs": [
+          {
+            "shortName": "inshotspecs",
+            "longName": "Shot Specs",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {
+              "FrameRange": "100-220",
+              "Sequence": "tests",
+              "Shot": "zumba_dance"
+            },
+            "defaultData": {},
+            "type": 10,
+            "connectionName": "outshotspecs",
+            "connectionNodeId": "3937663635383431373837363732336232313863346236623663313439663238"
+          }
+        ]
+      },
+      "outputs": {
+        "outframerange": [
+          {
+            "shortName": "outframerange",
+            "longName": "Frame Range",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              100,
+              220
+            ],
+            "defaultData": [
+              100,
+              240
+            ],
+            "type": 2,
+            "connectionName": "inframerange",
+            "connectionNodeId": "3432356162333934643664373933646236646236306335623732613234353039"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Oeuf_ShotSpecs",
+      "category": "Oeuf",
+      "id": "3937663635383431373837363732336232313863346236623663313439663238",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/volcan.png",
+      "definitionPath": "D:/dev/FLash/Library/Nodes/oeuf_shot_specs.fnode",
+      "nodeType": "Oeuf/Oeuf_ShotSpecs",
+      "opCode": "# BeginOp\n\noutshotspecs = inshotspecs\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inshotspecs": [
+          {
+            "shortName": "inshotspecs",
+            "longName": "Shot Specs",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {
+              "FrameRange": "100-220",
+              "Sequence": "tests",
+              "Shot": "zumba_dance"
+            },
+            "defaultData": {
+              "FrameRange": "100-240",
+              "Sequence": "seq010",
+              "Shot": "shot010"
+            },
+            "type": 10,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outshotspecs": [
+          {
+            "shortName": "outshotspecs",
+            "longName": "Output Shot Specs",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {
+              "FrameRange": "100-220",
+              "Sequence": "tests",
+              "Shot": "zumba_dance"
+            },
+            "defaultData": {},
+            "type": 10,
+            "connectionName": "inshotspecs",
+            "connectionNodeId": "6538613937343662303835616438626663316265303936323865336637656331"
+          },
+          {
+            "shortName": "outshotspecs",
+            "longName": "Output Shot Specs",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {
+              "FrameRange": "100-220",
+              "Sequence": "tests",
+              "Shot": "zumba_dance"
+            },
+            "defaultData": {},
+            "type": 10,
+            "connectionName": "inshotspecs",
+            "connectionNodeId": "6638376334623037353735393362666336386538656634326432626565336537"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Guerilla_CreateScene",
+      "category": "Guerilla",
+      "id": "3432356162333934643664373933646236646236306335623732613234353039",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/guerilla-render.png",
+      "definitionPath": "D:/dev/FLash/Library/Nodes/guerilla_create_scene.fnode",
+      "nodeType": "Guerilla/Guerilla_CreateScene",
+      "opCode": "# BeginOp\n\n# BeginOp\n\nimport os\n\nif os.path.exists(infilepath):\n    os.remove(infilepath)\n\ndir = os.path.dirname(infilepath)\n\nif not os.path.exists(dir):\n    os.makedirs(dir)\n\ngeneratedScript = f\"\"\"import guerilla\n\nimport RomanoTools.Guerilla.Utils as utils\n\nutils.SetOptims()\nutils.SetRange(\"{inframerange[0]}-{inframerange[1]}\")\n\nrenderPass = guerilla.Document().findchild(\"RenderPass\")\n\nrenderPass.FileLayerName.set(\"$o_$n\")\n\nguerilla.Document().ProjectWidth.set(2048)\nguerilla.Document().ProjectHeight.set(858)\n\nguerilla.Document().save(\"{infilepath}\")\n\"\"\"\n\ntmpScriptFilePath = FlashTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\noutscripttext = generatedScript\n\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infilepath": [
+          {
+            "shortName": "infilepath",
+            "longName": "Guerilla File Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/LIGHTING/tests/zumba_dance/zumda_dance.gproject",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "output",
+            "connectionNodeId": "3732663965633736336336373439353831323161303538646461383262626562"
+          }
+        ],
+        "inframerange": [
+          {
+            "shortName": "inframerange",
+            "longName": "Frame Range",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              100,
+              220
+            ],
+            "defaultData": [
+              100,
+              240
+            ],
+            "type": 2,
+            "connectionName": "outframerange",
+            "connectionNodeId": "6538613937343662303835616438626663316265303936323865336637656331"
+          }
+        ]
+      },
+      "outputs": {
+        "outfilepath": [
+          {
+            "shortName": "outfilepath",
+            "longName": "Output FilePath",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "inguerillafile",
+            "connectionNodeId": "3430333063363466313934633636303565633365326633303738353936613934"
+          }
+        ],
+        "outscriptfile": [
+          {
+            "shortName": "outscriptfile",
+            "longName": "Output Script File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Flash/3433323331653730376331363732343834653365356434613661303932623466.py",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "inscript1",
+            "connectionNodeId": "6330613663313534656136353936313638313662653461626265356532323266"
+          }
+        ],
+        "outscripttext": [
+          {
+            "shortName": "outscripttext",
+            "longName": "Output Script Text",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "import guerilla\n\nimport RomanoTools.Guerilla.Utils as utils\n\nutils.SetOptims()\nutils.SetRange(\"100-220\")\n\nrenderPass = guerilla.Document().findchild(\"RenderPass\")\n\nrenderPass.FileLayerName.set(\"$o_$n\")\n\nguerilla.Document().ProjectWidth.set(2048)\nguerilla.Document().ProjectHeight.set(858)\n\nguerilla.Document().save(\"Z:/OEUF/LIGHTING/tests/zumba_dance/zumda_dance.gproject\")\n",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "File",
+      "category": "Utility",
+      "id": "3963356364643030633764613736643862383332626537356364343730323261",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "",
+      "definitionPath": "D:/dev/FLash/Library/Nodes/file.fnode",
+      "nodeType": "Utility/File",
+      "opCode": "# BeginOp\n\noutfile = infile\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infile": [
+          {
+            "shortName": "infile",
+            "longName": "Input File Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/LIGHTING/tests/zumba_dance/zumda_dance.gproject",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/LIGHTING/tests/zumba_dance/zumda_dance.gproject",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "input1",
+            "connectionNodeId": "3732663965633736336336373439353831323161303538646461383262626562"
+          }
+        ]
+      }
+    },
+    {
+      "name": "File1",
+      "category": "Utility",
+      "id": "3666666531653062373337656539306661316166326133633331653038323633",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "",
+      "definitionPath": "D:/dev/FLash/Library/Nodes/file.fnode",
+      "nodeType": "Utility/File",
+      "opCode": "# BeginOp\n\noutfile = infile\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infile": [
+          {
+            "shortName": "infile",
+            "longName": "Input File Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/BORDEL/TESTPLUMES/RumbaDance_Bird.abc",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/BORDEL/TESTPLUMES/RumbaDance_Bird.abc",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "input1",
+            "connectionNodeId": "3734393138313739346639376462663637646465626636303736333530623239"
+          },
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/BORDEL/TESTPLUMES/RumbaDance_Bird.abc",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "inanimationfile",
+            "connectionNodeId": "6638376334623037353735393362666336386538656634326432626565336537"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Oeuf_FetchFeathers",
+      "category": "Oeuf",
+      "id": "3466633237366530616463626334376234316165323231646235636364376233",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/volcan.png",
+      "definitionPath": "D:/dev/FLash/Library/Nodes/oeuf_fetch_feathers.fnode",
+      "nodeType": "Oeuf/Oeuf_FetchFeathers",
+      "opCode": "# BeginOp\n\noutfeatherspath = infeatherspath\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infeatherspath": [
+          {
+            "shortName": "infeatherspath",
+            "longName": "Feathers Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_a_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_b_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_c_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_d_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_e_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_f_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_g_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_h_1.abc"
+            ],
+            "defaultData": [
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_a_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_b_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_c_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_d_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_e_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_f_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_g_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_h_1.abc"
+            ],
+            "type": 9,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfeatherspath": [
+          {
+            "shortName": "outfeatherspath",
+            "longName": "Feathers",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_a_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_b_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_c_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_d_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_e_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_f_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_g_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_h_1.abc"
+            ],
+            "defaultData": [],
+            "type": 9,
+            "connectionName": "input2",
+            "connectionNodeId": "6439346530336663303363316261386535353330646134613337326531613538"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Guerilla_LoadAlembics",
+      "category": "Guerilla",
+      "id": "3261646434326362656338643534646261633737663138303837323339633336",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/guerilla-render.png",
+      "definitionPath": "D:/dev/FLash/Library/Nodes/guerilla_load_alembics.fnode",
+      "nodeType": "Guerilla/Guerilla_LoadAlembics",
+      "opCode": "# BeginOp\n\nif type(inabcfiles) is str:\n    inabcfiles = [inabcfiles]\n\ngeneratedScript = f\"\"\"import guerilla, os\n\npaths = {inabcfiles}\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    with guerilla.Modifier() as mod:\n        mod.createref(name, path, options={{ 'prefixnodes' : False,'containschildren' : True }})\n\nguerilla.Document().save()\n\"\"\"\n\ntmpScriptFilePath = FlashTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\noutscripttext = generatedScript\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inabcfiles": [
+          {
+            "shortName": "inabcfiles",
+            "longName": "Alembic Files",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              "Z:/OEUF/BORDEL/TESTPLUMES/RumbaDance_Bird.abc",
+              "Z:/OEUF/CACHE/tests/zumba_dance/Charles/tests_zumba_dance_charles_cache_fur.abc",
+              "Z:/OEUF/CACHE/tests/zumba_dance/Charles/tests_zumba_dance_charles_cache_plumes.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_a_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_b_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_c_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_d_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_e_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_f_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_g_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_h_1.abc"
+            ],
+            "defaultData": [
+              ""
+            ],
+            "type": 9,
+            "connectionName": "output",
+            "connectionNodeId": "6439346530336663303363316261386535353330646134613337326531613538"
+          }
+        ]
+      },
+      "outputs": {
+        "outscriptfile": [
+          {
+            "shortName": "outscriptfile",
+            "longName": "Output Script File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Flash/6436316534336436383139363038353066626136343065633566333462623765.py",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "inscript1",
+            "connectionNodeId": "3730383261656331303537393361363535663331303333376665643430313931"
+          }
+        ],
+        "outscripttext": [
+          {
+            "shortName": "outscripttext",
+            "longName": "Output Script Text",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "import guerilla, os\n\npaths = ['Z:/OEUF/BORDEL/TESTPLUMES/RumbaDance_Bird.abc', 'Z:/OEUF/CACHE/tests/zumba_dance/Charles/tests_zumba_dance_charles_cache_fur.abc', 'Z:/OEUF/CACHE/tests/zumba_dance/Charles/tests_zumba_dance_charles_cache_plumes.abc', 'Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_a_1.abc', 'Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_b_1.abc', 'Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_c_1.abc', 'Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_d_1.abc', 'Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_e_1.abc', 'Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_f_1.abc', 'Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_g_1.abc', 'Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_h_1.abc']\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    with guerilla.Modifier() as mod:\n        mod.createref(name, path, options={ 'prefixnodes' : False,'containschildren' : True })\n\nguerilla.Document().save()\n",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge",
+      "category": "Utility",
+      "id": "3734393138313739346639376462663637646465626636303736333530623239",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/util.png",
+      "definitionPath": "D:/dev/FLash/Library/Nodes/merge.fnode",
+      "nodeType": "Utility/Merge",
+      "opCode": "# BeginOp\n\n# BeginOp\n\nif type(input1) is list:\n    if type(input2) is list:\n        output = [*input1, *input2]\n    else:\n        output = [*input1, input2]\nelif type(input2) is list:\n    output = [input1, *input2]\nelse:\n    output = [input1, input2]\n\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "input1": [
+          {
+            "shortName": "input1",
+            "longName": "Input 1",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/BORDEL/TESTPLUMES/RumbaDance_Bird.abc",
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outfile",
+            "connectionNodeId": "3666666531653062373337656539306661316166326133633331653038323633"
+          }
+        ],
+        "input2": [
+          {
+            "shortName": "input2",
+            "longName": "Input 2",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              "Z:/OEUF/CACHE/tests/zumba_dance/Charles/tests_zumba_dance_charles_cache_fur.abc",
+              "Z:/OEUF/CACHE/tests/zumba_dance/Charles/tests_zumba_dance_charles_cache_plumes.abc"
+            ],
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outabccachefile",
+            "connectionNodeId": "6638376334623037353735393362666336386538656634326432626565336537"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              "Z:/OEUF/BORDEL/TESTPLUMES/RumbaDance_Bird.abc",
+              "Z:/OEUF/CACHE/tests/zumba_dance/Charles/tests_zumba_dance_charles_cache_fur.abc",
+              "Z:/OEUF/CACHE/tests/zumba_dance/Charles/tests_zumba_dance_charles_cache_plumes.abc"
+            ],
+            "defaultData": [],
+            "type": 9,
+            "connectionName": "input1",
+            "connectionNodeId": "6439346530336663303363316261386535353330646134613337326531613538"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge1",
+      "category": "Utility",
+      "id": "6439346530336663303363316261386535353330646134613337326531613538",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/util.png",
+      "definitionPath": "D:/dev/FLash/Library/Nodes/merge.fnode",
+      "nodeType": "Utility/Merge",
+      "opCode": "# BeginOp\n\n# BeginOp\n\nif type(input1) is list:\n    if type(input2) is list:\n        output = [*input1, *input2]\n    else:\n        output = [*input1, input2]\nelif type(input2) is list:\n    output = [input1, *input2]\nelse:\n    output = [input1, input2]\n\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "input1": [
+          {
+            "shortName": "input1",
+            "longName": "Input 1",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              "Z:/OEUF/BORDEL/TESTPLUMES/RumbaDance_Bird.abc",
+              "Z:/OEUF/CACHE/tests/zumba_dance/Charles/tests_zumba_dance_charles_cache_fur.abc",
+              "Z:/OEUF/CACHE/tests/zumba_dance/Charles/tests_zumba_dance_charles_cache_plumes.abc"
+            ],
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "output",
+            "connectionNodeId": "3734393138313739346639376462663637646465626636303736333530623239"
+          }
+        ],
+        "input2": [
+          {
+            "shortName": "input2",
+            "longName": "Input 2",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_a_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_b_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_c_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_d_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_e_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_f_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_g_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_h_1.abc"
+            ],
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outfeatherspath",
+            "connectionNodeId": "3466633237366530616463626334376234316165323231646235636364376233"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              "Z:/OEUF/BORDEL/TESTPLUMES/RumbaDance_Bird.abc",
+              "Z:/OEUF/CACHE/tests/zumba_dance/Charles/tests_zumba_dance_charles_cache_fur.abc",
+              "Z:/OEUF/CACHE/tests/zumba_dance/Charles/tests_zumba_dance_charles_cache_plumes.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_a_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_b_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_c_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_d_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_e_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_f_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_g_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_h_1.abc"
+            ],
+            "defaultData": [],
+            "type": 9,
+            "connectionName": "inabcfiles",
+            "connectionNodeId": "3261646434326362656338643534646261633737663138303837323339633336"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Hou_Hython",
+      "category": "Houdini",
+      "id": "3665323434333336373930313261393536303037623436613237323832313265",
+      "color": [
+        255,
+        87,
+        34
+      ],
+      "iconPath": "$FLASH_ICONS/houdini.png",
+      "definitionPath": "D:/dev/FLash/Library/Nodes/hou_hython.fnode",
+      "nodeType": "Houdini/Hou_Hython",
+      "opCode": "# BeginOp\n\nimport subprocess, os\n\nFlashLogMessage(f\"Hython : Start executing script : {inscript}\")\n\ncommand = [\"hython\"]\n\nif os.path.exists(inhoufile):\n    command.append(inhoufile)\n\ncommand.append(inscript)\n\nFlashLogMessage(f\"Hython Command : {' '.join(command)}\")\n\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE)\nstdout, stderr = process.communicate()\n\nstdoutAsStr = stdout.decode(\"utf-8\")\nstderrAsStr = stderr.decode(\"utf-8\")\n\nif len(stderrAsStr) > 0:\n    FlashLogError(stderrAsStr)\nelse:\n    FlashLogMessage(f\"Hython : Finished executing script : {inscript}\")\n    FlashLogMessage(stdoutAsStr)\n\n\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inscript": [
+          {
+            "shortName": "inscript",
+            "longName": "Input Script Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Flash/3030386131303735656532623433386531366163306539646339656132313431.py",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outscriptfile",
+            "connectionNodeId": "6638376334623037353735393362666336386538656634326432626565336537"
+          }
+        ],
+        "inhoufile": [
+          {
+            "shortName": "inhoufile",
+            "longName": "Input Houdini File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/Bird_feathers_template.hipnc",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outfile",
+            "connectionNodeId": "3332396364663661353963303338663161633838326461643532666430646638"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "input2",
+            "connectionNodeId": "3732663965633736336336373439353831323161303538646461383262626562"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Switch",
+      "category": "Utility",
+      "id": "3732663965633736336336373439353831323161303538646461383262626562",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "",
+      "definitionPath": "D:/dev/FLash/Library/Nodes/switch.fnode",
+      "nodeType": "Utility/Switch",
+      "opCode": "# BeginOp\n\nif inswitchindex == 0:\n    output = input1\nelse:\n    output = input2\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "input1": [
+          {
+            "shortName": "input1",
+            "longName": "Input 1",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/LIGHTING/tests/zumba_dance/zumda_dance.gproject",
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outfile",
+            "connectionNodeId": "3963356364643030633764613736643862383332626537356364343730323261"
+          }
+        ],
+        "input2": [
+          {
+            "shortName": "input2",
+            "longName": "Input 2",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "output",
+            "connectionNodeId": "3665323434333336373930313261393536303037623436613237323832313265"
+          }
+        ],
+        "inswitchindex": [
+          {
+            "shortName": "inswitchindex",
+            "longName": "Switch Index",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": 0,
+            "defaultData": 0,
+            "type": 1,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/LIGHTING/tests/zumba_dance/zumda_dance.gproject",
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "infilepath",
+            "connectionNodeId": "3432356162333934643664373933646236646236306335623732613234353039"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Guerilla_GuerillaBatch",
+      "category": "Guerilla",
+      "id": "3430333063363466313934633636303565633365326633303738353936613934",
+      "color": [
+        52,
+        115,
+        165
+      ],
+      "iconPath": "$FLASH_ICONS/guerilla-render.png",
+      "definitionPath": "D:/dev/FLash/Library/Nodes/guerilla_guerillabatch.fnode",
+      "nodeType": "Guerilla/Guerilla_GuerillaBatch",
+      "opCode": "# BeginOp\n\nimport subprocess, platform, os\n\nFlashLogMessage(f\"GuerillaBatch : Start executing script : {inscript}\")\n\nif platform.system == \"windows\":\n    command = [f\"{inenvironment['GUERILLA']}/guerillaBatch\", \"--nogui\"] \n    \n    if os.path.exists(inguerillafile):\n        command.append(inguerillafile)\n    \n    command.append(inscript)\nelse:\n    command = [f\"{inenvironment['GUERILLA']}/guerilla\", \"--nogui\"]\n\n    if os.path.exists(inguerillafile):\n        command.append(inguerillafile)\n    \n    command.append(inscript)\n\nFlashLogMessage(f\"GuerillaBatch Command : {' '.join(command)}\")\n\nenv = os.environ.copy()\nenv.update(inenvironment)\n\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, env=env)\n\nstdout, stderr = process.communicate()\n\nstdoutAsStr = stdout.decode(\"utf-8\")\nstderrAsStr = stderr.decode(\"utf-8\")\n\nif len(stderrAsStr) > 0:\n    FlashLogError(stderrAsStr)\nelse:\n    FlashLogMessage(f\"GuerillaBatch : Finished executing script : {inscript}\")\n    FlashLogMessage(stdoutAsStr)\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inscript": [
+          {
+            "shortName": "inscript",
+            "longName": "Input Script Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "C:/Users/r.augier/AppData/Roaming/Flash/3339373762306637643439393165616133613032653733633764326462646562.py",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outscript",
+            "connectionNodeId": "6330613663313534656136353936313638313662653461626265356532323266"
+          }
+        ],
+        "inguerillafile": [
+          {
+            "shortName": "inguerillafile",
+            "longName": "Input Guerilla File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outfilepath",
+            "connectionNodeId": "3432356162333934643664373933646236646236306335623732613234353039"
+          }
+        ],
+        "inenvironment": [
+          {
+            "shortName": "inenvironment",
+            "longName": "Environment",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+            },
+            "defaultData": {
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain/Lib",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+            },
+            "type": 10,
+            "connectionName": "outenvironment",
+            "connectionNodeId": "3636333434393937646265383134353531346565656339343632653166376666"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 11,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge_Scripts",
+      "category": "Utility",
+      "id": "6330613663313534656136353936313638313662653461626265356532323266",
+      "color": [
+        52,
+        115,
+        165
+      ],
+      "iconPath": "$FLASH_ICONS/python.png",
+      "definitionPath": "D:/dev/FLash/Library/Nodes/merge_scripts.fnode",
+      "nodeType": "Utility/Merge_Scripts",
+      "opCode": "# BeginOp\n\nimport os, re\n\nscript1 = inscript1\nscript2 = inscript2\n\nscriptsAreFile = False\n\nif os.path.exists(script1):\n    with open(script1, \"r\") as scriptFile1:\n        script1 = scriptFile1.read()\n\nif os.path.exists(script2):\n    with open(script2, \"r\") as scriptFile2:\n        script2 = scriptFile2.read()\n\nimportPatterns = re.compile(r\"import\\s.+|from\\s.+\")\n\nimportMatches1 = re.findall(importPatterns, script1)\n\nimportMatches2 = re.findall(importPatterns, script2)\n\nmodulesToImport = []\nmodulesToImportAs = {}\nmodulesToImportFrom = {}\n\nfor importMatch in importMatches1:\n    if importMatch.startswith(\"import\"):\n        if \"as\" in importMatch:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importList = importMatch.split(\"as\")\n\n            modulesToImportAs[importList[0].replace(\" \", \"\")] = importList[1].replace(\" \", \"\")\n        else:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importMatch = importMatch.replace(\" \", \"\")\n            importList = importMatch.split(\",\")\n\n            for imp in importList: \n                modulesToImport.append(imp)\n    \n    elif importMatch.startswith(\"from\"):\n        importMatch = importMatch.replace(\"from\", \"\")\n        importList = importMatch.split(\"import\")\n\n        module = importList[0].replace(\" \", \"\")\n\n        elements = importList[1].split(\",\")\n\n        moduleElements = []\n\n        for elem in elements:\n            moduleElements.append(elem.replace(\" \", \"\"))\n\n        modulesToImportFrom[module] = moduleElements\n\nfor importMatch in importMatches2:\n    if importMatch.startswith(\"import\"):\n        if \"as\" in importMatch:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importList = importMatch.split(\"as\")\n\n            moduleName = importList[0].replace(\" \", \"\")\n            moduleAlias = importList[1].replace(\" \", \"\")\n\n            if moduleName in modulesToImportAs:\n                if moduleAlias == modulesToImportAs[moduleName]:\n                    pass\n                else:\n                    script2 = re.sub(fr\"({moduleAlias})\\.\", f\"{modulesToImportAs[moduleName]}.\", script2)\n            elif moduleName in modulesToImport:\n                script2 = re.sub(fr\"({moduleAlias})\\.\", f\"{moduleName}.\", script2)\n            else:\n                modulesToImportAs[moduleName] = moduleAlias\n        else:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importMatch = importMatch.replace(\" \", \"\")\n            importList = importMatch.split(\",\")\n\n            for imp in importList: \n                if imp in modulesToImportAs:\n                    script1 = re.sub(fr\"({modulesToImportAs[imp]})\\.\", f\"{imp}.\", script1)\n                    modulesToImportAs.pop(imp)\n                if not imp in modulesToImport:\n                    modulesToImport.append(imp)\n    \n    elif importMatch.startswith(\"from\"):\n        importMatch = importMatch.replace(\"from\", \"\")\n        importList = importMatch.split(\"import\")\n\n        module = importList[0].replace(\" \", \"\")\n\n        elements = importList[1].split(\",\")\n\n        moduleElements = []\n\n        for elem in elements:\n            moduleElements.append(elem.replace(\" \", \"\"))\n\n        if module in modulesToImportFrom:\n            for mod in moduleElements:\n                if not mod in modulesToImportFrom[module]:\n                    modulesToImportFrom[module].append(mod)\n        else:\n            modulesToImportFrom[module] = moduleElements\n\nfor importMatch in importMatches1:\n    script1 = script1.replace(importMatch, \"$\")\n\nfor importMatch in importMatches2:\n    script2 = script2.replace(importMatch, \"$\")\n\ndollarPattern = re.compile(r\"(\\$\\n)+\")\n\nscript1 = re.sub(dollarPattern, \"# Script 1\\n\", script1)\nscript2 = re.sub(dollarPattern, \"# Script 2\\n\", script2)\n\nmodulesToImportAsStr = \"import \"\n\nfor i, module in enumerate(modulesToImport):\n    if i == 0:\n        modulesToImportAsStr += f\"{module}\"\n    else:\n        modulesToImportAsStr += f\", {module}\"\n\nmodulesToImportAsAsStr = \"\"\n\nfor moduleName, moduleAlias in modulesToImportAs.items():\n    modulesToImportAsAsStr += f\"import {moduleName} as {moduleAlias}\"\n\nmodulesToImportFromAsStr = \"\"\n\nfor moduleName, subModules in modulesToImportFrom.items():\n    subModulesToImportFrom = f\"from {moduleName} import \"\n\n    for i, subModule in enumerate(subModules):\n        if i == 0:\n            subModulesToImportFrom += f\"{subModule}\"\n        else:\n            subModulesToImportFrom += f\", {subModule}\"\n\n    modulesToImportFromAsStr += f\"{subModulesToImportFrom}\\n\"\n\nmergedScripts = f\"{modulesToImportAsStr}\\n{modulesToImportAsAsStr}\\n{modulesToImportFromAsStr}\\n{script1}\\n{script2}\"\n\ntmpScriptFilePath = FlashTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(mergedScripts) \n\noutscript = tmpScriptFilePath.replace(\"\\\\\", \"/\")\noutscripttext = mergedScripts\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inscript1": [
+          {
+            "shortName": "inscript1",
+            "longName": "Input Script 1",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Flash/3433323331653730376331363732343834653365356434613661303932623466.py",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outscriptfile",
+            "connectionNodeId": "3432356162333934643664373933646236646236306335623732613234353039"
+          }
+        ],
+        "inscript2": [
+          {
+            "shortName": "inscript2",
+            "longName": "Input Script 2",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "C:/Users/r.augier/AppData/Roaming/Flash/3162396366383335616136366337653731666461333861373932643532623036.py",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outscript",
+            "connectionNodeId": "3730383261656331303537393361363535663331303333376665643430313931"
+          }
+        ]
+      },
+      "outputs": {
+        "outscript": [
+          {
+            "shortName": "outscript",
+            "longName": "Output Script",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "C:/Users/r.augier/AppData/Roaming/Flash/3339373762306637643439393165616133613032653733633764326462646562.py",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "inscript",
+            "connectionNodeId": "3430333063363466313934633636303565633365326633303738353936613934"
+          }
+        ],
+        "outscripttext": [
+          {
+            "shortName": "outscripttext",
+            "longName": "Output Script Text",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "import guerilla, os\nimport RomanoTools.Guerilla.Utils as utils\n\n# Script 1\n\n# Script 1\n\nutils.SetOptims()\nutils.SetRange(\"100-220\")\n\nrenderPass = guerilla.Document().findchild(\"RenderPass\")\n\nrenderPass.FileLayerName.set(\"$o_$n\")\n\nguerilla.Document().ProjectWidth.set(2048)\nguerilla.Document().ProjectHeight.set(858)\n\nguerilla.Document().save(\"Z:/OEUF/LIGHTING/tests/zumba_dance/zumda_dance.gproject\")\n\n# Script 2\n\n\n# Script 1\n\npaths = ['Z:/OEUF/BORDEL/TESTPLUMES/RumbaDance_Bird.abc', 'Z:/OEUF/CACHE/tests/zumba_dance/Charles/tests_zumba_dance_charles_cache_fur.abc', 'Z:/OEUF/CACHE/tests/zumba_dance/Charles/tests_zumba_dance_charles_cache_plumes.abc', 'Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_a_1.abc', 'Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_b_1.abc', 'Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_c_1.abc', 'Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_d_1.abc', 'Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_e_1.abc', 'Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_f_1.abc', 'Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_g_1.abc', 'Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_h_1.abc']\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    with guerilla.Modifier() as mod:\n        mod.createref(name, path, options={ 'prefixnodes' : False,'containschildren' : True })\n\nguerilla.Document().save()\n\n# Script 2\n\npaths = ['Z:/OEUF/assets/characters/Bird/shading/main/_EXPORT/RG_shading_Bird_charles.grendergraph', 'Z:/OEUF/UTILS/HDRIS/sky_midday_rg.grendergraph']\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    loaded = guerilla.Document().loadfile(path)\n\n    if not loaded:\n        FlashLogWarning(\"Could not load {} in guerilla file\".format(name))\n\nguerilla.Document().save()\n",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "File2",
+      "category": "Utility",
+      "id": "3332396364663661353963303338663161633838326461643532666430646638",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "",
+      "definitionPath": "D:/dev/FLash/Library/Nodes/file.fnode",
+      "nodeType": "Utility/File",
+      "opCode": "# BeginOp\n\noutfile = infile\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infile": [
+          {
+            "shortName": "infile",
+            "longName": "Input File Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/Bird_feathers_template.hipnc",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/Bird_feathers_template.hipnc",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "inhoufile",
+            "connectionNodeId": "3665323434333336373930313261393536303037623436613237323832313265"
+          }
+        ]
+      }
+    },
+    {
+      "name": "File3",
+      "category": "Utility",
+      "id": "3835366366646461636435366361323631663739643230643263383263363538",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "",
+      "definitionPath": "D:/dev/FLash/Library/Nodes/file.fnode",
+      "nodeType": "Utility/File",
+      "opCode": "# BeginOp\n\noutfile = infile\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infile": [
+          {
+            "shortName": "infile",
+            "longName": "Input File Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/assets/characters/Bird/shading/main/_EXPORT/RG_shading_Bird_charles.grendergraph",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/assets/characters/Bird/shading/main/_EXPORT/RG_shading_Bird_charles.grendergraph",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "input1",
+            "connectionNodeId": "3364653236633733616634353331663162323263356231353763333266633336"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Guerilla_LoadRenderGraphs",
+      "category": "Guerilla",
+      "id": "3337333337663130643339393130366136373535653133653161366133306433",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/guerilla-render.png",
+      "definitionPath": "D:/dev/FLash/Library/Nodes/guerilla_load_rendergraphs.fnode",
+      "nodeType": "Guerilla/Guerilla_LoadRenderGraphs",
+      "opCode": "# BeginOp\n\n# BeginOp\n\n# BeginOp\n\nif type(inrgfiles) is str:\n    inabcfiles = [inrgfiles]\nelse:\n    inabcfiles = inrgfiles\n\ngeneratedScript = f\"\"\"import guerilla, os\n\npaths = {inabcfiles}\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    loaded = guerilla.Document().loadfile(path)\n\n    if not loaded:\n        FlashLogWarning(\"Could not load {{}} in guerilla file\".format(name))\n\nguerilla.Document().save()\n\"\"\"\n\ntmpScriptFilePath = FlashTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\noutscripttext = generatedScript\n\n\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inrgfiles": [
+          {
+            "shortName": "inrgfiles",
+            "longName": "RenderGraph Files",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              "Z:/OEUF/assets/characters/Bird/shading/main/_EXPORT/RG_shading_Bird_charles.grendergraph",
+              "Z:/OEUF/UTILS/HDRIS/sky_midday_rg.grendergraph"
+            ],
+            "defaultData": [
+              ""
+            ],
+            "type": 9,
+            "connectionName": "output",
+            "connectionNodeId": "3364653236633733616634353331663162323263356231353763333266633336"
+          }
+        ]
+      },
+      "outputs": {
+        "outscriptfile": [
+          {
+            "shortName": "outscriptfile",
+            "longName": "Output Script File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Flash/3832613830363566326362643334303963336235343063366666366237616461.py",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "inscript2",
+            "connectionNodeId": "3730383261656331303537393361363535663331303333376665643430313931"
+          }
+        ],
+        "outscripttext": [
+          {
+            "shortName": "outscripttext",
+            "longName": "Output Script Text",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "import guerilla, os\n\npaths = ['Z:/OEUF/assets/characters/Bird/shading/main/_EXPORT/RG_shading_Bird_charles.grendergraph', 'Z:/OEUF/UTILS/HDRIS/sky_midday_rg.grendergraph']\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    loaded = guerilla.Document().loadfile(path)\n\n    if not loaded:\n        FlashLogWarning(\"Could not load {} in guerilla file\".format(name))\n\nguerilla.Document().save()\n",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge_Scripts1",
+      "category": "Utility",
+      "id": "3730383261656331303537393361363535663331303333376665643430313931",
+      "color": [
+        52,
+        115,
+        165
+      ],
+      "iconPath": "$FLASH_ICONS/python.png",
+      "definitionPath": "D:/dev/FLash/Library/Nodes/merge_scripts.fnode",
+      "nodeType": "Utility/Merge_Scripts",
+      "opCode": "# BeginOp\n\nimport os, re\n\nscript1 = inscript1\nscript2 = inscript2\n\nscriptsAreFile = False\n\nif os.path.exists(script1):\n    with open(script1, \"r\") as scriptFile1:\n        script1 = scriptFile1.read()\n\nif os.path.exists(script2):\n    with open(script2, \"r\") as scriptFile2:\n        script2 = scriptFile2.read()\n\nimportPatterns = re.compile(r\"import\\s.+|from\\s.+\")\n\nimportMatches1 = re.findall(importPatterns, script1)\n\nimportMatches2 = re.findall(importPatterns, script2)\n\nmodulesToImport = []\nmodulesToImportAs = {}\nmodulesToImportFrom = {}\n\nfor importMatch in importMatches1:\n    if importMatch.startswith(\"import\"):\n        if \"as\" in importMatch:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importList = importMatch.split(\"as\")\n\n            modulesToImportAs[importList[0].replace(\" \", \"\")] = importList[1].replace(\" \", \"\")\n        else:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importMatch = importMatch.replace(\" \", \"\")\n            importList = importMatch.split(\",\")\n\n            for imp in importList: \n                modulesToImport.append(imp)\n    \n    elif importMatch.startswith(\"from\"):\n        importMatch = importMatch.replace(\"from\", \"\")\n        importList = importMatch.split(\"import\")\n\n        module = importList[0].replace(\" \", \"\")\n\n        elements = importList[1].split(\",\")\n\n        moduleElements = []\n\n        for elem in elements:\n            moduleElements.append(elem.replace(\" \", \"\"))\n\n        modulesToImportFrom[module] = moduleElements\n\nfor importMatch in importMatches2:\n    if importMatch.startswith(\"import\"):\n        if \"as\" in importMatch:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importList = importMatch.split(\"as\")\n\n            moduleName = importList[0].replace(\" \", \"\")\n            moduleAlias = importList[1].replace(\" \", \"\")\n\n            if moduleName in modulesToImportAs:\n                if moduleAlias == modulesToImportAs[moduleName]:\n                    pass\n                else:\n                    script2 = re.sub(fr\"({moduleAlias})\\.\", f\"{modulesToImportAs[moduleName]}.\", script2)\n            elif moduleName in modulesToImport:\n                script2 = re.sub(fr\"({moduleAlias})\\.\", f\"{moduleName}.\", script2)\n            else:\n                modulesToImportAs[moduleName] = moduleAlias\n        else:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importMatch = importMatch.replace(\" \", \"\")\n            importList = importMatch.split(\",\")\n\n            for imp in importList: \n                if imp in modulesToImportAs:\n                    script1 = re.sub(fr\"({modulesToImportAs[imp]})\\.\", f\"{imp}.\", script1)\n                    modulesToImportAs.pop(imp)\n                if not imp in modulesToImport:\n                    modulesToImport.append(imp)\n    \n    elif importMatch.startswith(\"from\"):\n        importMatch = importMatch.replace(\"from\", \"\")\n        importList = importMatch.split(\"import\")\n\n        module = importList[0].replace(\" \", \"\")\n\n        elements = importList[1].split(\",\")\n\n        moduleElements = []\n\n        for elem in elements:\n            moduleElements.append(elem.replace(\" \", \"\"))\n\n        if module in modulesToImportFrom:\n            for mod in moduleElements:\n                if not mod in modulesToImportFrom[module]:\n                    modulesToImportFrom[module].append(mod)\n        else:\n            modulesToImportFrom[module] = moduleElements\n\nfor importMatch in importMatches1:\n    script1 = script1.replace(importMatch, \"$\")\n\nfor importMatch in importMatches2:\n    script2 = script2.replace(importMatch, \"$\")\n\ndollarPattern = re.compile(r\"(\\$\\n)+\")\n\nscript1 = re.sub(dollarPattern, \"# Script 1\\n\", script1)\nscript2 = re.sub(dollarPattern, \"# Script 2\\n\", script2)\n\nmodulesToImportAsStr = \"import \"\n\nfor i, module in enumerate(modulesToImport):\n    if i == 0:\n        modulesToImportAsStr += f\"{module}\"\n    else:\n        modulesToImportAsStr += f\", {module}\"\n\nmodulesToImportAsAsStr = \"\"\n\nfor moduleName, moduleAlias in modulesToImportAs.items():\n    modulesToImportAsAsStr += f\"import {moduleName} as {moduleAlias}\"\n\nmodulesToImportFromAsStr = \"\"\n\nfor moduleName, subModules in modulesToImportFrom.items():\n    subModulesToImportFrom = f\"from {moduleName} import \"\n\n    for i, subModule in enumerate(subModules):\n        if i == 0:\n            subModulesToImportFrom += f\"{subModule}\"\n        else:\n            subModulesToImportFrom += f\", {subModule}\"\n\n    modulesToImportFromAsStr += f\"{subModulesToImportFrom}\\n\"\n\nmergedScripts = f\"{modulesToImportAsStr}\\n{modulesToImportAsAsStr}\\n{modulesToImportFromAsStr}\\n{script1}\\n{script2}\"\n\ntmpScriptFilePath = FlashTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(mergedScripts) \n\noutscript = tmpScriptFilePath.replace(\"\\\\\", \"/\")\noutscripttext = mergedScripts\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inscript1": [
+          {
+            "shortName": "inscript1",
+            "longName": "Input Script 1",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Flash/6436316534336436383139363038353066626136343065633566333462623765.py",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outscriptfile",
+            "connectionNodeId": "3261646434326362656338643534646261633737663138303837323339633336"
+          }
+        ],
+        "inscript2": [
+          {
+            "shortName": "inscript2",
+            "longName": "Input Script 2",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Flash/3832613830363566326362643334303963336235343063366666366237616461.py",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outscriptfile",
+            "connectionNodeId": "3337333337663130643339393130366136373535653133653161366133306433"
+          }
+        ]
+      },
+      "outputs": {
+        "outscript": [
+          {
+            "shortName": "outscript",
+            "longName": "Output Script",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "C:/Users/r.augier/AppData/Roaming/Flash/3162396366383335616136366337653731666461333861373932643532623036.py",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "inscript2",
+            "connectionNodeId": "6330613663313534656136353936313638313662653461626265356532323266"
+          }
+        ],
+        "outscripttext": [
+          {
+            "shortName": "outscripttext",
+            "longName": "Output Script Text",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "import guerilla, os\n\n\n# Script 1\n\npaths = ['Z:/OEUF/BORDEL/TESTPLUMES/RumbaDance_Bird.abc', 'Z:/OEUF/CACHE/tests/zumba_dance/Charles/tests_zumba_dance_charles_cache_fur.abc', 'Z:/OEUF/CACHE/tests/zumba_dance/Charles/tests_zumba_dance_charles_cache_plumes.abc', 'Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_a_1.abc', 'Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_b_1.abc', 'Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_c_1.abc', 'Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_d_1.abc', 'Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_e_1.abc', 'Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_f_1.abc', 'Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_g_1.abc', 'Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_h_1.abc']\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    with guerilla.Modifier() as mod:\n        mod.createref(name, path, options={ 'prefixnodes' : False,'containschildren' : True })\n\nguerilla.Document().save()\n\n# Script 2\n\npaths = ['Z:/OEUF/assets/characters/Bird/shading/main/_EXPORT/RG_shading_Bird_charles.grendergraph', 'Z:/OEUF/UTILS/HDRIS/sky_midday_rg.grendergraph']\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    loaded = guerilla.Document().loadfile(path)\n\n    if not loaded:\n        FlashLogWarning(\"Could not load {} in guerilla file\".format(name))\n\nguerilla.Document().save()\n",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "Oeuf_GuerillaEnv",
+      "category": "Oeuf",
+      "id": "3636333434393937646265383134353531346565656339343632653166376666",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/volcan.png",
+      "definitionPath": "D:/dev/FLash/Library/Nodes/oeuf_guerilla_env.fnode",
+      "nodeType": "Oeuf/Oeuf_GuerillaEnv",
+      "opCode": "# BeginOp\n\noutenvironment = inenvironment\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inenvironment": [
+          {
+            "shortName": "inenvironment",
+            "longName": "Environment",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+            },
+            "defaultData": {
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+            },
+            "type": 10,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outenvironment": [
+          {
+            "shortName": "outenvironment",
+            "longName": "Output Environment",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+            },
+            "defaultData": {},
+            "type": 10,
+            "connectionName": "inenvironment",
+            "connectionNodeId": "3430333063363466313934633636303565633365326633303738353936613934"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Hou_AutoPlume_Charles1",
+      "category": "Houdini",
+      "id": "6638376334623037353735393362666336386538656634326432626565336537",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/houdini.png",
+      "definitionPath": "D:/dev/FLash/Library/Nodes/hou_autoplume_charles.fnode",
+      "nodeType": "Houdini/Hou_AutoPlume_Charles",
+      "opCode": "# BeginOp\n\n# BeginOp\n\n# BeginOp\n\n# BeginOp\n\n# BeginOp\n\nimport os\n\nfr = inshotspecs[\"FrameRange\"].split(\"-\")\nframerange = [int(fr[0]), int(fr[1])]\n\ncacheDir = f\"{incachedir}/{inshotspecs['Sequence']}/{inshotspecs['Shot']}/Charles\"\noutputfilefur = f\"{cacheDir}/{inshotspecs['Sequence']}_{inshotspecs['Shot']}_charles_cache_fur.abc\"\noutputfileplumes = f\"{cacheDir}/{inshotspecs['Sequence']}_{inshotspecs['Shot']}_charles_cache_plumes.abc\"\n\ngeneratedScript = f\"\"\"import hou\nanimSopNode = None\nplumeSopNode = None\n\nfor node in hou.node(\"/obj\").children():\n    if node.name() == \"anim_import\":\n        animSopNode = node\n    elif node.name() == \"EXPORT\":\n        plumeSopNode = node\n\nif animSopNode != None:\n    for node in animSopNode.children():\n        if node.type().name() == \"alembic\":\n            node.parm(\"fileName\").set(\"{inanimationfile}\")\n            break\n\nif plumeSopNode != None:\n    for node in plumeSopNode.children():\n        if node.name() == \"rop_alembic_fur\":\n            node.parm(\"filename\").set(\"{outputfilefur}\")\n            node.parm(\"f1\").set({framerange[0]})\n            node.parm(\"f2\").set({framerange[1]})\n            node.parm(\"execute\").pressButton()\n        if node.name() == \"rop_alembic_plumes\":\n            node.parm(\"filename\").set(\"{outputfileplumes}\")\n            node.parm(\"f1\").set({framerange[0]})\n            node.parm(\"f2\").set({framerange[1]})\n            node.parm(\"execute\").pressButton()\n\"\"\"\n\ntmpScriptFilePath = FlashTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\noutabccachefile = [outputfilefur, outputfileplumes]\n\n\n\n\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inanimationfile": [
+          {
+            "shortName": "inanimationfile",
+            "longName": "Animation",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/BORDEL/TESTPLUMES/RumbaDance_Bird.abc",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outfile",
+            "connectionNodeId": "3666666531653062373337656539306661316166326133633331653038323633"
+          }
+        ],
+        "intemplatefile": [
+          {
+            "shortName": "intemplatefile",
+            "longName": "Template File",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/Bird_feathers_template.hipnc",
+            "defaultData": "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/Bird_feathers_template.hipnc",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ],
+        "inshotspecs": [
+          {
+            "shortName": "inshotspecs",
+            "longName": "Shot Specs",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {
+              "FrameRange": "100-220",
+              "Sequence": "tests",
+              "Shot": "zumba_dance"
+            },
+            "defaultData": null,
+            "type": 10,
+            "connectionName": "outshotspecs",
+            "connectionNodeId": "3937663635383431373837363732336232313863346236623663313439663238"
+          }
+        ],
+        "incachedir": [
+          {
+            "shortName": "incachedir",
+            "longName": "Cache Directory",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/CACHE",
+            "defaultData": "Z:/OEUF/CACHE",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outscriptfile": [
+          {
+            "shortName": "outscriptfile",
+            "longName": "Output Script",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Flash/3030386131303735656532623433386531366163306539646339656132313431.py",
+            "defaultData": "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/Bird_feathers_template.hipnc",
+            "type": 7,
+            "connectionName": "inscript",
+            "connectionNodeId": "3665323434333336373930313261393536303037623436613237323832313265"
+          }
+        ],
+        "outabccachefile": [
+          {
+            "shortName": "outabccachefile",
+            "longName": "Output Cache File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              "Z:/OEUF/CACHE/tests/zumba_dance/Charles/tests_zumba_dance_charles_cache_fur.abc",
+              "Z:/OEUF/CACHE/tests/zumba_dance/Charles/tests_zumba_dance_charles_cache_plumes.abc"
+            ],
+            "defaultData": null,
+            "type": 9,
+            "connectionName": "input2",
+            "connectionNodeId": "3734393138313739346639376462663637646465626636303736333530623239"
+          }
+        ]
+      }
+    },
+    {
+      "name": "File4",
+      "category": "Utility",
+      "id": "3362383239636163616465316134393037363463373334656634633533656565",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "",
+      "definitionPath": "D:/dev/FLash/Library/Nodes/file.fnode",
+      "nodeType": "Utility/File",
+      "opCode": "# BeginOp\n\noutfile = infile\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infile": [
+          {
+            "shortName": "infile",
+            "longName": "Input File Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/UTILS/HDRIS/sky_midday_rg.grendergraph",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/UTILS/HDRIS/sky_midday_rg.grendergraph",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "input2",
+            "connectionNodeId": "3364653236633733616634353331663162323263356231353763333266633336"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge2",
+      "category": "Utility",
+      "id": "3364653236633733616634353331663162323263356231353763333266633336",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/util.png",
+      "definitionPath": "D:/dev/FLash/Library/Nodes/merge.fnode",
+      "nodeType": "Utility/Merge",
+      "opCode": "# BeginOp\n\n# BeginOp\n\nif type(input1) is list:\n    if type(input2) is list:\n        output = [*input1, *input2]\n    else:\n        output = [*input1, input2]\nelif type(input2) is list:\n    output = [input1, *input2]\nelse:\n    output = [input1, input2]\n\n\n",
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "input1": [
+          {
+            "shortName": "input1",
+            "longName": "Input 1",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/assets/characters/Bird/shading/main/_EXPORT/RG_shading_Bird_charles.grendergraph",
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outfile",
+            "connectionNodeId": "3835366366646461636435366361323631663739643230643263383263363538"
+          }
+        ],
+        "input2": [
+          {
+            "shortName": "input2",
+            "longName": "Input 2",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/UTILS/HDRIS/sky_midday_rg.grendergraph",
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outfile",
+            "connectionNodeId": "3362383239636163616465316134393037363463373334656634633533656565"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              "Z:/OEUF/assets/characters/Bird/shading/main/_EXPORT/RG_shading_Bird_charles.grendergraph",
+              "Z:/OEUF/UTILS/HDRIS/sky_midday_rg.grendergraph"
+            ],
+            "defaultData": [],
+            "type": 9,
+            "connectionName": "inrgfiles",
+            "connectionNodeId": "3337333337663130643339393130366136373535653133653161366133306433"
+          }
+        ]
+      }
+    }
+  ],
+  "tracker": [
+    "3362383239636163616465316134393037363463373334656634633533656565",
+    "3636333434393937646265383134353531346565656339343632653166376666",
+    "3835366366646461636435366361323631663739643230643263383263363538",
+    "3364653236633733616634353331663162323263356231353763333266633336",
+    "3337333337663130643339393130366136373535653133653161366133306433",
+    "3332396364663661353963303338663161633838326461643532666430646638",
+    "3466633237366530616463626334376234316165323231646235636364376233",
+    "3666666531653062373337656539306661316166326133633331653038323633",
+    "3963356364643030633764613736643862383332626537356364343730323261",
+    "3937663635383431373837363732336232313863346236623663313439663238",
+    "6638376334623037353735393362666336386538656634326432626565336537",
+    "3734393138313739346639376462663637646465626636303736333530623239",
+    "6439346530336663303363316261386535353330646134613337326531613538",
+    "3261646434326362656338643534646261633737663138303837323339633336",
+    "3730383261656331303537393361363535663331303333376665643430313931",
+    "3665323434333336373930313261393536303037623436613237323832313265",
+    "3732663965633736336336373439353831323161303538646461383262626562",
+    "6538613937343662303835616438626663316265303936323865336637656331",
+    "3432356162333934643664373933646236646236306335623732613234353039",
+    "6330613663313534656136353936313638313662653461626265356532323266",
+    "3430333063363466313934633636303565633365326633303738353936613934"
+  ]
+}

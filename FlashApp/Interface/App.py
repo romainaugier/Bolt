@@ -52,7 +52,7 @@ class GraphTabs(QtWidgets.QWidget):
 
         self.newTab.layout = QtWidgets.QVBoxLayout()
         gGraph.setFrameStyle(QtWidgets.QFrame.NoFrame)
-        gGraph.isCookingMovie.frameChanged.connect(lambda: self.tabs.setTabIcon(tabIndex, QtGui.QIcon(gGraph.getAnimationLogoMovie().currentPixmap())))
+        gGraph.isCookingMovie.frameChanged.connect(lambda: self.tabs.setTabIcon(tabIndex, QtGui.QIcon(gGraph.getAnimationLogoMovie())))
         gGraph.hasBeenEdited.connect(lambda: (self.tabs.setTabIcon(tabIndex, self.iconsLib.GetIcon("graph-edited")), 
                                               self.tabs.setTabText(tabIndex, f"{gGraph.graph.GetName()}*")))
         gGraph.finishedCooking.connect(lambda: self.tabs.setTabIcon(tabIndex, self.iconsLib.GetIcon("graph-done")))
@@ -110,7 +110,7 @@ class App(QtWidgets.QMainWindow):
         
         self.icons = Icons()
         
-        self.nodeEditor = NodeEditorWindow(self.icons, parent=self)
+        self.nodeEditor = NodeEditorWindow(self.icons, self.environment, parent=self)
 
         self.setWindowTitle("Flash")
   
@@ -213,6 +213,9 @@ class App(QtWidgets.QMainWindow):
         
         self.showPlugEditorSc = QtWidgets.QShortcut(QtGui.QKeySequence("P"), self)
         self.showPlugEditorSc.activated.connect(lambda: self.showPlugEditor())
+        
+        self.stopGraphCookingSc = QtWidgets.QShortcut(QtGui.QKeySequence("Escape"), self)
+        self.stopGraphCookingSc.activated.connect(lambda: self.stopGraph())
 
         # Init at least one graph
         self.addGraph()
@@ -295,6 +298,18 @@ class App(QtWidgets.QMainWindow):
             index = self.graphTabs.getActiveTabIndex()
 
         self.graphTabs.tabs.widget(index).layout.itemAt(0).widget().layoutGraph()
+        
+    def stopGraph(self, index : int = None) -> None:
+        """
+        Force the current graph to stop the cooking if it is cooking
+        
+        Args:
+            index (int, optional): graph index. Defaults to None.
+        """
+        if index is None:
+            index = self.graphTabs.getActiveTabIndex()
+
+        self.graphTabs.tabs.widget(index).layout.itemAt(0).widget().stopGraphCooking()
         
     def showPlugEditor(self, index : int = None) -> None:
         """

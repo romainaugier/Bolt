@@ -1,6 +1,10 @@
+from asyncio.windows_events import CONNECT_PIPE_INIT_DELAY
 import os
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+
+
+# Line Separators
 
 
 class QHLine(QtWidgets.QFrame):
@@ -35,6 +39,9 @@ class QVLine(QtWidgets.QFrame):
         pal = self.palette()
         pal.setColor(QtGui.QPalette.WindowText, color)
         self.setPalette(pal)
+
+
+# Label with Icon
 
 
 class IconLabel(QtWidgets.QWidget):
@@ -115,6 +122,10 @@ class IconLabel(QtWidgets.QWidget):
         self.text.setFont(QtGui.QFont(fontName, fontSize))
         self.text.setStyleSheet(f"color: rgb({color[0]}, {color[1]}, {color[2]})")
 
+
+# Context Menu
+
+
 class ContextMenu(QtWidgets.QMenu):
     """
     """
@@ -157,6 +168,9 @@ class ContextMenu(QtWidgets.QMenu):
         self.setMask(region)
 
 
+# Line Edit with drag event
+
+
 class LineEdit(QtWidgets.QLineEdit):
     """
     """
@@ -195,6 +209,9 @@ class LineEdit(QtWidgets.QLineEdit):
         else:
             event.ignore()
             
+            
+# Labeled Widgets
+
         
 class LabeledLineEdit(QtWidgets.QWidget):
     """
@@ -293,3 +310,312 @@ class LabeledCheckBox(QtWidgets.QWidget):
         """
         """
         return self.mainCheckBox
+    
+    
+# Python Code Editor
+
+
+class LineNumberArea(QtWidgets.QWidget):
+    """
+    """
+    def __init__(self, editor):
+        """
+        """
+        super().__init__(editor)
+        
+        self.editor = editor
+        
+    def sizeHint(self):
+        """
+        """
+        return QtCore.QSize(self.editor.lineNumberAreaWidth(), 0)
+    
+    def paintEvent(self, event : QtCore.QEvent) -> None:
+        """
+        """
+        self.editor.lineNumberAreaPaintEvent(event)
+        
+        
+def Format(color : QtGui.QColor, style = "") -> QtGui.QTextCharFormat:
+    """
+    """
+    fmt = QtGui.QTextCharFormat()
+    fmt.setForeground(color)
+    
+    return fmt
+
+
+class PySyntaxHighlighter(QtGui.QSyntaxHighlighter):
+    """
+    """
+    keywords = [
+        'and', 'assert', 'break', 'class', 'continue', 'def',
+        'del', 'elif', 'else', 'except', 'exec', 'finally',
+        'for', 'from', 'global', 'if', 'import', 'in',
+        'is', 'lambda', 'not', 'or', 'pass', 'print',
+        'raise', 'return', 'try', 'while', 'yield',
+        'None', 'True', 'False'
+    ]
+    
+    operators = [
+        '=',
+        '==', '!=', '<', '<=', '>', '>=',
+        '\+', '-', '\*', '/', '//', '\%', '\*\*',
+        '\+=', '-=', '\*=', '/=', '\%=',
+        '\^', '\|', '\&', '\~', '>>', '<<'
+    ]
+    
+    braces = [
+        '\{', '\}', '\(', '\)', '\[', '\]',
+    ]
+    
+    def __init__(self, parent : QtGui.QTextDocument, style : dict = None) -> None:
+        """
+        """
+        super().__init__(parent)
+        
+        # Multi lines strings
+        self.triSingle = (QtCore.QRegExp("'''"), 1, style["string"])
+        self.triDouble = (QtCore.QRegExp("\"\"\""), 2, style["string"])
+        
+        rules = []
+        
+        # keyword, operators and braces
+        rules += [(fr"\b{keyword}\b", 0, style["keyword"]) for keyword in self.keywords]
+        rules += [(fr"{operator}", 0, style["operator"]) for operator in self.operators]
+        rules += [(fr"{brace}", 0, style["brace"]) for brace in self.braces]
+        
+        rules += [
+            # 'self'
+            (r'\bself\b', 0, style["self"]),
+
+            # 'def' followed by an identifier
+            (r'\bdef\b\s*(\w+)', 1, style["defclass"]),
+            # 'class' followed by an identifier
+            (r'\bclass\b\s*(\w+)', 1, style["defclass"]),
+
+            # Numeric literals
+            (r'\b[+-]?[0-9]+[lL]?\b', 0, style["numbers"]),
+            (r'\b[+-]?0[xX][0-9A-Fa-f]+[lL]?\b', 0, style["numbers"]),
+            (r'\b[+-]?[0-9]+(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?\b', 0, style["numbers"]),
+
+            # Double-quoted string, possibly containing escape sequences
+            (r'"[^"\\]*(\\.[^"\\]*)*"', 0, style["string"]),
+            # Single-quoted string, possibly containing escape sequences
+            (r"'[^'\\]*(\\.[^'\\]*)*'", 0, style["string"]),
+
+            # From '#' until a newline
+            (r'#[^\n]*', 0, style["comment"]),
+        ]
+        
+        self.rules = [(QtCore.QRegExp(pattern), index, format) for (pattern, index, format) in rules]
+        
+    def highlightBlock(self, text) -> None:
+        """
+        """
+        self.tripleQuotesWithinStrings = []
+        
+        for expression, nth, format in self.rules:
+            index = expression.indexIn(text, 0)
+            
+            if index >= 0:
+                if expression.pattern() in [r'"[^"\\]*(\\.[^"\\]*)*"', r"'[^'\\]*(\\.[^'\\]*)*'"]:
+                    innerIndex = self.triSingle[0].indexIn(text, index + 1)
+                    
+                    if innerIndex == -1:
+                        innerIndex = self.triDouble[0].indexIn(text, index + 1)
+                        
+                    if innerIndex != -1:
+                        tripleQuoteIndexes = range(innerIndex, innerIndex + 3)
+                        self.tripleQuotesWithinStrings.extend(tripleQuoteIndexes)
+                        
+            while index >= 0:
+                if index in self.tripleQuotesWithinStrings:
+                    index += 1
+                    expression.indexIn(text, index)
+                    continue
+                
+                index = expression.pos(nth)
+                length = len(expression.cap(nth))
+                self.setFormat(index, length, format)
+                index = expression.indexIn(text, index + length)
+                
+        self.setCurrentBlockState(0)
+        
+        inMultiline = self.matchMultiline(text, *self.triSingle)
+        
+        if not inMultiline:
+            inMultiline = self.matchMultiline(text, *self.triDouble)
+            
+    def matchMultiline(self, text, delimiter, inState, style):
+        """
+        """
+        if self.previousBlockState() == inState:
+            start = 0
+            add = 0
+        else:
+            start = delimiter.indexIn(text)
+            
+            if start in self.tripleQuotesWithinStrings:
+                return False
+            
+            add = delimiter.matchedLength()
+            
+        while start >= 0:
+            end = delimiter.indexIn(text, start + add)
+            
+            if end >= add:
+                length = end - start + add + delimiter.matchedLength()
+                self.setCurrentBlockState(0)
+            else:
+                self.setCurrentBlockState(inState)
+                length = len(text) - start + add
+            
+            self.setFormat(start, length, style)
+            
+            start = delimiter.indexIn(text, start + length)
+            
+        if self.currentBlockState() == inState:
+            return True
+        else:
+            return False
+
+
+class PyCodeEditor(QtWidgets.QPlainTextEdit):
+    """
+    """
+    def __init__(self, highlightStyle : dict, font : QtGui.QFont) -> None:
+        """
+        """
+        super().__init__()
+        
+        self.lineNumberArea = LineNumberArea(self)
+        
+        self.highligther = PySyntaxHighlighter(self.document(), highlightStyle)
+        
+        self.lineHighlightColor = QtGui.QColor(QtCore.Qt.yellow).lighter(160)
+        self.lineIndicesBgColor= QtCore.Qt.lightGray
+        self.lineIndicesTextColor = QtCore.Qt.black
+        
+        self._font = font
+        self.setFont(self._font)
+        
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        
+        self.blockCountChanged.connect(self.updateLineNumberAreaWidth)
+        self.updateRequest.connect(self.updateLineNumberArea)
+        self.cursorPositionChanged.connect(lambda: (self.highlightCurrentLine(), self.ensureCursorVisible()))
+        
+        self.setCenterOnScroll(True)
+        self.updateLineNumberAreaWidth(0)
+        
+    def setLineHighlightColor(self, color : QtGui.QColor) -> None:
+        """
+        """
+        self.lineHighlightColor = color
+    
+    def setLineIndicesBgColor(self, color : QtGui.QColor) -> None:
+        """
+        """
+        self.lineIndicesBgColor= color
+    
+    def setLineIndicesTextColor(self, color : QtGui.QColor) -> None:
+        """
+        """
+        self.lineIndicesTextColor = color
+        
+    def lineNumberAreaWidth(self) -> int:
+        """
+        """
+        digits = 3
+        count = max(1, self.blockCount())
+        
+        while count >= 1000:
+            count /= 10
+            digits += 1
+            
+        space = 3 + self.fontMetrics().width('9') * digits
+        
+        return space
+    
+    @QtCore.pyqtSlot(int)
+    def updateLineNumberAreaWidth(self, _) -> None:
+        """
+        """
+        self.setViewportMargins(self.lineNumberAreaWidth(), 0, 0, 0)
+        
+    @QtCore.pyqtSlot(QtCore.QRect, int)
+    def updateLineNumberArea(self, rect : QtCore.QRect, dy : int) -> None:
+        """
+        """
+        if dy:
+            self.lineNumberArea.scroll(0, dy)
+        else:
+            self.lineNumberArea.update(0, rect.y(), self.lineNumberArea.width(), rect.height())
+            
+        if rect.contains(self.viewport().rect()):
+            self.updateLineNumberAreaWidth(0)
+        
+    def lineNumberAreaPaintEvent(self, event : QtCore.QEvent) -> None:
+        """
+        """
+        painter = QtGui.QPainter(self.lineNumberArea)
+        painter.fillRect(event.rect(), self.lineIndicesBgColor)
+        
+        block = self.firstVisibleBlock()
+        blockNumber = block.blockNumber()
+        top = self.blockBoundingGeometry(block).translated(self.contentOffset()).top()
+        bottom = top + self.blockBoundingRect(block).height()
+        
+        height = self.fontMetrics().height()
+        
+        while block.isValid() and (top <= event.rect().bottom()):
+            if block.isVisible() and (bottom >= event.rect().top()):
+                number = str(blockNumber + 1)
+                
+                painter.setPen(self.lineIndicesTextColor)
+                painter.setFont(self._font)
+                painter.drawText(0, top, self.lineNumberArea.width(), height, QtCore.Qt.AlignRight, number)
+                
+            block = block.next()
+            top = bottom
+            bottom = top + self.blockBoundingRect(block).height()
+            blockNumber += 1
+            
+    def highlightCurrentLine(self):
+        extraSelections = []
+        
+        if not self.isReadOnly():
+            selection = QtWidgets.QTextEdit.ExtraSelection()
+            
+            lineColor = self
+            
+            selection.format.setBackground(self.lineHighlightColor)
+            selection.format.setProperty(QtGui.QTextFormat.FullWidthSelection, True)
+            selection.cursor = self.textCursor()
+            selection.cursor.clearSelection()
+            extraSelections.append(selection)
+            
+        self.setExtraSelections(extraSelections)
+            
+    # EVENTS
+            
+    def resizeEvent(self, event : QtCore.QEvent) -> None:
+        """
+        """
+        super().resizeEvent(event)
+        
+        cr = self.contentsRect()
+        
+        self.lineNumberArea.setGeometry(QtCore.QRect(cr.left(), cr.top(), 
+                                                     self.lineNumberAreaWidth(), cr.height()))
+        
+    def keyPressEvent(self, event : QtCore.QEvent):
+        """
+        """
+        if event.key() == QtCore.Qt.Key_Tab:
+            cursor = self.textCursor()
+            cursor.insertText("    ")
+            return
+        
+        return super().keyPressEvent(event)

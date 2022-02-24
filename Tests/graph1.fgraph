@@ -2,14 +2,22 @@
   "nodes": [
     {
       "name": "File",
-      "id": "6438303732376439313934366430616563323762323836306532336434643932",
+      "category": "Utility",
+      "id": "6364333163613862626634373165343637646431373032646662383466376231",
       "color": [
         255,
         220,
         106
       ],
       "iconPath": "",
+      "definitionPath": "D:/dev/Flash/Library/Nodes/file.fnode",
+      "nodeType": "Utility/File",
       "opCode": "# BeginOp\n\noutfile = infile\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
       "inputs": {
         "infile": [
           {
@@ -17,7 +25,10 @@
             "longName": "Input File Path",
             "index": 0,
             "isExposed": true,
-            "data": "",
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "prout",
+            "defaultData": "",
             "type": 7,
             "connectionName": null,
             "connectionNodeId": null
@@ -31,24 +42,35 @@
             "longName": "Output File Path",
             "index": 0,
             "isExposed": false,
-            "data": "",
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "prout",
+            "defaultData": "",
             "type": 7,
             "connectionName": "indata",
-            "connectionNodeId": "6662323331666235373063333666383866626337373263643765646135623663"
+            "connectionNodeId": "6638393137363462633366333237613634653038346439323661393639626665"
           }
         ]
       }
     },
     {
       "name": "Debug",
-      "id": "6662323331666235373063333666383866626337373263643765646135623663",
+      "category": "Debug",
+      "id": "3261373236396361383562393030393338666537346639386533366362343162",
       "color": [
         50,
         222,
         132
       ],
       "iconPath": "$FLASH_ICONS/debug.png",
+      "definitionPath": "D:/dev/Flash/Library/Nodes/debug.fnode",
+      "nodeType": "Debug/Debug",
       "opCode": "# BeginOp\n\nFlashLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+      "disabled": true,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
       "inputs": {
         "indata": [
           {
@@ -56,10 +78,13 @@
             "longName": "Input Data",
             "index": 0,
             "isExposed": false,
-            "data": null,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "prout",
+            "defaultData": null,
             "type": 11,
-            "connectionName": "outfile",
-            "connectionNodeId": "6438303732376439313934366430616563323762323836306532336434643932"
+            "connectionName": "outdata",
+            "connectionNodeId": "6638393137363462633366333237613634653038346439323661393639626665"
           }
         ]
       },
@@ -70,134 +95,35 @@
             "longName": "Output Data",
             "index": 0,
             "isExposed": false,
-            "data": null,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "prout",
+            "defaultData": null,
             "type": 11,
-            "connectionName": "input1",
-            "connectionNodeId": "6534333731326164633133623363653933323431373932336339353966616333"
-          }
-        ]
-      }
-    },
-    {
-      "name": "Merge",
-      "id": "6534333731326164633133623363653933323431373932336339353966616333",
-      "color": [
-        0,
-        0,
-        0
-      ],
-      "iconPath": "$FLASH_ICONS/merge.png",
-      "opCode": "# BeginOp\n\noutput = [input1, input2]\n\n",
-      "inputs": {
-        "input1": [
-          {
-            "shortName": "input1",
-            "longName": "Input 1",
-            "index": 0,
-            "isExposed": false,
-            "data": null,
-            "type": 11,
-            "connectionName": "outdata",
-            "connectionNodeId": "6662323331666235373063333666383866626337373263643765646135623663"
-          }
-        ],
-        "input2": [
-          {
-            "shortName": "input2",
-            "longName": "Input 2",
-            "index": 0,
-            "isExposed": false,
-            "data": null,
-            "type": 11,
-            "connectionName": "outfloat",
-            "connectionNodeId": "3433346633353030333661656236353732643237613138373566643231613633"
-          }
-        ]
-      },
-      "outputs": {
-        "output": [
-          {
-            "shortName": "output",
-            "longName": "Output",
-            "index": 0,
-            "isExposed": false,
-            "data": [],
-            "type": 9,
             "connectionName": "indata",
-            "connectionNodeId": "6632613639356634303936366362646536616562353535313461363831613330"
-          },
-          {
-            "shortName": "output",
-            "longName": "Output",
-            "index": 0,
-            "isExposed": false,
-            "data": [],
-            "type": 9,
-            "connectionName": "input1",
-            "connectionNodeId": "3462336166336262623239346539383862623665623666613933363263616365"
-          }
-        ]
-      }
-    },
-    {
-      "name": "Float",
-      "id": "3433346633353030333661656236353732643237613138373566643231613633",
-      "color": [
-        0,
-        0,
-        0
-      ],
-      "iconPath": "",
-      "opCode": "# BeginOp\n\noutfloat = infloat\n\n",
-      "inputs": {
-        "infloat": [
-          {
-            "shortName": "infloat",
-            "longName": "Value",
-            "index": 0,
-            "isExposed": true,
-            "data": 0.0,
-            "type": 4,
-            "connectionName": null,
-            "connectionNodeId": null
-          }
-        ]
-      },
-      "outputs": {
-        "outfloat": [
-          {
-            "shortName": "outfloat",
-            "longName": "Output Float",
-            "index": 0,
-            "isExposed": false,
-            "data": 0.0,
-            "type": 4,
-            "connectionName": "input2",
-            "connectionNodeId": "6534333731326164633133623363653933323431373932336339353966616333"
-          },
-          {
-            "shortName": "outfloat",
-            "longName": "Output Float",
-            "index": 0,
-            "isExposed": false,
-            "data": 0.0,
-            "type": 4,
-            "connectionName": "input2",
-            "connectionNodeId": "3462336166336262623239346539383862623665623666613933363263616365"
+            "connectionNodeId": "3466663033363565636234333837646639613838333230623132643236373937"
           }
         ]
       }
     },
     {
       "name": "Debug1",
-      "id": "6632613639356634303936366362646536616562353535313461363831613330",
+      "category": "Debug",
+      "id": "3466663033363565636234333837646639613838333230623132643236373937",
       "color": [
         50,
         222,
         132
       ],
       "iconPath": "$FLASH_ICONS/debug.png",
+      "definitionPath": "D:/dev/Flash/Library/Nodes/debug.fnode",
+      "nodeType": "Debug/Debug",
       "opCode": "# BeginOp\n\nFlashLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
       "inputs": {
         "indata": [
           {
@@ -205,10 +131,13 @@
             "longName": "Input Data",
             "index": 0,
             "isExposed": false,
-            "data": null,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "prout",
+            "defaultData": null,
             "type": 11,
-            "connectionName": "output",
-            "connectionNodeId": "6534333731326164633133623363653933323431373932336339353966616333"
+            "connectionName": "outdata",
+            "connectionNodeId": "3261373236396361383562393030393338666537346639386533366362343162"
           }
         ]
       },
@@ -219,56 +148,61 @@
             "longName": "Output Data",
             "index": 0,
             "isExposed": false,
-            "data": null,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "prout",
+            "defaultData": null,
             "type": 11,
-            "connectionName": "input1",
-            "connectionNodeId": "6237313332666236363862386563303435643832306132353431356362373163"
+            "connectionName": null,
+            "connectionNodeId": null
           }
         ]
       }
     },
     {
-      "name": "Switch",
-      "id": "3462336166336262623239346539383862623665623666613933363263616365",
+      "name": "Sleep",
+      "category": "Debug",
+      "id": "6638393137363462633366333237613634653038346439323661393639626665",
       "color": [
-        0,
-        0,
-        0
+        50,
+        222,
+        132
       ],
-      "iconPath": "",
-      "opCode": "# BeginOp\n\nif inswitchindex == 0:\n    output = input1\nelse:\n    output = input2\n\n",
+      "iconPath": "$FLASH_ICONS/debug.png",
+      "definitionPath": "D:/dev/Flash/Library/Nodes/sleep.fnode",
+      "nodeType": "Debug/Sleep",
+      "opCode": "# BeginOp\n\nimport time\n\nFlashLogMessage(f\"Sleeping for {intime} seconds\")\n\ntime.sleep(intime)\n\noutdata = indata\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
       "inputs": {
-        "input1": [
+        "indata": [
           {
-            "shortName": "input1",
-            "longName": "Input 1",
+            "shortName": "indata",
+            "longName": "Input Data",
             "index": 0,
             "isExposed": false,
-            "data": null,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "prout",
+            "defaultData": null,
             "type": 11,
-            "connectionName": "output",
-            "connectionNodeId": "6534333731326164633133623363653933323431373932336339353966616333"
+            "connectionName": "outfile",
+            "connectionNodeId": "6364333163613862626634373165343637646431373032646662383466376231"
           }
         ],
-        "input2": [
+        "intime": [
           {
-            "shortName": "input2",
-            "longName": "Input 2",
-            "index": 0,
-            "isExposed": false,
-            "data": null,
-            "type": 11,
-            "connectionName": "outfloat",
-            "connectionNodeId": "3433346633353030333661656236353732643237613138373566643231613633"
-          }
-        ],
-        "inswitchindex": [
-          {
-            "shortName": "inswitchindex",
-            "longName": "Switch Index",
+            "shortName": "intime",
+            "longName": "Sleeping Time",
             "index": 0,
             "isExposed": true,
-            "data": 0,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": 5,
+            "defaultData": null,
             "type": 1,
             "connectionName": null,
             "connectionNodeId": null
@@ -276,151 +210,49 @@
         ]
       },
       "outputs": {
-        "output": [
-          {
-            "shortName": "output",
-            "longName": "Output",
-            "index": 0,
-            "isExposed": false,
-            "data": null,
-            "type": 11,
-            "connectionName": "input2",
-            "connectionNodeId": "6237313332666236363862386563303435643832306132353431356362373163"
-          }
-        ]
-      }
-    },
-    {
-      "name": "Merge1",
-      "id": "6237313332666236363862386563303435643832306132353431356362373163",
-      "color": [
-        0,
-        0,
-        0
-      ],
-      "iconPath": "$FLASH_ICONS/merge.png",
-      "opCode": "# BeginOp\n\noutput = [input1, input2]\n\n",
-      "inputs": {
-        "input1": [
-          {
-            "shortName": "input1",
-            "longName": "Input 1",
-            "index": 0,
-            "isExposed": false,
-            "data": null,
-            "type": 11,
-            "connectionName": "outdata",
-            "connectionNodeId": "6632613639356634303936366362646536616562353535313461363831613330"
-          }
-        ],
-        "input2": [
-          {
-            "shortName": "input2",
-            "longName": "Input 2",
-            "index": 0,
-            "isExposed": false,
-            "data": null,
-            "type": 11,
-            "connectionName": "output",
-            "connectionNodeId": "3462336166336262623239346539383862623665623666613933363263616365"
-          }
-        ]
-      },
-      "outputs": {
-        "output": [
-          {
-            "shortName": "output",
-            "longName": "Output",
-            "index": 0,
-            "isExposed": false,
-            "data": [],
-            "type": 9,
-            "connectionName": "indata",
-            "connectionNodeId": "6363613232356531313337633366636362653761363730633066393431303532"
-          }
-        ]
-      }
-    },
-    {
-      "name": "Debug2",
-      "id": "6363613232356531313337633366636362653761363730633066393431303532",
-      "color": [
-        50,
-        222,
-        132
-      ],
-      "iconPath": "$FLASH_ICONS/debug.png",
-      "opCode": "# BeginOp\n\nFlashLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
-      "inputs": {
-        "indata": [
-          {
-            "shortName": "indata",
-            "longName": "Input Data",
-            "index": 0,
-            "isExposed": false,
-            "data": null,
-            "type": 11,
-            "connectionName": "output",
-            "connectionNodeId": "6237313332666236363862386563303435643832306132353431356362373163"
-          }
-        ]
-      },
-      "outputs": {
         "outdata": [
           {
             "shortName": "outdata",
             "longName": "Output Data",
             "index": 0,
             "isExposed": false,
-            "data": null,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "prout",
+            "defaultData": null,
             "type": 11,
-            "connectionName": null,
-            "connectionNodeId": null
+            "connectionName": "indata",
+            "connectionNodeId": "3261373236396361383562393030393338666537346639386533366362343162"
           }
         ]
       }
     }
   ],
+  "tracker": [
+    "6364333163613862626634373165343637646431373032646662383466376231",
+    "6638393137363462633366333237613634653038346439323661393639626665",
+    "3466663033363565636234333837646639613838333230623132643236373937"
+  ],
   "positions": [
     {
-      "id": "6438303732376439313934366430616563323762323836306532336434643932",
-      "x": -150.0,
-      "y": 300.0
+      "id": "6364333163613862626634373165343637646431373032646662383466376231",
+      "x": -400.0,
+      "y": 250.0
     },
     {
-      "id": "6662323331666235373063333666383866626337373263643765646135623663",
-      "x": 250.0,
-      "y": 300.0
+      "id": "3261373236396361383562393030393338666537346639386533366362343162",
+      "x": 300.0,
+      "y": 250.0
     },
     {
-      "id": "6534333731326164633133623363653933323431373932336339353966616333",
-      "x": 600.0,
-      "y": 300.0
+      "id": "3466663033363565636234333837646639613838333230623132643236373937",
+      "x": 700.0,
+      "y": 250.0
     },
     {
-      "id": "3433346633353030333661656236353732643237613138373566643231613633",
-      "x": 250.0,
-      "y": 550.0
-    },
-    {
-      "id": "6632613639356634303936366362646536616562353535313461363831613330",
-      "x": 950.0,
-      "y": 300.0
-    },
-    {
-      "id": "3462336166336262623239346539383862623665623666613933363263616365",
-      "x": 950.0,
-      "y": 550.0
-    },
-    {
-      "id": "6237313332666236363862386563303435643832306132353431356362373163",
-      "x": 1300.0,
-      "y": 300.0
-    },
-    {
-      "id": "6363613232356531313337633366636362653761363730633066393431303532",
-      "x": 1600.0,
-      "y": 300.0
+      "id": "6638393137363462633366333237613634653038346439323661393639626665",
+      "x": 0.0,
+      "y": 250.0
     }
   ]
 }

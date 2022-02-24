@@ -63,6 +63,7 @@ class Graph():
         self.savePath = ""
         self.hasError = False
         self.isCooked = False
+        self.isCooking = False
         self.stopCook = False
         self.cookTime = None
         self.nodes : list = []
@@ -394,10 +395,18 @@ class Graph():
             
             skipCookedNodes (bool, optional): skips the node if they are already cooked. Defaults to True.
         """
+        if self.GetSavePath() == "":
+            self.ReportError()
+            self.logger.Log(LogLevel.ERROR, f"(Graph : {self.name} : Graph need to be saved before cooking it")
+            return
+        
+        self.SaveToFile(self.GetSavePath())
+        
         cookStart = Timer.Start()
         
         self.hasError = False
         self.isCooked = False
+        self.isCooking = True
         
         if not skipCookedNodes:
             self.SetAllDirty()
@@ -411,9 +420,12 @@ class Graph():
                 with self.GetLock():
                     if self.stopCook:
                         self.stopCook = False
+                        self.isCooking = False
                         self.ReportError()
                         self.logger.Log(LogLevel.ERROR, f"(Graph : {self.name} : Cooking interrupted")
-                        break
+                        self.tracker.Update()
+                        self.SaveToFile(self.GetSavePath())
+                        return
 
                 if skipCookedNodes:
                     if node.IsCooked():
@@ -425,10 +437,12 @@ class Graph():
                 node.Cook()
 
                 self.tracker.Update()
+                self.SaveToFile(self.GetSavePath())
 
                 # Check for errors
                 if node.hasError:
                     self.ReportError()
+                    self.isCooking = False
                     self.logger.Log(LogLevel.ERROR, f"(Graph : {self.name}) : Error in cooking node [{node.GetName()}]. Check the log for more details")
                     break
                 else:
@@ -438,12 +452,12 @@ class Graph():
                     if node.GetID() == lastNodeToCook:
                         self.logger.Log(LogLevel.DIAGNOSTIC, f"(Graph : {self.name}) : Graph cooked up to node {node.GetName()}")
                         with self.GetLock():
+                            self.isCooking = False
                             self.isCooked = True
                             self.tracker.Clean()
                         break
 
             if not self.hasError:
-                
                 cookEnd = Timer.Stop()
                 
                 self.cookTime = Timer.Time(cookStart, cookEnd)
@@ -451,6 +465,7 @@ class Graph():
                 self.logger.Log(LogLevel.DIAGNOSTIC, f"(Graph : {self.name}) : Graph cooked in {self.cookTime:.3f} seconds")
                 
                 with self.GetLock():
+                    self.isCooking = False
                     self.isCooked = True
                     self.tracker.Clean()
 
@@ -458,8 +473,9 @@ class Graph():
         """
         Forces the graph cooking to stop
         """
-        with self.GetLock():
-            self.stopCook = True
+        if self.isCooking:
+            with self.GetLock():
+                self.stopCook = True
 
     def ReportError(self) -> None:
         """
@@ -507,8 +523,6 @@ class Graph():
                 output.Disconnect(connection)
                 
         if node.IsInsideIfBlock():
-            print("remove node")
-            
             for blockName, blockNodes in self.ifBlocks.items():
                 if node.GetID() in blockNodes:
                     blockNodes.remove(node.GetID())
@@ -630,10 +644,22 @@ class Graph():
 
         self.name, _ = os.path.splitext(os.path.basename(filePath))
         self.savePath = filePath
-
+        
+        with open(filePath, "r") as file:
+            oldFileContent = file.read()
+            oldFileData = json.loads(oldFileContent)
+            
         if saveAsString:
             with open(filePath, "w") as file:
                 serializedGraph = self.Serialize()
+                
+                jsonGraph = json.loads(serializedGraph)
+                
+                if "positions" in oldFileData:
+                    jsonGraph["positions"] = oldFileData["positions"]
+                
+                serializedGraph = json.dumps(jsonGraph, indent=2)
+                
                 file.write(serializedGraph)
         else:
             with open(filePath, "wb") as file:
