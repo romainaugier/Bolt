@@ -113,6 +113,11 @@ class Graph():
         for node in self.nodes:
             node.SetDirty()
 
+    def GetIfBlocks(self) -> dict:
+        """
+        """
+        return self.ifBlocks
+
     def UpdateEnv(self) -> None:
         """
         """
@@ -397,7 +402,7 @@ class Graph():
         """
         if self.GetSavePath() == "":
             self.ReportError()
-            self.logger.Log(LogLevel.ERROR, f"(Graph : {self.name} : Graph need to be saved before cooking it")
+            self.logger.Log(LogLevel.ERROR, f"(Graph : {self.name}) : Graph needs to be saved before cooking it")
             return
         
         self.SaveToFile(self.GetSavePath())

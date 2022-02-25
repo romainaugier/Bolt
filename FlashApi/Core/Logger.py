@@ -40,10 +40,12 @@ class Logger():
     """
     Utility class to log informations to the user
     """
-    def __init__(self, level=LogLevel.WARNING, logToConsole=True, logToFile=False, file=None):
+    def __init__(self, level=LogLevel.WARNING, logToConsole=True, logToFile=False, logToCustomConsole=False, file=None):
         self.level = level
         self.logToConsole = logToConsole
         self.logToFile = logToFile
+        self.logToCustomConsole = logToCustomConsole
+        self.callbackFunction = None
         
         if file:
             self.file = open(file, "w")
@@ -54,6 +56,13 @@ class Logger():
     def __del__(self):
         if self.file:
             self.file.close()
+
+    def SetCustomConsoleCallback(self, callbackFunction) -> None:
+        """
+        Callback function called when the user wants the message and level to be sent to a specific function
+        """
+        self.callbackFunction = callbackFunction
+        self.logToCustomConsole = True
     
     def Log(self, level, input, getTraceback=False):
         """
@@ -66,21 +75,30 @@ class Logger():
             tracebackMessage = traceback.format_exc() + "\n" if getTraceback else ""
 
             message = "{0}[{1}] {2} : {3}\n{4}".format(level.GetAsColor(), level.GetAsString(), current_time, input, tracebackMessage)
+            messageClean = "[{0}] {1} : {2}\n{3}".format(level.GetAsString(), current_time, input, tracebackMessage)
             
             if self.logToConsole: 
                 sys.stdout.write(message)
             
-            self.LogToFile(message)
+            self.__LogToFile(messageClean)
+
+            self.__LogToCustomCallback(level, messageClean)
                 
             return message
 
         else:
             return ""
     
-
-    def LogToFile(self, input):
+    def __LogToFile(self, logMessage):
         """
         Log the message to a file if enabled
         """
         if self.logToFile:
-            self.file.write(input)
+            self.file.write(logMessage)
+
+    def __LogToCustomCallback(self, logLevel, logMessage):
+        """
+        Log the message and the level to the user callback function
+        """
+        if self.logToCustomConsole and self.callbackFunction is not None:
+            self.callbackFunction(logLevel, logMessage)

@@ -1,6 +1,6 @@
 # BeginAttr
 
-name = Nk_GenerateDaily
+name = NK_GenerateDaily
 icon = $FLASH_ICONS/nuke.png
 category = Nuke
 

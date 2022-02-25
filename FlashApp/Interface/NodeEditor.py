@@ -706,7 +706,7 @@ class NodeEditor(QtWidgets.QWidget):
         self.editTabs.setIconSize(QtCore.QSize(14, 14))
         
         self.opEditor = OpEditor(self.nodeToEditAsDict)
-        self.editTabs.addTab(self.opEditor, self.iconsLib.GetIcon("python"), "Op")
+        self.editTabs.addTab(self.opEditor, self.iconsLib.GetIcon("code"), "Op")
         self.editTabs.setIconSize(QtCore.QSize(14, 14))
         
         masterLayout.addWidget(self.editTabs)

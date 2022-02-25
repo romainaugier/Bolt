@@ -5,6 +5,7 @@
 name = Files
 color = [255, 220, 106]
 category = Utility
+icon = $FLASH_ICONS/files.png
 
 # EndAttr
 

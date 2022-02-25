@@ -600,10 +600,10 @@ class PlugEditor(QtWidgets.QWidget):
         """
         """
         QtCore.QTimer.singleShot(0, self.plugsWidget.adjustSize)
-        QtCore.QTimer.singleShot(4, self.adjustScrollArea)
-        QtCore.QTimer.singleShot(8, self.adjustSize)
-        QtCore.QTimer.singleShot(12, self.updateGeometry)
-        QtCore.QTimer.singleShot(16, self.roundCorners)
+        QtCore.QTimer.singleShot(5, self.adjustScrollArea)
+        QtCore.QTimer.singleShot(10, self.updateGeometry)
+        QtCore.QTimer.singleShot(15, self.adjustSize)
+        QtCore.QTimer.singleShot(30, self.roundCorners)
 
     def showPlugsAndInfos(self) -> None:
         """

@@ -254,7 +254,7 @@ class GGraph(QtWidgets.QGraphicsView):
         self.scene.setItemIndexMethod(QtWidgets.QGraphicsScene.NoIndex)
         self.scene.setSceneRect(0, 0, 800, 800)
         self.setScene(self.scene)
-        self.setCacheMode(QtWidgets.QGraphicsView.CacheBackground)
+        # self.setCacheMode(QtWidgets.QGraphicsView.CacheBackground)
         self.setViewportUpdateMode(QtWidgets.QGraphicsView.FullViewportUpdate)
         self.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.TextAntialiasing | QtGui.QPainter.SmoothPixmapTransform | QtGui.QPainter.HighQualityAntialiasing)
         self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
@@ -282,7 +282,7 @@ class GGraph(QtWidgets.QGraphicsView):
         self.threadCanJoin.connect(lambda: self.joinGraphThread())
 
         self.selectedNodeChanged.connect(self.onSelectedNodeChange)
-        self.hasBeenEdited.connect(lambda: (self.stopGraphCooking(), self.graph.SetAllDirty(), self.updateNodeBadges(), self.updateBlocks()))
+        self.hasBeenEdited.connect(lambda: (self.stopGraphCooking(), self.getInternalGraph().SetAllDirty(), self.updateNodeBadges(), self.updateBlocks()))
 
         QtWidgets.QApplication.instance().installEventFilter(self)
 
@@ -291,7 +291,7 @@ class GGraph(QtWidgets.QGraphicsView):
     def getEnv(self) -> Environment:
         """
         """
-        return self.graph.environment
+        return self.getInternalGraph().environment
 
     # PAINTING
 
@@ -361,7 +361,7 @@ class GGraph(QtWidgets.QGraphicsView):
         """
         """
         self.plugEditor.move(self.rect().width() - self.plugEditor.getWidth() - 50, 50)
-        self.plugEditor.setMaxHeight(self.sceneRect().height() - 50)
+        self.plugEditor.setMaxHeight(self.rect().height() - 225)
         
         return super().resizeEvent(event)
 
@@ -545,8 +545,11 @@ class GGraph(QtWidgets.QGraphicsView):
             newNodeAction.triggered.connect(lambda: self.addNode(newNodeAction.sender().data(), QtCore.QPointF(float(sceneX), float(sceneY))))
             nodeCategoryMenu.addAction(newNodeAction)
 
-        computeAction = menu.addAction("Cook")
-        computeAction.triggered.connect(lambda: self.launchGraphCooking())
+        cookAction = menu.addAction("Cook")
+        cookAction.triggered.connect(lambda: self.launchGraphCooking())
+
+        recookAction = menu.addAction("Recook")
+        recookAction.triggered.connect(lambda: self.launchGraphCooking(skipCookedNodes=False))
 
         reloadLibAction = menu.addAction("Reload Node Library")
         reloadLibAction.triggered.connect(lambda: self.nodeLibrary.Reload())
@@ -572,9 +575,9 @@ class GGraph(QtWidgets.QGraphicsView):
     def updateBlocks(self):
         """
         """
-        self.graph.FindNodesInIfBlock(silent=True)
+        self.getInternalGraph().FindNodesInIfBlock(silent=True)
 
-        for blockId in self.graph.ifBlocks:
+        for blockId in self.getInternalGraph().ifBlocks:
             gBlockExists = False
 
             for gBlock in self.gBlocks: 
@@ -587,7 +590,7 @@ class GGraph(QtWidgets.QGraphicsView):
 
                 self.addBlock(blockBeginNode, blockEndNode)
 
-        for blockId, blockNodes in self.graph.ifBlocks.items():  
+        for blockId, blockNodes in self.getInternalGraph().ifBlocks.items():  
             for gBlock in self.gBlocks:
                 if blockId == gBlock.blockId:
                     for blockNode in blockNodes:
@@ -651,22 +654,27 @@ class GGraph(QtWidgets.QGraphicsView):
 
     # GRAPH FUNCTIONS
 
+    def getInternalGraph(self) -> Graph:
+        """
+        """
+        return self.graph
+
     def addNode(self, nodeType : str, position : QtCore.QPointF) -> GNode:
         """
         """
         if "If_Block" in nodeType:
             nodesPath = self.nodeLibrary.GetPath(nodeType)
             
-            tmpBeginInternalNode = Node(self.graph.GetEnv())
+            tmpBeginInternalNode = Node(self.getInternalGraph().GetEnv())
             tmpBeginInternalNode.Load(nodesPath[0])
             tmpBeginInternalNode.SetIfBeginBlock()
             
-            tmpEndInternalNode = Node(self.graph.GetEnv())
+            tmpEndInternalNode = Node(self.getInternalGraph().GetEnv())
             tmpEndInternalNode.Load(nodesPath[1])
             tmpEndInternalNode.SetIfEndBlock()
             
-            self.graph.AddNode(tmpBeginInternalNode)
-            self.graph.AddNode(tmpEndInternalNode)
+            self.getInternalGraph().AddNode(tmpBeginInternalNode)
+            self.getInternalGraph().AddNode(tmpEndInternalNode)
             
             tmpBeginInternalNode.SetAssociatedBlockEnd(tmpEndInternalNode.GetID())
             tmpEndInternalNode.SetAssociatedBlockBegin(tmpBeginInternalNode.GetID())
@@ -694,8 +702,8 @@ class GGraph(QtWidgets.QGraphicsView):
             return tmpBeginGNode
         else:
             tmpInternalNode = self.nodeLibrary.Get(nodeType)
-            tmpInternalNode.SetEnv(self.graph.GetEnv())
-            self.graph.AddNode(tmpInternalNode)
+            tmpInternalNode.SetEnv(self.getInternalGraph().GetEnv())
+            self.getInternalGraph().AddNode(tmpInternalNode)
 
             tmpGNode = GNode(tmpInternalNode, "", self, self.iconsLib)
             tmpGNode.hasBeenSelected.connect(self.onNodeSelectionChange)
@@ -738,14 +746,18 @@ class GGraph(QtWidgets.QGraphicsView):
                 
         if node.getInternalNode().IsIfBeginBlock():
             node2 = self.getNodeById(node.getInternalNode().GetAssociatedBlockEnd())
-            self.graph.ifBlocks.pop(node.getInternalNode().GetID())
+
+            self.deleteBlock(node)
+
         elif node.getInternalNode().IsIfEndBlock():
             node2 = self.getNodeById(node.getInternalNode().GetAssociatedBlockBegin())
-            self.graph.ifBlocks.pop(node2.getInternalNode().GetID())
+            
+            self.deleteBlock(node2)
+
         else:
             node2 = None
             
-        self.graph.RemoveNode(node.getInternalNode())
+        self.getInternalGraph().RemoveNode(node.getInternalNode())
         
         if node2 is not None: 
             for sock in node2.inputGPlugs:
@@ -756,7 +768,7 @@ class GGraph(QtWidgets.QGraphicsView):
                 for edge in sock.edges[:]:
                     self.deleteEdge(edge)
                     
-            self.graph.RemoveNode(node2.getInternalNode())
+            self.getInternalGraph().RemoveNode(node2.getInternalNode())
         
         for block in self.gBlocks:
             if node in block.nodes:
@@ -848,12 +860,14 @@ class GGraph(QtWidgets.QGraphicsView):
         """
         blockToDelete = None
 
-        for block in self.blocks:
+        for block in self.gBlocks:
             if (block.getBlockBeginNode() == anyBlockNode or
                 block.getBlockEndNode() == anyBlockNode):
                 blockToDelete = block
 
         if blockToDelete is not None:
+            self.getInternalGraph().ifBlocks.pop(blockToDelete.blockId)
+
             self.gBlocks.remove(blockToDelete)
 
             self.scene.removeItem(blockToDelete)
@@ -890,13 +904,13 @@ class GGraph(QtWidgets.QGraphicsView):
         Cooks the graph
         """
         self.startCooking.emit()
-        self.graph.Cook(lastNodeToCook, skipCookedNodes)
+        self.getInternalGraph().Cook(lastNodeToCook, skipCookedNodes)
         self.threadCanJoin.emit()
         
     def stopGraphCooking(self) -> None:
         """
         """
-        self.graph.StopCook()
+        self.getInternalGraph().StopCook()
 
     def updateNodeBadges(self) -> None:
         """
@@ -928,7 +942,7 @@ class GGraph(QtWidgets.QGraphicsView):
 
             self.finishedCooking.emit()
 
-            if self.graph.hasError:
+            if self.getInternalGraph().hasError:
                 self.errorCooking.emit()
 
         self.updateNodeBadges()
@@ -937,22 +951,22 @@ class GGraph(QtWidgets.QGraphicsView):
         """
         """
         print("Nodes : ")
-        print(json.dumps([node.GetName() for node in self.graph.nodes], indent=4))
+        print(json.dumps([node.GetName() for node in self.getInternalGraph().nodes], indent=4))
         
-        self.graph.Sort()
+        self.getInternalGraph().Sort()
 
         print("Sorted Nodes : ")
-        print(json.dumps([node.GetName() for node in self.graph.sortedNodes], indent=4))
+        print(json.dumps([node.GetName() for node in self.getInternalGraph().sortedNodes], indent=4))
         
         print("Found If Blocks : ")
-        for blockName, nodes in self.graph.ifBlocks.items():
-            blockBegin = self.graph.GetNodeWithID(blockName)
+        for blockName, nodes in self.getInternalGraph().ifBlocks.items():
+            blockBegin = self.getInternalGraph().GetNodeWithID(blockName)
             print(f"Block Begin [{blockBegin.GetName()}]")
             
             for node in nodes:
-                print(f"- {self.graph.GetNodeWithID(node).GetName()}")
+                print(f"- {self.getInternalGraph().GetNodeWithID(node).GetName()}")
                 
-            blockEnd = self.graph.GetNodeWithID(blockBegin.GetAssociatedBlockEnd())
+            blockEnd = self.getInternalGraph().GetNodeWithID(blockBegin.GetAssociatedBlockEnd())
             print(f"Block End [{blockEnd.GetName()}]")
 
     def saveGraph(self, filePath : str) -> None:
@@ -964,10 +978,10 @@ class GGraph(QtWidgets.QGraphicsView):
         """
         name, _ = os.path.splitext(os.path.basename(filePath))
         
-        self.graph.SetName(name)
-        self.graph.SetSavePath(filePath)
+        self.getInternalGraph().SetName(name)
+        self.getInternalGraph().SetSavePath(filePath)
 
-        graphSerialized = self.graph.Serialize()
+        graphSerialized = self.getInternalGraph().Serialize()
 
         graphDict = json.loads(graphSerialized)
 
@@ -992,7 +1006,7 @@ class GGraph(QtWidgets.QGraphicsView):
         Args:
             filePath (str): path to the graph file
         """
-        self.graph.LoadFromFile(filePath)
+        self.getInternalGraph().LoadFromFile(filePath)
 
         self.constructGraphFromInternalGraph()
 
@@ -1028,10 +1042,10 @@ class GGraph(QtWidgets.QGraphicsView):
             elif type(item) is GEdge:
                 self.deleteEdge(item)
 
-        for node in self.graph.GetNodes():
+        for node in self.getInternalGraph().GetNodes():
             self.addNodeFromInternalGraph(node)
 
-        for node in self.graph.GetNodes():
+        for node in self.getInternalGraph().GetNodes():
             gNode = self.getNodeById(node.GetID())
 
             for outputName, output in node.GetOutputs().items():
@@ -1046,16 +1060,16 @@ class GGraph(QtWidgets.QGraphicsView):
     def layoutGraph(self) -> None:
         """
         """
-        self.graph.Sort()
+        self.getInternalGraph().Sort()
         
-        if not self.graph.HasError():
+        if not self.getInternalGraph().HasError():
             nodesNeedLayout = True
 
             iterations = 0
 
             while nodesNeedLayout == True:
             # while iterations < 2:
-                for i, node in enumerate(self.graph.sortedNodes):
+                for i, node in enumerate(self.getInternalGraph().sortedNodes):
                     gNode = self.getNodeById(node.GetID())
 
                     gNodePos = gNode.pos() + QtCore.QPointF(gNode.sizeX / 2, gNode.sizeY / 2)
@@ -1098,7 +1112,7 @@ class GGraph(QtWidgets.QGraphicsView):
 
             
 
-            for node in self.graph.sortedNodes:
+            for node in self.getInternalGraph().sortedNodes:
                 gNode = self.getNodeById(node.GetID())
 
             scene = self.scene

@@ -1,0 +1,254 @@
+{
+  "nodes": [
+    {
+      "name": "File",
+      "category": "Utility",
+      "id": "6466636364346634663731613736656634323930366634383031613836396564",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/file.fnode",
+      "nodeType": "Utility/File",
+      "opCode": "# BeginOp\n\noutfile = infile\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infile": [
+          {
+            "shortName": "infile",
+            "longName": "Input File Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "test",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "test",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "input",
+            "connectionNodeId": "3734626362363034393133303331656632646464633537373333376436613439"
+          }
+        ]
+      }
+    },
+    {
+      "name": "If_Begin",
+      "category": "Utility",
+      "id": "3734626362363034393133303331656632646464633537373333376436613439",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/ifbegin.fnode",
+      "nodeType": "Utility/If_Begin",
+      "opCode": "# BeginOp\n\noutput = input\n\n",
+      "disabled": false,
+      "isIfBegin": true,
+      "associatedEndBlockId": "3134383436666436643364343032376564356534353631336635326139323863",
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "input": [
+          {
+            "shortName": "input",
+            "longName": "Input",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "test",
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outfile",
+            "connectionNodeId": "6466636364346634663731613736656634323930366634383031613836396564"
+          }
+        ],
+        "incondition": [
+          {
+            "shortName": "incondition",
+            "longName": "Condition",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": true,
+            "defaultData": true,
+            "type": 8,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "test",
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "indata",
+            "connectionNodeId": "3166363337313339383839636161616364396536346430623566653934346231"
+          }
+        ]
+      }
+    },
+    {
+      "name": "If_End",
+      "category": "Utility",
+      "id": "3134383436666436643364343032376564356534353631336635326139323863",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/ifend.fnode",
+      "nodeType": "Utility/If_End",
+      "opCode": "# BeginOp\n\noutput = input\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": true,
+      "associatedBeginBlockId": "3734626362363034393133303331656632646464633537373333376436613439",
+      "inputs": {
+        "input": [
+          {
+            "shortName": "input",
+            "longName": "Input",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "test",
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outdata",
+            "connectionNodeId": "3166363337313339383839636161616364396536346430623566653934346231"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "test",
+            "defaultData": null,
+            "type": 11,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "Debug",
+      "category": "Debug",
+      "id": "3166363337313339383839636161616364396536346430623566653934346231",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$FLASH_ICONS/debug.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/debug.fnode",
+      "nodeType": "Debug/Debug",
+      "opCode": "# BeginOp\n\nFlashLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "test",
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "output",
+            "connectionNodeId": "3734626362363034393133303331656632646464633537373333376436613439"
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "test",
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "input",
+            "connectionNodeId": "3134383436666436643364343032376564356534353631336635326139323863"
+          }
+        ]
+      }
+    }
+  ],
+  "tracker": null,
+  "positions": [
+    {
+      "id": "6466636364346634663731613736656634323930366634383031613836396564",
+      "x": 0.0,
+      "y": 300.0
+    },
+    {
+      "id": "3134383436666436643364343032376564356534353631336635326139323863",
+      "x": 1100.0,
+      "y": 300.0
+    },
+    {
+      "id": "3166363337313339383839636161616364396536346430623566653934346231",
+      "x": 700.0,
+      "y": 300.0
+    },
+    {
+      "id": "3734626362363034393133303331656632646464633537373333376436613439",
+      "x": 350.0,
+      "y": 300.0
+    }
+  ]
+}

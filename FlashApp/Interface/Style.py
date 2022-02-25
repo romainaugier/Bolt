@@ -176,3 +176,10 @@ def GetQColorFromPalette(colorEnum : ColorPalette) -> QtGui.QColor:
     """
     """
     return QtGui.QColor(colorEnum.value)
+
+def GetColorFromPalette(colorEnum : ColorPalette) -> list:
+    """
+    """
+    qColor = QtGui.QColor(colorEnum.value)
+
+    return [qColor.red(), qColor.green(), qColor.blue()]

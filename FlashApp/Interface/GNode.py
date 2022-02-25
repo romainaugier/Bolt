@@ -83,10 +83,10 @@ class Badge(QtWidgets.QGraphicsObject):
         self.state = BadgeState.DIRTY
         self.message = ""
 
-        self.dirtyPixmap = self.iconsLib.GetPixmap("badge-dirty")
+        self.dirtyPixmap = self.iconsLib.GetColoredPixmap("badge-dirty", GetQColorFromPalette(ColorPalette.FOREGROUND))
         self.cookedPixmap = self.iconsLib.GetPixmap("badge-cooked")
-        self.warningPixmap = self.iconsLib.GetPixmap("badge-warning")
-        self.errorPixmap = self.iconsLib.GetPixmap("badge-error")
+        self.warningPixmap = self.iconsLib.GetPixmap("warning")
+        self.errorPixmap = self.iconsLib.GetPixmap("error")
 
         # self.cookingMovie = self.iconsLib.GetAnim("badge-cooking")
         self.cookingMovie = QtGui.QMovie(f"{FLASHROOT}/Library/Icons/badge-cooking.gif")
@@ -261,10 +261,9 @@ class GPlug(QtWidgets.QGraphicsObject):
 
         painter.setPen(Qt.NoPen)
         
-        color = self.color
+        color = QtGui.QColor(self.color)
         
         if self.getInternalPlug().GetNode().IsDisabled():
-            color = self.color
             color.setAlpha(78)
 
         painter.setBrush(color)
@@ -428,11 +427,6 @@ class GPlug(QtWidgets.QGraphicsObject):
         """
         """
         for edge in self.edges:
-            edge.source.getInternalPlug().Disconnect(edge.destination.getInternalPlug())
-
-            edge.source.edges.remove(edge)
-            edge.destination.edges.remove(edge)
-
             self.graph.deleteItem(edge)
 
 class GNode(QtWidgets.QGraphicsObject):
@@ -921,6 +915,16 @@ class GEdge(QtWidgets.QGraphicsPathItem):
         stroke.setWidth(20)
         
         return stroke.createStroke(path)
+
+    def boundingRect(self) -> QtCore.QRectF:
+        """
+        """
+        path = self.buildPath()
+        
+        stroke = QtGui.QPainterPathStroker()
+        stroke.setWidth(20)
+        
+        return stroke.createStroke(path).boundingRect()
 
     # PAINTING
 

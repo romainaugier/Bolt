@@ -1,6 +1,6 @@
 import os
 
-from PyQt5 import QtGui
+from PyQt5 import QtGui, QtCore
 
 from FlashApp import FLASHROOT
 
@@ -70,6 +70,26 @@ class Icons():
             QtGui.QPixmap: pixmap
         """
         return self.pixmaps[name]
+
+    def GetColoredPixmap(self, name : str, color : QtGui.QColor) -> QtGui.QPixmap:
+        """
+        Returns a qpixmap given a name and a color to set the pixmap to (used
+        to get the same black withicons with different colors)
+
+        Args:
+            name (str): pixmap name
+            color (QtGui.QColor): new color
+
+        Returns:
+            QtGui.QPixmap: pixmap with the proper color applied
+        """
+        pixmap : QtGui.QPixmap = self.pixmaps[name]
+        mask = pixmap.createMaskFromColor(QtGui.QColor(0, 0, 0), QtCore.Qt.MaskOutColor)
+
+        newPixmap = QtGui.QPixmap(pixmap.size())
+        newPixmap.fill(color)
+        newPixmap.setMask(mask)
+        return newPixmap   
 
     def GetAnim(self, name : str) -> QtGui.QMovie:
         """

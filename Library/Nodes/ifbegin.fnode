@@ -4,6 +4,7 @@
 
 name = If_Begin
 category = Utility
+icon = $FLASH_ICONS/block.png
 
 # EndAttr
 

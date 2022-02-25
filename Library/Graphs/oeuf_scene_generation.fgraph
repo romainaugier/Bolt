@@ -1,0 +1,2406 @@
+{
+  "nodes": [
+    {
+      "name": "Hou_AutoPlume_Charles",
+      "category": "Houdini",
+      "id": "3966313331363738396462303335663561616462303738323634303033656164",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/houdini.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/hou_autoplume_charles.fnode",
+      "nodeType": "Houdini/Hou_AutoPlume_Charles",
+      "opCode": "# BeginOp\n\n# BeginOp\n\n# BeginOp\n\n# BeginOp\n\n# BeginOp\n\nimport os\n\nfr = inshotspecs[\"FrameRange\"].split(\"-\")\nframerange = [int(fr[0]), int(fr[1])]\n\ncacheDir = f\"{incachedir}/{inshotspecs['Sequence']}/{inshotspecs['Shot']}/Charles\"\noutputfilefur = f\"{cacheDir}/{inshotspecs['Sequence']}_{inshotspecs['Shot']}_charles_cache_fur.abc\"\noutputfileplumes = f\"{cacheDir}/{inshotspecs['Sequence']}_{inshotspecs['Shot']}_charles_cache_plumes.abc\"\n\ngeneratedScript = f\"\"\"import hou\nanimSopNode = None\nplumeSopNode = None\n\nfor node in hou.node(\"/obj\").children():\n    if node.name() == \"anim_import\":\n        animSopNode = node\n    elif node.name() == \"EXPORT\":\n        plumeSopNode = node\n\nif animSopNode != None:\n    for node in animSopNode.children():\n        if node.type().name() == \"alembic\":\n            node.parm(\"fileName\").set(\"{inanimationfile}\")\n            break\n\nif plumeSopNode != None:\n    for node in plumeSopNode.children():\n        if node.name() == \"rop_alembic_fur\":\n            node.parm(\"filename\").set(\"{outputfilefur}\")\n            node.parm(\"f1\").set({framerange[0]})\n            node.parm(\"f2\").set({framerange[1]})\n            node.parm(\"execute\").pressButton()\n        if node.name() == \"rop_alembic_plumes\":\n            node.parm(\"filename\").set(\"{outputfileplumes}\")\n            node.parm(\"f1\").set({framerange[0]})\n            node.parm(\"f2\").set({framerange[1]})\n            node.parm(\"execute\").pressButton()\n\"\"\"\n\ntmpScriptFilePath = FlashTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\noutabccachefile = [outputfilefur, outputfileplumes]\n\n\n\n\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inanimationfile": [
+          {
+            "shortName": "inanimationfile",
+            "longName": "Animation",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outfile",
+            "connectionNodeId": "3433656138663163363334383332333035613638353831383033343564383330"
+          }
+        ],
+        "intemplatefile": [
+          {
+            "shortName": "intemplatefile",
+            "longName": "Template File",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/Bird_feathers_template.hipnc",
+            "defaultData": "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/Bird_feathers_template.hipnc",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ],
+        "inshotspecs": [
+          {
+            "shortName": "inshotspecs",
+            "longName": "Shot Specs",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 10,
+            "connectionName": "outshotspecs",
+            "connectionNodeId": "3265306139363364323630303539633538623039363139656331326166366234"
+          }
+        ],
+        "incachedir": [
+          {
+            "shortName": "incachedir",
+            "longName": "Cache Directory",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/CACHE",
+            "defaultData": "Z:/OEUF/CACHE",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outscriptfile": [
+          {
+            "shortName": "outscriptfile",
+            "longName": "Output Script",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "inscript1",
+            "connectionNodeId": "3830663234616438366539613163366139383538336263333831633563656361"
+          }
+        ],
+        "outabccachefile": [
+          {
+            "shortName": "outabccachefile",
+            "longName": "Output Cache File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 9,
+            "connectionName": "input1",
+            "connectionNodeId": "3234663166313833333538623334383331626534356439313761613161666534"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Hou_AutoPlume_Corinne",
+      "category": "Houdini",
+      "id": "3833323665616164336533656163313734326234323666623861636666393934",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/houdini.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/hou_autoplume_corinne.fnode",
+      "nodeType": "Houdini/Hou_AutoPlume_Corinne",
+      "opCode": "# BeginOp\n\nimport os\n\nfr = inshotspecs[\"FrameRange\"].split(\"-\")\nframerange = [int(fr[0]), int(fr[1])]\n\ncacheDir = f\"{incachedir}/{inshotspecs['Sequence']}/{inshotspecs['Shot']}/Corinne\"\noutputfilefur = f\"{cacheDir}/{inshotspecs['Sequence']}_{inshotspecs['Shot']}_corinne_cache_fur.abc\"\noutputfileplumes = f\"{cacheDir}/{inshotspecs['Sequence']}_{inshotspecs['Shot']}_corinne_cache_plumes.abc\"\n\ngeneratedScript = f\"\"\"import hou\nanimSopNode = None\nplumeSopNode = None\n\nfor node in hou.node(\"/obj\").children():\n    if node.name() == \"anim_import\":\n        animSopNode = node\n    elif node.name() == \"EXPORT\":\n        plumeSopNode = node\n\nif animSopNode != None:\n    for node in animSopNode.children():\n        if node.type().name() == \"alembic\":\n            node.parm(\"fileName\").set(\"{inanimationfile}\")\n            break\n\nif plumeSopNode != None:\n    for node in plumeSopNode.children():\n        if node.name() == \"rop_alembic_fur\":\n            node.parm(\"filename\").set(\"{outputfilefur}\")\n            node.parm(\"f1\").set({framerange[0]})\n            node.parm(\"f2\").set({framerange[1]})\n            node.parm(\"execute\").pressButton()\n        if node.name() == \"rop_alembic_plumes\":\n            node.parm(\"filename\").set(\"{outputfileplumes}\")\n            node.parm(\"f1\").set({framerange[0]})\n            node.parm(\"f2\").set({framerange[1]})\n            node.parm(\"execute\").pressButton()\n\"\"\"\n\ntmpScriptFilePath = FlashTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\noutabccachefile = [outputfilefur, outputfileplumes]\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inanimationfile": [
+          {
+            "shortName": "inanimationfile",
+            "longName": "Animation",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outfile",
+            "connectionNodeId": "6230373337633433306538373031306139343038323137303138343730313533"
+          }
+        ],
+        "intemplatefile": [
+          {
+            "shortName": "intemplatefile",
+            "longName": "Template File",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/assets/characters/Bird/modeling/femelle/Houdini/Bird_feathers_template.hipnc",
+            "defaultData": "Z:/OEUF/assets/characters/Bird/modeling/femelle/Houdini/Bird_feathers_template.hipnc",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ],
+        "inshotspecs": [
+          {
+            "shortName": "inshotspecs",
+            "longName": "Shot Specs",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 10,
+            "connectionName": "outshotspecs",
+            "connectionNodeId": "3265306139363364323630303539633538623039363139656331326166366234"
+          }
+        ],
+        "incachedir": [
+          {
+            "shortName": "incachedir",
+            "longName": "Cache Directory",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/CACHE",
+            "defaultData": "Z:/OEUF/CACHE",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outscriptfile": [
+          {
+            "shortName": "outscriptfile",
+            "longName": "Output Script",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "inscript2",
+            "connectionNodeId": "3830663234616438366539613163366139383538336263333831633563656361"
+          }
+        ],
+        "outabccachefile": [
+          {
+            "shortName": "outabccachefile",
+            "longName": "Output Cache File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 9,
+            "connectionName": "input2",
+            "connectionNodeId": "3234663166313833333538623334383331626534356439313761613161666534"
+          }
+        ]
+      }
+    },
+    {
+      "name": "File",
+      "category": "Utility",
+      "id": "3433656138663163363334383332333035613638353831383033343564383330",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "$FLASH_ICONS/file.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/file.fnode",
+      "nodeType": "Utility/File",
+      "opCode": "# BeginOp\n\noutfile = infile\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infile": [
+          {
+            "shortName": "infile",
+            "longName": "Input File Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "inanimationfile",
+            "connectionNodeId": "3966313331363738396462303335663561616462303738323634303033656164"
+          },
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "input1",
+            "connectionNodeId": "6364353466356532316565626364633736383234353866383233663038353539"
+          }
+        ]
+      }
+    },
+    {
+      "name": "File1",
+      "category": "Utility",
+      "id": "6230373337633433306538373031306139343038323137303138343730313533",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "$FLASH_ICONS/file.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/file.fnode",
+      "nodeType": "Utility/File",
+      "opCode": "# BeginOp\n\noutfile = infile\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infile": [
+          {
+            "shortName": "infile",
+            "longName": "Input File Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "inanimationfile",
+            "connectionNodeId": "3833323665616164336533656163313734326234323666623861636666393934"
+          },
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "input2",
+            "connectionNodeId": "6364353466356532316565626364633736383234353866383233663038353539"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Oeuf_ShotSpecs",
+      "category": "Oeuf",
+      "id": "3265306139363364323630303539633538623039363139656331326166366234",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/volcan.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/oeuf_shot_specs.fnode",
+      "nodeType": "Oeuf/Oeuf_ShotSpecs",
+      "opCode": "# BeginOp\n\noutshotspecs = inshotspecs\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inshotspecs": [
+          {
+            "shortName": "inshotspecs",
+            "longName": "Shot Specs",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {
+              "FrameRange": "100-240",
+              "Sequence": "seq010",
+              "Shot": "shot010"
+            },
+            "defaultData": {
+              "FrameRange": "100-240",
+              "Sequence": "seq010",
+              "Shot": "shot010"
+            },
+            "type": 10,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outshotspecs": [
+          {
+            "shortName": "outshotspecs",
+            "longName": "Output Shot Specs",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {},
+            "defaultData": {},
+            "type": 10,
+            "connectionName": "inshotspecs",
+            "connectionNodeId": "3966313331363738396462303335663561616462303738323634303033656164"
+          },
+          {
+            "shortName": "outshotspecs",
+            "longName": "Output Shot Specs",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {},
+            "defaultData": {},
+            "type": 10,
+            "connectionName": "inshotspecs",
+            "connectionNodeId": "3833323665616164336533656163313734326234323666623861636666393934"
+          },
+          {
+            "shortName": "outshotspecs",
+            "longName": "Output Shot Specs",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {},
+            "defaultData": {},
+            "type": 10,
+            "connectionName": "inshotspecs",
+            "connectionNodeId": "3131356333343463313566393839343637333939393265383865646634383635"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge_Scripts",
+      "category": "Utility",
+      "id": "3830663234616438366539613163366139383538336263333831633563656361",
+      "color": [
+        52,
+        115,
+        165
+      ],
+      "iconPath": "$FLASH_ICONS/python.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/merge_scripts.fnode",
+      "nodeType": "Utility/Merge_Scripts",
+      "opCode": "# BeginOp\n\nimport os, re\n\nscript1 = inscript1\nscript2 = inscript2\n\nscriptsAreFile = False\n\nif os.path.exists(script1):\n    with open(script1, \"r\") as scriptFile1:\n        script1 = scriptFile1.read()\n\nif os.path.exists(script2):\n    with open(script2, \"r\") as scriptFile2:\n        script2 = scriptFile2.read()\n\nimportPatterns = re.compile(r\"import\\s.+|from\\s.+\")\n\nimportMatches1 = re.findall(importPatterns, script1)\n\nimportMatches2 = re.findall(importPatterns, script2)\n\nmodulesToImport = []\nmodulesToImportAs = {}\nmodulesToImportFrom = {}\n\nfor importMatch in importMatches1:\n    if importMatch.startswith(\"import\"):\n        if \"as\" in importMatch:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importList = importMatch.split(\"as\")\n\n            modulesToImportAs[importList[0].replace(\" \", \"\")] = importList[1].replace(\" \", \"\")\n        else:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importMatch = importMatch.replace(\" \", \"\")\n            importList = importMatch.split(\",\")\n\n            for imp in importList: \n                modulesToImport.append(imp)\n    \n    elif importMatch.startswith(\"from\"):\n        importMatch = importMatch.replace(\"from\", \"\")\n        importList = importMatch.split(\"import\")\n\n        module = importList[0].replace(\" \", \"\")\n\n        elements = importList[1].split(\",\")\n\n        moduleElements = []\n\n        for elem in elements:\n            moduleElements.append(elem.replace(\" \", \"\"))\n\n        modulesToImportFrom[module] = moduleElements\n\nfor importMatch in importMatches2:\n    if importMatch.startswith(\"import\"):\n        if \"as\" in importMatch:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importList = importMatch.split(\"as\")\n\n            moduleName = importList[0].replace(\" \", \"\")\n            moduleAlias = importList[1].replace(\" \", \"\")\n\n            if moduleName in modulesToImportAs:\n                if moduleAlias == modulesToImportAs[moduleName]:\n                    pass\n                else:\n                    script2 = re.sub(fr\"({moduleAlias})\\.\", f\"{modulesToImportAs[moduleName]}.\", script2)\n            elif moduleName in modulesToImport:\n                script2 = re.sub(fr\"({moduleAlias})\\.\", f\"{moduleName}.\", script2)\n            else:\n                modulesToImportAs[moduleName] = moduleAlias\n        else:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importMatch = importMatch.replace(\" \", \"\")\n            importList = importMatch.split(\",\")\n\n            for imp in importList: \n                if imp in modulesToImportAs:\n                    script1 = re.sub(fr\"({modulesToImportAs[imp]})\\.\", f\"{imp}.\", script1)\n                    modulesToImportAs.pop(imp)\n                if not imp in modulesToImport:\n                    modulesToImport.append(imp)\n    \n    elif importMatch.startswith(\"from\"):\n        importMatch = importMatch.replace(\"from\", \"\")\n        importList = importMatch.split(\"import\")\n\n        module = importList[0].replace(\" \", \"\")\n\n        elements = importList[1].split(\",\")\n\n        moduleElements = []\n\n        for elem in elements:\n            moduleElements.append(elem.replace(\" \", \"\"))\n\n        if module in modulesToImportFrom:\n            for mod in moduleElements:\n                if not mod in modulesToImportFrom[module]:\n                    modulesToImportFrom[module].append(mod)\n        else:\n            modulesToImportFrom[module] = moduleElements\n\nfor importMatch in importMatches1:\n    script1 = script1.replace(importMatch, \"$\")\n\nfor importMatch in importMatches2:\n    script2 = script2.replace(importMatch, \"$\")\n\ndollarPattern = re.compile(r\"(\\$\\n)+\")\n\nscript1 = re.sub(dollarPattern, \"# Script 1\\n\", script1)\nscript2 = re.sub(dollarPattern, \"# Script 2\\n\", script2)\n\nmodulesToImportAsStr = \"import \"\n\nfor i, module in enumerate(modulesToImport):\n    if i == 0:\n        modulesToImportAsStr += f\"{module}\"\n    else:\n        modulesToImportAsStr += f\", {module}\"\n\nmodulesToImportAsAsStr = \"\"\n\nfor moduleName, moduleAlias in modulesToImportAs.items():\n    modulesToImportAsAsStr += f\"import {moduleName} as {moduleAlias}\"\n\nmodulesToImportFromAsStr = \"\"\n\nfor moduleName, subModules in modulesToImportFrom.items():\n    subModulesToImportFrom = f\"from {moduleName} import \"\n\n    for i, subModule in enumerate(subModules):\n        if i == 0:\n            subModulesToImportFrom += f\"{subModule}\"\n        else:\n            subModulesToImportFrom += f\", {subModule}\"\n\n    modulesToImportFromAsStr += f\"{subModulesToImportFrom}\\n\"\n\nmergedScripts = f\"{modulesToImportAsStr}\\n{modulesToImportAsAsStr}\\n{modulesToImportFromAsStr}\\n{script1}\\n{script2}\"\n\ntmpScriptFilePath = FlashTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(mergedScripts) \n\noutscript = tmpScriptFilePath.replace(\"\\\\\", \"/\")\noutscripttext = mergedScripts\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inscript1": [
+          {
+            "shortName": "inscript1",
+            "longName": "Input Script 1",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outscriptfile",
+            "connectionNodeId": "3966313331363738396462303335663561616462303738323634303033656164"
+          }
+        ],
+        "inscript2": [
+          {
+            "shortName": "inscript2",
+            "longName": "Input Script 2",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outscriptfile",
+            "connectionNodeId": "3833323665616164336533656163313734326234323666623861636666393934"
+          }
+        ]
+      },
+      "outputs": {
+        "outscript": [
+          {
+            "shortName": "outscript",
+            "longName": "Output Script",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "inscript",
+            "connectionNodeId": "3664333434616330613532313764636164306236653365363861306262363533"
+          }
+        ],
+        "outscripttext": [
+          {
+            "shortName": "outscripttext",
+            "longName": "Output Script Text",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "Hou_Hython",
+      "category": "Houdini",
+      "id": "3664333434616330613532313764636164306236653365363861306262363533",
+      "color": [
+        255,
+        87,
+        34
+      ],
+      "iconPath": "$FLASH_ICONS/houdini.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/hou_hython.fnode",
+      "nodeType": "Houdini/Hou_Hython",
+      "opCode": "# BeginOp\n\nimport subprocess, os\n\nFlashLogMessage(f\"Hython : Start executing script : {inscript}\")\n\ncommand = [\"hython\"]\n\nif os.path.exists(inhoufile):\n    command.append(inhoufile)\n\ncommand.append(inscript)\n\nFlashLogMessage(f\"Hython Command : {' '.join(command)}\")\n\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE)\nstdout, stderr = process.communicate()\n\nstdoutAsStr = stdout.decode(\"utf-8\")\nstderrAsStr = stderr.decode(\"utf-8\")\n\nif len(stderrAsStr) > 0:\n    FlashLogError(stderrAsStr)\nelse:\n    FlashLogMessage(f\"Hython : Finished executing script : {inscript}\")\n    FlashLogMessage(stdoutAsStr)\n\n\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inscript": [
+          {
+            "shortName": "inscript",
+            "longName": "Input Script Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outscript",
+            "connectionNodeId": "3830663234616438366539613163366139383538336263333831633563656361"
+          }
+        ],
+        "inhoufile": [
+          {
+            "shortName": "inhoufile",
+            "longName": "Input Houdini File",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "input1",
+            "connectionNodeId": "3234396137663665323532313936343139363933343362383438343230313730"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge",
+      "category": "Utility",
+      "id": "3234663166313833333538623334383331626534356439313761613161666534",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/util.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/merge.fnode",
+      "nodeType": "Utility/Merge",
+      "opCode": "# BeginOp\n\n# BeginOp\n\nif type(input1) is list:\n    if type(input2) is list:\n        output = [*input1, *input2]\n    else:\n        output = [*input1, input2]\nelif type(input2) is list:\n    output = [input1, *input2]\nelse:\n    output = [input1, input2]\n\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "input1": [
+          {
+            "shortName": "input1",
+            "longName": "Input 1",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outabccachefile",
+            "connectionNodeId": "3966313331363738396462303335663561616462303738323634303033656164"
+          }
+        ],
+        "input2": [
+          {
+            "shortName": "input2",
+            "longName": "Input 2",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outabccachefile",
+            "connectionNodeId": "3833323665616164336533656163313734326234323666623861636666393934"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [],
+            "defaultData": [],
+            "type": 9,
+            "connectionName": "input1",
+            "connectionNodeId": "6131633638386536383935313666613132353136323465373432346431626264"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge1",
+      "category": "Utility",
+      "id": "6364353466356532316565626364633736383234353866383233663038353539",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/util.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/merge.fnode",
+      "nodeType": "Utility/Merge",
+      "opCode": "# BeginOp\n\n# BeginOp\n\nif type(input1) is list:\n    if type(input2) is list:\n        output = [*input1, *input2]\n    else:\n        output = [*input1, input2]\nelif type(input2) is list:\n    output = [input1, *input2]\nelse:\n    output = [input1, input2]\n\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "input1": [
+          {
+            "shortName": "input1",
+            "longName": "Input 1",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outfile",
+            "connectionNodeId": "3433656138663163363334383332333035613638353831383033343564383330"
+          }
+        ],
+        "input2": [
+          {
+            "shortName": "input2",
+            "longName": "Input 2",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outfile",
+            "connectionNodeId": "6230373337633433306538373031306139343038323137303138343730313533"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [],
+            "defaultData": [],
+            "type": 9,
+            "connectionName": "input2",
+            "connectionNodeId": "6131633638386536383935313666613132353136323465373432346431626264"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge2",
+      "category": "Utility",
+      "id": "6131633638386536383935313666613132353136323465373432346431626264",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/util.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/merge.fnode",
+      "nodeType": "Utility/Merge",
+      "opCode": "# BeginOp\n\n# BeginOp\n\nif type(input1) is list:\n    if type(input2) is list:\n        output = [*input1, *input2]\n    else:\n        output = [*input1, input2]\nelif type(input2) is list:\n    output = [input1, *input2]\nelse:\n    output = [input1, input2]\n\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "input1": [
+          {
+            "shortName": "input1",
+            "longName": "Input 1",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "output",
+            "connectionNodeId": "3234663166313833333538623334383331626534356439313761613161666534"
+          }
+        ],
+        "input2": [
+          {
+            "shortName": "input2",
+            "longName": "Input 2",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "output",
+            "connectionNodeId": "6364353466356532316565626364633736383234353866383233663038353539"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [],
+            "defaultData": [],
+            "type": 9,
+            "connectionName": "input1",
+            "connectionNodeId": "3361616438353166396262656637633762356234316366646265326137306431"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Guerilla_LoadAlembics",
+      "category": "Guerilla",
+      "id": "6634356561373530343633653461333130326362333931386535393538666666",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/guerilla-render.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/guerilla_load_alembics.fnode",
+      "nodeType": "Guerilla/Guerilla_LoadAlembics",
+      "opCode": "# BeginOp\n\nif type(inabcfiles) is str:\n    inabcfiles = [inabcfiles]\n\ngeneratedScript = f\"\"\"import guerilla, os\n\npaths = {inabcfiles}\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    with guerilla.Modifier() as mod:\n        mod.createref(name, path, options={{ 'prefixnodes' : False,'containschildren' : True }})\n\nguerilla.Document().save()\n\"\"\"\n\ntmpScriptFilePath = FlashTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\noutscripttext = generatedScript\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inabcfiles": [
+          {
+            "shortName": "inabcfiles",
+            "longName": "Alembic Files",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              ""
+            ],
+            "defaultData": [
+              ""
+            ],
+            "type": 9,
+            "connectionName": "output",
+            "connectionNodeId": "3361616438353166396262656637633762356234316366646265326137306431"
+          }
+        ]
+      },
+      "outputs": {
+        "outscriptfile": [
+          {
+            "shortName": "outscriptfile",
+            "longName": "Output Script File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "inscript1",
+            "connectionNodeId": "3737333839646136323239346438386139356562653231336131636232613437"
+          }
+        ],
+        "outscripttext": [
+          {
+            "shortName": "outscripttext",
+            "longName": "Output Script Text",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "Oeuf_FetchFeathers",
+      "category": "Oeuf",
+      "id": "6138613936333462656439326261313164623439633966366162303161646237",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/volcan.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/oeuf_fetch_feathers.fnode",
+      "nodeType": "Oeuf/Oeuf_FetchFeathers",
+      "opCode": "# BeginOp\n\noutfeatherspath = infeatherspath\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infeatherspath": [
+          {
+            "shortName": "infeatherspath",
+            "longName": "Feathers Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_a_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_b_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_c_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_d_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_e_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_f_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_g_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_h_1.abc"
+            ],
+            "defaultData": [
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_a_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_b_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_c_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_d_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_e_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_f_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_g_1.abc",
+              "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/export/feather_general_h_1.abc"
+            ],
+            "type": 9,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfeatherspath": [
+          {
+            "shortName": "outfeatherspath",
+            "longName": "Feathers",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [],
+            "defaultData": [],
+            "type": 9,
+            "connectionName": "input1",
+            "connectionNodeId": "3237393638663838663261356266656532353664616139316336393163643036"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge3",
+      "category": "Utility",
+      "id": "3361616438353166396262656637633762356234316366646265326137306431",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/util.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/merge.fnode",
+      "nodeType": "Utility/Merge",
+      "opCode": "# BeginOp\n\n# BeginOp\n\nif type(input1) is list:\n    if type(input2) is list:\n        output = [*input1, *input2]\n    else:\n        output = [*input1, input2]\nelif type(input2) is list:\n    output = [input1, *input2]\nelse:\n    output = [input1, input2]\n\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "input1": [
+          {
+            "shortName": "input1",
+            "longName": "Input 1",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "output",
+            "connectionNodeId": "6131633638386536383935313666613132353136323465373432346431626264"
+          }
+        ],
+        "input2": [
+          {
+            "shortName": "input2",
+            "longName": "Input 2",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "output",
+            "connectionNodeId": "3237393638663838663261356266656532353664616139316336393163643036"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [],
+            "defaultData": [],
+            "type": 9,
+            "connectionName": "inabcfiles",
+            "connectionNodeId": "6634356561373530343633653461333130326362333931386535393538666666"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Guerilla_LoadRenderGraphs",
+      "category": "Guerilla",
+      "id": "3035653134346332386339616634306632353963373864643233326566636566",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/guerilla-render.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/guerilla_load_rendergraphs.fnode",
+      "nodeType": "Guerilla/Guerilla_LoadRenderGraphs",
+      "opCode": "# BeginOp\n\n# BeginOp\n\n# BeginOp\n\nif type(inrgfiles) is str:\n    inabcfiles = [inrgfiles]\nelse:\n    inabcfiles = inrgfiles\n\ngeneratedScript = f\"\"\"import guerilla, os\n\npaths = {inabcfiles}\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    loaded = guerilla.Document().loadfile(path)\n\n    if not loaded:\n        FlashLogWarning(\"Could not load {{}} in guerilla file\".format(name))\n\nguerilla.Document().save()\n\"\"\"\n\ntmpScriptFilePath = FlashTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\noutscripttext = generatedScript\n\n\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inrgfiles": [
+          {
+            "shortName": "inrgfiles",
+            "longName": "RenderGraph Files",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              ""
+            ],
+            "defaultData": [
+              ""
+            ],
+            "type": 9,
+            "connectionName": "output",
+            "connectionNodeId": "6162343339646633376564623530316339316439313035623865336531623334"
+          }
+        ]
+      },
+      "outputs": {
+        "outscriptfile": [
+          {
+            "shortName": "outscriptfile",
+            "longName": "Output Script File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "inscript2",
+            "connectionNodeId": "3737333839646136323239346438386139356562653231336131636232613437"
+          }
+        ],
+        "outscripttext": [
+          {
+            "shortName": "outscripttext",
+            "longName": "Output Script Text",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "Files",
+      "category": "Utility",
+      "id": "6636346366633733303132313438613133646563323830363134393739383362",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "$FLASH_ICONS/files.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/files.fnode",
+      "nodeType": "Utility/Files",
+      "opCode": "# BeginOp\n\noutfiles = infiles\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infiles": [
+          {
+            "shortName": "infiles",
+            "longName": "Input Files Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 9,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfiles": [
+          {
+            "shortName": "outfiles",
+            "longName": "Output Files Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 9,
+            "connectionName": "input1",
+            "connectionNodeId": "6162343339646633376564623530316339316439313035623865336531623334"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge_Scripts1",
+      "category": "Utility",
+      "id": "3737333839646136323239346438386139356562653231336131636232613437",
+      "color": [
+        52,
+        115,
+        165
+      ],
+      "iconPath": "$FLASH_ICONS/python.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/merge_scripts.fnode",
+      "nodeType": "Utility/Merge_Scripts",
+      "opCode": "# BeginOp\n\nimport os, re\n\nscript1 = inscript1\nscript2 = inscript2\n\nscriptsAreFile = False\n\nif os.path.exists(script1):\n    with open(script1, \"r\") as scriptFile1:\n        script1 = scriptFile1.read()\n\nif os.path.exists(script2):\n    with open(script2, \"r\") as scriptFile2:\n        script2 = scriptFile2.read()\n\nimportPatterns = re.compile(r\"import\\s.+|from\\s.+\")\n\nimportMatches1 = re.findall(importPatterns, script1)\n\nimportMatches2 = re.findall(importPatterns, script2)\n\nmodulesToImport = []\nmodulesToImportAs = {}\nmodulesToImportFrom = {}\n\nfor importMatch in importMatches1:\n    if importMatch.startswith(\"import\"):\n        if \"as\" in importMatch:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importList = importMatch.split(\"as\")\n\n            modulesToImportAs[importList[0].replace(\" \", \"\")] = importList[1].replace(\" \", \"\")\n        else:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importMatch = importMatch.replace(\" \", \"\")\n            importList = importMatch.split(\",\")\n\n            for imp in importList: \n                modulesToImport.append(imp)\n    \n    elif importMatch.startswith(\"from\"):\n        importMatch = importMatch.replace(\"from\", \"\")\n        importList = importMatch.split(\"import\")\n\n        module = importList[0].replace(\" \", \"\")\n\n        elements = importList[1].split(\",\")\n\n        moduleElements = []\n\n        for elem in elements:\n            moduleElements.append(elem.replace(\" \", \"\"))\n\n        modulesToImportFrom[module] = moduleElements\n\nfor importMatch in importMatches2:\n    if importMatch.startswith(\"import\"):\n        if \"as\" in importMatch:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importList = importMatch.split(\"as\")\n\n            moduleName = importList[0].replace(\" \", \"\")\n            moduleAlias = importList[1].replace(\" \", \"\")\n\n            if moduleName in modulesToImportAs:\n                if moduleAlias == modulesToImportAs[moduleName]:\n                    pass\n                else:\n                    script2 = re.sub(fr\"({moduleAlias})\\.\", f\"{modulesToImportAs[moduleName]}.\", script2)\n            elif moduleName in modulesToImport:\n                script2 = re.sub(fr\"({moduleAlias})\\.\", f\"{moduleName}.\", script2)\n            else:\n                modulesToImportAs[moduleName] = moduleAlias\n        else:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importMatch = importMatch.replace(\" \", \"\")\n            importList = importMatch.split(\",\")\n\n            for imp in importList: \n                if imp in modulesToImportAs:\n                    script1 = re.sub(fr\"({modulesToImportAs[imp]})\\.\", f\"{imp}.\", script1)\n                    modulesToImportAs.pop(imp)\n                if not imp in modulesToImport:\n                    modulesToImport.append(imp)\n    \n    elif importMatch.startswith(\"from\"):\n        importMatch = importMatch.replace(\"from\", \"\")\n        importList = importMatch.split(\"import\")\n\n        module = importList[0].replace(\" \", \"\")\n\n        elements = importList[1].split(\",\")\n\n        moduleElements = []\n\n        for elem in elements:\n            moduleElements.append(elem.replace(\" \", \"\"))\n\n        if module in modulesToImportFrom:\n            for mod in moduleElements:\n                if not mod in modulesToImportFrom[module]:\n                    modulesToImportFrom[module].append(mod)\n        else:\n            modulesToImportFrom[module] = moduleElements\n\nfor importMatch in importMatches1:\n    script1 = script1.replace(importMatch, \"$\")\n\nfor importMatch in importMatches2:\n    script2 = script2.replace(importMatch, \"$\")\n\ndollarPattern = re.compile(r\"(\\$\\n)+\")\n\nscript1 = re.sub(dollarPattern, \"# Script 1\\n\", script1)\nscript2 = re.sub(dollarPattern, \"# Script 2\\n\", script2)\n\nmodulesToImportAsStr = \"import \"\n\nfor i, module in enumerate(modulesToImport):\n    if i == 0:\n        modulesToImportAsStr += f\"{module}\"\n    else:\n        modulesToImportAsStr += f\", {module}\"\n\nmodulesToImportAsAsStr = \"\"\n\nfor moduleName, moduleAlias in modulesToImportAs.items():\n    modulesToImportAsAsStr += f\"import {moduleName} as {moduleAlias}\"\n\nmodulesToImportFromAsStr = \"\"\n\nfor moduleName, subModules in modulesToImportFrom.items():\n    subModulesToImportFrom = f\"from {moduleName} import \"\n\n    for i, subModule in enumerate(subModules):\n        if i == 0:\n            subModulesToImportFrom += f\"{subModule}\"\n        else:\n            subModulesToImportFrom += f\", {subModule}\"\n\n    modulesToImportFromAsStr += f\"{subModulesToImportFrom}\\n\"\n\nmergedScripts = f\"{modulesToImportAsStr}\\n{modulesToImportAsAsStr}\\n{modulesToImportFromAsStr}\\n{script1}\\n{script2}\"\n\ntmpScriptFilePath = FlashTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(mergedScripts) \n\noutscript = tmpScriptFilePath.replace(\"\\\\\", \"/\")\noutscripttext = mergedScripts\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inscript1": [
+          {
+            "shortName": "inscript1",
+            "longName": "Input Script 1",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outscriptfile",
+            "connectionNodeId": "6634356561373530343633653461333130326362333931386535393538666666"
+          }
+        ],
+        "inscript2": [
+          {
+            "shortName": "inscript2",
+            "longName": "Input Script 2",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outscriptfile",
+            "connectionNodeId": "3035653134346332386339616634306632353963373864643233326566636566"
+          }
+        ]
+      },
+      "outputs": {
+        "outscript": [
+          {
+            "shortName": "outscript",
+            "longName": "Output Script",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "inscript2",
+            "connectionNodeId": "3831613363616666353435333034653336613232633932643836363162656237"
+          }
+        ],
+        "outscripttext": [
+          {
+            "shortName": "outscripttext",
+            "longName": "Output Script Text",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "Switch",
+      "category": "Utility",
+      "id": "3234396137663665323532313936343139363933343362383438343230313730",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/switch.fnode",
+      "nodeType": "Utility/Switch",
+      "opCode": "# BeginOp\n\nif inswitchindex == 0:\n    output = input1\nelse:\n    output = input2\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "input1": [
+          {
+            "shortName": "input1",
+            "longName": "Input 1",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "output",
+            "connectionNodeId": "3664333434616330613532313764636164306236653365363861306262363533"
+          }
+        ],
+        "input2": [
+          {
+            "shortName": "input2",
+            "longName": "Input 2",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outscript",
+            "connectionNodeId": "3831613363616666353435333034653336613232633932643836363162656237"
+          }
+        ],
+        "inswitchindex": [
+          {
+            "shortName": "inswitchindex",
+            "longName": "Switch Index",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": 1,
+            "defaultData": 0,
+            "type": 1,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "inscript",
+            "connectionNodeId": "3637643661656438393737323935323632346461616532303237376136376564"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Guerilla_CreateScene",
+      "category": "Guerilla",
+      "id": "6230323162663838646436373239313861613437346335626563336635383930",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/guerilla-render.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/guerilla_create_scene.fnode",
+      "nodeType": "Guerilla/Guerilla_CreateScene",
+      "opCode": "# BeginOp\n\n# BeginOp\n\n# BeginOp\n\n# BeginOp\n\nimport os\n\nif os.path.exists(infilepath):\n    os.remove(infilepath)\n\ndir = os.path.dirname(infilepath)\n\nif not os.path.exists(dir):\n    os.makedirs(dir)\n\ngeneratedScript = f\"\"\"import guerilla\n\nimport RomanoTools.Guerilla.Utils as utils\n\nutils.SetOptims()\nutils.SetRange(\"{inframerange[0]}-{inframerange[1]}\")\n\nrenderPass = guerilla.Document().findchild(\"RenderPass\")\n\nrenderPass.FileLayerName.set(\"$o_$n\")\n\nguerilla.Document().ProjectWidth.set(2048)\nguerilla.Document().ProjectHeight.set(858)\n\nlayer = guerilla.Document().findchild(\"RenderPass|Layer\")\n\naovNames = {inrenderpasses}\n\naovsToAdd = {inrenderpasses}\n\nexistingAovs = [aov.PlugName.get() for aov in layer.children()]\n\nfor aov in aovNames:\n\tif aov in existingAovs:\n\t\taovsToAdd.remove(aov)\n\nwith guerilla.Modifier() as mod:\n\tfor aov in aovsToAdd:\n\t\tlayer.addaov(aov)\n\nguerilla.Document().save(\"{infilepath}\")\n\"\"\"\n\ntmpScriptFilePath = FlashTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\noutscripttext = generatedScript\n\n\n\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infilepath": [
+          {
+            "shortName": "infilepath",
+            "longName": "Guerilla File Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outfile",
+            "connectionNodeId": "3032333332386638636330303065346266326239393461326432353364323732"
+          }
+        ],
+        "inframerange": [
+          {
+            "shortName": "inframerange",
+            "longName": "Frame Range",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              100,
+              240
+            ],
+            "defaultData": [
+              100,
+              240
+            ],
+            "type": 2,
+            "connectionName": "outframerange",
+            "connectionNodeId": "3131356333343463313566393839343637333939393265383865646634383635"
+          }
+        ],
+        "inrenderpasses": [
+          {
+            "shortName": "inrenderpasses",
+            "longName": "Render Passes",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              "Albedo",
+              "Diffuse",
+              "IndDiffuse",
+              "Specular",
+              "Reflection",
+              "Refraction",
+              "SSS",
+              "Incandescence",
+              "Z",
+              "MotionVector",
+              "Shadows",
+              "ShadowMask",
+              "BeautyKey",
+              "BeautyFill",
+              "BeautyRim",
+              "BeautyEnv"
+            ],
+            "defaultData": [
+              "Albedo",
+              "Diffuse",
+              "IndDiffuse",
+              "Specular",
+              "Reflection",
+              "Refraction",
+              "SSS",
+              "Incandescence",
+              "Z",
+              "MotionVector",
+              "Shadows",
+              "ShadowMask",
+              "BeautyKey",
+              "BeautyFill",
+              "BeautyRim",
+              "BeautyEnv"
+            ],
+            "type": 9,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfilepath": [
+          {
+            "shortName": "outfilepath",
+            "longName": "Output FilePath",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "indata",
+            "connectionNodeId": "3739363466656262613932396433633935303332383234323066323535336532"
+          }
+        ],
+        "outscriptfile": [
+          {
+            "shortName": "outscriptfile",
+            "longName": "Output Script File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "inscript1",
+            "connectionNodeId": "3831613363616666353435333034653336613232633932643836363162656237"
+          }
+        ],
+        "outscripttext": [
+          {
+            "shortName": "outscripttext",
+            "longName": "Output Script Text",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "Extract_Framerange",
+      "category": "Utility",
+      "id": "3131356333343463313566393839343637333939393265383865646634383635",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/util.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/extract_framerange.fnode",
+      "nodeType": "Utility/Extract_Framerange",
+      "opCode": "# BeginOp\n\nframerange = inshotspecs[\"FrameRange\"].split(\"-\")\n\noutframerange = [int(framerange[0]),int(framerange[1])]\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inshotspecs": [
+          {
+            "shortName": "inshotspecs",
+            "longName": "Shot Specs",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {},
+            "defaultData": {},
+            "type": 10,
+            "connectionName": "outshotspecs",
+            "connectionNodeId": "3265306139363364323630303539633538623039363139656331326166366234"
+          }
+        ]
+      },
+      "outputs": {
+        "outframerange": [
+          {
+            "shortName": "outframerange",
+            "longName": "Frame Range",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              100,
+              240
+            ],
+            "defaultData": [
+              100,
+              240
+            ],
+            "type": 2,
+            "connectionName": "inframerange",
+            "connectionNodeId": "6230323162663838646436373239313861613437346335626563336635383930"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge_Scripts2",
+      "category": "Utility",
+      "id": "3831613363616666353435333034653336613232633932643836363162656237",
+      "color": [
+        52,
+        115,
+        165
+      ],
+      "iconPath": "$FLASH_ICONS/python.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/merge_scripts.fnode",
+      "nodeType": "Utility/Merge_Scripts",
+      "opCode": "# BeginOp\n\nimport os, re\n\nscript1 = inscript1\nscript2 = inscript2\n\nscriptsAreFile = False\n\nif os.path.exists(script1):\n    with open(script1, \"r\") as scriptFile1:\n        script1 = scriptFile1.read()\n\nif os.path.exists(script2):\n    with open(script2, \"r\") as scriptFile2:\n        script2 = scriptFile2.read()\n\nimportPatterns = re.compile(r\"import\\s.+|from\\s.+\")\n\nimportMatches1 = re.findall(importPatterns, script1)\n\nimportMatches2 = re.findall(importPatterns, script2)\n\nmodulesToImport = []\nmodulesToImportAs = {}\nmodulesToImportFrom = {}\n\nfor importMatch in importMatches1:\n    if importMatch.startswith(\"import\"):\n        if \"as\" in importMatch:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importList = importMatch.split(\"as\")\n\n            modulesToImportAs[importList[0].replace(\" \", \"\")] = importList[1].replace(\" \", \"\")\n        else:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importMatch = importMatch.replace(\" \", \"\")\n            importList = importMatch.split(\",\")\n\n            for imp in importList: \n                modulesToImport.append(imp)\n    \n    elif importMatch.startswith(\"from\"):\n        importMatch = importMatch.replace(\"from\", \"\")\n        importList = importMatch.split(\"import\")\n\n        module = importList[0].replace(\" \", \"\")\n\n        elements = importList[1].split(\",\")\n\n        moduleElements = []\n\n        for elem in elements:\n            moduleElements.append(elem.replace(\" \", \"\"))\n\n        modulesToImportFrom[module] = moduleElements\n\nfor importMatch in importMatches2:\n    if importMatch.startswith(\"import\"):\n        if \"as\" in importMatch:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importList = importMatch.split(\"as\")\n\n            moduleName = importList[0].replace(\" \", \"\")\n            moduleAlias = importList[1].replace(\" \", \"\")\n\n            if moduleName in modulesToImportAs:\n                if moduleAlias == modulesToImportAs[moduleName]:\n                    pass\n                else:\n                    script2 = re.sub(fr\"({moduleAlias})\\.\", f\"{modulesToImportAs[moduleName]}.\", script2)\n            elif moduleName in modulesToImport:\n                script2 = re.sub(fr\"({moduleAlias})\\.\", f\"{moduleName}.\", script2)\n            else:\n                modulesToImportAs[moduleName] = moduleAlias\n        else:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importMatch = importMatch.replace(\" \", \"\")\n            importList = importMatch.split(\",\")\n\n            for imp in importList: \n                if imp in modulesToImportAs:\n                    script1 = re.sub(fr\"({modulesToImportAs[imp]})\\.\", f\"{imp}.\", script1)\n                    modulesToImportAs.pop(imp)\n                if not imp in modulesToImport:\n                    modulesToImport.append(imp)\n    \n    elif importMatch.startswith(\"from\"):\n        importMatch = importMatch.replace(\"from\", \"\")\n        importList = importMatch.split(\"import\")\n\n        module = importList[0].replace(\" \", \"\")\n\n        elements = importList[1].split(\",\")\n\n        moduleElements = []\n\n        for elem in elements:\n            moduleElements.append(elem.replace(\" \", \"\"))\n\n        if module in modulesToImportFrom:\n            for mod in moduleElements:\n                if not mod in modulesToImportFrom[module]:\n                    modulesToImportFrom[module].append(mod)\n        else:\n            modulesToImportFrom[module] = moduleElements\n\nfor importMatch in importMatches1:\n    script1 = script1.replace(importMatch, \"$\")\n\nfor importMatch in importMatches2:\n    script2 = script2.replace(importMatch, \"$\")\n\ndollarPattern = re.compile(r\"(\\$\\n)+\")\n\nscript1 = re.sub(dollarPattern, \"# Script 1\\n\", script1)\nscript2 = re.sub(dollarPattern, \"# Script 2\\n\", script2)\n\nmodulesToImportAsStr = \"import \"\n\nfor i, module in enumerate(modulesToImport):\n    if i == 0:\n        modulesToImportAsStr += f\"{module}\"\n    else:\n        modulesToImportAsStr += f\", {module}\"\n\nmodulesToImportAsAsStr = \"\"\n\nfor moduleName, moduleAlias in modulesToImportAs.items():\n    modulesToImportAsAsStr += f\"import {moduleName} as {moduleAlias}\"\n\nmodulesToImportFromAsStr = \"\"\n\nfor moduleName, subModules in modulesToImportFrom.items():\n    subModulesToImportFrom = f\"from {moduleName} import \"\n\n    for i, subModule in enumerate(subModules):\n        if i == 0:\n            subModulesToImportFrom += f\"{subModule}\"\n        else:\n            subModulesToImportFrom += f\", {subModule}\"\n\n    modulesToImportFromAsStr += f\"{subModulesToImportFrom}\\n\"\n\nmergedScripts = f\"{modulesToImportAsStr}\\n{modulesToImportAsAsStr}\\n{modulesToImportFromAsStr}\\n{script1}\\n{script2}\"\n\ntmpScriptFilePath = FlashTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(mergedScripts) \n\noutscript = tmpScriptFilePath.replace(\"\\\\\", \"/\")\noutscripttext = mergedScripts\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inscript1": [
+          {
+            "shortName": "inscript1",
+            "longName": "Input Script 1",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outscriptfile",
+            "connectionNodeId": "6230323162663838646436373239313861613437346335626563336635383930"
+          }
+        ],
+        "inscript2": [
+          {
+            "shortName": "inscript2",
+            "longName": "Input Script 2",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outscript",
+            "connectionNodeId": "3737333839646136323239346438386139356562653231336131636232613437"
+          }
+        ]
+      },
+      "outputs": {
+        "outscript": [
+          {
+            "shortName": "outscript",
+            "longName": "Output Script",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "input2",
+            "connectionNodeId": "3234396137663665323532313936343139363933343362383438343230313730"
+          }
+        ],
+        "outscripttext": [
+          {
+            "shortName": "outscripttext",
+            "longName": "Output Script Text",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "File2",
+      "category": "Utility",
+      "id": "3032333332386638636330303065346266326239393461326432353364323732",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "$FLASH_ICONS/file.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/file.fnode",
+      "nodeType": "Utility/File",
+      "opCode": "# BeginOp\n\noutfile = infile\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infile": [
+          {
+            "shortName": "infile",
+            "longName": "Input File Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "infilepath",
+            "connectionNodeId": "6230323162663838646436373239313861613437346335626563336635383930"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Guerilla_GuerillaBatch",
+      "category": "Guerilla",
+      "id": "3637643661656438393737323935323632346461616532303237376136376564",
+      "color": [
+        52,
+        115,
+        165
+      ],
+      "iconPath": "$FLASH_ICONS/guerilla-render.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/guerilla_guerillabatch.fnode",
+      "nodeType": "Guerilla/Guerilla_GuerillaBatch",
+      "opCode": "# BeginOp\n\nimport subprocess, platform, os\n\nFlashLogMessage(f\"GuerillaBatch : Start executing script : {inscript}\")\n\nif platform.system == \"windows\":\n    command = [f\"{inenvironment['GUERILLA']}/guerillaBatch\", \"--nogui\"] \n    \n    if os.path.exists(inguerillafile):\n        command.append(inguerillafile)\n    \n    command.append(inscript)\nelse:\n    command = [f\"{inenvironment['GUERILLA']}/guerilla\", \"--nogui\"]\n\n    if os.path.exists(inguerillafile):\n        command.append(inguerillafile)\n    \n    command.append(inscript)\n\nFlashLogMessage(f\"GuerillaBatch Command : {' '.join(command)}\")\n\nenv = os.environ.copy()\nenv.update(inenvironment)\n\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, env=env)\n\nstdout, stderr = process.communicate()\n\nstdoutAsStr = stdout.decode(\"utf-8\")\nstderrAsStr = stderr.decode(\"utf-8\")\n\nif len(stderrAsStr) > 0:\n    FlashLogError(stderrAsStr)\nelse:\n    FlashLogMessage(f\"GuerillaBatch : Finished executing script : {inscript}\")\n    FlashLogMessage(stdoutAsStr)\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inscript": [
+          {
+            "shortName": "inscript",
+            "longName": "Input Script Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "output",
+            "connectionNodeId": "3234396137663665323532313936343139363933343362383438343230313730"
+          }
+        ],
+        "inguerillafile": [
+          {
+            "shortName": "inguerillafile",
+            "longName": "Input Guerilla File",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ],
+        "inenvironment": [
+          {
+            "shortName": "inenvironment",
+            "longName": "Environment",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain/Lib",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+            },
+            "defaultData": {
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain/Lib",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+            },
+            "type": 10,
+            "connectionName": "outenvironment",
+            "connectionNodeId": "3064646464656336303339306661396263383736363232373439373433343830"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 11,
+            "connectionName": "input1",
+            "connectionNodeId": "3164353434343062663763363130343364373761336566346336356262333539"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Oeuf_GuerillaEnv",
+      "category": "Oeuf",
+      "id": "3064646464656336303339306661396263383736363232373439373433343830",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/volcan.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/oeuf_guerilla_env.fnode",
+      "nodeType": "Oeuf/Oeuf_GuerillaEnv",
+      "opCode": "# BeginOp\n\noutenvironment = inenvironment\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inenvironment": [
+          {
+            "shortName": "inenvironment",
+            "longName": "Environment",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+            },
+            "defaultData": {
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+            },
+            "type": 10,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outenvironment": [
+          {
+            "shortName": "outenvironment",
+            "longName": "Output Environment",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {},
+            "defaultData": {},
+            "type": 10,
+            "connectionName": "inenvironment",
+            "connectionNodeId": "3637643661656438393737323935323632346461616532303237376136376564"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Switch1",
+      "category": "Utility",
+      "id": "3164353434343062663763363130343364373761336566346336356262333539",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/switch.fnode",
+      "nodeType": "Utility/Switch",
+      "opCode": "# BeginOp\n\nif inswitchindex == 0:\n    output = input1\nelse:\n    output = input2\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "input1": [
+          {
+            "shortName": "input1",
+            "longName": "Input 1",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "output",
+            "connectionNodeId": "3637643661656438393737323935323632346461616532303237376136376564"
+          }
+        ],
+        "input2": [
+          {
+            "shortName": "input2",
+            "longName": "Input 2",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outdata",
+            "connectionNodeId": "3739363466656262613932396433633935303332383234323066323535336532"
+          }
+        ],
+        "inswitchindex": [
+          {
+            "shortName": "inswitchindex",
+            "longName": "Switch Index",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": 0,
+            "defaultData": 0,
+            "type": 1,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "indata",
+            "connectionNodeId": "3431353063633236333631323133363333323436316136623233393131353131"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Debug",
+      "category": "Debug",
+      "id": "3739363466656262613932396433633935303332383234323066323535336532",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$FLASH_ICONS/debug.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/debug.fnode",
+      "nodeType": "Debug/Debug",
+      "opCode": "# BeginOp\n\nFlashLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outfilepath",
+            "connectionNodeId": "6230323162663838646436373239313861613437346335626563336635383930"
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "input2",
+            "connectionNodeId": "3164353434343062663763363130343364373761336566346336356262333539"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Debug1",
+      "category": "Debug",
+      "id": "3431353063633236333631323133363333323436316136623233393131353131",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$FLASH_ICONS/debug.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/debug.fnode",
+      "nodeType": "Debug/Debug",
+      "opCode": "# BeginOp\n\nFlashLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "output",
+            "connectionNodeId": "3164353434343062663763363130343364373761336566346336356262333539"
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge4",
+      "category": "Utility",
+      "id": "3237393638663838663261356266656532353664616139316336393163643036",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/util.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/merge.fnode",
+      "nodeType": "Utility/Merge",
+      "opCode": "# BeginOp\n\n# BeginOp\n\nif type(input1) is list:\n    if type(input2) is list:\n        output = [*input1, *input2]\n    else:\n        output = [*input1, input2]\nelif type(input2) is list:\n    output = [input1, *input2]\nelse:\n    output = [input1, input2]\n\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "input1": [
+          {
+            "shortName": "input1",
+            "longName": "Input 1",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outfeatherspath",
+            "connectionNodeId": "6138613936333462656439326261313164623439633966366162303161646237"
+          }
+        ],
+        "input2": [
+          {
+            "shortName": "input2",
+            "longName": "Input 2",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outfiles",
+            "connectionNodeId": "6638313566306161613365663364333735336364643765633231306463323737"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [],
+            "defaultData": [],
+            "type": 9,
+            "connectionName": "input2",
+            "connectionNodeId": "3361616438353166396262656637633762356234316366646265326137306431"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Files1",
+      "category": "Utility",
+      "id": "6638313566306161613365663364333735336364643765633231306463323737",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "$FLASH_ICONS/files.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/files.fnode",
+      "nodeType": "Utility/Files",
+      "opCode": "# BeginOp\n\noutfiles = infiles\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infiles": [
+          {
+            "shortName": "infiles",
+            "longName": "Input Files Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 9,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfiles": [
+          {
+            "shortName": "outfiles",
+            "longName": "Output Files Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 9,
+            "connectionName": "input2",
+            "connectionNodeId": "3237393638663838663261356266656532353664616139316336393163643036"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Files2",
+      "category": "Utility",
+      "id": "6539656532356163386566356133366463343535653633663462386165613064",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "$FLASH_ICONS/files.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/files.fnode",
+      "nodeType": "Utility/Files",
+      "opCode": "# BeginOp\n\noutfiles = infiles\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infiles": [
+          {
+            "shortName": "infiles",
+            "longName": "Input Files Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 9,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfiles": [
+          {
+            "shortName": "outfiles",
+            "longName": "Output Files Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 9,
+            "connectionName": "input2",
+            "connectionNodeId": "6162343339646633376564623530316339316439313035623865336531623334"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge5",
+      "category": "Utility",
+      "id": "6162343339646633376564623530316339316439313035623865336531623334",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$FLASH_ICONS/util.png",
+      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/merge.fnode",
+      "nodeType": "Utility/Merge",
+      "opCode": "# BeginOp\n\n# BeginOp\n\nif type(input1) is list:\n    if type(input2) is list:\n        output = [*input1, *input2]\n    else:\n        output = [*input1, input2]\nelif type(input2) is list:\n    output = [input1, *input2]\nelse:\n    output = [input1, input2]\n\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "input1": [
+          {
+            "shortName": "input1",
+            "longName": "Input 1",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outfiles",
+            "connectionNodeId": "6636346366633733303132313438613133646563323830363134393739383362"
+          }
+        ],
+        "input2": [
+          {
+            "shortName": "input2",
+            "longName": "Input 2",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outfiles",
+            "connectionNodeId": "6539656532356163386566356133366463343535653633663462386165613064"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [],
+            "defaultData": [],
+            "type": 9,
+            "connectionName": "inrgfiles",
+            "connectionNodeId": "3035653134346332386339616634306632353963373864643233326566636566"
+          }
+        ]
+      }
+    }
+  ],
+  "tracker": null,
+  "positions": [
+    {
+      "id": "3966313331363738396462303335663561616462303738323634303033656164",
+      "x": -150.0,
+      "y": 100.0
+    },
+    {
+      "id": "3833323665616164336533656163313734326234323666623861636666393934",
+      "x": -150.0,
+      "y": 500.0
+    },
+    {
+      "id": "3433656138663163363334383332333035613638353831383033343564383330",
+      "x": -550.0,
+      "y": 100.0
+    },
+    {
+      "id": "6230373337633433306538373031306139343038323137303138343730313533",
+      "x": -550.0,
+      "y": 500.0
+    },
+    {
+      "id": "3265306139363364323630303539633538623039363139656331326166366234",
+      "x": -750.0,
+      "y": 300.0
+    },
+    {
+      "id": "3830663234616438366539613163366139383538336263333831633563656361",
+      "x": 550.0,
+      "y": 100.0
+    },
+    {
+      "id": "3664333434616330613532313764636164306236653365363861306262363533",
+      "x": 1000.0,
+      "y": 100.0
+    },
+    {
+      "id": "3234663166313833333538623334383331626534356439313761613161666534",
+      "x": 600.0,
+      "y": 1000.0
+    },
+    {
+      "id": "6364353466356532316565626364633736383234353866383233663038353539",
+      "x": -150.0,
+      "y": 800.0
+    },
+    {
+      "id": "6131633638386536383935313666613132353136323465373432346431626264",
+      "x": 1150.0,
+      "y": 800.0
+    },
+    {
+      "id": "6634356561373530343633653461333130326362333931386535393538666666",
+      "x": 2000.0,
+      "y": 800.0
+    },
+    {
+      "id": "6138613936333462656439326261313164623439633966366162303161646237",
+      "x": 400.0,
+      "y": 1200.0
+    },
+    {
+      "id": "3361616438353166396262656637633762356234316366646265326137306431",
+      "x": 1500.0,
+      "y": 800.0
+    },
+    {
+      "id": "3035653134346332386339616634306632353963373864643233326566636566",
+      "x": 2050.0,
+      "y": 1200.0
+    },
+    {
+      "id": "6636346366633733303132313438613133646563323830363134393739383362",
+      "x": 1400.0,
+      "y": 1200.0
+    },
+    {
+      "id": "3737333839646136323239346438386139356562653231336131636232613437",
+      "x": 2700.0,
+      "y": 800.0
+    },
+    {
+      "id": "3234396137663665323532313936343139363933343362383438343230313730",
+      "x": 3500.0,
+      "y": 100.0
+    },
+    {
+      "id": "6230323162663838646436373239313861613437346335626563336635383930",
+      "x": 2300.0,
+      "y": 300.0
+    },
+    {
+      "id": "3131356333343463313566393839343637333939393265383865646634383635",
+      "x": 1600.0,
+      "y": 300.0
+    },
+    {
+      "id": "3831613363616666353435333034653336613232633932643836363162656237",
+      "x": 3100.0,
+      "y": 300.0
+    },
+    {
+      "id": "3032333332386638636330303065346266326239393461326432353364323732",
+      "x": 1950.0,
+      "y": 0.0
+    },
+    {
+      "id": "3637643661656438393737323935323632346461616532303237376136376564",
+      "x": 3900.0,
+      "y": 100.0
+    },
+    {
+      "id": "3064646464656336303339306661396263383736363232373439373433343830",
+      "x": 3400.0,
+      "y": 450.0
+    },
+    {
+      "id": "3164353434343062663763363130343364373761336566346336356262333539",
+      "x": 4550.0,
+      "y": 750.0
+    },
+    {
+      "id": "3739363466656262613932396433633935303332383234323066323535336532",
+      "x": 3400.0,
+      "y": 750.0
+    },
+    {
+      "id": "3431353063633236333631323133363333323436316136623233393131353131",
+      "x": 5050.0,
+      "y": 750.0
+    },
+    {
+      "id": "3237393638663838663261356266656532353664616139316336393163643036",
+      "x": 1000.0,
+      "y": 1200.0
+    },
+    {
+      "id": "6638313566306161613365663364333735336364643765633231306463323737",
+      "x": 600.0,
+      "y": 1400.0
+    },
+    {
+      "id": "6539656532356163386566356133366463343535653633663462386165613064",
+      "x": 1400.0,
+      "y": 1500.0
+    },
+    {
+      "id": "6162343339646633376564623530316339316439313035623865336531623334",
+      "x": 1700.0,
+      "y": 1200.0
+    }
+  ]
+}

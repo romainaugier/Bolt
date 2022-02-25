@@ -3,6 +3,7 @@ import os
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from FlashApp.Interface.Icons import *
+from FlashApp.Interface.Console import *
 from FlashApp.Interface.NodeEditor import *
 from FlashApp.Interface.GGraph import *
 from FlashApi.Core.Logger import *
@@ -56,7 +57,7 @@ class GraphTabs(QtWidgets.QWidget):
         gGraph.hasBeenEdited.connect(lambda: (self.tabs.setTabIcon(tabIndex, self.iconsLib.GetIcon("graph-edited")), 
                                               self.tabs.setTabText(tabIndex, f"{gGraph.graph.GetName()}*")))
         gGraph.finishedCooking.connect(lambda: self.tabs.setTabIcon(tabIndex, self.iconsLib.GetIcon("graph-done")))
-        gGraph.errorCooking.connect(lambda: self.tabs.setTabIcon(tabIndex, self.iconsLib.GetIcon("graph-error")))
+        gGraph.errorCooking.connect(lambda: self.tabs.setTabIcon(tabIndex, self.iconsLib.GetIcon("error")))
         gGraph.selectedNodeChanged.connect(self.onNodeSelectionChange)
 
         self.newTab.layout.addWidget(gGraph)
@@ -102,7 +103,7 @@ class App(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
 
-        self.logger = Logger(level=LogLevel.DIAGNOSTIC)
+        self.logger = Logger(level=LogLevel.WARNING)
 
         self.environment = Environment()
 
@@ -169,7 +170,7 @@ class App(QtWidgets.QMainWindow):
         shelfLayout.addWidget(self.createNewNodeButton)
 
         self.modifySelectedNodeButton = QtWidgets.QPushButton("")
-        self.modifySelectedNodeButton.setIcon(self.icons.GetIcon("modify-node"))
+        self.modifySelectedNodeButton.setIcon(self.icons.GetIcon("edit-node"))
         self.modifySelectedNodeButton.setToolTip("Modify the selected node\nOpens the node properties editor")
         shelfLayout.addWidget(self.modifySelectedNodeButton)
 
@@ -184,6 +185,16 @@ class App(QtWidgets.QMainWindow):
         graphLayout.addWidget(self.graphTabs)
 
         masterLayout.addLayout(graphLayout)
+
+        # Console
+
+        self.console = Console(self.icons)
+        # self.console.newMessageLogged.connect(lambda: QtCore.QTimer.singleShot(10000, self.console.reset))
+        self.logger.SetCustomConsoleCallback(self.console.log)
+
+        masterLayout.addWidget(self.console)
+
+        # Master Layout
 
         masterWidget.setLayout(masterLayout)
 

@@ -51,7 +51,7 @@ class IconLabel(QtWidgets.QWidget):
     IconSize = QtCore.QSize(24, 24)
     HSpacing = 10
 
-    def __init__(self, pixmap : QtGui.QPixmap, text : str, finalStretch : bool = True):
+    def __init__(self, pixmap : QtGui.QPixmap, text : str, font : QtGui.QFont = QtGui.QFont("Helvetica", 14), finalStretch : bool = True):
         """
         """
         super(QtWidgets.QWidget, self).__init__()
@@ -61,8 +61,6 @@ class IconLabel(QtWidgets.QWidget):
         self.mainLayout.setAlignment(QtCore.Qt.AlignLeft)
         self.mainLayout.setContentsMargins(0, 0, 0, 0)
 
-        self.setLayout(self.mainLayout)
-        
         if pixmap is not None:
             self.icon = QtWidgets.QLabel()
             self.mainLayout.addWidget(self.icon)
@@ -74,9 +72,14 @@ class IconLabel(QtWidgets.QWidget):
             self.spacer = None
 
         self.text = QtWidgets.QLabel(text)
-        self.text.setFont(QtGui.QFont("Helvetica", 14))
+
+        self._font = font
+
+        self.text.setFont(self._font)
         self.text.setStyleSheet("color: rgb(143, 144, 160)")
         self.mainLayout.addWidget(self.text)
+        
+        self.setLayout(self.mainLayout)
 
     def setText(self, text : str) -> None:
         """
@@ -107,7 +110,7 @@ class IconLabel(QtWidgets.QWidget):
             self.spacer = None
 
         self.text = QtWidgets.QLabel(text)
-        self.text.setFont(QtGui.QFont("Helvetica", 14))
+        self.text.setFont(self._font)
         self.text.setStyleSheet("color: rgb(143, 144, 160)")
         self.mainLayout.addWidget(self.text)
 
@@ -119,7 +122,13 @@ class IconLabel(QtWidgets.QWidget):
     def setFont(self, fontName : str, fontSize : int, color : list):
         """
         """
-        self.text.setFont(QtGui.QFont(fontName, fontSize))
+        self._font = QtGui.QFont(fontName, fontSize)
+        self.text.setFont(self._font)
+        self.text.setStyleSheet(f"color: rgb({color[0]}, {color[1]}, {color[2]})")
+
+    def setTextColor(self, color : list) -> None:
+        """
+        """
         self.text.setStyleSheet(f"color: rgb({color[0]}, {color[1]}, {color[2]})")
 
 

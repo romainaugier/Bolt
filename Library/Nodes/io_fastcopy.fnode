@@ -4,7 +4,7 @@
 
 name = FastCopy
 category = IO
-icon = $FLASH_ICONS/system.png
+icon = $FLASH_ICONS/fastcopy.png
 
 # EndAttr
 
