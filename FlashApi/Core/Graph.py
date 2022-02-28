@@ -736,7 +736,8 @@ class Graph():
         if self.tracker is not None:
             for nodeID in self.tracker:
                 node = self.GetNodeWithID(nodeID)
-                node.SetCooked()
+                if node is not None:
+                    node.SetCooked()
             self.tracker = Tracker(self)
             self.tracker.cookedNodes = graphDict["tracker"]
         else:
