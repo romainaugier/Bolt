@@ -1,7 +1,7 @@
 import os, re
 
 from FlashApi import FLASHROOT
-from FlashApi.Core.FileSystem import CleanPath
+from FlashApi.Core.FileSystem import *
 
 class Environment():
     """
@@ -10,7 +10,7 @@ class Environment():
     All environment variables written in a string should begin with $ and be capital letters,
     with underscores for separation
 
-    For example : $FLASH_ROOT, $CGDIR, $CGNAME
+    For example : $FLASH_ROOT, $GRAPH_DIR, $GRAPH_NAME
     """
 
     Variables = {}
@@ -21,9 +21,14 @@ class Environment():
         for var, value in os.environ.items():
             self.Variables[var] = CleanPath(value)
 
-        self.Variables["FLASH_ROOT"] = CleanPath(FLASHROOT)
-        self.Variables["FLASH_LIB"] = f"{CleanPath(FLASHROOT)}/Library"
-        self.Variables["FLASH_ICONS"] = f"{CleanPath(FLASHROOT)}/Library/Icons"
+        if IsExecutable():
+            flashRoot = GetCurrentExecPath()
+        else:
+            flashRoot = FLASHROOT
+
+        self.Variables["FLASH_ROOT"] = CleanPath(flashRoot)
+        self.Variables["FLASH_LIB"] = f"{CleanPath(flashRoot)}/Library"
+        self.Variables["FLASH_ICONS"] = f"{CleanPath(flashRoot)}/Library/Icons"
 
     def Get(self, varName : str) -> str:
         """

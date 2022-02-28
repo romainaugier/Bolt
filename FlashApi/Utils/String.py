@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 
 
 def Increment(string : str) -> str:
@@ -31,3 +32,20 @@ def Increment(string : str) -> str:
         string = f"{string}1"
 
     return string
+
+
+def GetCurrentTimeAsStr(format : str = "%m%d%Y_%H%M%S") -> str:
+    """
+    Returns the current date and time as a string
+
+    Args:
+        format (str): format of the date and time. Defaults to "%m%d%Y_%H%M%S"
+
+    Returns:
+        str: current date and time
+    """
+    now = datetime.now()
+
+    currentTimeStr = now.strftime(format)
+
+    return currentTimeStr

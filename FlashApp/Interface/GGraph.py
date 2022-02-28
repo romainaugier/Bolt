@@ -290,8 +290,15 @@ class GGraph(QtWidgets.QGraphicsView):
 
     def getEnv(self) -> Environment:
         """
+        Returns the environment of the internal graph
         """
-        return self.getInternalGraph().environment
+        return self.getInternalGraph().GetEnv()
+
+    def setEnv(self, environment : Environment) -> None:
+        """
+        Sets the environment of the internal graph
+        """
+        self.getInternalGraph().SetEnv(environment)
 
     # PAINTING
 

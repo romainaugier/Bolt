@@ -1,4 +1,4 @@
-import binascii, os, time, threading, json, copy
+import binascii, os, threading, json, copy
 
 from functools import lru_cache
 
@@ -66,14 +66,19 @@ class Graph():
         self.isCooking = False
         self.stopCook = False
         self.cookTime = None
-        self.nodes : list = []
-        self.sortedNodes : list = []
+        self.cookProgress = None
+        self.progressCallbackFunction = None
+        self.nodes : list[Node] = []
+        self.exposedPlugs : list[Plug] = []
+        self.sortedNodes : list[Node] = []
         self.ifBlocks : dict = {}
         self.nodeCount = 0
         self.lock = threading.Lock()
         self.tracker = Tracker(self)
 
         self.UpdateEnv()
+
+    # GETTERS / SETTERS
 
     def SetName(self, name : str) -> None:
         """
@@ -95,7 +100,7 @@ class Graph():
         """
         return self.savePath
 
-    def GetNodes(self) -> list:
+    def GetNodes(self) -> list[Node]:
         """
         Returns:
             list[Node]: nodes of the graph
@@ -118,6 +123,8 @@ class Graph():
         """
         return self.ifBlocks
 
+    # ENV
+
     def UpdateEnv(self) -> None:
         """
         """
@@ -131,6 +138,54 @@ class Graph():
         """
         """
         return self.environment
+
+    def SetEnv(self, environment : Environment) -> None:
+        """
+        Sets the environment of the current graph
+        """
+        self.environment = environment
+
+    # EXPOSED PLUGS
+
+    def UpdateExposedPlugs(self) -> None:
+        """
+        Finds all the exposed to graph plugs and updates the class list 
+        """
+        self.exposedPlugs.clear()
+
+        for node in self.nodes:
+            for input in node.GetInputs():
+                if input.IsExposedToGraph():
+                    self.exposedPlugs.append(input)
+
+    def GetExposedPlugs(self) -> list[Plug]:
+        """
+        Returns the exposed plugs
+        """
+        return self.exposedPlugs
+
+    def FindExposedPlug(self, nodeName : str, plugName : str, updateExposedPlugsList : bool = False) -> Plug:
+        """
+        Finds a plug given the name of its parent node and its name
+
+        Args:
+            nodeName (str): name of the parent node
+            plugName (str): name of the plug (shortName)
+            updateExposedPlugsList (bool): update the exposed plugs list (defaults to False)
+
+        Returns:
+            Plug: plug if the plug was found, else None 
+        """
+        if updateExposedPlugsList:
+            self.UpdateExposedPlugs()
+
+        for plug in self.exposedPlugs: 
+            if plugName == plug.GetShortName() and nodeName == plug.GetNodeName():
+                return plug
+
+        return None
+
+    # GRAPH SORTING
 
     def HasNodesToSort(self) -> bool:
         """
@@ -220,8 +275,7 @@ class Graph():
                     elif connectedNode == beginBlock:
                         return False
                     elif connectedNode.IsIfEndBlock():
-                        if node.IsIfBeginBlock():# and connectedNode.GetID() == node.GetAssociatedBlockEnd():
-                            print(connectedNode.GetName())
+                        if node.IsIfBeginBlock():
                             continue
                         else:
                             return False
@@ -373,6 +427,47 @@ class Graph():
                 self.logger.Log(LogLevel.DIAGNOSTIC, f"(Graph : {self.name}) : Nodes sorted")
                 
                 self.ArrangeIfBlocksAfterGlobalSorting()
+
+    # Cooking
+
+    def SetProgressCallback(self, callback) -> None:
+        """
+        Sets the progress output callback function
+
+        The callback function must accept an int argument (the current progress) like
+        the following function :
+
+        function(progress : int = 0):
+            print(f"PROGRESS : {progress}%%")
+
+        Args:
+            callback (function): function to call when outputing progress
+        """
+        self.progressCallbackFunction = callback
+
+    def GetProgress(self) -> float:
+        """
+        Returns the progress of the current graph cooking
+
+        Returns:
+            float: cooking progress
+        """
+        return self.cookProgress
+
+    def UpdateProgress(self, progressStep : float) -> None:
+        """
+        Update the cook progress and calls the callback function
+
+        Args:
+            progressStep (float): progress step to add to the current progress
+        """
+        if self.cookProgress is None:
+            self.cookProgress = progressStep
+        else:
+            self.cookProgress += progressStep
+
+        if self.progressCallbackFunction is not None:
+            self.progressCallbackFunction(round(self.cookProgress))
                 
     def HandleIfBlock(self, node : Node) -> None:
         """
@@ -408,6 +503,7 @@ class Graph():
         self.SaveToFile(self.GetSavePath())
         
         cookStart = Timer.Start()
+        self.UpdateProgress(0.0)
         
         self.hasError = False
         self.isCooked = False
@@ -419,6 +515,8 @@ class Graph():
         self.logger.Log(LogLevel.DIAGNOSTIC, f"(Graph : {self.name}) : Cooking graph")
         
         self.Sort()
+        
+        progressStep = 100.0 / float(len(self.sortedNodes))
 
         if not self.hasError:
             for node in self.sortedNodes:
@@ -444,6 +542,7 @@ class Graph():
                 self.tracker.Update()
                 self.SaveToFile(self.GetSavePath())
 
+
                 # Check for errors
                 if node.hasError:
                     self.ReportError()
@@ -451,11 +550,13 @@ class Graph():
                     self.logger.Log(LogLevel.ERROR, f"(Graph : {self.name}) : Error in cooking node [{node.GetName()}]. Check the log for more details")
                     break
                 else:
+                    self.UpdateProgress(progressStep)
                     self.logger.Log(LogLevel.DIAGNOSTIC, f"(Graph : {self.name}) : Cooked node [{node.GetName()}]")
 
                 if lastNodeToCook is not None:
                     if node.GetID() == lastNodeToCook:
                         self.logger.Log(LogLevel.DIAGNOSTIC, f"(Graph : {self.name}) : Graph cooked up to node {node.GetName()}")
+
                         with self.GetLock():
                             self.isCooking = False
                             self.isCooked = True
@@ -497,6 +598,8 @@ class Graph():
         """
         """
         return self.isCooked
+
+    # Nodes
 
     def AddNode(self, node : Node) -> None:
         """
@@ -571,6 +674,8 @@ class Graph():
 
         return None
 
+    # I/O
+
     def Serialize(self) -> str:
         """
         Serializes the graph to a json string
@@ -595,7 +700,7 @@ class Graph():
 
     def Deserialize(self, serializedGraph : str) -> None:
         """
-        Loads a graph from a serialized one
+        Loads a graph from a serialized one (in json format)
 
         Args:
             serializedGraph (str): serialized graph

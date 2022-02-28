@@ -374,10 +374,6 @@ class GPlug(QtWidgets.QGraphicsObject):
 
         menu = ContextMenu()
 
-        printAction = QtWidgets.QAction("Debug")
-        printAction.triggered.connect(lambda: print("Debug"))
-        menu.addAction(printAction)
-
         if self.getInternalPlug().IsConnected():
             disconnectAction = menu.addAction("Disconnect")
             disconnectAction.triggered.connect(lambda: self.deleteEdges())
@@ -391,6 +387,15 @@ class GPlug(QtWidgets.QGraphicsObject):
                 unexposeAction = QtWidgets.QAction("Expose")
                 unexposeAction.triggered.connect(self.expose)
                 menu.addAction(unexposeAction)
+            
+            if self.getInternalPlug().IsExposedToGraph():
+                unexposeToGraphAction = QtWidgets.QAction("Unexpose To Graph")
+                unexposeToGraphAction.triggered.connect(self.unexposeToGraph)
+                menu.addAction(unexposeToGraphAction)
+            else:
+                unexposeToGraphAction = QtWidgets.QAction("Expose To Graph")
+                unexposeToGraphAction.triggered.connect(self.exposeToGraph)
+                menu.addAction(unexposeToGraphAction)
 
         menu.exec(QtCore.QPoint(position.x(), position.y()))
 
@@ -406,7 +411,11 @@ class GPlug(QtWidgets.QGraphicsObject):
         self.setAcceptTouchEvents(False)
         self.update(self.boundingRect())
 
-        self.hasBeenRightClicked.emit([])
+    def exposeToGraph(self) -> None:
+        """
+        """
+        self.getInternalPlug().SetExposedToGraph()
+        self.expose()
         
     def unexpose(self) -> None:
         """
@@ -415,8 +424,11 @@ class GPlug(QtWidgets.QGraphicsObject):
         self.color.setAlpha(255)
         self.setAcceptTouchEvents(True)
         self.update(self.boundingRect())
-        
-        self.hasBeenRightClicked.emit([])
+
+    def unexposeToGraph(self) -> None:
+        """
+        """
+        self.getInternalPlug().SetExposedToGraph(False)
 
     def addEdge(self, edge : GEdge) -> None:
         """

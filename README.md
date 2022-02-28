@@ -2,9 +2,10 @@
 DDAGs for easy task automation, written with Python 3.9.
 
 Dependencies :
-- Python 3.9+ 
+- Python 3.9.7 
 - PyQt5
 - Colorama
+- PyInstaller (required if you want to build the executable)
 
 
 ## Description

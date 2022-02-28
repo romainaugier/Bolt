@@ -20,3 +20,24 @@ class Timer():
         """
         """
         return end - start
+
+    @staticmethod
+    def TimeFunction(function) -> None:
+        """
+        Function decorator used to time a function
+
+        Args:
+            function (_type_): function to time
+        """
+        def _Time(*args, **kwargs):
+            start = Timer.Start()
+            
+            function(args, kwargs)
+
+            end = Timer.Stop()
+
+            time = Timer.Time(start, end)
+
+            print(f"{time:.3f}")
+
+        return _Time

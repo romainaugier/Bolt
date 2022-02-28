@@ -26,6 +26,7 @@ def GetRoamingDataDir() -> str:
 
     return flashRoamingDataDirPath
 
+
 def GetNewRandomPyFile() -> str:
     """
     Returns a path to a script file with a randomly generated name
@@ -36,7 +37,32 @@ def GetNewRandomPyFile() -> str:
     """
     return "{}/{}.py".format(GetRoamingDataDir(), binascii.hexlify(os.urandom(16)).hex())
 
+
 def CleanPath(path : str) -> str:
     """
     """
     return path.replace("\\", "/")
+
+
+def IsExecutable() -> bool:
+    """
+    Returns True if the program has been built as an executable, and False
+    if the program is ran with python
+
+    Returns:
+        bool: ^
+    """
+    if "python.exe" in sys.executable:
+        return False
+    else:
+        return True
+
+
+def GetCurrentExecPath() -> str:
+    """
+    Returns the path to the directory of the current executable
+
+    Returns:
+        str: path to the directory of the current executable
+    """
+    return os.path.dirname(sys.executable)

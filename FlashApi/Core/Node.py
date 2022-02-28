@@ -80,7 +80,7 @@ class Parser():
         self.opCode = ""
         
     @staticmethod
-    def CleanBrackets(text) -> list:
+    def CleanBrackets(text : str) -> list:
         """
         """
         clean1 = text.replace("[", "")
@@ -89,12 +89,12 @@ class Parser():
         return clean2
 
     @staticmethod
-    def SplitEqual(text) -> list:
+    def SplitEqual(text : str) -> list:
         """
         """
         return text.split("=")
 
-    def PreProcess(self, text) -> str:
+    def PreProcess(self, text : str) -> str:
         """
         Preprocesses the file to check if there are any error to return
         and removes comment
@@ -130,8 +130,10 @@ class Parser():
             return PlugType.DICT
         elif plugTypeStr == "custom":
             return PlugType.CUSTOM
+        else:
+            return PlugType.CUSTOM
 
-    def GetAttributes(self, lines, lineIndex) -> int:
+    def GetAttributes(self, lines : list[str], lineIndex : int) -> int:
         """
         """
         while True:
@@ -166,7 +168,7 @@ class Parser():
             
             lineIndex += 1
 
-    def GetPlugs(self, lines, lineIndex) -> int:
+    def GetPlugs(self, lines : list[str], lineIndex : int) -> int:
         """
         """
         tmpShortName = ""
@@ -192,6 +194,12 @@ class Parser():
                             newPlug.SetExposed(tmpExposed)
                             newPlug.SetHidden(tmpHidden)
                             newPlug.SetExposedToGraph(tmpExposedToGraph)
+
+                            if tmpShortName.startswith("out"):
+                                newPlug.SetExposed(False)
+                                newPlug.SetHidden(False)
+                                newPlug.SetExposedToGraph(False)
+
                             self.plugs.append(newPlug)
 
                             tmpShortName = ""
@@ -238,7 +246,7 @@ class Parser():
 
             lineIndex += 1
 
-    def GetOpCode(self, lines, lineIndex) -> int:
+    def GetOpCode(self, lines : list[str], lineIndex : int) -> int:
         """
         """
         while True:
@@ -250,7 +258,7 @@ class Parser():
                 self.opCode += opLine + "\n"
                 lineIndex += 1
 
-    def Parse(self, nodeFile) -> dict:
+    def Parse(self, nodeFile : str) -> dict:
         """
         """
         definition = {}
@@ -272,7 +280,7 @@ class Parser():
                     index = self.GetPlugs(lines, index)
 
                 elif line.startswith("# BeginOp"):
-                    index = self.GetOpCode(lines, index)
+                    index = self.GetOpCode(lines, index + 1)
 
                 else:
                     index += 1
@@ -341,6 +349,13 @@ class Plug():
             Node: parent node of the plug
         """
         return self.parentNode
+
+    def GetNodeName(self) -> str:
+        """
+        Returns:
+            str: name of the parent node
+        """
+        return self.parentNode.GetName()
 
     def SetIndex(self, index : int) -> None:
         """
@@ -568,12 +583,7 @@ class Node():
         Returns:
             int: number of inputs
         """
-        count = 0
-
-        for inputName, input in self.inputs.items():
-            count += 1
-
-        return count
+        return len(self.inputs.keys())
     
     def GetOutputCount(self) -> int:
         """

@@ -78,11 +78,17 @@ class Logger():
             messageClean = "[{0}] {1} : {2}\n{3}".format(level.GetAsString(), current_time, input, tracebackMessage)
             
             if self.logToConsole: 
-                sys.stdout.write(message)
+                if level == LogLevel.ERROR: 
+                    sys.stderr.write(message)
+                    sys.stdout.write(colorama.Fore.RESET)
+                else:
+                    sys.stdout.write(message)
+                    sys.stdout.write(colorama.Fore.RESET)
             
             self.__LogToFile(messageClean)
 
             self.__LogToCustomCallback(level, messageClean)
+
                 
             return message
 
