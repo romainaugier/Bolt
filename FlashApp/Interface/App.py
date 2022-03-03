@@ -103,7 +103,7 @@ class App(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
 
-        self.logger = Logger(level=LogLevel.WARNING)
+        self.logger = Logger(level=LogLevel.MESSAGE)
 
         self.environment = Environment()
 
@@ -116,14 +116,19 @@ class App(QtWidgets.QMainWindow):
         self.setWindowTitle("Flash")
   
         self.setWindowIcon(self.icons.GetIcon("flash"))
-
-        masterLayout = QtWidgets.QVBoxLayout()
-        masterWidget = QtWidgets.QWidget()
+        
+        # Central layout and widget
+        
+        self.centralLayout = QtWidgets.QVBoxLayout()
+        self._centralWidget = QtWidgets.QWidget()
+        self._centralWidget.setLayout(self.centralLayout)
 
         # Shelf
 
         shelfLayout = QtWidgets.QHBoxLayout()
         shelfLayout.setAlignment(Qt.AlignLeft)
+        
+        shelfWidget = QtWidgets.QWidget()
 
         # Graph Buttons
 
@@ -174,33 +179,35 @@ class App(QtWidgets.QMainWindow):
         self.modifySelectedNodeButton.setToolTip("Modify the selected node\nOpens the node properties editor")
         shelfLayout.addWidget(self.modifySelectedNodeButton)
 
-        masterLayout.addLayout(shelfLayout)
+        shelfWidget.setLayout(shelfLayout)
+        
+        dockShelfWidget = QtWidgets.QDockWidget("Shelf Tools", self)
+        dockShelfWidget.setAllowedAreas(QtCore.Qt.AllDockWidgetAreas)
+        dockShelfWidget.setWidget(shelfWidget)
+
+        self.addDockWidget(QtCore.Qt.TopDockWidgetArea, dockShelfWidget)
 
         # Graphs
 
-        graphLayout = QtWidgets.QHBoxLayout()
-
         self.graphTabs = GraphTabs(self.nodeLib, self.icons, self.logger, self)
-
-        graphLayout.addWidget(self.graphTabs)
-
-        masterLayout.addLayout(graphLayout)
+        
+        dockGraphTabsWidget = QtWidgets.QDockWidget("Graphs Editor", self)
+        dockGraphTabsWidget.setAllowedAreas(QtCore.Qt.AllDockWidgetAreas)
+        dockGraphTabsWidget.setWidget(self.graphTabs)
+        
+        self.addDockWidget(QtCore.Qt.TopDockWidgetArea, dockGraphTabsWidget)
 
         # Console
 
         self.console = Console(self.icons)
-        # self.console.newMessageLogged.connect(lambda: QtCore.QTimer.singleShot(10000, self.console.reset))
         self.logger.SetCustomConsoleCallback(self.console.log)
-
-        masterLayout.addWidget(self.console)
-
-        # Master Layout
-
-        masterWidget.setLayout(masterLayout)
-
-        self.setCentralWidget(masterWidget)
         
+        dockConsoleWidget = QtWidgets.QDockWidget("Console", self)
+        dockConsoleWidget.setAllowedAreas(QtCore.Qt.AllDockWidgetAreas)
+        self.addDockWidget(QtCore.Qt.BottomDockWidgetArea, dockConsoleWidget)
+
         # Shortcuts
+        
         self.newGraphSc = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+N"), self)
         self.newGraphSc.activated.connect(lambda: self.addGraph())
 

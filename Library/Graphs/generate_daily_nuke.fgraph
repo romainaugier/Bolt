@@ -27,7 +27,7 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "Z:/OEUF/RENDER/seq010/shot060/LD3",
+            "data": "Z:/OEUF/RENDER/tests/meteors/LD1",
             "defaultData": "",
             "type": 7,
             "connectionName": "outdir",
@@ -59,7 +59,7 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Flash/6433636365336537316330303039643965636132663136663333386265373835.py",
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Flash/3533323563656331663037393136343535646338653935303937373732326537.py",
             "defaultData": "",
             "type": 7,
             "connectionName": "inscriptfile",
@@ -148,7 +148,7 @@
       "iconPath": "$FLASH_ICONS/nuke.png",
       "definitionPath": "D:/dev/FLash/Library/Nodes/nk_nukepy.fnode",
       "nodeType": "Nuke/NK_NukePy",
-      "opCode": "# BeginOp\n\nimport subprocess, os\n\nFlashLogMessage(f\"NukeBatch : Start executing script : {inscriptfile}\")\n\ncommand = [f\"{innukebindir}\", \"-t\", inscriptfile]\n\nfor arg in inargs:\n    command.append(arg)\n\nFlashLogMessage(f\"NukeBatch Command : {' '.join(command)}\")\n\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE)\nstdout, stderr = process.communicate()\n\nstdoutAsStr = stdout.decode(\"utf-8\")\nstderrAsStr = stderr.decode(\"utf-8\")\n\nif len(stderrAsStr) > 0:\n    FlashLogError(stderrAsStr)\nelse:\n    FlashLogMessage(f\"NukeBatch : Finished executing script\")\n    FlashLogMessage(stdoutAsStr)\n\n    for line in stdoutAsStr.splitlines():\n        if line.startswith(\"OUTPUTFILE\"):\n            outfile = line.split(\"=\")[1].strip()\n\n",
+      "opCode": "\n# BeginOp\n\nimport subprocess, os\n\nFlashLogMessage(f\"NukeBatch : Start executing script : {inscriptfile}\")\n\ncommand = [f\"{innukebindir}\", \"-t\", inscriptfile]\n\nfor arg in inargs:\n    command.append(arg)\n\nFlashLogMessage(f\"NukeBatch Command : {' '.join(command)}\")\n\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, encoding=\"utf-8\")\nstdout, stderr = process.communicate()\n\ntry:\n    stdoutAsStr = stdout\n    stderrAsStr = stderr\n\n    if len(stderrAsStr) > 0:\n        FlashLogError(stderrAsStr)\n    else:\n        FlashLogMessage(f\"NukeBatch : Finished executing script\")\n        FlashLogMessage(stdoutAsStr)\n\n        for line in stdoutAsStr.splitlines():\n            if line.startswith(\"OUTPUTFILE\"):\n                outfile = line.split(\"=\")[1].strip()\nexcept Exception as e:\n    FlashLogMessage(e)\n\n",
       "disabled": false,
       "isIfBegin": false,
       "associatedEndBlockId": null,
@@ -163,7 +163,7 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Flash/6433636365336537316330303039643965636132663136663333386265373835.py",
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Flash/3533323563656331663037393136343535646338653935303937373732326537.py",
             "defaultData": "",
             "type": 7,
             "connectionName": "outscriptfile",
@@ -246,7 +246,7 @@
             "isExposed": true,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "Z:/OEUF/RENDER/seq010/shot060/LD3",
+            "data": "Z:/OEUF/RENDER/tests/meteors/LD1",
             "defaultData": "",
             "type": 7,
             "connectionName": null,
@@ -263,7 +263,7 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "Z:/OEUF/RENDER/seq010/shot060/LD3",
+            "data": "Z:/OEUF/RENDER/tests/meteors/LD1",
             "defaultData": "",
             "type": 7,
             "connectionName": "inrenderdir",
@@ -276,8 +276,8 @@
   "tracker": null,
   "positions": [
     {
-      "id": "3166383330353636316562353065323339306331333466343731613133626133",
-      "x": 2600.0,
+      "id": "3635313264326266623236646566303962386366323737636562363535323864",
+      "x": 2150.0,
       "y": 200.0
     },
     {
@@ -286,8 +286,8 @@
       "y": 400.0
     },
     {
-      "id": "3635313264326266623236646566303962386366323737636562363535323864",
-      "x": 2150.0,
+      "id": "3166383330353636316562353065323339306331333466343731613133626133",
+      "x": 2600.0,
       "y": 200.0
     },
     {

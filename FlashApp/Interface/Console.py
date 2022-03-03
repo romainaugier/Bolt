@@ -27,6 +27,28 @@ class ConsoleLineEdit(QtWidgets.QLineEdit):
         """)
 
 
+class ConsoleLabel(QtWidgets.QLineEdit):
+    """
+    """
+    def __init__(self, parent=None) -> None:
+        """
+        """
+        super().__init__(parent=parent)
+
+        self.backGroundColor = GetColorFromPalette(ColorPalette.BACKGROUND)
+        self.textColor = GetColorFromPalette(ColorPalette.FOREGROUND)
+
+        self.setTextColor(self.textColor)
+
+    def setTextColor(self, color : list) -> None:
+        """
+        """
+        self.setStyleSheet(f"""
+        color : rgb({color[0]}, {color[1]}, {color[2]});
+        background-color : rgb({self.backGroundColor[0]}, {self.backGroundColor[1]}, {self.backGroundColor[2]})
+        """)
+
+
 class Console(QtWidgets.QWidget):
     """
     """
@@ -52,11 +74,11 @@ class Console(QtWidgets.QWidget):
         self.messageIcon = QtWidgets.QLabel()
         self.messageIcon.setPixmap(icon.scaled(24, 24))
 
-        self.masterLayout.addWidget(self.messageIcon)
+        # self.masterLayout.addWidget(self.messageIcon)
 
         self.masterLayout.addSpacing(10)
 
-        self.messageDisplay = ConsoleLineEdit()
+        self.messageDisplay = ConsoleLabel()
         self.messageDisplay.setFixedHeight(20)
         self.messageDisplay.setFont(QtGui.QFont("Helvetica", 8))
 
@@ -83,7 +105,7 @@ class Console(QtWidgets.QWidget):
         elif level == LogLevel.WARNING:
             self.messageDisplay.setTextColor(GetColorFromPalette(ColorPalette.WARNINGCOLOR))
         else:
-            self.messageDisplay.setTextColor(GetColorFromPalette(ColorPalette.TEXT))
+            self.messageDisplay.setTextColor(GetColorFromPalette(ColorPalette.FOREGROUND))
 
         self.messageDisplay.setText(message)
         self.messageDisplay.text

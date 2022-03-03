@@ -27,7 +27,7 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "",
+            "data": "Test",
             "defaultData": null,
             "type": 11,
             "connectionName": "outdata",
@@ -44,7 +44,7 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "",
+            "data": "Test",
             "defaultData": null,
             "type": 11,
             "connectionName": null,
@@ -80,7 +80,7 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "",
+            "data": "Test",
             "defaultData": null,
             "type": 11,
             "connectionName": "outfile",
@@ -112,7 +112,7 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "",
+            "data": "Test",
             "defaultData": null,
             "type": 11,
             "connectionName": "indata",
@@ -148,7 +148,7 @@
             "isExposed": true,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "",
+            "data": "Test",
             "defaultData": "",
             "type": 7,
             "connectionName": null,
@@ -165,7 +165,7 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "",
+            "data": "Test",
             "defaultData": "",
             "type": 7,
             "connectionName": "indata",
@@ -175,7 +175,11 @@
       }
     }
   ],
-  "tracker": null,
+  "tracker": [
+    "3762363166323036666431653638613433393261356662356330643265366163",
+    "6231633261303866353566383035333965646534626561633739333939316365",
+    "3364346139353839326434333139616230326137633633626236343663323064"
+  ],
   "positions": [
     {
       "id": "3364346139353839326434333139616230326137633633626236343663323064",

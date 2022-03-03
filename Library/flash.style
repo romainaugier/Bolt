@@ -2,6 +2,18 @@ QMainWindow {
 	background: rgb(13, 14, 25);
 }
 
+QMainWindow::separator {
+	width: 2px; 
+	background: rgb(74, 82, 107);
+}
+
+/* Dock Widgets */
+
+QDockWidget {
+	color: rgb(74, 82, 107);
+	background: rgb(13, 14, 25);
+}
+
 QPushButton {
 	color: rgb(143, 144, 160);
 	background-color: rgba(74, 82, 107, 63);
@@ -42,23 +54,11 @@ QTextEdit {
 	background-color: rgba(255, 255, 255, 10);
 }
 
-/* Menus */
-
-QMenuBar {
-	color: rgba(255, 255, 255, 100);
-	background-color: rgba(255, 255, 255, 0);
-}
-
-QMenu {
-	background-color: rgb(255, 0, 0);
-	border-radius: 20px;
-}
-
 /* Tabs */
 
 QTabBar {                                          
 	font-family: Helvetica;                          
-	font-size: 10pt;                               
+	font-size: 8pt;                               
 }
 
 QTabWidget::pane { 
@@ -74,9 +74,9 @@ QTabBar::tab {
 	color: #FFFFFF;
     background: rgb(72, 69, 79);
     border: 1px solid #191C1D;
-    border-bottom-color: #191C1D; /* same as the pane color */
-    border-top-left-radius: 1px;
-    border-top-right-radius: 1px;
+    border-bottom-color: #191C1D;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
     min-width: 50px;
     min-height: 20px;
     padding: 2px;
@@ -91,11 +91,10 @@ QTabBar::tab:selected {
 	background: solid rgb(64, 69, 102);
     border-color: #191C1D;
     border-bottom-color: #191C1D;
-	border-top-color: #FABD00;
-	border-top-width: 2px;
 }
 
-QTabBar::tab:!selected {                           
+QTabBar::tab:!selected {              
+	color: rgb(74, 82, 107);             
 	background: solid rgb(41, 43, 61);
 }   
 
