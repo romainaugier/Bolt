@@ -10,23 +10,28 @@ class GraphsEditor(QtWidgets.QWidget):
 
     selectedNodeChanged = QtCore.pyqtSignal(str)
 
-    def __init__(self, nodeLib : Lib, icons : Icons, logger : Logger, parent):
+    def __init__(self, icons : Icons, logger : Logger, environment : Environment, parent=None):
         super(QtWidgets.QWidget, self).__init__(parent)
 
-        self.nodeLib = nodeLib
+        self.nodeLib = Lib(logger, environment)
+        self.environment = environment
         self.iconsLib = icons
         self.logger = logger
+        
+        self.setFocusPolicy(QtCore.Qt.StrongFocus)
 
-        self.layout = QtWidgets.QVBoxLayout(self)
+        self._layout = QtWidgets.QVBoxLayout(self)
+        self._layout.setSpacing(0)
+        self._layout.setContentsMargins(0, 0, 0, 0)
 
         self.tabs = QtWidgets.QTabWidget()
 
-        self.layout.addWidget(self.tabs)
-        self.setLayout(self.layout)
+        self._layout.addWidget(self.tabs)
+        self.setLayout(self._layout)
 
         self.addTab()
 
-    def addTab(self, graph : GGraph = None, env : Environment = None) -> None:
+    def addTab(self, graph : GGraph = None) -> None:
         """
         Adds a new tab with a graph if provided
 
@@ -40,12 +45,14 @@ class GraphsEditor(QtWidgets.QWidget):
         if graph is not None:
             gGraph = graph
         else:
-            gGraph = GGraph(self.nodeLib, self.logger, env)
+            gGraph = GGraph(self.nodeLib, self.logger, self.environment)
+            
+        gGraph.setFocusProxy(self)
 
         self.tabs.addTab(self.newTab, self.iconsLib.GetIcon("graph-edited"), f"{gGraph.graph.GetName()}")
         self.tabs.setIconSize(QtCore.QSize(18, 18))
 
-        self.newTab.layout = QtWidgets.QVBoxLayout()
+        self.newTab._layout = QtWidgets.QVBoxLayout()
         gGraph.setFrameStyle(QtWidgets.QFrame.NoFrame)
         gGraph.isCookingMovie.frameChanged.connect(lambda: self.tabs.setTabIcon(tabIndex, QtGui.QIcon(gGraph.getAnimationLogoMovie())))
         gGraph.hasBeenEdited.connect(lambda: (self.tabs.setTabIcon(tabIndex, self.iconsLib.GetIcon("graph-edited")), 
@@ -54,8 +61,8 @@ class GraphsEditor(QtWidgets.QWidget):
         gGraph.errorCooking.connect(lambda: self.tabs.setTabIcon(tabIndex, self.iconsLib.GetIcon("error")))
         gGraph.selectedNodeChanged.connect(self.onNodeSelectionChange)
 
-        self.newTab.layout.addWidget(gGraph)
-        self.newTab.setLayout(self.newTab.layout)
+        self.newTab._layout.addWidget(gGraph)
+        self.newTab.setLayout(self.newTab._layout)
 
         self.tabs.setCurrentIndex(tabIndex)
 
@@ -71,6 +78,12 @@ class GraphsEditor(QtWidgets.QWidget):
             index (int): tab index to remove
         """
         self.tabs.removeTab(index)
+        
+    def removeActiveTab(self) -> None:
+        """
+        Removes the active tab
+        """
+        self.tabs.removeTab(self.tabs.currentIndex())
 
     def getActiveTabIndex(self) -> int:
         """
@@ -90,3 +103,69 @@ class GraphsEditor(QtWidgets.QWidget):
             name (str): new name of the tab
         """
         self.tabs.setTabText(index, name)
+        
+    def cookActiveGraph(self) -> None:
+        """
+        Cooks the graph in the active tab
+        """
+        index = self.tabs.currentIndex()
+        self.tabs.widget(index).layout().itemAt(0).widget().launchGraphCooking(skipCookedNodes=False)
+        
+    def saveActiveGraph(self, forceName : bool = False) -> None:
+        """
+        Save the active graph to a file
+
+        Args:
+            forceName (bool) : force renaming the file. Defaults to False.
+        """
+        index = self.getActiveTabIndex()
+
+        graph : GGraph = self.tabs.widget(index).layout().itemAt(0).widget()
+        internalGraph : Graph = graph.getInternalGraph()
+
+        if internalGraph.GetSavePath() != "" and not forceName:
+            filePath = internalGraph.GetSavePath()
+        else:
+            filePath, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save File", self.environment.Get("FLASH_ROOT"), "Flash Graph (*.fgraph)")
+
+        if filePath != "":
+            graph.saveGraph(filePath)
+
+            self.tabs.setTabText(index, internalGraph.GetName())
+
+    def loadNewGraph(self) -> None:
+        """
+        Loads a graph from a file
+        """
+        filePath, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Open File", self.environment.Get("FLASH_ROOT"), "Flash Graph (*.fgraph)")
+        
+        if os.path.exists(filePath):
+            newGGraph = GGraph(self.nodeLib, self.logger, self.environment)
+
+            newGGraph.loadGraph(filePath)
+
+            self.addTab(graph=newGGraph)
+
+    def layoutActiveGraph(self) -> None:
+        """
+        Layouts the active graph
+        """
+        index = self.getActiveTabIndex()
+
+        self.tabs.widget(index).layout().itemAt(0).widget().layoutGraph()
+        
+    def stopActiveGraph(self) -> None:
+        """
+        Force the active graph to stop the cooking if it is cooking
+        """
+        index = self.getActiveTabIndex()
+
+        self.tabs.widget(index).layout().itemAt(0).widget().stopGraphCooking()
+        
+    def showActiveGraphPlugEditor(self) -> None:
+        """
+        Shows/Hides the plug editor of the active graph
+        """
+        index = self.getActiveTabIndex()
+
+        self.tabs.widget(index).layout().itemAt(0).widget().showPlugEditor()

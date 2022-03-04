@@ -7,6 +7,18 @@ QMainWindow::separator {
 	background: rgb(74, 82, 107);
 }
 
+QSplitter::handle {
+	background: rgb(74, 82, 107);
+}
+
+QSplitter::handle:horizontal {
+	width: 2px;
+}
+
+QSplitter::handle:vertical {
+	height: 2px;
+}
+
 /* Dock Widgets */
 
 QDockWidget {
@@ -16,7 +28,7 @@ QDockWidget {
 
 QPushButton {
 	color: rgb(143, 144, 160);
-	background-color: rgba(74, 82, 107, 63);
+	background-color: transparent;
     height: 40;
     width: 40;
     qproperty-iconSize: 25px;

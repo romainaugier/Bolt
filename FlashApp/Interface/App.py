@@ -33,28 +33,32 @@ class App(QtWidgets.QMainWindow):
         # Central layout and widget
         
         self.centralLayout = QtWidgets.QVBoxLayout()
+        self.centralLayout.setSpacing(0)
+        self.centralLayout.setContentsMargins(0, 0, 0, 0)
         self._centralWidget = QtWidgets.QWidget()
-        self._centralWidget.setLayout(self.centralLayout)
 
         # Shelf
 
         shelfLayout = QtWidgets.QHBoxLayout()
         shelfLayout.setAlignment(Qt.AlignLeft)
+        # shelfLayout.setSpacing(0)
+        shelfLayout.setContentsMargins(5, 5, 5, 5)
         
         shelfWidget = QtWidgets.QWidget()
+        shelfWidget.setFixedHeight(60)
 
         # Graph Buttons
 
         self.newGraphButton = QtWidgets.QPushButton("")
         self.newGraphButton.setIcon(self.icons.GetIcon("new-graph"))
         self.newGraphButton.setToolTip("Create New Graph")
-        self.newGraphButton.clicked.connect(lambda: self.addGraph())
+        self.newGraphButton.clicked.connect(lambda: self.ctrlNShortcut())
         shelfLayout.addWidget(self.newGraphButton)
 
         self.cookGraphButton = QtWidgets.QPushButton("")
         self.cookGraphButton.setIcon(self.icons.GetIcon("cook-graph"))
         self.cookGraphButton.setToolTip("Cook Active Graph")
-        self.cookGraphButton.clicked.connect(lambda: self.cookGraph())
+        self.cookGraphButton.clicked.connect(lambda: self.cShortcut())
         shelfLayout.addWidget(self.cookGraphButton)
 
         self.saveGraphButton = QtWidgets.QPushButton("")
@@ -66,13 +70,13 @@ class App(QtWidgets.QMainWindow):
         self.loadGraphButton = QtWidgets.QPushButton("")
         self.loadGraphButton.setIcon(self.icons.GetIcon("load-graph"))
         self.loadGraphButton.setToolTip("Load Graph from a file")
-        self.loadGraphButton.clicked.connect(lambda: self.loadGraph())
+        self.loadGraphButton.clicked.connect(lambda: self.ctrlLShortcut())
         shelfLayout.addWidget(self.loadGraphButton)
 
         self.layoutGraphButton = QtWidgets.QPushButton("")
         self.layoutGraphButton.setIcon(self.icons.GetIcon("layout-graph"))
         self.layoutGraphButton.setToolTip("Layout Active Graph")
-        self.layoutGraphButton.clicked.connect(lambda: self.layoutGraph())
+        self.layoutGraphButton.clicked.connect(lambda: self.lShortcut())
         shelfLayout.addWidget(self.layoutGraphButton)
 
         separator = QVLine()
@@ -96,53 +100,61 @@ class App(QtWidgets.QMainWindow):
         
         self.centralLayout.addWidget(shelfWidget)
 
+        # Separator
+        
+        sep = QHLine()
+        sep.setFixedHeight(2)
+        sep.setColor(GetQColorFromPalette(ColorPalette.TEXT))
+        self.centralLayout.addWidget(sep)
+
         # Principal panel
 
-        self.principalPanel = Panel()
+        self.principalPanel = Panel(0, self.icons, self.logger, self.environment)
         self.centralLayout.addWidget(self.principalPanel) 
 
         # Central Widget
 
+        self._centralWidget.setLayout(self.centralLayout)
         self.setCentralWidget(self._centralWidget)
 
         # Shortcuts
         
         self.newGraphSc = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+N"), self)
-        self.newGraphSc.activated.connect(lambda: self.addGraph())
+        self.newGraphSc.activated.connect(lambda: self.ctrlNShortcut())
 
         self.closeGraphSc = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+W"), self)
-        self.closeGraphSc.activated.connect(lambda: self.closeGraph())
+        self.closeGraphSc.activated.connect(lambda: self.ctrlWShortcut())
 
         self.cookGraphSc = QtWidgets.QShortcut(QtGui.QKeySequence("C"), self)
-        self.cookGraphSc.activated.connect(lambda: self.cookGraph())
+        self.cookGraphSc.activated.connect(lambda: self.cShortcut())
 
         self.saveGraphSc = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+S"), self)
-        self.saveGraphSc.activated.connect(lambda: self.saveGraph())
+        self.saveGraphSc.activated.connect(lambda: self.ctrlSShortcut())
         
         self.forceSaveGraphSc = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+Shift+S"), self)
-        self.forceSaveGraphSc.activated.connect(lambda: self.saveGraph(forceName=True))
+        self.forceSaveGraphSc.activated.connect(lambda: self.ctrlShiftSShortcut(forceName=True))
 
         self.loadGraphSc = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+L"), self)
-        self.loadGraphSc.activated.connect(lambda: self.loadGraph())
+        self.loadGraphSc.activated.connect(lambda: self.ctrlLShortcut())
         
         self.layoutGraphSc = QtWidgets.QShortcut(QtGui.QKeySequence("L"), self)
-        self.layoutGraphSc.activated.connect(lambda: self.layoutGraph())
+        self.layoutGraphSc.activated.connect(lambda: self.lShortcut())
         
         self.showPlugEditorSc = QtWidgets.QShortcut(QtGui.QKeySequence("P"), self)
-        self.showPlugEditorSc.activated.connect(lambda: self.showPlugEditor())
+        self.showPlugEditorSc.activated.connect(lambda: self.pShortcut())
         
         self.stopGraphCookingSc = QtWidgets.QShortcut(QtGui.QKeySequence("Escape"), self)
-        self.stopGraphCookingSc.activated.connect(lambda: self.stopGraph())
+        self.stopGraphCookingSc.activated.connect(lambda: self.escapeShortcut())
 
-        # Init at least one graph
-        # self.addGraph()
-
-    def addGraph(self) -> None:
+    def ctrlNShortcut(self) -> None:
         """
         """
-        self.graphTabs.addTab(env=self.environment)
+        focusedWidget = QtWidgets.QApplication.focusWidget()
+        
+        if isinstance(focusedWidget, GraphsEditor):
+            focusedWidget.addTab()
 
-    def closeGraph(self, index : int = None) -> None:
+    def ctrlWShortcut(self) -> None:
         """
         Close the tab at the index given as argument. If the index
         is left to None, close the active tab
@@ -151,112 +163,115 @@ class App(QtWidgets.QMainWindow):
             index (int, optional): Index of the tab to close. 
             Defaults to None.
         """
-        if index is not None:
-            self.graphTabs.removeTab(index)
-        else:
-            self.graphTabs.removeTab(self.graphTabs.getActiveTabIndex())
-
-    def cookGraph(self, index : int = None) -> None:
-        """
-        Cook the graph at the given index
-
-        Args:
-            index (int, optional): Index of the graph to cook. Defaults to None.
-        """
-        if index is None:
-            index = self.graphTabs.getActiveTabIndex()
-
-        self.graphTabs.tabs.widget(index).layout.itemAt(0).widget().launchGraphCooking(skipCookedNodes=False)
-
-    def saveGraph(self, index : int = None, forceName : bool = False) -> None:
-        """
-        Save the graph to a file
-
-        Args:
-            index (int, optional): index of the graph to save. Defaults to None.
-        """
-        if index is None:
-            index = self.graphTabs.getActiveTabIndex()
-
-        graph : GGraph = self.graphTabs.tabs.widget(index).layout.itemAt(0).widget()
-        internalGraph : Graph = self.graphTabs.tabs.widget(index).layout.itemAt(0).widget().graph
-
-        if internalGraph.GetSavePath() != "" and not forceName:
-            filePath = internalGraph.GetSavePath()
-        else:
-            filePath, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save File", self.environment.Get("FLASH_ROOT"), "Flash Graph (*.fgraph)")
-
-        if filePath != "":
-            graph.saveGraph(filePath)
-
-            self.graphTabs.tabs.setTabText(index, internalGraph.GetName())
-
-    def loadGraph(self) -> None:
-        """
-        Loads a graph from a file
-        """
-        filePath, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Open File", self.environment.Get("FLASH_ROOT"), "Flash Graph (*.fgraph)")
+        focusedWidget = QtWidgets.QApplication.focusWidget()
         
-        if os.path.exists(filePath):
-            newGGraph = GGraph(self.nodeLib, self.logger, self.environment)
+        if isinstance(focusedWidget, GraphsEditor):
+            focusedWidget.removeActiveTab()
 
-            newGGraph.loadGraph(filePath)
-
-            self.graphTabs.addTab(graph=newGGraph)
-
-    def layoutGraph(self, index : int = None) -> None:
+    def cShortcut(self) -> None:
         """
-        Layouts the graph at the given index 
-
-        Args:
-            index (int, optional): graph index. Defaults to None.
-        """
-        if index is None:
-            index = self.graphTabs.getActiveTabIndex()
-
-        self.graphTabs.tabs.widget(index).layout.itemAt(0).widget().layoutGraph()
+        Called when C is pressed. Depending on the focused widget, it might do different things.
         
-    def stopGraph(self, index : int = None) -> None:
+        If the focused widget is :
+            - Graphs Editor -> Cooks the active graph
         """
-        Force the current graph to stop the cooking if it is cooking
+        focusedWidget = QtWidgets.QApplication.focusWidget()
         
-        Args:
-            index (int, optional): graph index. Defaults to None.
-        """
-        if index is None:
-            index = self.graphTabs.getActiveTabIndex()
+        if isinstance(focusedWidget, GraphsEditor):
+            focusedWidget.cookActiveGraph()
 
-        self.graphTabs.tabs.widget(index).layout.itemAt(0).widget().stopGraphCooking()
+    def ctrlSShortcut(self) -> None:
+        """
+        Called when Ctrl+S is pressed. Depending on the focused widget, it might do different things.
         
-    def showPlugEditor(self, index : int = None) -> None:
+        If the focused widget is :
+            - Graphs Editor -> Saves the active graph
         """
-        Shows/Hides the plug editor of the current graphTabs
-
-        Args:
-            index (int, optional): index of the graph to show/hide the plug editor. Defaults to None.
+        focusedWidget = QtWidgets.QApplication.focusWidget()
+        
+        if isinstance(focusedWidget, GraphsEditor):
+            focusedWidget.saveActiveGraph()
+    
+    def ctrlShiftSShortcut(self) -> None:
         """
-        if index is None:
-            index = self.graphTabs.getActiveTabIndex()
+        Called when Ctrl+Shift+S is pressed. Depending on the focused widget, it might do different things.
+        
+        If the focused widget is :
+            - Graphs Editor -> Saves the active graph with name override
+        """
+        focusedWidget = QtWidgets.QApplication.focusWidget()
+        
+        if isinstance(focusedWidget, GraphsEditor):
+            focusedWidget.saveActiveGraph(forceName=True)
 
-        self.graphTabs.tabs.widget(index).layout.itemAt(0).widget().showPlugEditor()
+    def ctrlLShortcut(self) -> None:
+        """
+        Called when Ctrl+L is pressed. Depending on the focused widget, it might do different things.
+        
+        If the focused widget is :
+            - Graphs Editor -> Loads a graph from a file
+        """
+        focusedWidget = QtWidgets.QApplication.focusWidget()
+        
+        if isinstance(focusedWidget, GraphsEditor):
+            focusedWidget.loadNewGraph()
+
+    def lShortcut(self) -> None:
+        """
+        Called when L is pressed. Depending on the focused widget, it might do different things.
+        
+        If the focused widget is :
+            - Graphs Editor -> Layout the active graph
+        """
+        focusedWidget = QtWidgets.QApplication.focusWidget()
+        
+        if isinstance(focusedWidget, GraphsEditor):
+            focusedWidget.layoutActiveGraph()
+        
+    def escapeShortcut(self) -> None:
+        """
+        Called when Esc is pressed. Depending on the focused widget, it might do different things.
+        
+        If the focused widget is :
+            - Graphs Editor -> Stops the current graph cooking op
+        """
+        focusedWidget = QtWidgets.QApplication.focusWidget()
+        
+        if isinstance(focusedWidget, GraphsEditor):
+            focusedWidget.stopActiveGraph()
+        
+    def pShortcut(self) -> None:
+        """
+        Called when P is pressed. Depending on the focused widget, it might do different things.
+        
+        If the focused widget is :
+            - Graphs Editor -> Show the active graph plug editor
+        """
+        focusedWidget = QtWidgets.QApplication.focusWidget()
+        
+        if isinstance(focusedWidget, GraphsEditor):
+            focusedWidget.showActiveGraphPlugEditor()
         
     def openNodeEditor(self) -> None:
         """
         Show the node properties editor
         """
-        index = self.graphTabs.getActiveTabIndex()
+        focusedWidget = QtWidgets.QApplication.focusWidget()
         
-        gGraph : GGraph = self.graphTabs.tabs.widget(index).layout.itemAt(0).widget()
-        
-        currentGraphSelection = gGraph.scene.selectedItems() 
-        
-        node = None
-        
-        if len(currentGraphSelection) > 0:
-            if type(currentGraphSelection[0]) is GNode:
-                node = currentGraphSelection[0].getInternalNode()
-        
-        self.nodeEditor.setNodeToEdit(node)
-        
-        self.nodeEditor.show()
+        if isinstance(focusedWidget, GraphsEditor):
+            index = focusedWidget.getActiveTabIndex()
+            
+            gGraph : GGraph = focusedWidget.tabs.widget(index).layout.itemAt(0).widget()
+            
+            currentGraphSelection = gGraph.scene.selectedItems() 
+            
+            node = None
+            
+            if len(currentGraphSelection) > 0:
+                if type(currentGraphSelection[0]) is GNode:
+                    node = currentGraphSelection[0].getInternalNode()
+            
+            self.nodeEditor.setNodeToEdit(node)
+            
+            self.nodeEditor.show()
         

@@ -1,0 +1,126 @@
+{
+  "nodes": [
+    {
+      "name": "File",
+      "category": "Utility",
+      "id": "3636396136653335653239613836376631333839346237666561633263343363",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "$FLASH_ICONS/file.png",
+      "definitionPath": "D:/dev/Flash/Library/Nodes/file.fnode",
+      "nodeType": "Utility/File",
+      "opCode": "\noutfile = infile\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infile": [
+          {
+            "shortName": "infile",
+            "longName": "Input File Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "indata",
+            "connectionNodeId": "3334643033303061616639323834383135306232363439303965326566373839"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Error",
+      "category": "Debug",
+      "id": "3334643033303061616639323834383135306232363439303965326566373839",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$FLASH_ICONS/debug.png",
+      "definitionPath": "D:/dev/Flash/Library/Nodes/error.fnode",
+      "nodeType": "Debug/Error",
+      "opCode": "\nFlashLogError(\"You have done something bad\")\n\nFlashError()\n\noutdata = indata\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outfile",
+            "connectionNodeId": "3636396136653335653239613836376631333839346237666561633263343363"
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": null,
+            "type": 11,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    }
+  ],
+  "tracker": [
+    "3636396136653335653239613836376631333839346237666561633263343363",
+    "3334643033303061616639323834383135306232363439303965326566373839"
+  ],
+  "positions": [
+    {
+      "id": "3636396136653335653239613836376631333839346237666561633263343363",
+      "x": -500.0,
+      "y": 200.0
+    },
+    {
+      "id": "3334643033303061616639323834383135306232363439303965326566373839",
+      "x": 50.0,
+      "y": 200.0
+    }
+  ]
+}

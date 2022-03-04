@@ -9,10 +9,14 @@ class TabType(QtWidgets.QWidget):
 
     name = "Tab Type"
 
-    def __init__(self, parent=None) -> None:
+    def __init__(self, iconsLib : Icons, logger : Logger, environment : Environment, parent=None) -> None:
         """
         """
         super().__init__(parent=parent)
+        
+        self.iconsLib = iconsLib
+        self.logger = logger
+        self.environment = environment
 
     def getName(self) -> str:
         """
@@ -26,14 +30,14 @@ class TabTypeGraphsEditor(TabType):
 
     name = "Graphs Editor"
 
-    def __init__(self, parent=None) -> None:
+    def __init__(self, iconsLib : Icons, logger : Logger, environment : Environment, parent=None) -> None:
         """
         """
-        super().__init__(parent=parent)
+        super().__init__(iconsLib, logger, environment, parent=parent)
 
         self.masterLayout = QtWidgets.QVBoxLayout()
 
-        self.masterLayout.addWidget(GraphsEditor())
+        self.masterLayout.addWidget(GraphsEditor(iconsLib, logger, environment))
 
         self.setLayout(self.masterLayout)
 
@@ -44,6 +48,10 @@ class TabTypeJobs(TabType):
 
     name = "Jobs"
 
+    def __init__(self, iconsLib : Icons, logger : Logger, environment : Environment, parent=None) -> None:
+        """
+        """
+        super().__init__(iconsLib, logger, environment, parent=parent)
 
 class TabTypeGraphLibrary(TabType):
     """
@@ -51,6 +59,10 @@ class TabTypeGraphLibrary(TabType):
 
     name = "Graph Library"
 
+    def __init__(self, iconsLib : Icons, logger : Logger, environment : Environment, parent=None) -> None:
+        """
+        """
+        super().__init__(iconsLib, logger, environment, parent=parent)
 
 class TabTypeGraphParameters(TabType):
     """
@@ -58,80 +70,84 @@ class TabTypeGraphParameters(TabType):
 
     name = "Graph Parameters"
 
-
-class TabBarPlus(QtWidgets.QTabBar):
+    def __init__(self, iconsLib : Icons, logger : Logger, environment : Environment, parent=None) -> None:
+        """
+        """
+        super().__init__(iconsLib, logger, environment, parent=parent)
+        
+            
+class TabButtons(QtWidgets.QWidget):
     """
-    Tab bar with a plus button to add a tab
     """
     
-    addTab = QtCore.pyqtSignal()
+    addButtonClicked = QtCore.pyqtSignal()
+    splitButtonClicked = QtCore.pyqtSignal(QtCore.QPoint)
     
-    def __init__(self, parent=None) -> None:
+    def __init__(self, addIcon : QtGui.QIcon, splitIcon : QtGui.QIcon, parent=None) -> None:
         """
         """
         super().__init__(parent=parent)
         
-        self.addButton = QtWidgets.QPushButton("+")
-        self.addButton.setParent(self)
-        self.addButton.setFixedSize(10, 10)
-        self.addButton.clicked.connect(self.addTab.emit)
-        self.moveAddButton()
+        self.masterLayout = QtWidgets.QHBoxLayout()
         
-    def sizeHint(self) -> QtCore.QSize:
-        """
-        Returns the size of the tabbar plus the button width
-        """
-        sizeHint = QtWidgets.QTabBar.sizeHint(self)
-        width = sizeHint.width()
-        height = sizeHint.height()
+        self.addButton = QtWidgets.QToolButton(self)
+        self.addButton.setIcon(addIcon)
+        self.addButton.setFixedSize(16, 16)
+        self.addButton.setIconSize(QtCore.QSize(16, 16))
+        self.addButton.setStyleSheet("background: transparent")
+        self.addButton.clicked.connect(self.addButtonClicked.emit)
+        self.masterLayout.addWidget(self.addButton)
         
-        return QtCore.QSize(width + 15, height)
+        self.splitButton = QtWidgets.QToolButton(self)
+        self.splitButton.setFixedSize(16, 16)
+        self.splitButton.setIcon(splitIcon)
+        self.splitButton.setIconSize(QtCore.QSize(16, 16))
+        self.splitButton.setStyleSheet("background: transparent")
+        self.splitButton.clicked.connect(lambda: self.splitButtonClicked.emit(self.splitButton.mapToGlobal(self.splitButton.pos())))
+        self.masterLayout.addWidget(self.splitButton)
         
-    def resizeEvent(self, event) -> None:
-        """
-        """
-        super().resizeEvent(event)
+        self.setLayout(self.masterLayout)
         
-        self.moveAddButton()
-        
-    def tabLayoutChanged(self) -> None:
+    def getAddButton(self) -> QtWidgets.QToolButton:
         """
         """
-        super().tabLayoutChanged()
-        
-        self.moveAddButton()
-        
-    def moveAddButton(self) -> None:
+        return self.addButton
+    
+    def getSplitButton(self) -> QtWidgets.QToolButton:
         """
         """
-        size = sum([self.tabRect(i).width() for i in range(self.count())])
-        
-        h = self.geometry().top()
-        w = self.width()
-        
-        if size > w:
-            self.addButton.move(w - 54, h)
-        else:
-            self.addButton.move(size, h)
+        return self.splitButton
             
             
 class Tab(QtWidgets.QTabWidget):
     """
     """
-    def __init__(self, parent=None) -> None:
+    
+    splitButtonClicked = QtCore.pyqtSignal(QtCore.QPoint)
+    
+    def __init__(self, iconsLib : Icons, logger : Logger, environment : Environment, parent=None) -> None:
         """
         """
         super().__init__(parent=parent)
         
-        self._tabBar = TabBarPlus()
-        self.setTabBar(self._tabBar)
+        self.iconsLib = iconsLib
+        self.logger = logger
+        self.environment = environment
         
         self.setMovable(True)
         self.setTabsClosable(True)
         
-        self._tabBar.addTab.connect(self.addTab)
-        self._tabBar.tabMoved.connect(self._tabBar.moveAddButton)
+        addPixmap = self.iconsLib.GetColoredPixmap("add-button", GetQColorFromPalette(ColorPalette.FOREGROUND))
+        splitPixmap = self.iconsLib.GetColoredPixmap("split-button", GetQColorFromPalette(ColorPalette.FOREGROUND))
+        
+        self.buttons = TabButtons(QtGui.QIcon(addPixmap), QtGui.QIcon(splitPixmap))
+        self.buttons.addButtonClicked.connect(self.addTabMenu)
+        self.buttons.splitButtonClicked.connect(self.splitButtonClicked)
+        self.setCornerWidget(self.buttons)
+        
         self.tabCloseRequested.connect(self.removeTab)
+        
+        self.addGraphEditor()
 
     def removeTab(self, index : int) -> None:
         """
@@ -142,9 +158,44 @@ class Tab(QtWidgets.QTabWidget):
     def addGraphEditor(self) -> None:
         """
         """
-        graphEditor = TabTypeGraphsEditor()
+        graphEditor = TabTypeGraphsEditor(self.iconsLib, self.logger, self.environment)
 
         self.addTab(graphEditor, graphEditor.getName())
+        
+    def addTabMenu(self) -> None:
+        """
+        """
+        menu = ContextMenu()
+        
+        addGraphAction = menu.addAction("Add Graph Editor")
+        addGraphAction.triggered.connect(self.addGraphEditor)
+        
+        menu.exec_(self.buttons.getAddButton().mapToGlobal(self.buttons.getAddButton().pos()))
+        
+        
+class TabWidget(QtWidgets.QWidget):
+    """
+    """
+    def __init__(self, iconsLib : Icons, logger : Logger, environment : Environment, parent=None) -> None:
+        """
+        """
+        super().__init__(parent=parent)
+        
+        self.tab = Tab(iconsLib, logger, environment, parent)
+        
+        masterLayout = QtWidgets.QVBoxLayout()
+        
+        masterLayout.setSpacing(0)
+        masterLayout.setContentsMargins(10, 10, 10, 10)
+        
+        masterLayout.addWidget(self.tab)
+        
+        self.setLayout(masterLayout)
+        
+    def getTab(self) -> Tab:
+        """
+        """
+        return self.tab
 
 
 class Panel(QtWidgets.QWidget):
@@ -157,22 +208,44 @@ class Panel(QtWidgets.QWidget):
     - the splitter widget, which contains 2 widgets that are 2 tabs (and one of them is the principal widget)
     """
 
-    def __init__(self, parent=None) -> None:
+    def __init__(self, index : int, iconsLib : Icons, logger : Logger, environment : Environment, principalWidget : TabWidget = None, parent=None) -> None:
         """
         """
         super().__init__(parent=parent)
+        
+        self.index = index
+        self.iconsLib = iconsLib
+        self.logger = logger
+        self.environment = environment
+        
+        self.setFocusPolicy(QtCore.Qt.StrongFocus)
 
         self.masterLayout = QtWidgets.QVBoxLayout()
+        self.masterLayout.setSpacing(0)
+        self.masterLayout.setContentsMargins(0, 0, 0, 0)
 
-        self.splitterWidget = QtWidgets.QSplitter()
-        self.principalWidget = Tab()
+        self.splitterWidget = QtWidgets.QSplitter(QtCore.Qt.Horizontal)
+        self.splitterWidget.setContentsMargins(0, 0, 0, 0)
+        
+        if principalWidget is not None:
+            self.principalWidget = principalWidget
+            self.principalWidget.getTab().splitButtonClicked.connect(self.splitterMenu)
+        else:
+            self.principalWidget = TabWidget(self.iconsLib, self.logger, self.environment)
+            self.principalWidget.getTab().splitButtonClicked.connect(self.splitterMenu)
+        
+        self.stackWidget = QtWidgets.QStackedWidget()
 
+        self.stackWidget.addWidget(self.principalWidget)
+        self.stackWidget.addWidget(self.splitterWidget)
+
+        self.masterLayout.addWidget(self.stackWidget)
+        
         self.showPrincipalWidget()
-
-        self.masterLayout.addWidget(self.splitterWidget)
-        self.masterLayout.addWidget(self.principalWidget)
-
+        
         self.setLayout(self.masterLayout)
+    
+    # GETTERS / SETTERS
 
     def getPrincipalWidget(self) -> QtWidgets.QWidget:
         """
@@ -197,16 +270,14 @@ class Panel(QtWidgets.QWidget):
     def showPrincipalWidget(self) -> None:
         """
         """
-        self.getPrincipalWidget().show()
-        self.getSplitterWidget().hide()
+        self.stackWidget.setCurrentIndex(0)
 
         self.splitterWidgetIsActive = False
 
     def showSplitterWidget(self) -> None:
         """
         """
-        self.getPrincipalWidget().hide()
-        self.getSplitterWidget().show()
+        self.stackWidget.setCurrentIndex(1)
         
         self.splitterWidgetIsActive = True
 
@@ -214,11 +285,18 @@ class Panel(QtWidgets.QWidget):
         """
         """
         if self.getSplitterWidget().count() > 1:
-            self.getSplitterWidget().widget(0).deleteLater()
-            self.getSplitterWidget().widget(1).deleteLater()
+            self.splitterWidget.widget(0).deleteLater()
+            self.splitterWidget.widget(1).deleteLater()
+            
+        self.principalWidget.getTab().splitButtonClicked.disconnect()
 
-        self.getSplitterWidget().addWidget(Panel())
-        self.getSplitterWidget().addWidget(Panel())
+        leftPanel = Panel(0, self.iconsLib, self.logger, self.environment, self.principalWidget, parent=self)
+        rightPanel = Panel(1, self.iconsLib, self.logger, self.environment, parent=self)
+
+        self.splitterWidget.addWidget(leftPanel)
+        self.splitterWidget.addWidget(rightPanel)
+        
+        self.showSplitterWidget()
 
     def setSplitterWidgetOrientation(self, orientation : QtCore.Qt.Orientation) -> None:
         """
@@ -229,26 +307,43 @@ class Panel(QtWidgets.QWidget):
         """
         """
         return self.splitterWidgetIsActive
-
-    def getActiveWidget(self) -> QtWidgets.QWidget:
+    
+    def closePanel(self) -> None:
         """
-        Go through all widgets and find the one that is focused
         """
-        if self.isSplitterWidgetActive():
-            for i in range(2):
-                widget = self.getSplitterWidget().widget(i)
-
-                if widget.isSplitterWidgetActive():
-                    activeWidget = widget.getActiveWidget()
-
-                    if activeWidget is not None:
-                        return activeWidget
-
-                elif widget.hasFocus():
-                    return widget
-
-        else:
-            if self.getPrincipalWidget().hasFocus():
-                return self.getPrincipalWidget()
-            else:
-                return None
+        parent = self.parentWidget()
+        
+        if isinstance(parent, QtWidgets.QSplitter):
+            if self.index == 0:
+                topParent = parent.parentWidget().parentWidget()
+                
+                print(topParent)
+                
+                if isinstance(topParent, Panel):
+                    if self.isSplitterWidgetActive():
+                        topParent.setSplitterWidget(self.splitterWidget)
+                        topParent.showSplitterWidget()
+                    else:
+                        topParent.setPrincipalWidget(self.principalWidget)
+                        topParent.showPrincipalWidget()
+            
+            parent.widget(self.index).deleteLater()
+            self.close()
+            self.setParent(None)
+    
+    @QtCore.pyqtSlot(QtCore.QPoint)
+    def splitterMenu(self, position : QtCore.QPoint) -> None:
+        """
+        """
+        menu = ContextMenu()
+        
+        splitHorizontallyAction = menu.addAction("Split Horizontally")
+        splitHorizontallyAction.triggered.connect(lambda: (self.setSplitterWidgetOrientation(QtCore.Qt.Horizontal), self.activateSplitterWidget()))
+        
+        splitVerticallyAction = menu.addAction("Split Vertically")
+        splitVerticallyAction.triggered.connect(lambda: (self.setSplitterWidgetOrientation(QtCore.Qt.Vertical), self.activateSplitterWidget()))
+        
+        closeAction = menu.addAction("Close")
+        closeAction.triggered.connect(lambda: self.closePanel())
+        
+        menu.exec_(QtCore.QPoint(position.x() - 50, position.y()))

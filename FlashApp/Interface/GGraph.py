@@ -263,7 +263,7 @@ class GGraph(QtWidgets.QGraphicsView):
 
         self.setAcceptDrops(True)
 
-        self.setMinimumSize(800, 800)
+        # self.setMinimumSize(800, 800)
         self.gridSize = 50
 
         self.scene.gridSize = self.gridSize
@@ -367,6 +367,12 @@ class GGraph(QtWidgets.QGraphicsView):
     def resizeEvent(self, event: QtGui.QResizeEvent) -> None:
         """
         """
+        if self.plugEditor.getWidth() > self.rect().width() - 50:
+            self.plugEditor.hide()
+        else:
+            if self.plugEditor.isHidden():
+                self.showPlugEditor()
+        
         self.plugEditor.move(self.rect().width() - self.plugEditor.getWidth() - 50, 50)
         self.plugEditor.setMaxHeight(self.rect().height() - 225)
         
