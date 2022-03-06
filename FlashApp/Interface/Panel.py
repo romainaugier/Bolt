@@ -317,7 +317,19 @@ class Panel(QtWidgets.QWidget):
             if self.index == 0:
                 topParent = parent.parentWidget().parentWidget()
                 
-                print(topParent)
+                print("idx0", topParent)
+                
+                if isinstance(topParent, Panel):
+                    if self.isSplitterWidgetActive():
+                        topParent.setSplitterWidget(self.splitterWidget)
+                        topParent.showSplitterWidget()
+                    else:
+                        topParent.setPrincipalWidget(self.principalWidget)
+                        topParent.showPrincipalWidget()
+            else:
+                topParent = parent.parentWidget().parentWidget()
+                
+                print("idx1", topParent)
                 
                 if isinstance(topParent, Panel):
                     if self.isSplitterWidgetActive():
@@ -327,6 +339,9 @@ class Panel(QtWidgets.QWidget):
                         topParent.setPrincipalWidget(self.principalWidget)
                         topParent.showPrincipalWidget()
             
+                if parent.count() == 1:
+                    self.index = 0
+                
             parent.widget(self.index).deleteLater()
             self.close()
             self.setParent(None)
