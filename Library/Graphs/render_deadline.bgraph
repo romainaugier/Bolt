@@ -1,0 +1,1097 @@
+{
+  "nodes": [
+    {
+      "name": "Deadline_SubmitGuerillaJob",
+      "category": "Deadline",
+      "id": "3662633930323037623534666338353830343666633362333333643163346264",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$BOLT_ICONS/deadline.png",
+      "definitionPath": "$BOLT_LIB/Nodes/deadline_submit_guerilla_job.bnode",
+      "nodeType": "Deadline/Deadline_SubmitGuerillaJob",
+      "opCode": "\nimport subprocess, re\n\njobRibgenName = \"\"\njobRenderName = \"\"\n\nwith open(inribgenjobinfo, \"r\") as file:\n    for line in file.readlines():\n        if line.startswith(\"Name\"):\n            jobRibgenName = line.split(\"=\")[1]\n\nwith open(inrenderjobinfo, \"r\") as file:\n    for line in file.readlines():\n        if line.startswith(\"Name\"):\n            jobRenderName = line.split(\"=\")[1]\n\nBoltLogMessage(f\"Deadline : Submitting ribgen job {jobRibgenName}\")\nBoltLogMessage(f\"Deadline : Submitting render job {jobRenderName}\")\n\ncommand = [\n    \"deadlinecommand\",\n    \"-Multi\",\n    \"-job\",\n    inribgenjobinfo,\n    inribgenplugininfo,\n    \"-job\",\n    \"-dependsOnPrevious\",\n    inrenderjobinfo,\n    inrenderplugininfo\n]\n\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE)\nstdout, stderr = process.communicate()\n\nstdoutAsStr = stdout.decode(\"utf-8\")\nstderrAsStr = stderr.decode(\"utf-8\")\n\nif len(stderrAsStr) > 0:\n    BoltLogError(stderrAsStr)\nelse:\n    jobIdPattern = r\"JobID=(\\S+)\"\n\n    matches = re.findall(jobIdPattern, stdoutAsStr)\n\n    outribgenjobid = matches[0]\n    outrenderjobid = matches[1]\n\n    BoltLogMessage(f\"Deadline : Finished submitting job. \\n    Ribgen Job ID = {outribgenjobid}\\n    Render Job ID = {outrenderjobid}\")\n\n    BoltLogMessage(stdoutAsStr)\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inribgenjobinfo": [
+          {
+            "shortName": "inribgenjobinfo",
+            "longName": "Ribgen Job Info File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outribgenjobinfofile",
+            "connectionNodeId": "3534396663623431333835383834373461636530363139306432346462303061"
+          }
+        ],
+        "inribgenplugininfo": [
+          {
+            "shortName": "inribgenplugininfo",
+            "longName": "Ribgen Plugin Info File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outribgenplugininfofile",
+            "connectionNodeId": "3534396663623431333835383834373461636530363139306432346462303061"
+          }
+        ],
+        "inrenderjobinfo": [
+          {
+            "shortName": "inrenderjobinfo",
+            "longName": "Render Job Info File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outrenderjobinfofile",
+            "connectionNodeId": "3534396663623431333835383834373461636530363139306432346462303061"
+          }
+        ],
+        "inrenderplugininfo": [
+          {
+            "shortName": "inrenderplugininfo",
+            "longName": "Render Plugin Info File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": true,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outribgenjobid": [
+          {
+            "shortName": "outribgenjobid",
+            "longName": "Ribgen Job ID",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ],
+        "outrenderjobid": [
+          {
+            "shortName": "outrenderjobid",
+            "longName": "Render Job ID",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "injobid",
+            "connectionNodeId": "3934303435383636343131383961653666623734393730623333653536663535"
+          }
+        ]
+      }
+    },
+    {
+      "name": "File",
+      "category": "Utility",
+      "id": "6133313433643361616136663439393130343533663633393430336237373161",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "$BOLT_ICONS/file.png",
+      "definitionPath": "$BOLT_LIB/Nodes/file.bnode",
+      "nodeType": "Utility/File",
+      "opCode": "\noutfile = infile\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infile": [
+          {
+            "shortName": "infile",
+            "longName": "Input File Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "inguerillafile",
+            "connectionNodeId": "3534396663623431333835383834373461636530363139306432346462303061"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Oeuf_GuerillaEnv",
+      "category": "Oeuf",
+      "id": "6138613631313065633231633337393162313637356537393734363963373561",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$BOLT_ICONS/volcan.png",
+      "definitionPath": "$BOLT_LIB/Nodes/oeuf_guerilla_env.bnode",
+      "nodeType": "Oeuf/Oeuf_GuerillaEnv",
+      "opCode": "\noutenvironment = inenvironment\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inenvironment": [
+          {
+            "shortName": "inenvironment",
+            "longName": "Environment",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+            },
+            "defaultData": {
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio"
+            },
+            "type": 10,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outenvironment": [
+          {
+            "shortName": "outenvironment",
+            "longName": "Output Environment",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {},
+            "defaultData": {},
+            "type": 10,
+            "connectionName": "inenvironment",
+            "connectionNodeId": "3534396663623431333835383834373461636530363139306432346462303061"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Oeuf_RenderOptionsLD",
+      "category": "Oeuf",
+      "id": "3732386138313437336136623862333263616630366262333961643030663837",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$BOLT_ICONS/volcan.png",
+      "definitionPath": "$BOLT_LIB/Nodes/oeuf_render_options_ld.bnode",
+      "nodeType": "Oeuf/Oeuf_RenderOptionsLD",
+      "opCode": "\noutrenderoptions = inrenderoptions\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inrenderoptions": [
+          {
+            "shortName": "inrenderoptions",
+            "longName": "Render Options",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {
+              "Type": "LD",
+              "Team": "oeuf",
+              "SequenceName": "sequence",
+              "ShotName": "shot",
+              "Optims": true,
+              "FrameRange": "100-240"
+            },
+            "defaultData": {
+              "Type": "LD",
+              "Team": "oeuf",
+              "SequenceName": "sequence",
+              "ShotName": "shot",
+              "Optims": true,
+              "FrameRange": "100-240"
+            },
+            "type": 10,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outrenderoptions": [
+          {
+            "shortName": "outrenderoptions",
+            "longName": "Output Render Options",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {},
+            "defaultData": {},
+            "type": 10,
+            "connectionName": "inrenderoptions",
+            "connectionNodeId": "3534396663623431333835383834373461636530363139306432346462303061"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Guerilla_PrepareDeadlineJob",
+      "category": "Guerilla",
+      "id": "3534396663623431333835383834373461636530363139306432346462303061",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$BOLT_ICONS/guerilla-render.png",
+      "definitionPath": "$BOLT_LIB/Nodes/guerilla_prepare_deadline_job.bnode",
+      "nodeType": "Guerilla/Guerilla_PrepareDeadlineJob",
+      "opCode": "\n# BeginOp\n\n# BeginOp\n\n# BeginOp\n\nfrom datetime import datetime\nimport re, os, subprocess, platform\n\nnow = datetime.now()\n\ncurrentTimeStr = now.strftime('%m%d%Y_%H%M%S')\n\n# Setup job and batch name\nteamName = inrenderoptions[\"Team\"]\njobType = inrenderoptions[\"Type\"]\nsequenceName = inrenderoptions[\"SequenceName\"] \nshotName = inrenderoptions[\"ShotName\"]\nframeRange = inrenderoptions[\"FrameRange\"]\n\njobName = f\"{teamName}_{jobType}_{sequenceName}_{shotName}\"\nbatchName = f\"{jobName}-{currentTimeStr}\"\n\nif jobType == \"LD\":\n    injoboptions[\"Priority\"] = 50\nelif jobType == \"FML\":\n    injoboptions[\"Priority\"] = 75\nelif jobType == \"HD\":\n    injoboptions[\"Priority\"] = 25\n\nrenderDir = f\"{inrenderdir}/{sequenceName}/{shotName}/{jobType}1\"\n\nwhile os.path.exists(renderDir):   \n    numPattern = r\"(\\d+)$\"\n\n    match = re.search(numPattern, renderDir)\n\n    value = int(match.group()) + 1\n\n    renderDir = f\"{renderDir[:match.start()]}{value}\"\n\nos.makedirs(renderDir)\nBoltLogMessage(f\"RenderDir : {renderDir}\")\n\nrenderFile = f\"{renderDir}/render_{sequenceName}_{shotName}_$f.$x\"\nopenExrIdFile = f\"{renderDir}/render_{sequenceName}_{shotName}_id_$f.$x\"\n\n# Setup job options\ninjoboptions[\"Plugin\"] = \"Guerilla\"\ninjoboptions[\"Name\"] = jobName\ninjoboptions[\"BatchName\"] = batchName\ninjoboptions[\"Frames\"] = frameRange\ninjoboptions[\"OutputDirectory0\"] = renderDir\n\n# Render Job Infos\ngeneratedRenderJobInfos = \"\"\n\nfor key, item in injoboptions.items():\n    generatedRenderJobInfos += f\"{key}={item}\\n\"\n\n# Ribgen Job Infos\ninjoboptions[\"Name\"] = f\"{jobName}_ribgen\"\ninjoboptions[\"Frames\"] = 0\n\ngeneratedRibgenJobInfos = \"\"\n\nfor key, item in injoboptions.items():\n    generatedRibgenJobInfos += f\"{key}={item}\\n\"\n\n# Generate Guerilla script\n\ngeneratedScript = f\"\"\"import guerilla, os\nimport RomanoTools.Guerilla.Utils as utils\n\nlayer = guerilla.Document().findchild(\"RenderPass|Layer\")\n\naovs = {inrenderpasses}\n\nexistingAovs = [aov.PlugName.get() for aov in layer.children()]\n\naovsToAdd = {inrenderpasses}\n\nfor aov in aovs:\n    if aov in existingAovs:\n        aovsToAdd.remove(aov)\n\nwith guerilla.Modifier() as mod:\n\n    for aov in layer.children():\n        if aov.PlugName.get() == \"Albedo\":\n            aov.OverrideSettings.set(True)\n            aov.DisplayDriver.set(\"exrid\")\n            aov.FileName.set(\"{openExrIdFile}\")\n\n    utils.SetRange(\"{frameRange}\")\n    utils.SetOptims()\n\n    if \"{jobType}\" == \"LD\":\n        utils.SetLowRenderParms()\n    else:\n        utils.SetFinalRenderParms()\n\n    prefNode = guerilla.Document().findchild(\"Preferences\")\n\n    prefNode.RenderfarmSequence.set(\"{jobName}\")\n    prefNode.DeferredRibGen.set(True)\n\n    renderPass = guerilla.Document().findchild(\"RenderPass\")\n    renderPass.FileName.set(\"{renderFile}\")\n    renderPass.DisplayDriver.set(\"exr\")\n\nsceneDir = guerilla.envcontext.getenv(\"SCENE_PATH\")\njobsDir = \"{{}}/jobs\".format(sceneDir)\n\noptions = guerilla.renderoptions({{}})\n\noptions[\"JobsDirectory\"] = jobsDir\noptions[\"DeferredRibGenBatch\"] = 0\noptions[\"DeferredFile\"] = \"{{}}/{{}}_ribgen_{{}}.gproject\".format(jobsDir, options[\"FilePrefix\"], options[\"RenderId\"])\n\nscriptFiles = guerilla.render(\"none\", options)\n\nribgenScriptFile = scriptFiles[0].getscriptfile(0)\nrenderScriptFile = scriptFiles[1].getscriptfile(0)\n\nprint(\"RIBGEN_SCRIPT_FILE={{}}\".format(\"{{}}/{{}}\".format(jobsDir, ribgenScriptFile)))\nprint(\"RENDER_SCRIPT_FILE={{}}\".format(\"{{}}/{{}}\".format(jobsDir, renderScriptFile)))\n\nguerilla.Document().save()\n\"\"\"\n\n# Start the guerilla scene and execute the script to prepare it\n\ntmpScriptFilePath = BoltTempScript()\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(generatedScript)\n\nBoltLogMessage(f\"GuerillaBatch : Start executing script : {tmpScriptFilePath}\")\n\nif platform.system == \"windows\":\n    command = [f\"{inenvironment['GUERILLA']}/guerillaBatch\", \"--nogui\"] \n    \n    if os.path.exists(inguerillafile):\n        command.append(inguerillafile)\n    \n    command.append(tmpScriptFilePath)\nelse:\n    command = [f\"{inenvironment['GUERILLA']}/guerilla\", \"--nogui\"]\n\n    if os.path.exists(inguerillafile):\n        command.append(inguerillafile)\n    \n    command.append(tmpScriptFilePath)\n\nBoltLogMessage(f\"GuerillaBatch Command : {' '.join(command)}\")\n\nenv = os.environ.copy()\nenv.update(inenvironment)\n\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, env=env)\n\nstdout, stderr = process.communicate()\n\nstdoutAsStr = stdout.decode(\"utf-8\")\nstderrAsStr = stderr.decode(\"utf-8\")\n\nif len(stderrAsStr) > 0:\n    BoltLogError(stderrAsStr)\nelse:\n    BoltLogMessage(f\"GuerillaBatch : Finished executing script : {tmpScriptFilePath}\")\n    BoltLogMessage(stdoutAsStr)\n\n# Get the generated guerilla scriptfiles paths\n\nribgenScriptPattern = r\"RIBGEN_SCRIPT_FILE=(\\S+)\"\nrenderScriptPattern = r\"RENDER_SCRIPT_FILE=(\\S+)\"\n\nribGenScriptFilePath = re.findall(ribgenScriptPattern, stdoutAsStr)[0]\nrenderScriptFilePath = re.findall(renderScriptPattern, stdoutAsStr)[0]\n\ntmpDirPath = BoltTempDir()\n\n# Render Job Infos\nrenderJobInfoFile = f\"{tmpDirPath}/render_job_info_{currentTimeStr}.job\"\n\nwith open(renderJobInfoFile, \"w\") as file:\n    file.write(generatedRenderJobInfos) \n\n# Render Plugin Infos\nrenderJobPluginFile = f\"{tmpDirPath}/render_plugin_info_{currentTimeStr}.job\"\n\nwith open(renderJobPluginFile, \"w\") as file:\n    file.write(f\"ScriptFile={renderScriptFilePath}\\nScriptArgs=\\\"--frame={frameRange.split('-')[0]}\\\"\")\n\n# Ribgen Job Infos\nribgenJobInfoFile = f\"{tmpDirPath}/ribgen_job_info_{currentTimeStr}.job\"\n\nwith open(ribgenJobInfoFile, \"w\") as file:\n    file.write(generatedRibgenJobInfos)\n\n# Ribgen Plugin Infos\nribgenJobPluginFile = f\"{tmpDirPath}/ribgen_plugin_info_{currentTimeStr}.job\"\n\nwith open(ribgenJobPluginFile, \"w\") as file:\n    file.write(f\"ScriptFile={ribGenScriptFilePath}\\nScriptArgs=\")\n\noutribgenjobinfofile = ribgenJobInfoFile\noutribgenplugininfofile = ribgenJobPluginFile\noutrenderjobinfofile = renderJobInfoFile\noutrenderplugininfofile = renderJobPluginFile\noutrenderdir = renderDir\n\n\n\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inguerillafile": [
+          {
+            "shortName": "inguerillafile",
+            "longName": "Scene File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outfile",
+            "connectionNodeId": "6133313433643361616136663439393130343533663633393430336237373161"
+          }
+        ],
+        "inenvironment": [
+          {
+            "shortName": "inenvironment",
+            "longName": "Environment",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib"
+            },
+            "defaultData": {
+              "DEADLINEPATH": "C:/Program Files/Thinkbox/Deadline10;C:/Program Files/Thinkbox/Deadline10/bin",
+              "GUERILLA": "P:/GUERILLA/2.3.0.13_Romain",
+              "GUERILLA_PYTHON_LIBRARY": "P:/PYTHON/Python27_Romain/python27.dll;P:/PYTHON/Python27_Romain",
+              "OCIO": "P:/COLOR/aces_1.2/config.ocio",
+              "PATH": "%PYTHONHOME%;%PATH%",
+              "PYTHONHOME": "P:/PYTHON/Python27_Romain",
+              "PYTHONPATH": "P:/PYTHON/Python27_Romain;P:/PYTHON/Python27_Romain/Lib"
+            },
+            "type": 10,
+            "connectionName": "outenvironment",
+            "connectionNodeId": "6138613631313065633231633337393162313637356537393734363963373561"
+          }
+        ],
+        "injoboptions": [
+          {
+            "shortName": "injoboptions",
+            "longName": "Job Options",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {
+              "ChunkSize": 1,
+              "Comment": "",
+              "Department": "",
+              "EnableAutoTimeout": false,
+              "Group": "all",
+              "JobDependencies": "",
+              "LimitConcurrentTasksToNumberOfCpus": true,
+              "LimitGroups": "",
+              "MachineLimit": 0,
+              "OnJobComplete": "Nothing",
+              "Pool": "w456",
+              "SecondaryPool": "rdf",
+              "TaskTimeoutMinutes": 0,
+              "Whitelist": ""
+            },
+            "defaultData": {
+              "ChunkSize": 1,
+              "Comment": "",
+              "Department": "",
+              "EnableAutoTimeout": false,
+              "Group": "all",
+              "JobDependencies": "",
+              "LimitConcurrentTasksToNumberOfCpus": true,
+              "LimitGroups": "",
+              "MachineLimit": 0,
+              "OnJobComplete": "Nothing",
+              "Pool": "w456",
+              "SecondaryPool": "rdf",
+              "TaskTimeoutMinutes": 0,
+              "Whitelist": ""
+            },
+            "type": 10,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ],
+        "inrenderoptions": [
+          {
+            "shortName": "inrenderoptions",
+            "longName": "Render Options",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {
+              "FrameRange": "100-240",
+              "Optims": true,
+              "SequenceName": "sequence",
+              "ShotName": "shot",
+              "Team": "oeuf",
+              "Type": "LD"
+            },
+            "defaultData": {
+              "FrameRange": "100-240",
+              "Optims": true,
+              "SequenceName": "sequence",
+              "ShotName": "shot",
+              "Team": "oeuf",
+              "Type": "LD"
+            },
+            "type": 10,
+            "connectionName": "outrenderoptions",
+            "connectionNodeId": "3732386138313437336136623862333263616630366262333961643030663837"
+          }
+        ],
+        "inrenderdir": [
+          {
+            "shortName": "inrenderdir",
+            "longName": "Render Directory",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/RENDER",
+            "defaultData": "Z:/OEUF/RENDER",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ],
+        "inrenderpasses": [
+          {
+            "shortName": "inrenderpasses",
+            "longName": "Render Passes",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              "Albedo",
+              "Diffuse",
+              "IndDiffuse",
+              "Specular",
+              "Reflection",
+              "Refraction",
+              "SSS",
+              "Incandescence",
+              "Z",
+              "MotionVector",
+              "Shadows",
+              "ShadowMask",
+              "BeautyKey",
+              "BeautyFill",
+              "BeautyRim",
+              "BeautyEnv"
+            ],
+            "defaultData": [
+              "Albedo",
+              "Diffuse",
+              "IndDiffuse",
+              "Specular",
+              "Reflection",
+              "Refraction",
+              "SSS",
+              "Incandescence",
+              "Z",
+              "MotionVector",
+              "Shadows",
+              "ShadowMask",
+              "BeautyKey",
+              "BeautyFill",
+              "BeautyRim",
+              "BeautyEnv"
+            ],
+            "type": 9,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outribgenjobinfofile": [
+          {
+            "shortName": "outribgenjobinfofile",
+            "longName": "Output Ribgen Job Info File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "inribgenjobinfo",
+            "connectionNodeId": "3662633930323037623534666338353830343666633362333333643163346264"
+          }
+        ],
+        "outribgenplugininfofile": [
+          {
+            "shortName": "outribgenplugininfofile",
+            "longName": "Output Ribgen Plugin Info File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "inribgenplugininfo",
+            "connectionNodeId": "3662633930323037623534666338353830343666633362333333643163346264"
+          }
+        ],
+        "outrenderjobinfofile": [
+          {
+            "shortName": "outrenderjobinfofile",
+            "longName": "Output Render Job Info File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "inrenderjobinfo",
+            "connectionNodeId": "3662633930323037623534666338353830343666633362333333643163346264"
+          }
+        ],
+        "outrenderplugininfofile": [
+          {
+            "shortName": "outrenderplugininfofile",
+            "longName": "Output Render Plugin Info File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ],
+        "outrenderdir": [
+          {
+            "shortName": "outrenderdir",
+            "longName": "Output Render Directory",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "indata",
+            "connectionNodeId": "3034663162366363643930373837623530663031313362353236306532343237"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Deadline_WaitForJobFinished",
+      "category": "Deadline",
+      "id": "3934303435383636343131383961653666623734393730623333653536663535",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$BOLT_ICONS/deadline.png",
+      "definitionPath": "$BOLT_LIB/Nodes/deadline_wait_for_job.bnode",
+      "nodeType": "Deadline/Deadline_WaitForJobFinished",
+      "opCode": "\nimport subprocess, time\n\nBoltLogMessage(f\"Deadline : Waiting for job {injobid}\")\n\njobIsNotComplete = True\n\nwhile jobIsNotComplete:\n\n    process = subprocess.Popen([\"deadlinecommand\", \"-GetJob\", injobid], stdout = subprocess.PIPE, stderr = subprocess.PIPE)\n    stdout, stderr = process.communicate()\n\n    stdoutAsStr = stdout.decode(\"utf-8\")\n    stderrAsStr = stderr.decode(\"utf-8\")\n\n    for line in stdoutAsStr.splitlines():\n        if line.startswith(\"JobStatus\"):\n            jobStatus = line.split(\"=\")[1]\n\n            if jobStatus == \"Completed\":\n                jobIsNotComplete = False\n                outjobcomplete = True\n                BoltLogMessage(f\"Deadline : Job {injobid} is complete\")\n                break\n            elif jobStatus == \"Failed\":\n                jobIsNotComplete = False\n                outjobcomplete = False\n                BoltLogWarning(f\"Deadline : Job {injobid} is failed\")\n                break\n            else:\n                time.sleep(60)\n                break\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "injobid": [
+          {
+            "shortName": "injobid",
+            "longName": "Job ID",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outrenderjobid",
+            "connectionNodeId": "3662633930323037623534666338353830343666633362333333643163346264"
+          }
+        ]
+      },
+      "outputs": {
+        "outjobcomplete": [
+          {
+            "shortName": "outjobcomplete",
+            "longName": "Job Complete",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": true,
+            "defaultData": true,
+            "type": 8,
+            "connectionName": "incondition",
+            "connectionNodeId": "6139623863323131323932323566643431643862373166643462376138643335"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Debug",
+      "category": "Debug",
+      "id": "3034663162366363643930373837623530663031313362353236306532343237",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$BOLT_ICONS/debug.png",
+      "definitionPath": "$BOLT_LIB/Nodes/debug.bnode",
+      "nodeType": "Debug/Debug",
+      "opCode": "\nBoltLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outrenderdir",
+            "connectionNodeId": "3534396663623431333835383834373461636530363139306432346462303061"
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "input",
+            "connectionNodeId": "6139623863323131323932323566643431643862373166643462376138643335"
+          }
+        ]
+      }
+    },
+    {
+      "name": "If_Begin",
+      "category": "Utility",
+      "id": "6139623863323131323932323566643431643862373166643462376138643335",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$BOLT_ICONS/block.png",
+      "definitionPath": "D:/dev/Bolt/Library/Nodes/ifbegin.bnode",
+      "nodeType": "Utility/If_Begin",
+      "opCode": "\noutput = input\n\n",
+      "disabled": false,
+      "isIfBegin": true,
+      "associatedEndBlockId": "6532623361303334613830333737393034303764653062613765626435356635",
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "input": [
+          {
+            "shortName": "input",
+            "longName": "Input",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outdata",
+            "connectionNodeId": "3034663162366363643930373837623530663031313362353236306532343237"
+          }
+        ],
+        "incondition": [
+          {
+            "shortName": "incondition",
+            "longName": "Condition",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": true,
+            "defaultData": true,
+            "type": 8,
+            "connectionName": "outjobcomplete",
+            "connectionNodeId": "3934303435383636343131383961653666623734393730623333653536663535"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "inrenderdir",
+            "connectionNodeId": "3139336132656639393435656665363762393165333261623033653835306339"
+          }
+        ]
+      }
+    },
+    {
+      "name": "If_End",
+      "category": "Utility",
+      "id": "6532623361303334613830333737393034303764653062613765626435356635",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$BOLT_ICONS/block.png",
+      "definitionPath": "D:/dev/Bolt/Library/Nodes/ifend.bnode",
+      "nodeType": "Utility/If_End",
+      "opCode": "\noutput = input\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": true,
+      "associatedBeginBlockId": "6139623863323131323932323566643431643862373166643462376138643335",
+      "inputs": {
+        "input": [
+          {
+            "shortName": "input",
+            "longName": "Input",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outfile",
+            "connectionNodeId": "3237346335613734336532323564643862356435653466313763343563636638"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "NK_GenerateDaily",
+      "category": "Nuke",
+      "id": "3139336132656639393435656665363762393165333261623033653835306339",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$BOLT_ICONS/nuke.png",
+      "definitionPath": "$BOLT_LIB/Nodes/nk_generatedaily.bnode",
+      "nodeType": "Nuke/NK_GenerateDaily",
+      "opCode": "\ngeneratedScript = f\"\"\"import nuke, os, sys\n\nnuke.scriptOpen(\"{innuketemplate}\")\n\nseqs = nuke.getFileNameList(\"{inrenderdir}\")\n\noutputfile = \"{inrenderdir}/daily/daily.mov\"\n\nif len(seqs) > 0:\n    if not os.path.exists(outputfile):\n        os.makedirs(os.path.dirname(outputfile))\n\n    read = nuke.toNode(\"MAIN_READ\")\n    read.knob(\"file\").fromUserText(\"{inrenderdir}/\" + seqs[0])\n\n    write = nuke.toNode(\"MAIN_WRITE\")\n    write.knob(\"file\").fromUserText(outputfile)\n\n    first = int(read.knob(\"first\").getValue())\n    last = int(read.knob(\"last\").getValue())\n\n    nuke.execute(\"MAIN_WRITE\", start=first, end=last, incr=1)\n\nelse:\n    sys.stderr.write(\"[ERROR] Nk_GenerateDaily : No file sequence found\")\n\n\"\"\"\n\ntmpScriptFilePath = BoltTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as file:\n    file.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inrenderdir": [
+          {
+            "shortName": "inrenderdir",
+            "longName": "Render Directory",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "output",
+            "connectionNodeId": "6139623863323131323932323566643431643862373166643462376138643335"
+          }
+        ],
+        "innuketemplate": [
+          {
+            "shortName": "innuketemplate",
+            "longName": "Nuke Template File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "D:/dev/Bolt/Library/Templates/Nuke/generate_daily.nk",
+            "defaultData": "D:/dev/Bolt/Library/Templates/Nuke/generate_daily.nk",
+            "type": 7,
+            "connectionName": "outfile",
+            "connectionNodeId": "6561643865303663626362386536663164393838623130643862376639303535"
+          }
+        ]
+      },
+      "outputs": {
+        "outscriptfile": [
+          {
+            "shortName": "outscriptfile",
+            "longName": "Script File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "inscriptfile",
+            "connectionNodeId": "3237346335613734336532323564643862356435653466313763343563636638"
+          }
+        ],
+        "outrenderdir": [
+          {
+            "shortName": "outrenderdir",
+            "longName": "Render Directory",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "NK_NukePy",
+      "category": "Nuke",
+      "id": "3237346335613734336532323564643862356435653466313763343563636638",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$BOLT_ICONS/nuke.png",
+      "definitionPath": "$BOLT_LIB/Nodes/nk_nukepy.bnode",
+      "nodeType": "Nuke/NK_NukePy",
+      "opCode": "\n# BeginOp\n\nimport subprocess, os\n\nBoltLogMessage(f\"NukeBatch : Start executing script : {inscriptfile}\")\n\ncommand = [f\"{innukebindir}\", \"-t\", inscriptfile]\n\nfor arg in inargs:\n    command.append(arg)\n\nBoltLogMessage(f\"NukeBatch Command : {' '.join(command)}\")\n\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, encoding=\"utf-8\")\nstdout, stderr = process.communicate()\n\ntry:\n    stdoutAsStr = stdout\n    stderrAsStr = stderr\n\n    if len(stderrAsStr) > 0:\n        BoltLogError(stderrAsStr)\n    else:\n        BoltLogMessage(f\"NukeBatch : Finished executing script\")\n        BoltLogMessage(stdoutAsStr)\n\n        for line in stdoutAsStr.splitlines():\n            if line.startswith(\"OUTPUTFILE\"):\n                outfile = line.split(\"=\")[1].strip()\nexcept Exception as e:\n    BoltLogMessage(e)\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inscriptfile": [
+          {
+            "shortName": "inscriptfile",
+            "longName": "Script File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outscriptfile",
+            "connectionNodeId": "3139336132656639393435656665363762393165333261623033653835306339"
+          }
+        ],
+        "inargs": [
+          {
+            "shortName": "inargs",
+            "longName": "Script Arguments",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [],
+            "defaultData": [],
+            "type": 9,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ],
+        "innukebindir": [
+          {
+            "shortName": "innukebindir",
+            "longName": "Nuke Binary Directory",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "C:/Program Files/Nuke13.0v5/Nuke13.0.exe",
+            "defaultData": "C:/Program Files/Nuke13.0v5/Nuke13.0.exe",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "input",
+            "connectionNodeId": "6532623361303334613830333737393034303764653062613765626435356635"
+          }
+        ]
+      }
+    },
+    {
+      "name": "File1",
+      "category": "Utility",
+      "id": "6561643865303663626362386536663164393838623130643862376639303535",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "$BOLT_ICONS/file.png",
+      "definitionPath": "$BOLT_LIB/Nodes/file.bnode",
+      "nodeType": "Utility/File",
+      "opCode": "\noutfile = infile\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infile": [
+          {
+            "shortName": "infile",
+            "longName": "Input File Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "D:/dev/Bolt/Library/Templates/Nuke/generate_daily.nk",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "innuketemplate",
+            "connectionNodeId": "3139336132656639393435656665363762393165333261623033653835306339"
+          }
+        ]
+      }
+    }
+  ],
+  "tracker": null,
+  "positions": [
+    {
+      "id": "3237346335613734336532323564643862356435653466313763343563636638",
+      "x": 2650.0,
+      "y": 300.0
+    },
+    {
+      "id": "6139623863323131323932323566643431643862373166643462376138643335",
+      "x": 2000.0,
+      "y": 300.0
+    },
+    {
+      "id": "6532623361303334613830333737393034303764653062613765626435356635",
+      "x": 2950.0,
+      "y": 300.0
+    },
+    {
+      "id": "3139336132656639393435656665363762393165333261623033653835306339",
+      "x": 2250.0,
+      "y": 300.0
+    },
+    {
+      "id": "3662633930323037623534666338353830343666633362333333643163346264",
+      "x": 900.0,
+      "y": 300.0
+    },
+    {
+      "id": "6133313433643361616136663439393130343533663633393430336237373161",
+      "x": -150.0,
+      "y": 300.0
+    },
+    {
+      "id": "6138613631313065633231633337393162313637356537393734363963373561",
+      "x": -150.0,
+      "y": 450.0
+    },
+    {
+      "id": "3034663162366363643930373837623530663031313362353236306532343237",
+      "x": 1450.0,
+      "y": 700.0
+    },
+    {
+      "id": "3732386138313437336136623862333263616630366262333961643030663837",
+      "x": -150.0,
+      "y": 600.0
+    },
+    {
+      "id": "3534396663623431333835383834373461636530363139306432346462303061",
+      "x": 350.0,
+      "y": 300.0
+    },
+    {
+      "id": "3934303435383636343131383961653666623734393730623333653536663535",
+      "x": 1450.0,
+      "y": 300.0
+    },
+    {
+      "id": "6561643865303663626362386536663164393838623130643862376639303535",
+      "x": 2000.0,
+      "y": 500.0
+    }
+  ]
+}

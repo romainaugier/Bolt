@@ -10,7 +10,7 @@
         106
       ],
       "iconPath": "",
-      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/file.fnode",
+      "definitionPath": "C:/Users/augie/Documents/Bolt/Library/Nodes/file.fnode",
       "nodeType": "Utility/File",
       "opCode": "# BeginOp\n\noutfile = infile\n\n",
       "disabled": false,
@@ -63,7 +63,7 @@
         0
       ],
       "iconPath": "",
-      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/ifbegin.fnode",
+      "definitionPath": "C:/Users/augie/Documents/Bolt/Library/Nodes/ifbegin.fnode",
       "nodeType": "Utility/If_Begin",
       "opCode": "# BeginOp\n\noutput = input\n\n",
       "disabled": false,
@@ -131,7 +131,7 @@
         0
       ],
       "iconPath": "",
-      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/ifend.fnode",
+      "definitionPath": "C:/Users/augie/Documents/Bolt/Library/Nodes/ifend.fnode",
       "nodeType": "Utility/If_End",
       "opCode": "# BeginOp\n\noutput = input\n\n",
       "disabled": false,
@@ -183,10 +183,10 @@
         222,
         132
       ],
-      "iconPath": "$FLASH_ICONS/debug.png",
-      "definitionPath": "C:/Users/augie/Documents/Flash/Library/Nodes/debug.fnode",
+      "iconPath": "$BOLT_ICONS/debug.png",
+      "definitionPath": "C:/Users/augie/Documents/Bolt/Library/Nodes/debug.fnode",
       "nodeType": "Debug/Debug",
-      "opCode": "# BeginOp\n\nFlashLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+      "opCode": "# BeginOp\n\nBoltLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
       "disabled": false,
       "isIfBegin": false,
       "associatedEndBlockId": null,

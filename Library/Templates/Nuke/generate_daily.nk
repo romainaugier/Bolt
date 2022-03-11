@@ -33,7 +33,7 @@ define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
 }
 Root {
  inputs 0
- name D:/dev/Flash/Library/Templates/Nuke/generate_daily.nk
+ name D:/dev/Bolt/Library/Templates/Nuke/generate_daily.nk
  last_frame 120
  lock_range true
  format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"

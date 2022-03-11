@@ -86,7 +86,7 @@
         0,
         0
       ],
-      "iconPath": "$FLASH_ICONS/merge.png",
+      "iconPath": "$BOLT_ICONS/merge.png",
       "opCode": "# BeginOp\n\nif type(input1) is list:\n    if type(input2) is list:\n        output = [*input1, *input2]\n    else:\n        output = [*input1, input2]\nelif type(input2) is list:\n    output = [input1, *input2]\nelse:\n    output = [input1, input2]\n\n",
       "inputs": {
         "input1": [
@@ -148,7 +148,7 @@
         0,
         0
       ],
-      "iconPath": "$FLASH_ICONS/merge.png",
+      "iconPath": "$BOLT_ICONS/merge.png",
       "opCode": "# BeginOp\n\nif type(input1) is list:\n    if type(input2) is list:\n        output = [*input1, *input2]\n    else:\n        output = [*input1, input2]\nelif type(input2) is list:\n    output = [input1, *input2]\nelse:\n    output = [input1, input2]\n\n",
       "inputs": {
         "input1": [
@@ -206,7 +206,7 @@
         0,
         0
       ],
-      "iconPath": "$FLASH_ICONS/merge.png",
+      "iconPath": "$BOLT_ICONS/merge.png",
       "opCode": "# BeginOp\n\nif type(input1) is list:\n    if type(input2) is list:\n        output = [*input1, *input2]\n    else:\n        output = [*input1, input2]\nelif type(input2) is list:\n    output = [input1, *input2]\nelse:\n    output = [input1, input2]\n\n",
       "inputs": {
         "input1": [
@@ -266,8 +266,8 @@
         0,
         0
       ],
-      "iconPath": "$FLASH_ICONS/guerilla-render.png",
-      "opCode": "# BeginOp\n\nif type(inabcfiles) is str:\n    inabcfiles = [inabcfiles]\n\ngeneratedScript = f\"\"\"import guerilla, os\n\npaths = {inabcfiles}\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    with guerilla.Modifier() as mod:\n        mod.createref(name, path, options={{ 'prefixnodes' : False,'containschildren' : True }})\n\nguerilla.Document().save()\n\"\"\"\n\ntmpScriptFilePath = FlashTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\noutscripttext = generatedScript\n\n",
+      "iconPath": "$BOLT_ICONS/guerilla-render.png",
+      "opCode": "# BeginOp\n\nif type(inabcfiles) is str:\n    inabcfiles = [inabcfiles]\n\ngeneratedScript = f\"\"\"import guerilla, os\n\npaths = {inabcfiles}\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    with guerilla.Modifier() as mod:\n        mod.createref(name, path, options={{ 'prefixnodes' : False,'containschildren' : True }})\n\nguerilla.Document().save()\n\"\"\"\n\ntmpScriptFilePath = BoltTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\noutscripttext = generatedScript\n\n",
       "inputs": {
         "inabcfiles": [
           {
@@ -295,7 +295,7 @@
             "longName": "Output Script File",
             "index": 0,
             "isExposed": false,
-            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Flash/6437336334323639623737643330363331386630653435343930313332343864.py",
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Bolt/6437336334323639623737643330363331386630653435343930313332343864.py",
             "type": 7,
             "connectionName": "inscript1",
             "connectionNodeId": "3463383565626230356530353834653431343037323738316135363561383430"
@@ -323,8 +323,8 @@
         0,
         0
       ],
-      "iconPath": "$FLASH_ICONS/guerilla-render.png",
-      "opCode": "# BeginOp\n\nif type(inrgfiles) is str:\n    inabcfiles = [inrgfiles]\n\ngeneratedScript = f\"\"\"import guerilla, os\n\npaths = {inrgfiles}\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    loaded = guerilla.Document().loadfile(path)\n\n    if not loaded:\n        FlashLogWarning(\"Could not load {{}} in guerilla file\".format(name))\n\nguerilla.Document().save()\n\"\"\"\n\ntmpScriptFilePath = FlashTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\noutscripttext = generatedScript\n\n",
+      "iconPath": "$BOLT_ICONS/guerilla-render.png",
+      "opCode": "# BeginOp\n\nif type(inrgfiles) is str:\n    inabcfiles = [inrgfiles]\n\ngeneratedScript = f\"\"\"import guerilla, os\n\npaths = {inrgfiles}\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    loaded = guerilla.Document().loadfile(path)\n\n    if not loaded:\n        BoltLogWarning(\"Could not load {{}} in guerilla file\".format(name))\n\nguerilla.Document().save()\n\"\"\"\n\ntmpScriptFilePath = BoltTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\noutscripttext = generatedScript\n\n",
       "inputs": {
         "inrgfiles": [
           {
@@ -351,7 +351,7 @@
             "longName": "Output Script File",
             "index": 0,
             "isExposed": false,
-            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Flash/3161306463323361363963656566303432303235323932343332613862393865.py",
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Bolt/3161306463323361363963656566303432303235323932343332613862393865.py",
             "type": 7,
             "connectionName": "inscript2",
             "connectionNodeId": "3463383565626230356530353834653431343037323738316135363561383430"
@@ -363,7 +363,7 @@
             "longName": "Output Script Text",
             "index": 0,
             "isExposed": false,
-            "data": "import guerilla, os\n\npaths = ['Z:/OEUF/RnD/trees/rendergraphs/trees.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/leaves2.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/leaves3.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/lighting.grendergraph']\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    loaded = guerilla.Document().loadfile(path)\n\n    if not loaded:\n        FlashLogWarning(\"Could not load {} in guerilla file\".format(name))\n\nguerilla.Document().save()\n",
+            "data": "import guerilla, os\n\npaths = ['Z:/OEUF/RnD/trees/rendergraphs/trees.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/leaves2.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/leaves3.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/lighting.grendergraph']\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    loaded = guerilla.Document().loadfile(path)\n\n    if not loaded:\n        BoltLogWarning(\"Could not load {} in guerilla file\".format(name))\n\nguerilla.Document().save()\n",
             "type": 7,
             "connectionName": null,
             "connectionNodeId": null
@@ -428,8 +428,8 @@
         115,
         165
       ],
-      "iconPath": "$FLASH_ICONS/python.png",
-      "opCode": "# BeginOp\n\nimport os, re\n\nscript1 = inscript1\nscript2 = inscript2\n\nscriptsAreFile = False\n\nif os.path.exists(script1):\n    with open(script1, \"r\") as scriptFile1:\n        script1 = scriptFile1.read()\n\nif os.path.exists(script2):\n    with open(script2, \"r\") as scriptFile2:\n        script2 = scriptFile2.read()\n\nimportPatterns = re.compile(r\"import\\s.+|from\\s.+\")\n\nimportMatches1 = re.findall(importPatterns, script1)\n\nimportMatches2 = re.findall(importPatterns, script2)\n\nmodulesToImport = []\nmodulesToImportAs = {}\nmodulesToImportFrom = {}\n\nfor importMatch in importMatches1:\n    if importMatch.startswith(\"import\"):\n        if \"as\" in importMatch:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importList = importMatch.split(\"as\")\n\n            modulesToImportAs[importList[0].replace(\" \", \"\")] = importList[1].replace(\" \", \"\")\n        else:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importMatch = importMatch.replace(\" \", \"\")\n            importList = importMatch.split(\",\")\n\n            for imp in importList: \n                modulesToImport.append(imp)\n    \n    elif importMatch.startswith(\"from\"):\n        importMatch = importMatch.replace(\"from\", \"\")\n        importList = importMatch.split(\"import\")\n\n        module = importList[0].replace(\" \", \"\")\n\n        elements = importList[1].split(\",\")\n\n        moduleElements = []\n\n        for elem in elements:\n            moduleElements.append(elem.replace(\" \", \"\"))\n\n        modulesToImportFrom[module] = moduleElements\n\nfor importMatch in importMatches2:\n    if importMatch.startswith(\"import\"):\n        if \"as\" in importMatch:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importList = importMatch.split(\"as\")\n\n            moduleName = importList[0].replace(\" \", \"\")\n            moduleAlias = importList[1].replace(\" \", \"\")\n\n            if moduleName in modulesToImportAs:\n                if moduleAlias == modulesToImportAs[moduleName]:\n                    pass\n                else:\n                    script2 = re.sub(fr\"({moduleAlias})\\.\", f\"{modulesToImportAs[moduleName]}.\", script2)\n            elif moduleName in modulesToImport:\n                script2 = re.sub(fr\"({moduleAlias})\\.\", f\"{moduleName}.\", script2)\n            else:\n                modulesToImportAs[moduleName] = moduleAlias\n        else:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importMatch = importMatch.replace(\" \", \"\")\n            importList = importMatch.split(\",\")\n\n            for imp in importList: \n                if imp in modulesToImportAs:\n                    script1 = re.sub(fr\"({modulesToImportAs[imp]})\\.\", f\"{imp}.\", script1)\n                    modulesToImportAs.pop(imp)\n                if not imp in modulesToImport:\n                    modulesToImport.append(imp)\n    \n    elif importMatch.startswith(\"from\"):\n        importMatch = importMatch.replace(\"from\", \"\")\n        importList = importMatch.split(\"import\")\n\n        module = importList[0].replace(\" \", \"\")\n\n        elements = importList[1].split(\",\")\n\n        moduleElements = []\n\n        for elem in elements:\n            moduleElements.append(elem.replace(\" \", \"\"))\n\n        if module in modulesToImportFrom:\n            for mod in moduleElements:\n                if not mod in modulesToImportFrom[module]:\n                    modulesToImportFrom[module].append(mod)\n        else:\n            modulesToImportFrom[module] = moduleElements\n\nfor importMatch in importMatches1:\n    script1 = script1.replace(importMatch, \"$\")\n\nfor importMatch in importMatches2:\n    script2 = script2.replace(importMatch, \"$\")\n\ndollarPattern = re.compile(r\"(\\$\\n)+\")\n\nscript1 = re.sub(dollarPattern, \"# Script 1\\n\", script1)\nscript2 = re.sub(dollarPattern, \"# Script 2\\n\", script2)\n\nmodulesToImportAsStr = \"import \"\n\nfor i, module in enumerate(modulesToImport):\n    if i == 0:\n        modulesToImportAsStr += f\"{module}\"\n    else:\n        modulesToImportAsStr += f\", {module}\"\n\nmodulesToImportAsAsStr = \"\"\n\nfor moduleName, moduleAlias in modulesToImportAs.items():\n    modulesToImportAsAsStr += f\"import {moduleName} as {moduleAlias}\"\n\nmodulesToImportFromAsStr = \"\"\n\nfor moduleName, subModules in modulesToImportFrom.items():\n    subModulesToImportFrom = f\"from {moduleName} import \"\n\n    for i, subModule in enumerate(subModules):\n        if i == 0:\n            subModulesToImportFrom += f\"{subModule}\"\n        else:\n            subModulesToImportFrom += f\", {subModule}\"\n\n    modulesToImportFromAsStr += f\"{subModulesToImportFrom}\\n\"\n\nmergedScripts = f\"{modulesToImportAsStr}\\n{modulesToImportAsAsStr}\\n{modulesToImportFromAsStr}\\n{script1}\\n{script2}\"\n\ntmpScriptFilePath = FlashTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(mergedScripts) \n\noutscript = tmpScriptFilePath.replace(\"\\\\\", \"/\")\noutscripttext = mergedScripts\n\n",
+      "iconPath": "$BOLT_ICONS/python.png",
+      "opCode": "# BeginOp\n\nimport os, re\n\nscript1 = inscript1\nscript2 = inscript2\n\nscriptsAreFile = False\n\nif os.path.exists(script1):\n    with open(script1, \"r\") as scriptFile1:\n        script1 = scriptFile1.read()\n\nif os.path.exists(script2):\n    with open(script2, \"r\") as scriptFile2:\n        script2 = scriptFile2.read()\n\nimportPatterns = re.compile(r\"import\\s.+|from\\s.+\")\n\nimportMatches1 = re.findall(importPatterns, script1)\n\nimportMatches2 = re.findall(importPatterns, script2)\n\nmodulesToImport = []\nmodulesToImportAs = {}\nmodulesToImportFrom = {}\n\nfor importMatch in importMatches1:\n    if importMatch.startswith(\"import\"):\n        if \"as\" in importMatch:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importList = importMatch.split(\"as\")\n\n            modulesToImportAs[importList[0].replace(\" \", \"\")] = importList[1].replace(\" \", \"\")\n        else:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importMatch = importMatch.replace(\" \", \"\")\n            importList = importMatch.split(\",\")\n\n            for imp in importList: \n                modulesToImport.append(imp)\n    \n    elif importMatch.startswith(\"from\"):\n        importMatch = importMatch.replace(\"from\", \"\")\n        importList = importMatch.split(\"import\")\n\n        module = importList[0].replace(\" \", \"\")\n\n        elements = importList[1].split(\",\")\n\n        moduleElements = []\n\n        for elem in elements:\n            moduleElements.append(elem.replace(\" \", \"\"))\n\n        modulesToImportFrom[module] = moduleElements\n\nfor importMatch in importMatches2:\n    if importMatch.startswith(\"import\"):\n        if \"as\" in importMatch:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importList = importMatch.split(\"as\")\n\n            moduleName = importList[0].replace(\" \", \"\")\n            moduleAlias = importList[1].replace(\" \", \"\")\n\n            if moduleName in modulesToImportAs:\n                if moduleAlias == modulesToImportAs[moduleName]:\n                    pass\n                else:\n                    script2 = re.sub(fr\"({moduleAlias})\\.\", f\"{modulesToImportAs[moduleName]}.\", script2)\n            elif moduleName in modulesToImport:\n                script2 = re.sub(fr\"({moduleAlias})\\.\", f\"{moduleName}.\", script2)\n            else:\n                modulesToImportAs[moduleName] = moduleAlias\n        else:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importMatch = importMatch.replace(\" \", \"\")\n            importList = importMatch.split(\",\")\n\n            for imp in importList: \n                if imp in modulesToImportAs:\n                    script1 = re.sub(fr\"({modulesToImportAs[imp]})\\.\", f\"{imp}.\", script1)\n                    modulesToImportAs.pop(imp)\n                if not imp in modulesToImport:\n                    modulesToImport.append(imp)\n    \n    elif importMatch.startswith(\"from\"):\n        importMatch = importMatch.replace(\"from\", \"\")\n        importList = importMatch.split(\"import\")\n\n        module = importList[0].replace(\" \", \"\")\n\n        elements = importList[1].split(\",\")\n\n        moduleElements = []\n\n        for elem in elements:\n            moduleElements.append(elem.replace(\" \", \"\"))\n\n        if module in modulesToImportFrom:\n            for mod in moduleElements:\n                if not mod in modulesToImportFrom[module]:\n                    modulesToImportFrom[module].append(mod)\n        else:\n            modulesToImportFrom[module] = moduleElements\n\nfor importMatch in importMatches1:\n    script1 = script1.replace(importMatch, \"$\")\n\nfor importMatch in importMatches2:\n    script2 = script2.replace(importMatch, \"$\")\n\ndollarPattern = re.compile(r\"(\\$\\n)+\")\n\nscript1 = re.sub(dollarPattern, \"# Script 1\\n\", script1)\nscript2 = re.sub(dollarPattern, \"# Script 2\\n\", script2)\n\nmodulesToImportAsStr = \"import \"\n\nfor i, module in enumerate(modulesToImport):\n    if i == 0:\n        modulesToImportAsStr += f\"{module}\"\n    else:\n        modulesToImportAsStr += f\", {module}\"\n\nmodulesToImportAsAsStr = \"\"\n\nfor moduleName, moduleAlias in modulesToImportAs.items():\n    modulesToImportAsAsStr += f\"import {moduleName} as {moduleAlias}\"\n\nmodulesToImportFromAsStr = \"\"\n\nfor moduleName, subModules in modulesToImportFrom.items():\n    subModulesToImportFrom = f\"from {moduleName} import \"\n\n    for i, subModule in enumerate(subModules):\n        if i == 0:\n            subModulesToImportFrom += f\"{subModule}\"\n        else:\n            subModulesToImportFrom += f\", {subModule}\"\n\n    modulesToImportFromAsStr += f\"{subModulesToImportFrom}\\n\"\n\nmergedScripts = f\"{modulesToImportAsStr}\\n{modulesToImportAsAsStr}\\n{modulesToImportFromAsStr}\\n{script1}\\n{script2}\"\n\ntmpScriptFilePath = BoltTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(mergedScripts) \n\noutscript = tmpScriptFilePath.replace(\"\\\\\", \"/\")\noutscripttext = mergedScripts\n\n",
       "inputs": {
         "inscript1": [
           {
@@ -437,7 +437,7 @@
             "longName": "Input Script 1",
             "index": 0,
             "isExposed": false,
-            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Flash/3739323063323465323236386465386361376636303135376332373134353561.py",
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Bolt/3739323063323465323236386465386361376636303135376332373134353561.py",
             "type": 7,
             "connectionName": "outscriptfile",
             "connectionNodeId": "6265333735666532376330326663393665323930656563303130343230663538"
@@ -449,7 +449,7 @@
             "longName": "Input Script 2",
             "index": 0,
             "isExposed": false,
-            "data": "C:/Users/r.augier/AppData/Roaming/Flash/3032626432653336663961343237373262623963356137363735313434356234.py",
+            "data": "C:/Users/r.augier/AppData/Roaming/Bolt/3032626432653336663961343237373262623963356137363735313434356234.py",
             "type": 7,
             "connectionName": "outscript",
             "connectionNodeId": "3463383565626230356530353834653431343037323738316135363561383430"
@@ -463,7 +463,7 @@
             "longName": "Output Script",
             "index": 0,
             "isExposed": false,
-            "data": "C:/Users/r.augier/AppData/Roaming/Flash/6361636336393763356137303762646663636264383538383062366331333035.py",
+            "data": "C:/Users/r.augier/AppData/Roaming/Bolt/6361636336393763356137303762646663636264383538383062366331333035.py",
             "type": 7,
             "connectionName": "inscript",
             "connectionNodeId": "3662373531373764306164663633646432633634313230366537313832653438"
@@ -475,7 +475,7 @@
             "longName": "Output Script Text",
             "index": 0,
             "isExposed": false,
-            "data": "import guerilla, os\nimport RomanoTools.Guerilla.Utils as utils\n\n# Script 1\n\n# Script 1\n\nutils.SetOptims()\nutils.SetRange(\"100-240\")\n\nrenderPass = guerilla.Document().findchild(\"RenderPass\")\n\nrenderPass.FileLayerName.set(\"$o_$n\")\n\nguerilla.Document().ProjectWidth.set(2048)\nguerilla.Document().ProjectHeight.set(858)\n\nguerilla.Document().save(\"Z:/OEUF/RnD/trees/lookdev/trees_lookdev.gproject\")\n\n# Script 2\n\n\n# Script 1\n\npaths = ['Z:/OEUF/RnD/trees/fbx/test_tree_2.abc', 'Z:/OEUF/RnD/trees/fbx/test_tree_3.abc', 'Z:/OEUF/RnD/trees/export/leaves_pcloud2.abc', 'Z:/OEUF/RnD/trees/export/leaves_pcloud3.abc', 'Z:/OEUF/RnD/trees/export/leave1.abc']\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    with guerilla.Modifier() as mod:\n        mod.createref(name, path, options={ 'prefixnodes' : False,'containschildren' : True })\n\nguerilla.Document().save()\n\n# Script 2\n\npaths = ['Z:/OEUF/RnD/trees/rendergraphs/trees.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/leaves2.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/leaves3.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/lighting.grendergraph']\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    loaded = guerilla.Document().loadfile(path)\n\n    if not loaded:\n        FlashLogWarning(\"Could not load {} in guerilla file\".format(name))\n\nguerilla.Document().save()\n",
+            "data": "import guerilla, os\nimport RomanoTools.Guerilla.Utils as utils\n\n# Script 1\n\n# Script 1\n\nutils.SetOptims()\nutils.SetRange(\"100-240\")\n\nrenderPass = guerilla.Document().findchild(\"RenderPass\")\n\nrenderPass.FileLayerName.set(\"$o_$n\")\n\nguerilla.Document().ProjectWidth.set(2048)\nguerilla.Document().ProjectHeight.set(858)\n\nguerilla.Document().save(\"Z:/OEUF/RnD/trees/lookdev/trees_lookdev.gproject\")\n\n# Script 2\n\n\n# Script 1\n\npaths = ['Z:/OEUF/RnD/trees/fbx/test_tree_2.abc', 'Z:/OEUF/RnD/trees/fbx/test_tree_3.abc', 'Z:/OEUF/RnD/trees/export/leaves_pcloud2.abc', 'Z:/OEUF/RnD/trees/export/leaves_pcloud3.abc', 'Z:/OEUF/RnD/trees/export/leave1.abc']\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    with guerilla.Modifier() as mod:\n        mod.createref(name, path, options={ 'prefixnodes' : False,'containschildren' : True })\n\nguerilla.Document().save()\n\n# Script 2\n\npaths = ['Z:/OEUF/RnD/trees/rendergraphs/trees.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/leaves2.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/leaves3.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/lighting.grendergraph']\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    loaded = guerilla.Document().loadfile(path)\n\n    if not loaded:\n        BoltLogWarning(\"Could not load {} in guerilla file\".format(name))\n\nguerilla.Document().save()\n",
             "type": 7,
             "connectionName": null,
             "connectionNodeId": null
@@ -491,8 +491,8 @@
         115,
         165
       ],
-      "iconPath": "$FLASH_ICONS/python.png",
-      "opCode": "# BeginOp\n\nimport os, re\n\nscript1 = inscript1\nscript2 = inscript2\n\nscriptsAreFile = False\n\nif os.path.exists(script1):\n    with open(script1, \"r\") as scriptFile1:\n        script1 = scriptFile1.read()\n\nif os.path.exists(script2):\n    with open(script2, \"r\") as scriptFile2:\n        script2 = scriptFile2.read()\n\nimportPatterns = re.compile(r\"import\\s.+|from\\s.+\")\n\nimportMatches1 = re.findall(importPatterns, script1)\n\nimportMatches2 = re.findall(importPatterns, script2)\n\nmodulesToImport = []\nmodulesToImportAs = {}\nmodulesToImportFrom = {}\n\nfor importMatch in importMatches1:\n    if importMatch.startswith(\"import\"):\n        if \"as\" in importMatch:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importList = importMatch.split(\"as\")\n\n            modulesToImportAs[importList[0].replace(\" \", \"\")] = importList[1].replace(\" \", \"\")\n        else:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importMatch = importMatch.replace(\" \", \"\")\n            importList = importMatch.split(\",\")\n\n            for imp in importList: \n                modulesToImport.append(imp)\n    \n    elif importMatch.startswith(\"from\"):\n        importMatch = importMatch.replace(\"from\", \"\")\n        importList = importMatch.split(\"import\")\n\n        module = importList[0].replace(\" \", \"\")\n\n        elements = importList[1].split(\",\")\n\n        moduleElements = []\n\n        for elem in elements:\n            moduleElements.append(elem.replace(\" \", \"\"))\n\n        modulesToImportFrom[module] = moduleElements\n\nfor importMatch in importMatches2:\n    if importMatch.startswith(\"import\"):\n        if \"as\" in importMatch:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importList = importMatch.split(\"as\")\n\n            moduleName = importList[0].replace(\" \", \"\")\n            moduleAlias = importList[1].replace(\" \", \"\")\n\n            if moduleName in modulesToImportAs:\n                if moduleAlias == modulesToImportAs[moduleName]:\n                    pass\n                else:\n                    script2 = re.sub(fr\"({moduleAlias})\\.\", f\"{modulesToImportAs[moduleName]}.\", script2)\n            elif moduleName in modulesToImport:\n                script2 = re.sub(fr\"({moduleAlias})\\.\", f\"{moduleName}.\", script2)\n            else:\n                modulesToImportAs[moduleName] = moduleAlias\n        else:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importMatch = importMatch.replace(\" \", \"\")\n            importList = importMatch.split(\",\")\n\n            for imp in importList: \n                if imp in modulesToImportAs:\n                    script1 = re.sub(fr\"({modulesToImportAs[imp]})\\.\", f\"{imp}.\", script1)\n                    modulesToImportAs.pop(imp)\n                if not imp in modulesToImport:\n                    modulesToImport.append(imp)\n    \n    elif importMatch.startswith(\"from\"):\n        importMatch = importMatch.replace(\"from\", \"\")\n        importList = importMatch.split(\"import\")\n\n        module = importList[0].replace(\" \", \"\")\n\n        elements = importList[1].split(\",\")\n\n        moduleElements = []\n\n        for elem in elements:\n            moduleElements.append(elem.replace(\" \", \"\"))\n\n        if module in modulesToImportFrom:\n            for mod in moduleElements:\n                if not mod in modulesToImportFrom[module]:\n                    modulesToImportFrom[module].append(mod)\n        else:\n            modulesToImportFrom[module] = moduleElements\n\nfor importMatch in importMatches1:\n    script1 = script1.replace(importMatch, \"$\")\n\nfor importMatch in importMatches2:\n    script2 = script2.replace(importMatch, \"$\")\n\ndollarPattern = re.compile(r\"(\\$\\n)+\")\n\nscript1 = re.sub(dollarPattern, \"# Script 1\\n\", script1)\nscript2 = re.sub(dollarPattern, \"# Script 2\\n\", script2)\n\nmodulesToImportAsStr = \"import \"\n\nfor i, module in enumerate(modulesToImport):\n    if i == 0:\n        modulesToImportAsStr += f\"{module}\"\n    else:\n        modulesToImportAsStr += f\", {module}\"\n\nmodulesToImportAsAsStr = \"\"\n\nfor moduleName, moduleAlias in modulesToImportAs.items():\n    modulesToImportAsAsStr += f\"import {moduleName} as {moduleAlias}\"\n\nmodulesToImportFromAsStr = \"\"\n\nfor moduleName, subModules in modulesToImportFrom.items():\n    subModulesToImportFrom = f\"from {moduleName} import \"\n\n    for i, subModule in enumerate(subModules):\n        if i == 0:\n            subModulesToImportFrom += f\"{subModule}\"\n        else:\n            subModulesToImportFrom += f\", {subModule}\"\n\n    modulesToImportFromAsStr += f\"{subModulesToImportFrom}\\n\"\n\nmergedScripts = f\"{modulesToImportAsStr}\\n{modulesToImportAsAsStr}\\n{modulesToImportFromAsStr}\\n{script1}\\n{script2}\"\n\ntmpScriptFilePath = FlashTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(mergedScripts) \n\noutscript = tmpScriptFilePath.replace(\"\\\\\", \"/\")\noutscripttext = mergedScripts\n\n",
+      "iconPath": "$BOLT_ICONS/python.png",
+      "opCode": "# BeginOp\n\nimport os, re\n\nscript1 = inscript1\nscript2 = inscript2\n\nscriptsAreFile = False\n\nif os.path.exists(script1):\n    with open(script1, \"r\") as scriptFile1:\n        script1 = scriptFile1.read()\n\nif os.path.exists(script2):\n    with open(script2, \"r\") as scriptFile2:\n        script2 = scriptFile2.read()\n\nimportPatterns = re.compile(r\"import\\s.+|from\\s.+\")\n\nimportMatches1 = re.findall(importPatterns, script1)\n\nimportMatches2 = re.findall(importPatterns, script2)\n\nmodulesToImport = []\nmodulesToImportAs = {}\nmodulesToImportFrom = {}\n\nfor importMatch in importMatches1:\n    if importMatch.startswith(\"import\"):\n        if \"as\" in importMatch:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importList = importMatch.split(\"as\")\n\n            modulesToImportAs[importList[0].replace(\" \", \"\")] = importList[1].replace(\" \", \"\")\n        else:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importMatch = importMatch.replace(\" \", \"\")\n            importList = importMatch.split(\",\")\n\n            for imp in importList: \n                modulesToImport.append(imp)\n    \n    elif importMatch.startswith(\"from\"):\n        importMatch = importMatch.replace(\"from\", \"\")\n        importList = importMatch.split(\"import\")\n\n        module = importList[0].replace(\" \", \"\")\n\n        elements = importList[1].split(\",\")\n\n        moduleElements = []\n\n        for elem in elements:\n            moduleElements.append(elem.replace(\" \", \"\"))\n\n        modulesToImportFrom[module] = moduleElements\n\nfor importMatch in importMatches2:\n    if importMatch.startswith(\"import\"):\n        if \"as\" in importMatch:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importList = importMatch.split(\"as\")\n\n            moduleName = importList[0].replace(\" \", \"\")\n            moduleAlias = importList[1].replace(\" \", \"\")\n\n            if moduleName in modulesToImportAs:\n                if moduleAlias == modulesToImportAs[moduleName]:\n                    pass\n                else:\n                    script2 = re.sub(fr\"({moduleAlias})\\.\", f\"{modulesToImportAs[moduleName]}.\", script2)\n            elif moduleName in modulesToImport:\n                script2 = re.sub(fr\"({moduleAlias})\\.\", f\"{moduleName}.\", script2)\n            else:\n                modulesToImportAs[moduleName] = moduleAlias\n        else:\n            importMatch = importMatch.replace(\"import\", \"\")\n            importMatch = importMatch.replace(\" \", \"\")\n            importList = importMatch.split(\",\")\n\n            for imp in importList: \n                if imp in modulesToImportAs:\n                    script1 = re.sub(fr\"({modulesToImportAs[imp]})\\.\", f\"{imp}.\", script1)\n                    modulesToImportAs.pop(imp)\n                if not imp in modulesToImport:\n                    modulesToImport.append(imp)\n    \n    elif importMatch.startswith(\"from\"):\n        importMatch = importMatch.replace(\"from\", \"\")\n        importList = importMatch.split(\"import\")\n\n        module = importList[0].replace(\" \", \"\")\n\n        elements = importList[1].split(\",\")\n\n        moduleElements = []\n\n        for elem in elements:\n            moduleElements.append(elem.replace(\" \", \"\"))\n\n        if module in modulesToImportFrom:\n            for mod in moduleElements:\n                if not mod in modulesToImportFrom[module]:\n                    modulesToImportFrom[module].append(mod)\n        else:\n            modulesToImportFrom[module] = moduleElements\n\nfor importMatch in importMatches1:\n    script1 = script1.replace(importMatch, \"$\")\n\nfor importMatch in importMatches2:\n    script2 = script2.replace(importMatch, \"$\")\n\ndollarPattern = re.compile(r\"(\\$\\n)+\")\n\nscript1 = re.sub(dollarPattern, \"# Script 1\\n\", script1)\nscript2 = re.sub(dollarPattern, \"# Script 2\\n\", script2)\n\nmodulesToImportAsStr = \"import \"\n\nfor i, module in enumerate(modulesToImport):\n    if i == 0:\n        modulesToImportAsStr += f\"{module}\"\n    else:\n        modulesToImportAsStr += f\", {module}\"\n\nmodulesToImportAsAsStr = \"\"\n\nfor moduleName, moduleAlias in modulesToImportAs.items():\n    modulesToImportAsAsStr += f\"import {moduleName} as {moduleAlias}\"\n\nmodulesToImportFromAsStr = \"\"\n\nfor moduleName, subModules in modulesToImportFrom.items():\n    subModulesToImportFrom = f\"from {moduleName} import \"\n\n    for i, subModule in enumerate(subModules):\n        if i == 0:\n            subModulesToImportFrom += f\"{subModule}\"\n        else:\n            subModulesToImportFrom += f\", {subModule}\"\n\n    modulesToImportFromAsStr += f\"{subModulesToImportFrom}\\n\"\n\nmergedScripts = f\"{modulesToImportAsStr}\\n{modulesToImportAsAsStr}\\n{modulesToImportFromAsStr}\\n{script1}\\n{script2}\"\n\ntmpScriptFilePath = BoltTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(mergedScripts) \n\noutscript = tmpScriptFilePath.replace(\"\\\\\", \"/\")\noutscripttext = mergedScripts\n\n",
       "inputs": {
         "inscript1": [
           {
@@ -500,7 +500,7 @@
             "longName": "Input Script 1",
             "index": 0,
             "isExposed": false,
-            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Flash/6437336334323639623737643330363331386630653435343930313332343864.py",
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Bolt/6437336334323639623737643330363331386630653435343930313332343864.py",
             "type": 7,
             "connectionName": "outscriptfile",
             "connectionNodeId": "3439323436383931333034636336383438373266323133383636353337646230"
@@ -512,7 +512,7 @@
             "longName": "Input Script 2",
             "index": 0,
             "isExposed": false,
-            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Flash/3161306463323361363963656566303432303235323932343332613862393865.py",
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Bolt/3161306463323361363963656566303432303235323932343332613862393865.py",
             "type": 7,
             "connectionName": "outscriptfile",
             "connectionNodeId": "6635303733383735623435326366333530666461303934616637333764376462"
@@ -526,7 +526,7 @@
             "longName": "Output Script",
             "index": 0,
             "isExposed": false,
-            "data": "C:/Users/r.augier/AppData/Roaming/Flash/3032626432653336663961343237373262623963356137363735313434356234.py",
+            "data": "C:/Users/r.augier/AppData/Roaming/Bolt/3032626432653336663961343237373262623963356137363735313434356234.py",
             "type": 7,
             "connectionName": "inscript2",
             "connectionNodeId": "6336623032666262646333633062313634306532663366333138656539383934"
@@ -538,7 +538,7 @@
             "longName": "Output Script Text",
             "index": 0,
             "isExposed": false,
-            "data": "import guerilla, os\n\n\n# Script 1\n\npaths = ['Z:/OEUF/RnD/trees/fbx/test_tree_2.abc', 'Z:/OEUF/RnD/trees/fbx/test_tree_3.abc', 'Z:/OEUF/RnD/trees/export/leaves_pcloud2.abc', 'Z:/OEUF/RnD/trees/export/leaves_pcloud3.abc', 'Z:/OEUF/RnD/trees/export/leave1.abc']\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    with guerilla.Modifier() as mod:\n        mod.createref(name, path, options={ 'prefixnodes' : False,'containschildren' : True })\n\nguerilla.Document().save()\n\n# Script 2\n\npaths = ['Z:/OEUF/RnD/trees/rendergraphs/trees.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/leaves2.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/leaves3.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/lighting.grendergraph']\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    loaded = guerilla.Document().loadfile(path)\n\n    if not loaded:\n        FlashLogWarning(\"Could not load {} in guerilla file\".format(name))\n\nguerilla.Document().save()\n",
+            "data": "import guerilla, os\n\n\n# Script 1\n\npaths = ['Z:/OEUF/RnD/trees/fbx/test_tree_2.abc', 'Z:/OEUF/RnD/trees/fbx/test_tree_3.abc', 'Z:/OEUF/RnD/trees/export/leaves_pcloud2.abc', 'Z:/OEUF/RnD/trees/export/leaves_pcloud3.abc', 'Z:/OEUF/RnD/trees/export/leave1.abc']\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    with guerilla.Modifier() as mod:\n        mod.createref(name, path, options={ 'prefixnodes' : False,'containschildren' : True })\n\nguerilla.Document().save()\n\n# Script 2\n\npaths = ['Z:/OEUF/RnD/trees/rendergraphs/trees.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/leaves2.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/leaves3.grendergraph', 'Z:/OEUF/RnD/trees/rendergraphs/lighting.grendergraph']\n\nfor path in paths:\n    name = os.path.basename(path)\n\n    loaded = guerilla.Document().loadfile(path)\n\n    if not loaded:\n        BoltLogWarning(\"Could not load {} in guerilla file\".format(name))\n\nguerilla.Document().save()\n",
             "type": 7,
             "connectionName": null,
             "connectionNodeId": null
@@ -554,8 +554,8 @@
         115,
         165
       ],
-      "iconPath": "$FLASH_ICONS/guerilla-render.png",
-      "opCode": "# BeginOp\n\nimport subprocess, platform, os\n\nFlashLogMessage(f\"GuerillaBatch : Start executing script : {inscript}\")\n\nif platform.system == \"windows\":\n    command = [f\"{inenvironment['GUERILLA']}/guerillaBatch\", \"--nogui\"] \n    \n    if os.path.exists(inguerillafile):\n        command.append(inguerillafile)\n    \n    command.append(inscript)\nelse:\n    command = [f\"{inenvironment['GUERILLA']}/guerilla\", \"--nogui\"]\n\n    if os.path.exists(inguerillafile):\n        command.append(inguerillafile)\n    \n    command.append(inscript)\n\nFlashLogMessage(f\"GuerillaBatch Command : {' '.join(command)}\")\n\nenv = os.environ.copy()\nenv.update(inenvironment)\n\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, env=env)\n\nstdout, stderr = process.communicate()\n\nstdoutAsStr = stdout.decode(\"utf-8\")\nstderrAsStr = stderr.decode(\"utf-8\")\n\nif len(stderrAsStr) > 0:\n    FlashLogError(stderrAsStr)\nelse:\n    FlashLogMessage(f\"GuerillaBatch : Finished executing script : {inscript}\")\n    FlashLogMessage(stdoutAsStr)\n\n",
+      "iconPath": "$BOLT_ICONS/guerilla-render.png",
+      "opCode": "# BeginOp\n\nimport subprocess, platform, os\n\nBoltLogMessage(f\"GuerillaBatch : Start executing script : {inscript}\")\n\nif platform.system == \"windows\":\n    command = [f\"{inenvironment['GUERILLA']}/guerillaBatch\", \"--nogui\"] \n    \n    if os.path.exists(inguerillafile):\n        command.append(inguerillafile)\n    \n    command.append(inscript)\nelse:\n    command = [f\"{inenvironment['GUERILLA']}/guerilla\", \"--nogui\"]\n\n    if os.path.exists(inguerillafile):\n        command.append(inguerillafile)\n    \n    command.append(inscript)\n\nBoltLogMessage(f\"GuerillaBatch Command : {' '.join(command)}\")\n\nenv = os.environ.copy()\nenv.update(inenvironment)\n\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, env=env)\n\nstdout, stderr = process.communicate()\n\nstdoutAsStr = stdout.decode(\"utf-8\")\nstderrAsStr = stderr.decode(\"utf-8\")\n\nif len(stderrAsStr) > 0:\n    BoltLogError(stderrAsStr)\nelse:\n    BoltLogMessage(f\"GuerillaBatch : Finished executing script : {inscript}\")\n    BoltLogMessage(stdoutAsStr)\n\n",
       "inputs": {
         "inscript": [
           {
@@ -563,7 +563,7 @@
             "longName": "Input Script Path",
             "index": 0,
             "isExposed": false,
-            "data": "C:/Users/r.augier/AppData/Roaming/Flash/6361636336393763356137303762646663636264383538383062366331333035.py",
+            "data": "C:/Users/r.augier/AppData/Roaming/Bolt/6361636336393763356137303762646663636264383538383062366331333035.py",
             "type": 7,
             "connectionName": "outscript",
             "connectionNodeId": "6336623032666262646333633062313634306532663366333138656539383934"
@@ -625,7 +625,7 @@
         0,
         0
       ],
-      "iconPath": "$FLASH_ICONS/volcan.png",
+      "iconPath": "$BOLT_ICONS/volcan.png",
       "opCode": "# BeginOp\n\noutenvironment = inenvironment\n\n",
       "inputs": {
         "inenvironment": [
@@ -737,7 +737,7 @@
         0,
         0
       ],
-      "iconPath": "$FLASH_ICONS/merge.png",
+      "iconPath": "$BOLT_ICONS/merge.png",
       "opCode": "# BeginOp\n\nif type(input1) is list:\n    if type(input2) is list:\n        output = [*input1, *input2]\n    else:\n        output = [*input1, input2]\nelif type(input2) is list:\n    output = [input1, *input2]\nelse:\n    output = [input1, input2]\n\n",
       "inputs": {
         "input1": [
@@ -862,8 +862,8 @@
         222,
         132
       ],
-      "iconPath": "$FLASH_ICONS/debug.png",
-      "opCode": "# BeginOp\n\nFlashLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+      "iconPath": "$BOLT_ICONS/debug.png",
+      "opCode": "# BeginOp\n\nBoltLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
       "inputs": {
         "indata": [
           {
@@ -901,8 +901,8 @@
         222,
         132
       ],
-      "iconPath": "$FLASH_ICONS/debug.png",
-      "opCode": "# BeginOp\n\nFlashLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+      "iconPath": "$BOLT_ICONS/debug.png",
+      "opCode": "# BeginOp\n\nBoltLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
       "inputs": {
         "indata": [
           {
@@ -956,8 +956,8 @@
         115,
         165
       ],
-      "iconPath": "$FLASH_ICONS/guerilla-render.png",
-      "opCode": "# BeginOp\n\nimport subprocess, os\n\nFlashLogMessage(f\"Guerilla : Start session\")\n\ncommand = [f\"{inenvironment['GUERILLA']}/guerilla\"] \n\nif os.path.exists(inguerillafile):\n    FlashLogMessage(f\"Guerilla : File : {inguerillafile}\")\n    command.append(inguerillafile)\n\nif os.path.exists(inscript):\n    FlashLogMessage(f\"Guerilla : Script : {inscript}\")\n    command.append(inscript)\n\nFlashLogMessage(f\"Guerilla Command : {' '.join(command)}\")\n\nenv = os.environ.copy()\nenv.update(inenvironment)\n\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, env=env)\n\nstdout, stderr = process.communicate()\n\nstdoutAsStr = stdout.decode(\"utf-8\")\nstderrAsStr = stderr.decode(\"utf-8\")\n\nif len(stderrAsStr) > 0:\n    FlashLogError(stderrAsStr)\nelse:\n    FlashLogMessage(f\"Guerilla : Finished session\")\n    FlashLogMessage(stdoutAsStr)\n\n",
+      "iconPath": "$BOLT_ICONS/guerilla-render.png",
+      "opCode": "# BeginOp\n\nimport subprocess, os\n\nBoltLogMessage(f\"Guerilla : Start session\")\n\ncommand = [f\"{inenvironment['GUERILLA']}/guerilla\"] \n\nif os.path.exists(inguerillafile):\n    BoltLogMessage(f\"Guerilla : File : {inguerillafile}\")\n    command.append(inguerillafile)\n\nif os.path.exists(inscript):\n    BoltLogMessage(f\"Guerilla : Script : {inscript}\")\n    command.append(inscript)\n\nBoltLogMessage(f\"Guerilla Command : {' '.join(command)}\")\n\nenv = os.environ.copy()\nenv.update(inenvironment)\n\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, env=env)\n\nstdout, stderr = process.communicate()\n\nstdoutAsStr = stdout.decode(\"utf-8\")\nstderrAsStr = stderr.decode(\"utf-8\")\n\nif len(stderrAsStr) > 0:\n    BoltLogError(stderrAsStr)\nelse:\n    BoltLogMessage(f\"Guerilla : Finished session\")\n    BoltLogMessage(stdoutAsStr)\n\n",
       "inputs": {
         "inscript": [
           {
@@ -1027,8 +1027,8 @@
         0,
         0
       ],
-      "iconPath": "$FLASH_ICONS/guerilla-render.png",
-      "opCode": "# BeginOp\n\nimport os\n\nif os.path.exists(infilepath):\n    os.remove(infilepath)\n\ngeneratedScript = f\"\"\"import guerilla\n\nimport RomanoTools.Guerilla.Utils as utils\n\nutils.SetOptims()\nutils.SetRange(\"{inframerange[0]}-{inframerange[1]}\")\n\nrenderPass = guerilla.Document().findchild(\"RenderPass\")\n\nrenderPass.FileLayerName.set(\"$o_$n\")\n\nguerilla.Document().ProjectWidth.set(2048)\nguerilla.Document().ProjectHeight.set(858)\n\nguerilla.Document().save(\"{infilepath}\")\n\"\"\"\n\ntmpScriptFilePath = FlashTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\noutscripttext = generatedScript\n\n",
+      "iconPath": "$BOLT_ICONS/guerilla-render.png",
+      "opCode": "# BeginOp\n\nimport os\n\nif os.path.exists(infilepath):\n    os.remove(infilepath)\n\ngeneratedScript = f\"\"\"import guerilla\n\nimport RomanoTools.Guerilla.Utils as utils\n\nutils.SetOptims()\nutils.SetRange(\"{inframerange[0]}-{inframerange[1]}\")\n\nrenderPass = guerilla.Document().findchild(\"RenderPass\")\n\nrenderPass.FileLayerName.set(\"$o_$n\")\n\nguerilla.Document().ProjectWidth.set(2048)\nguerilla.Document().ProjectHeight.set(858)\n\nguerilla.Document().save(\"{infilepath}\")\n\"\"\"\n\ntmpScriptFilePath = BoltTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\noutscripttext = generatedScript\n\n",
       "inputs": {
         "infilepath": [
           {
@@ -1077,7 +1077,7 @@
             "longName": "Output Script File",
             "index": 0,
             "isExposed": false,
-            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Flash/3739323063323465323236386465386361376636303135376332373134353561.py",
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Bolt/3739323063323465323236386465386361376636303135376332373134353561.py",
             "type": 7,
             "connectionName": "inscript1",
             "connectionNodeId": "6336623032666262646333633062313634306532663366333138656539383934"

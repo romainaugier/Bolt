@@ -1,0 +1,44 @@
+// Calls mayapy.exe with a generated script file passed in the first input
+
+# BeginAttr
+
+name = Maya_MayaPy
+color = [33, 163, 165]
+icon = $BOLT_ICONS/maya.png
+category = Maya
+
+# EndAttr
+
+# BeginPlugs
+
+# BeginPlug
+
+shortName = inscript
+longName = Input Script Path
+defaultValue = ""
+type = str
+exposed = False
+
+# EndPlug
+
+# EndPlugs
+
+# BeginOp
+
+import subprocess
+
+BoltLogMessage(f"MayaPy : Start executing script : {inscript}")
+
+process = subprocess.Popen(["mayapy", inscript], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+stdout, stderr = process.communicate()
+
+stdoutAsStr = stdout.decode("utf-8")
+stderrAsStr = stderr.decode("utf-8")
+
+if len(stderrAsStr) > 0:
+    BoltLogError(stderrAsStr)
+else:
+    BoltLogMessage(f"MayaPy : Finished executing script : {inscript}")
+    BoltLogMessage(stdoutAsStr)
+
+# EndOp

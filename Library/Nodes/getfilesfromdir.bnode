@@ -1,0 +1,51 @@
+// Returns a list of files
+
+# BeginAttr
+
+name = GetFilesFromDirectory
+color = [255, 220, 106]
+category = Utility
+icon = $BOLT_ICONS/util.png
+
+# EndAttr
+
+# BeginPlugs
+
+# BeginPlug
+
+shortName = indir
+longName = Input Directory
+defaultValue = ""
+type = str
+exposed = True
+
+# EndPlug
+
+# BeginPlug
+
+shortName = outfiles
+longName = Output Files Path
+defaultValue = []
+type = list
+exposed = False
+
+# EndPlug
+
+# EndPlugs
+
+# BeginOp
+
+import os
+
+outfiles = []
+
+if os.path.exists(indir):
+    for file in os.listdir(indir):
+        path = f"{indir}/{file}"
+
+        if os.path.isfile(path):
+            outfiles.append(path)
+else:
+    BoltLogError(f"Input directory does not exist ({indir})")
+
+# EndOp

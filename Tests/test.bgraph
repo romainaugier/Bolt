@@ -1,0 +1,65 @@
+{
+  "nodes": [
+    {
+      "name": "Debug",
+      "category": "Debug",
+      "id": "3562626334616538623730353064636439303939366465663638313338303030",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$BOLT_ICONS/debug.png",
+      "definitionPath": "$BOLT_LIB/Nodes/debug.bnode",
+      "nodeType": "Debug/Debug",
+      "opCode": "\nBoltLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    }
+  ],
+  "tracker": null,
+  "positions": [
+    {
+      "id": "3562626334616538623730353064636439303939366465663638313338303030",
+      "x": 93.0,
+      "y": 290.0
+    }
+  ]
+}

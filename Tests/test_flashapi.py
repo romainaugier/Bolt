@@ -2,11 +2,11 @@ import sys, os, copy, json
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-from FlashApi.Core.Node import *
-from FlashApi.Core.Graph import *
-from FlashApi.Core.Lib import *
-from FlashApi.Core.Logger import *
-from FlashApp import FLASHROOT
+from BoltApi.Core.Node import *
+from BoltApi.Core.Graph import *
+from BoltApi.Core.Lib import *
+from BoltApi.Core.Logger import *
+from BoltApp import BOLTROOT
 
 TESTDIR = os.path.dirname(__file__)
 
@@ -16,7 +16,7 @@ def PrintSeps():
 if __name__ == "__main__":
     logger = Logger(level=LogLevel.DEBUG)
     
-    logger.Log(LogLevel.DEBUG, "Testing Flash API...") 
+    logger.Log(LogLevel.DEBUG, "Testing Bolt API...") 
     
     PrintSeps()
 
@@ -102,7 +102,7 @@ if __name__ == "__main__":
 
     logger.Log(LogLevel.DEBUG, "Saving to file...")
 
-    graphSavePath = f"{TESTDIR}/tmp_graph.fgraph"
+    graphSavePath = f"{TESTDIR}/tmp_graph.bgraph"
 
     graph.SaveToFile(graphSavePath)
 
@@ -122,9 +122,9 @@ if __name__ == "__main__":
     
     logger.Log(LogLevel.DEBUG, "Loading if block graph...")
     
-    ifGraph = f"{TESTDIR}/if_block_test.fgraph"
+    ibgraph = f"{TESTDIR}/if_block_test.bgraph"
     
-    graph.LoadFromFile(ifGraph)
+    graph.LoadFromFile(ibgraph)
     
     graph.Sort()
     

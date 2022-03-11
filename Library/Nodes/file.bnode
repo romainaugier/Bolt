@@ -1,0 +1,40 @@
+// Look for a file and returns it
+
+# BeginAttr
+
+name = File
+color = [255, 220, 106]
+category = Utility
+icon = $BOLT_ICONS/file.png
+
+# EndAttr
+
+# BeginPlugs
+
+# BeginPlug
+
+shortName = infile
+longName = Input File Path
+defaultValue = ""
+type = str
+exposed = True
+
+# EndPlug
+
+# BeginPlug
+
+shortName = outfile
+longName = Output File Path
+defaultValue = ""
+type = str
+exposed = False
+
+# EndPlug
+
+# EndPlugs
+
+# BeginOp
+
+outfile = infile
+
+# EndOp

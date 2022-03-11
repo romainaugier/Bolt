@@ -1,0 +1,66 @@
+// Calls FastCopy.exe
+
+# BeginAttr
+
+name = FastCopy
+category = IO
+icon = $BOLT_ICONS/fastcopy.png
+
+# EndAttr
+
+# BeginPlugs
+
+# BeginPlug
+
+shortName = insrcdir
+longName = Source Directory
+defaultValue = ""
+type = str
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = indstdir
+longName = Destination Directory
+defaultValue = ""
+type = str
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = outdir
+longName = Output Directory
+defaultValue = ""
+type = str
+
+# EndPlug
+
+# EndPlugs
+
+# BeginOp
+
+import subprocess
+
+BoltLogMessage(f"FastCopy : Start copying : {insrcdir} -> {indstdir}")
+
+command = ["Z:/OEUF/RomanoTools/RomanoTools/Cpp/FastCopy/build/Release/FastCopy.exe", insrcdir, indstdir]
+
+process = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+stdout, stderr = process.communicate()
+
+stdoutAsStr = stdout.decode("utf-8")
+stderrAsStr = stderr.decode("utf-8")
+
+if len(stderrAsStr) > 0:
+    BoltLogError(stderrAsStr)
+else:
+    BoltLogMessage(f"FastCopy : Finished copying")
+    BoltLogMessage(stdoutAsStr)
+
+outdir = indstdir
+
+# EndOp

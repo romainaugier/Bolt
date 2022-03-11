@@ -1,0 +1,68 @@
+// Waits for a job to be completed, if job is failed it will return false
+
+# BeginAttr
+
+name = Deadline_WaitForJobFinished
+icon = $BOLT_ICONS/deadline.png
+category = Deadline
+
+# EndAttr
+
+# BeginPlugs
+
+# BeginPlug
+
+shortName = injobid
+longName = Job ID
+defaultValue = ""
+type = str
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = outjobcomplete
+longName = Job Complete
+defaultValue = True
+type = bool
+
+# EndPlug
+
+# EndPlugs
+
+# BeginOp
+
+import subprocess, time
+
+BoltLogMessage(f"Deadline : Waiting for job {injobid}")
+
+jobIsNotComplete = True
+
+while jobIsNotComplete:
+
+    process = subprocess.Popen(["deadlinecommand", "-GetJob", injobid], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+    stdout, stderr = process.communicate()
+
+    stdoutAsStr = stdout.decode("utf-8")
+    stderrAsStr = stderr.decode("utf-8")
+
+    for line in stdoutAsStr.splitlines():
+        if line.startswith("JobStatus"):
+            jobStatus = line.split("=")[1]
+
+            if jobStatus == "Completed":
+                jobIsNotComplete = False
+                outjobcomplete = True
+                BoltLogMessage(f"Deadline : Job {injobid} is complete")
+                break
+            elif jobStatus == "Failed":
+                jobIsNotComplete = False
+                outjobcomplete = False
+                BoltLogWarning(f"Deadline : Job {injobid} is failed")
+                break
+            else:
+                time.sleep(60)
+                break
+
+# EndOp

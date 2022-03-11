@@ -8,7 +8,7 @@
       132
     ],
     "iconPath": "",
-    "opCode": "# BeginOp\n\nFlashLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+    "opCode": "# BeginOp\n\nBoltLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
     "inputs": {
       "indata": [
         {
@@ -16,7 +16,7 @@
           "longName": "Input Data",
           "index": 0,
           "isExposed": false,
-          "data": "C:\\Users\\augie\\Documents\\Flash\\Tests/test_script.py",
+          "data": "C:\\Users\\augie\\Documents\\Bolt\\Tests/test_script.py",
           "type": 11,
           "connectionName": "outfile",
           "connectionNodeId": "3865313431323637393463316133313839633130653835346531623136623533"
@@ -30,7 +30,7 @@
           "longName": "Output Data",
           "index": 0,
           "isExposed": false,
-          "data": "C:\\Users\\augie\\Documents\\Flash\\Tests/test_script.py",
+          "data": "C:\\Users\\augie\\Documents\\Bolt\\Tests/test_script.py",
           "type": 11,
           "connectionName": "inscript",
           "connectionNodeId": "6337383963323662323664336361313933323934346564343439653264636532"
@@ -47,7 +47,7 @@
       165
     ],
     "iconPath": "",
-    "opCode": "# BeginOp\n\nimport subprocess\n\nFlashLogMessage(f\"Python : Start executing script : {inscript}\")\n\nprocess = subprocess.Popen([\"python\", inscript], stdout = subprocess.PIPE, stderr = subprocess.PIPE)\nstdout, stderr = process.communicate()\n\nstdoutAsStr = stdout.decode(\"utf-8\")\nstderrAsStr = stderr.decode(\"utf-8\")\n\nif len(stderrAsStr) > 0:\n    FlashLogError(stderrAsStr)\nelse:\n    FlashLogMessage(f\"python : Finished executing script : {inscript}\")\n    FlashLogMessage(stdoutAsStr)\n\n",
+    "opCode": "# BeginOp\n\nimport subprocess\n\nBoltLogMessage(f\"Python : Start executing script : {inscript}\")\n\nprocess = subprocess.Popen([\"python\", inscript], stdout = subprocess.PIPE, stderr = subprocess.PIPE)\nstdout, stderr = process.communicate()\n\nstdoutAsStr = stdout.decode(\"utf-8\")\nstderrAsStr = stderr.decode(\"utf-8\")\n\nif len(stderrAsStr) > 0:\n    BoltLogError(stderrAsStr)\nelse:\n    BoltLogMessage(f\"python : Finished executing script : {inscript}\")\n    BoltLogMessage(stdoutAsStr)\n\n",
     "inputs": {
       "inscript": [
         {
@@ -55,7 +55,7 @@
           "longName": "Input Script Path",
           "index": 0,
           "isExposed": false,
-          "data": "C:\\Users\\augie\\Documents\\Flash\\Tests/test_script.py",
+          "data": "C:\\Users\\augie\\Documents\\Bolt\\Tests/test_script.py",
           "type": 7,
           "connectionName": "outdata",
           "connectionNodeId": "6531346664383833643235653239313630303536346464356462613538333564"
@@ -81,7 +81,7 @@
           "longName": "Input File Path",
           "index": 0,
           "isExposed": true,
-          "data": "C:\\Users\\augie\\Documents\\Flash\\Tests/test_script.py",
+          "data": "C:\\Users\\augie\\Documents\\Bolt\\Tests/test_script.py",
           "type": 7,
           "connectionName": null,
           "connectionNodeId": null
@@ -95,7 +95,7 @@
           "longName": "Output File Path",
           "index": 0,
           "isExposed": false,
-          "data": "C:\\Users\\augie\\Documents\\Flash\\Tests/test_script.py",
+          "data": "C:\\Users\\augie\\Documents\\Bolt\\Tests/test_script.py",
           "type": 7,
           "connectionName": "indata",
           "connectionNodeId": "6531346664383833643235653239313630303536346464356462613538333564"

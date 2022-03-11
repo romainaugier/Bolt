@@ -1,0 +1,88 @@
+# BeginAttr
+
+name = NK_GenerateDaily
+icon = $BOLT_ICONS/nuke.png
+category = Nuke
+
+# EndAttr
+
+# BeginPlugs
+
+# BeginPlug
+
+shortName = inrenderdir
+longName = Render Directory
+defaultValue = ""
+type = str
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = innuketemplate
+longName = Nuke Template File
+defaultValue = "D:/dev/Bolt/Library/Templates/Nuke/generate_daily.nk"
+type = str
+exposed = True
+
+# EndPlug
+
+# BeginPlug
+
+shortName = outscriptfile
+longName = Script File
+defaultValue = ""
+type = str
+
+# EndPlug
+
+# BeginPlug
+
+shortName = outrenderdir
+longName = Render Directory
+defaultValue = ""
+type = str
+
+# EndPlug
+
+# EndPlugs
+
+# BeginOp
+
+generatedScript = f"""import nuke, os, sys
+
+nuke.scriptOpen("{innuketemplate}")
+
+seqs = nuke.getFileNameList("{inrenderdir}")
+
+outputfile = "{inrenderdir}/daily/daily.mov"
+
+if len(seqs) > 0:
+    if not os.path.exists(outputfile):
+        os.makedirs(os.path.dirname(outputfile))
+
+    read = nuke.toNode("MAIN_READ")
+    read.knob("file").fromUserText("{inrenderdir}/" + seqs[0])
+
+    write = nuke.toNode("MAIN_WRITE")
+    write.knob("file").fromUserText(outputfile)
+
+    first = int(read.knob("first").getValue())
+    last = int(read.knob("last").getValue())
+
+    nuke.execute("MAIN_WRITE", start=first, end=last, incr=1)
+
+else:
+    sys.stderr.write("[ERROR] Nk_GenerateDaily : No file sequence found")
+
+"""
+
+tmpScriptFilePath = BoltTempScript()
+
+with open(tmpScriptFilePath, "w") as file:
+    file.write(generatedScript)
+
+outscriptfile = tmpScriptFilePath
+
+# EndOp

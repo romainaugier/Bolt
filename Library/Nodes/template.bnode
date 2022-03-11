@@ -1,0 +1,112 @@
+// Here there is everything that can be used to build a Bolt node
+// This is a comment
+
+# BeginAttr                                     // Begin the attributes definition
+
+name = Template                                 // Name of the node
+color = [255, 127, 64]                          // Color that will be used in the interface
+icon = $BOLT_ICONS/Bolt.png                   // Icons must be png files
+category = Debug                                // Category for the node
+
+# EndAttr                                       // End the attributes definition
+
+# BeginPlugs                                    // Begin the plugs definition
+
+# BeginPlug                                     // Begin one plug definition
+
+shortName = inint
+longName = Integer
+defaultValue = 0
+type = int
+exposed = False
+
+# EndPlug                                       // End one plug definition
+
+# BeginPlug                                     // Begin one plug definition
+
+shortName = infloat
+longName = Float
+defaultValue = 10.0
+type = float
+exposed = False
+
+# EndPlug                                       // End one plug definition
+
+# BeginPlug                                     // Begin one plug definition
+
+shortName = instring
+longName = String
+defaultValue = "bonjour"
+type = str
+exposed = False
+
+# EndPlug                                       // End one plug definition
+
+# BeginPlug                                     // Begin one plug definition
+
+shortName = inbool
+longName = Boolean
+defaultValue = True
+type = bool
+exposed = False
+
+# EndPlug                                       // End one plug definition
+
+# BeginPlug                                     // Begin one plug definition
+
+shortName = incustom
+longName = Custom
+defaultValue = None
+type = custom
+exposed = False
+
+# EndPlug
+
+# BeginPlug                                     // Begin one plug definition
+
+shortName = indict
+longName = Dict
+defaultValue = { "dict" : True }
+type = dict
+exposed = False
+
+# EndPlug                                       // End one plug definition
+
+# BeginPlug                                     // Begin of one plug definition
+
+shortName = outlist
+longName = List
+defaultValue = []
+type = list
+
+# EndPlug
+
+# EndPlugs                                      // End the plugs definition
+
+# BeginOp                                       // Begin the operation code 
+
+import sys
+
+print("Bolt Node compiled and ran with : ", sys.version)
+
+# A set of utility functions are available for the user
+# Returns the temporary directory so the user can store files there
+# (such as generated script files...)
+BoltTempDir = BoltTempDir()
+
+# Prints a message to the Bolt Console
+BoltLogMessage("Cooking template node...")
+
+# plugs can be called with their shortName
+print("Integer Input Plug : ", inint)
+print("Float Input Plug : ", infloat)
+print("String Input Plug : ", instring)
+print("Boolean Input Plug : ", inbool)
+print("Custom Input Plug : ", incustom)
+print("Dict Input Plug : ", indict)
+
+outlist = [inint, infloat, instring, inbool]
+
+print("List Output Plug : ", outlist)
+
+# EndOp                                         // End the operation code

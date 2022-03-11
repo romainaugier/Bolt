@@ -1,0 +1,42 @@
+// Debug node that emits a warning. Used for app testing
+
+# BeginAttr
+
+name = Warning
+color = [50, 222, 132]
+icon = $BOLT_ICONS/debug.png
+category = Debug
+
+# EndAttr
+
+# BeginPlugs
+
+# BeginPlug
+
+shortName = indata
+longName = Input Data
+defaultValue = None
+type = custom
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = outdata
+longName = Output Data
+defaultValue = None
+type = custom
+exposed = False
+
+# EndPlug
+
+# EndPlugs
+
+# BeginOp
+
+BoltLogWarning("You have done something bad, but it's ok")
+
+outdata = indata
+
+# EndOp

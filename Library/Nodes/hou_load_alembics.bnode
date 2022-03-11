@@ -1,0 +1,74 @@
+// Generates a script to load an alembic file into a houdini file
+
+# BeginAttr
+
+name = Hou_LoadAlembics
+icon = $BOLT_ICONS/houdini.png
+category = Houdini
+
+# EndAttr
+
+# BeginPlugs
+
+# BeginPlug
+
+shortName = inabcfiles
+longName = Input Alembic Files
+defaultValue = ""
+type = str
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = outscriptfile
+longName = Output Script File
+defaultValue = ""
+type = str
+
+# EndPlug
+
+# EndPlugs
+
+# BeginOp
+
+if type(inabcfiles) is str:
+    inabcfiles = [inabcfiles]
+
+generatedScript = f"""import hou, os
+
+paths = {inabcfiles}
+
+for path in paths:
+    file = os.path.basename(path)
+    filename = os.path.splitext()[0]
+
+    sopNode = hou.node("/obj").createNode("geo", "alembic_{{}}".format(filename))
+
+    abcNode = sopNode.createNode("alembic")
+    abcNode.parm("fileName").set(path)
+    abcNode.parm("loadmode").set(1)
+
+    convertNode = sopNode.createNode("convert")
+    convertNode.setInput(0, abcNode)
+
+    xformNode = sopNode.createNode("xform")
+    xformNode.setInput(0, convertNode)
+
+    nullNode = sopNode.createNode("null", "OUT_{{}}".format(filename))
+    nullNode.setInput(0, xformNode)
+
+    sopNode.layoutChildren()
+
+    hou.hipFile.save()
+"""
+
+tmpScriptFilePath = BoltTempScript()
+
+with open(tmpScriptFilePath, "w") as scriptFile:
+    scriptFile.write(generatedScript)
+
+outscriptfile = tmpScriptFilePath
+
+# EndOp
