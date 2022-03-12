@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from BoltApp.Interface.GraphsEditor import *
+from BoltApp.Interface.GraphLibrary import *
 
 
 class TabType(QtWidgets.QWidget):
@@ -63,6 +64,12 @@ class TabTypeGraphLibrary(TabType):
         """
         """
         super().__init__(iconsLib, logger, environment, parent=parent)
+        
+        self.masterLayout = QtWidgets.QVBoxLayout()
+        
+        self.masterLayout.addWidget(GraphLibrary(environment, iconsLib))
+        
+        self.setLayout(self.masterLayout)
 
 class TabTypeGraphParameters(TabType):
     """
@@ -162,6 +169,13 @@ class Tab(QtWidgets.QTabWidget):
 
         self.addTab(graphEditor, graphEditor.getName())
         
+    def addGraphLibrary(self) -> None:
+        """
+        """
+        graphLibrary = TabTypeGraphLibrary(self.iconsLib, self.logger, self.environment)
+        
+        self.addTab(graphLibrary, graphLibrary.getName())
+        
     def addTabMenu(self) -> None:
         """
         """
@@ -169,6 +183,9 @@ class Tab(QtWidgets.QTabWidget):
         
         addGraphAction = menu.addAction("Add Graph Editor")
         addGraphAction.triggered.connect(self.addGraphEditor)
+        
+        addGraphLibAction = menu.addAction("Add Graph Library")
+        addGraphLibAction.triggered.connect(self.addGraphLibrary)
         
         menu.exec_(self.buttons.getAddButton().mapToGlobal(self.buttons.getAddButton().pos()))
         

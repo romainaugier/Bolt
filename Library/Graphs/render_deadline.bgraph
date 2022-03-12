@@ -1,119 +1,6 @@
 {
   "nodes": [
     {
-      "name": "Deadline_SubmitGuerillaJob",
-      "category": "Deadline",
-      "id": "3662633930323037623534666338353830343666633362333333643163346264",
-      "color": [
-        0,
-        0,
-        0
-      ],
-      "iconPath": "$BOLT_ICONS/deadline.png",
-      "definitionPath": "$BOLT_LIB/Nodes/deadline_submit_guerilla_job.bnode",
-      "nodeType": "Deadline/Deadline_SubmitGuerillaJob",
-      "opCode": "\nimport subprocess, re\n\njobRibgenName = \"\"\njobRenderName = \"\"\n\nwith open(inribgenjobinfo, \"r\") as file:\n    for line in file.readlines():\n        if line.startswith(\"Name\"):\n            jobRibgenName = line.split(\"=\")[1]\n\nwith open(inrenderjobinfo, \"r\") as file:\n    for line in file.readlines():\n        if line.startswith(\"Name\"):\n            jobRenderName = line.split(\"=\")[1]\n\nBoltLogMessage(f\"Deadline : Submitting ribgen job {jobRibgenName}\")\nBoltLogMessage(f\"Deadline : Submitting render job {jobRenderName}\")\n\ncommand = [\n    \"deadlinecommand\",\n    \"-Multi\",\n    \"-job\",\n    inribgenjobinfo,\n    inribgenplugininfo,\n    \"-job\",\n    \"-dependsOnPrevious\",\n    inrenderjobinfo,\n    inrenderplugininfo\n]\n\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE)\nstdout, stderr = process.communicate()\n\nstdoutAsStr = stdout.decode(\"utf-8\")\nstderrAsStr = stderr.decode(\"utf-8\")\n\nif len(stderrAsStr) > 0:\n    BoltLogError(stderrAsStr)\nelse:\n    jobIdPattern = r\"JobID=(\\S+)\"\n\n    matches = re.findall(jobIdPattern, stdoutAsStr)\n\n    outribgenjobid = matches[0]\n    outrenderjobid = matches[1]\n\n    BoltLogMessage(f\"Deadline : Finished submitting job. \\n    Ribgen Job ID = {outribgenjobid}\\n    Render Job ID = {outrenderjobid}\")\n\n    BoltLogMessage(stdoutAsStr)\n\n",
-      "disabled": false,
-      "isIfBegin": false,
-      "associatedEndBlockId": null,
-      "isIfEnd": false,
-      "associatedBeginBlockId": null,
-      "inputs": {
-        "inribgenjobinfo": [
-          {
-            "shortName": "inribgenjobinfo",
-            "longName": "Ribgen Job Info File",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": "",
-            "defaultData": "",
-            "type": 7,
-            "connectionName": "outribgenjobinfofile",
-            "connectionNodeId": "3534396663623431333835383834373461636530363139306432346462303061"
-          }
-        ],
-        "inribgenplugininfo": [
-          {
-            "shortName": "inribgenplugininfo",
-            "longName": "Ribgen Plugin Info File",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": "",
-            "defaultData": "",
-            "type": 7,
-            "connectionName": "outribgenplugininfofile",
-            "connectionNodeId": "3534396663623431333835383834373461636530363139306432346462303061"
-          }
-        ],
-        "inrenderjobinfo": [
-          {
-            "shortName": "inrenderjobinfo",
-            "longName": "Render Job Info File",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": "",
-            "defaultData": "",
-            "type": 7,
-            "connectionName": "outrenderjobinfofile",
-            "connectionNodeId": "3534396663623431333835383834373461636530363139306432346462303061"
-          }
-        ],
-        "inrenderplugininfo": [
-          {
-            "shortName": "inrenderplugininfo",
-            "longName": "Render Plugin Info File",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": true,
-            "data": "",
-            "defaultData": "",
-            "type": 7,
-            "connectionName": null,
-            "connectionNodeId": null
-          }
-        ]
-      },
-      "outputs": {
-        "outribgenjobid": [
-          {
-            "shortName": "outribgenjobid",
-            "longName": "Ribgen Job ID",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": "",
-            "defaultData": "",
-            "type": 7,
-            "connectionName": null,
-            "connectionNodeId": null
-          }
-        ],
-        "outrenderjobid": [
-          {
-            "shortName": "outrenderjobid",
-            "longName": "Render Job ID",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": "",
-            "defaultData": "",
-            "type": 7,
-            "connectionName": "injobid",
-            "connectionNodeId": "3934303435383636343131383961653666623734393730623333653536663535"
-          }
-        ]
-      }
-    },
-    {
       "name": "File",
       "category": "Utility",
       "id": "6133313433643361616136663439393130343533663633393430336237373161",
@@ -519,7 +406,7 @@
             "defaultData": "",
             "type": 7,
             "connectionName": "inribgenjobinfo",
-            "connectionNodeId": "3662633930323037623534666338353830343666633362333333643163346264"
+            "connectionNodeId": "3833383766363136663338353232646164333534633830623733663936323464"
           }
         ],
         "outribgenplugininfofile": [
@@ -534,7 +421,7 @@
             "defaultData": "",
             "type": 7,
             "connectionName": "inribgenplugininfo",
-            "connectionNodeId": "3662633930323037623534666338353830343666633362333333643163346264"
+            "connectionNodeId": "3833383766363136663338353232646164333534633830623733663936323464"
           }
         ],
         "outrenderjobinfofile": [
@@ -549,7 +436,7 @@
             "defaultData": "",
             "type": 7,
             "connectionName": "inrenderjobinfo",
-            "connectionNodeId": "3662633930323037623534666338353830343666633362333333643163346264"
+            "connectionNodeId": "3833383766363136663338353232646164333534633830623733663936323464"
           }
         ],
         "outrenderplugininfofile": [
@@ -563,8 +450,8 @@
             "data": "",
             "defaultData": "",
             "type": 7,
-            "connectionName": null,
-            "connectionNodeId": null
+            "connectionName": "inrenderplugininfo",
+            "connectionNodeId": "3833383766363136663338353232646164333534633830623733663936323464"
           }
         ],
         "outrenderdir": [
@@ -615,7 +502,7 @@
             "defaultData": "",
             "type": 7,
             "connectionName": "outrenderjobid",
-            "connectionNodeId": "3662633930323037623534666338353830343666633362333333643163346264"
+            "connectionNodeId": "3833383766363136663338353232646164333534633830623733663936323464"
           }
         ]
       },
@@ -1029,35 +916,123 @@
           }
         ]
       }
+    },
+    {
+      "name": "Deadline_SubmitGuerillaJob1",
+      "category": "Deadline",
+      "id": "3833383766363136663338353232646164333534633830623733663936323464",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$BOLT_ICONS/deadline.png",
+      "definitionPath": "$BOLT_LIB/Nodes/deadline_submit_guerilla_job.bnode",
+      "nodeType": "Deadline/Deadline_SubmitGuerillaJob",
+      "opCode": "\nimport subprocess, re\n\njobRibgenName = \"\"\njobRenderName = \"\"\n\nwith open(inribgenjobinfo, \"r\") as file:\n    for line in file.readlines():\n        if line.startswith(\"Name\"):\n            jobRibgenName = line.split(\"=\")[1]\n\nwith open(inrenderjobinfo, \"r\") as file:\n    for line in file.readlines():\n        if line.startswith(\"Name\"):\n            jobRenderName = line.split(\"=\")[1]\n\nBoltLogMessage(f\"Deadline : Submitting ribgen job {jobRibgenName}\")\nBoltLogMessage(f\"Deadline : Submitting render job {jobRenderName}\")\n\ncommand = [\n    \"deadlinecommand\",\n    \"-Multi\",\n    \"-job\",\n    inribgenjobinfo,\n    inribgenplugininfo,\n    \"-job\",\n    \"-dependsOnPrevious\",\n    inrenderjobinfo,\n    inrenderplugininfo\n]\n\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE)\nstdout, stderr = process.communicate()\n\nstdoutAsStr = stdout.decode(\"utf-8\")\nstderrAsStr = stderr.decode(\"utf-8\")\n\nif len(stderrAsStr) > 0:\n    BoltLogError(stderrAsStr)\nelse:\n    jobIdPattern = r\"JobID=(\\S+)\"\n\n    matches = re.findall(jobIdPattern, stdoutAsStr)\n\n    outribgenjobid = matches[0]\n    outrenderjobid = matches[1]\n\n    BoltLogMessage(f\"Deadline : Finished submitting job. \\n    Ribgen Job ID = {outribgenjobid}\\n    Render Job ID = {outrenderjobid}\")\n\n    BoltLogMessage(stdoutAsStr)\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inribgenjobinfo": [
+          {
+            "shortName": "inribgenjobinfo",
+            "longName": "Ribgen Job Info File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outribgenjobinfofile",
+            "connectionNodeId": "3534396663623431333835383834373461636530363139306432346462303061"
+          }
+        ],
+        "inribgenplugininfo": [
+          {
+            "shortName": "inribgenplugininfo",
+            "longName": "Ribgen Plugin Info File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outribgenplugininfofile",
+            "connectionNodeId": "3534396663623431333835383834373461636530363139306432346462303061"
+          }
+        ],
+        "inrenderjobinfo": [
+          {
+            "shortName": "inrenderjobinfo",
+            "longName": "Render Job Info File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outrenderjobinfofile",
+            "connectionNodeId": "3534396663623431333835383834373461636530363139306432346462303061"
+          }
+        ],
+        "inrenderplugininfo": [
+          {
+            "shortName": "inrenderplugininfo",
+            "longName": "Render Plugin Info File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outrenderplugininfofile",
+            "connectionNodeId": "3534396663623431333835383834373461636530363139306432346462303061"
+          }
+        ]
+      },
+      "outputs": {
+        "outribgenjobid": [
+          {
+            "shortName": "outribgenjobid",
+            "longName": "Ribgen Job ID",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ],
+        "outrenderjobid": [
+          {
+            "shortName": "outrenderjobid",
+            "longName": "Render Job ID",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "injobid",
+            "connectionNodeId": "3934303435383636343131383961653666623734393730623333653536663535"
+          }
+        ]
+      }
     }
   ],
   "tracker": null,
   "positions": [
-    {
-      "id": "3237346335613734336532323564643862356435653466313763343563636638",
-      "x": 2650.0,
-      "y": 300.0
-    },
-    {
-      "id": "6139623863323131323932323566643431643862373166643462376138643335",
-      "x": 2000.0,
-      "y": 300.0
-    },
-    {
-      "id": "6532623361303334613830333737393034303764653062613765626435356635",
-      "x": 2950.0,
-      "y": 300.0
-    },
-    {
-      "id": "3139336132656639393435656665363762393165333261623033653835306339",
-      "x": 2250.0,
-      "y": 300.0
-    },
-    {
-      "id": "3662633930323037623534666338353830343666633362333333643163346264",
-      "x": 900.0,
-      "y": 300.0
-    },
     {
       "id": "6133313433643361616136663439393130343533663633393430336237373161",
       "x": -150.0,
@@ -1067,11 +1042,6 @@
       "id": "6138613631313065633231633337393162313637356537393734363963373561",
       "x": -150.0,
       "y": 450.0
-    },
-    {
-      "id": "3034663162366363643930373837623530663031313362353236306532343237",
-      "x": 1450.0,
-      "y": 700.0
     },
     {
       "id": "3732386138313437336136623862333263616630366262333961643030663837",
@@ -1089,9 +1059,39 @@
       "y": 300.0
     },
     {
+      "id": "3034663162366363643930373837623530663031313362353236306532343237",
+      "x": 1450.0,
+      "y": 700.0
+    },
+    {
+      "id": "6139623863323131323932323566643431643862373166643462376138643335",
+      "x": 2000.0,
+      "y": 300.0
+    },
+    {
+      "id": "6532623361303334613830333737393034303764653062613765626435356635",
+      "x": 2950.0,
+      "y": 300.0
+    },
+    {
+      "id": "3139336132656639393435656665363762393165333261623033653835306339",
+      "x": 2250.0,
+      "y": 300.0
+    },
+    {
+      "id": "3237346335613734336532323564643862356435653466313763343563636638",
+      "x": 2650.0,
+      "y": 300.0
+    },
+    {
       "id": "6561643865303663626362386536663164393838623130643862376639303535",
       "x": 2000.0,
       "y": 500.0
+    },
+    {
+      "id": "3833383766363136663338353232646164333534633830623733663936323464",
+      "x": 900.0,
+      "y": 300.0
     }
   ]
 }

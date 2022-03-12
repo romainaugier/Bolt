@@ -490,21 +490,27 @@ class GGraph(QtWidgets.QGraphicsView):
 
         self.scale(scaleFactor, scaleFactor)
 
-    def dragEnterEvent(self, event):
-        if event.mimeData().hasUrls:
+    def dragEnterEvent(self, event : QtGui.QDragEnterEvent):
+        """
+        """
+        if event.mimeData().hasUrls():
             event.accept()
         else:
             event.ignore()
 
-    def dragMoveEvent(self, event):
-        if event.mimeData().hasUrls:
+    def dragMoveEvent(self, event : QtGui.QDragEnterEvent):
+        """
+        """
+        if event.mimeData().hasUrls():
             event.setDropAction(QtCore.Qt.CopyAction)
             event.accept()
         else:
             event.ignore()
 
-    def dropEvent(self, event):
-        if event.mimeData().hasUrls:
+    def dropEvent(self, event : QtGui.QDragEnterEvent):
+        """
+        """
+        if event.mimeData().hasUrls():
             event.setDropAction(QtCore.Qt.CopyAction)
             event.accept()
 

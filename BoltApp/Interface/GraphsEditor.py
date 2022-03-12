@@ -19,6 +19,7 @@ class GraphsEditor(QtWidgets.QWidget):
         self.logger = logger
         
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
+        self.setAcceptDrops(True)
 
         self._layout = QtWidgets.QVBoxLayout(self)
         self._layout.setSpacing(0)
@@ -31,6 +32,10 @@ class GraphsEditor(QtWidgets.QWidget):
 
         self.addTab()
 
+    @QtCore.pyqtSlot(str)
+    def onNodeSelectionChange(self, nodeId : str) -> None:
+        self.selectedNodeChanged.emit(nodeId)
+        
     def addTab(self, graph : GGraph = None) -> None:
         """
         Adds a new tab with a graph if provided
@@ -65,10 +70,6 @@ class GraphsEditor(QtWidgets.QWidget):
         self.newTab.setLayout(self.newTab._layout)
 
         self.tabs.setCurrentIndex(tabIndex)
-
-    @QtCore.pyqtSlot(str)
-    def onNodeSelectionChange(self, nodeId : str) -> None:
-        self.selectedNodeChanged.emit(nodeId)
 
     def removeTab(self, index : int) -> None:
         """
@@ -133,11 +134,12 @@ class GraphsEditor(QtWidgets.QWidget):
 
             self.tabs.setTabText(index, internalGraph.GetName())
 
-    def loadNewGraph(self) -> None:
+    def loadNewGraph(self, filePath : str = None) -> None:
         """
         Loads a graph from a file
         """
-        filePath, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Open File", self.environment.Get("BOLT_ROOT"), "Bolt Graph (*.bgraph)")
+        if filePath is None:
+            filePath, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Open File", self.environment.Get("BOLT_ROOT"), "Bolt Graph (*.bgraph)")
         
         if os.path.exists(filePath):
             newGGraph = GGraph(self.nodeLib, self.logger, self.environment)
@@ -169,3 +171,44 @@ class GraphsEditor(QtWidgets.QWidget):
         index = self.getActiveTabIndex()
 
         self.tabs.widget(index).layout().itemAt(0).widget().showPlugEditor()
+        
+    # EVENTS
+    
+    def dragEnterEvent(self, event : QtGui.QDragEnterEvent):
+        """
+        """
+        eventAccepted = False
+        
+        if event.mimeData().hasUrls():
+            for url in event.mimeData().urls():
+                itemPath = url.toLocalFile()
+                if ".bgraph" in itemPath:
+                    event.accept()
+                    eventAccepted = True
+        
+        if eventAccepted:
+            event.accept()
+        else:
+            return super().dragEnterEvent(event)
+
+    def dropEvent(self, event : QtGui.QDragEnterEvent):
+        """
+        """
+        eventAccepted = False
+        
+        if event.mimeData().hasUrls():
+            for url in event.mimeData().urls():
+                itemPath = url.toLocalFile()
+                if ".bgraph" in itemPath:
+                    
+                    if os.path.isfile(itemPath):
+                        self.loadNewGraph(itemPath)
+                        
+                        event.setDropAction(QtCore.Qt.CopyAction)
+                        event.accept()
+                        eventAccepted = True
+        
+        if eventAccepted:
+            event.accept()
+        else:
+            return super().dropEvent(event)

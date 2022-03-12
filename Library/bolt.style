@@ -110,6 +110,8 @@ QTabBar::tab:!selected {
 	background: solid rgb(41, 43, 61);
 }   
 
+/* Scroll */
+
 QScrollBar:vertical {
 	background-color: rgb(8, 8, 10);
 	width: 10px;
@@ -152,6 +154,8 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical
 	background: none;
 }
 
+/* Checkbox */
+
 QCheckBox {
 	border: none;
 }
@@ -163,6 +167,8 @@ QCheckBox::indicator::unchecked {
 QCheckBox::indicator::checked {
 	background-color: rgb(195, 232, 141);
 }
+
+/* Combo Box */
 
 QComboBox {
 	border: none;
@@ -178,6 +184,19 @@ QComboBox::drop-down {
 
 QComboBox::down-arrow {
 	border: none;
+	color: rgb(143, 144, 160);
+	background-color: rgb(8, 8, 10);
+}
+
+/* Tree View */
+
+QTreeView {
+	color: rgb(143, 144, 160);
+	background-color: rgb(8, 8, 10);
+	alternate-background-color: rgb(13, 14, 25);
+}
+
+QHeaderView::section {
 	color: rgb(143, 144, 160);
 	background-color: rgb(8, 8, 10);
 }
