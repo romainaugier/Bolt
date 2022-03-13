@@ -469,12 +469,25 @@ class GGraph(QtWidgets.QGraphicsView):
 
     def wheelEvent(self, event: QtGui.QWheelEvent) -> None:
         if not event.isAccepted():
+            inFactor = 1.1
+            outFactor = 1.0 / inFactor
+            
+            oldPos = self.mapToScene(event.pos())
+            
             if event.angleDelta().y() > 0:
-                # self.scaleView(1.01)
-                self.scale(1.05, 1.05)
+                zoomFactor = inFactor
             else:
-                # self.scaleView(0.99)
-                self.scale(0.95, 0.95)
+                zoomFactor = outFactor
+                
+            self.scale(zoomFactor, zoomFactor)
+            
+            newPos = self.mapToScene(event.pos())
+            
+            delta = oldPos - newPos
+            
+            self.setSceneRect(self.sceneRect().translated(delta))
+            
+            return
 
         return super().wheelEvent(event)
             
