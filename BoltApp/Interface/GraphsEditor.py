@@ -173,6 +173,17 @@ class GraphsEditor(QtWidgets.QWidget):
         self.tabs.widget(index).layout().itemAt(0).widget().showPlugEditor()
         
     # EVENTS
+
+    def keyPressEvent(self, event : QtGui.QKeyEvent) -> None:
+        """
+        """
+        index = self.getActiveTabIndex()
+
+        activeGraph = self.tabs.widget(index).layout().itemAt(0).widget()
+
+        activeGraph.keyPressEvent(event)
+
+        return super().keyPressEvent(event)
     
     def dragEnterEvent(self, event : QtGui.QDragEnterEvent):
         """

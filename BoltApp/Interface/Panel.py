@@ -38,9 +38,18 @@ class TabTypeGraphsEditor(TabType):
 
         self.masterLayout = QtWidgets.QVBoxLayout()
 
-        self.masterLayout.addWidget(GraphsEditor(iconsLib, logger, environment))
+        self.graphsEditorWidget = GraphsEditor(iconsLib, logger, environment)
+
+        self.masterLayout.addWidget(self.graphsEditorWidget)
 
         self.setLayout(self.masterLayout)
+
+    def keyPressEvent(self, event : QtGui.QKeyEvent) -> None:
+        """
+        """
+        self.graphsEditorWidget.keyPressEvent(event)
+
+        return super().keyPressEvent(event)
 
 
 class TabTypeJobs(TabType):

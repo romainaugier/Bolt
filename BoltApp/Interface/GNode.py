@@ -94,7 +94,7 @@ class Badge(QtWidgets.QGraphicsObject):
         self.setPos(x - self.size, y)
 
         self.isHovered = False
-        self.setFlag(QtWidgets.QGraphicsItem.ItemIsSelectable, True)
+        self.setFlag(QtWidgets.QGraphicsItem.ItemIsSelectable, False)
         self.setCacheMode(QtWidgets.QGraphicsItem.DeviceCoordinateCache)
         self.setZValue(2)
         self.setAcceptHoverEvents(True)
@@ -545,6 +545,7 @@ class GNode(QtWidgets.QGraphicsObject):
         self.canMove = True
         self.isHovered = False
         self.setFlag(QtWidgets.QGraphicsItem.ItemIsFocusable, True)
+        self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QtWidgets.QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QtWidgets.QGraphicsItem.ItemSendsGeometryChanges, True)
         self.setCacheMode(QtWidgets.QGraphicsItem.DeviceCoordinateCache)
@@ -789,58 +790,29 @@ class GNode(QtWidgets.QGraphicsObject):
         
         return super().hoverLeaveEvent(ev)
 
-    def mousePressEvent(self, ev):
-        pos = ev.pos()
+    def mousePressEvent(self, event : QtGui.QMouseEvent) -> None:
+        """
+        When a node is clicked, set it on top of the other ones
+        """
+        for item in self.graph.items():
+            item.setZValue(1)
+        
+        for item in self.graph.items():
+            if isinstance(item, GEdge): item.setZValue(0)
+        
+        self.setZValue(2)
 
-        if self.isHovered:
-            self.setSelected(True)
-            self.hasBeenSelected.emit(self.id)
+        return super().mousePressEvent(event)
 
-            for item in self.graph.items():
-                item.setZValue(1)
-            
-            for item in self.graph.items():
-                if type(item) is GEdge: item.setZValue(0)
-
-            self.setZValue(2)
-
-        if pos.x() < 15.0 or pos.x() > self.sizeX: 
-            self.canMove = False
-        else:
-            self.canMove = True
-
-    def mouseMoveEvent(self, event : QtGui.QMouseEvent):
+    def mouseMoveEvent(self, event : QtGui.QMouseEvent) -> None:
         """
         """     
-        if self.canMove and event.buttons() & Qt.LeftButton:
-            self.hasMoved.emit()
-            self.scene().movingNode = self
-            
-            origCursorPos = event.lastScenePos()
-            updatedCursorPos = event.scenePos()
-            
-            origPosition = self.scenePos()
-
-            updatedCursorX = updatedCursorPos.x() - origCursorPos.x() + origPosition.x()
-            updatedCursorY = updatedCursorPos.y() - origCursorPos.y() + origPosition.y()
-
-            if QtGui.QGuiApplication.keyboardModifiers() & Qt.ShiftModifier:
-                gridSize = self.scene().gridSize
-
-                newPos = QtCore.QPointF(round(updatedCursorX / gridSize) * gridSize, round(updatedCursorY / gridSize) * gridSize)
-                self.setPos(newPos)
-            else:
-                self.setPos(updatedCursorX, updatedCursorY)
-            
-            self.adjustEdges()
-            
-        else:
-            return super().mouseMoveEvent(event)
+        return super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event : QtGui.QMouseEvent) -> None:
         """
         """
-        self.scene().movingNode = None
+        return super().mouseReleaseEvent(event)
 
     # CHANGE
 
@@ -875,7 +847,7 @@ class GEdge(QtWidgets.QGraphicsPathItem):
         self.firstPos = self.source.scenePos()
         self.lastPos = self.destination.scenePos()
 
-        self.isHovered = False
+        self.__isHoveredByNode = False
 
         self.setFlag(QtWidgets.QGraphicsItem.ItemIsFocusable, True)
         self.setFlag(QtWidgets.QGraphicsItem.ItemIsSelectable, True)
@@ -960,6 +932,10 @@ class GEdge(QtWidgets.QGraphicsPathItem):
         pen = QtGui.QPen()
         pen.setWidth(2)
         pen.setBrush(gradient)
+
+        if self.isSelected() or self.isHoveredByNode():
+            pen.setBrush(GetQColorFromPalette(ColorPalette.WARNINGCOLOR))
+
         painter.setPen(pen)
 
         painter.drawPath(path)
@@ -976,25 +952,14 @@ class GEdge(QtWidgets.QGraphicsPathItem):
 
         self.update(rect)
 
-    # EVENTS
+    # NODE HOVER
 
-    def mousePressEvent(self, event) -> None:
+    def setHoveredByNode(self, hovered : bool) -> None:
         """
         """
-        if self.isHovered is True:
-            self.setSelected(True)
+        self.__isHoveredByNode = hovered
 
-    def hoverEnterEvent(self, event) -> None:
+    def isHoveredByNode(self) -> bool:
         """
         """
-        self.isHovered = True
-        
-    def hoverMoveEvent(self, event) -> None:
-        """
-        """
-        pass
-
-    def hoverLeaveEvent(self, event) -> None:
-        """
-        """
-        self.isHovered = False
+        return self.__isHoveredByNode

@@ -212,7 +212,7 @@ class GGraph(QtWidgets.QGraphicsView):
 
         self.logger = logger
 
-        self.scene = GraphicsScene(self) 
+        self.setScene(GraphicsScene(self))
 
         self.iconsLib = Icons()
         self.isCookingMovie = self.iconsLib.GetAnim("badge-cooking")
@@ -251,9 +251,9 @@ class GGraph(QtWidgets.QGraphicsView):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-        self.scene.setItemIndexMethod(QtWidgets.QGraphicsScene.NoIndex)
-        self.scene.setSceneRect(0, 0, 800, 800)
-        self.setScene(self.scene)
+        self.scene().setItemIndexMethod(QtWidgets.QGraphicsScene.NoIndex)
+        self.scene().setSceneRect(0, 0, 800, 800)
+        self.setScene(self.scene())
         self.setViewportUpdateMode(QtWidgets.QGraphicsView.FullViewportUpdate)
         self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
         self.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.TextAntialiasing | QtGui.QPainter.SmoothPixmapTransform | QtGui.QPainter.HighQualityAntialiasing)
@@ -264,7 +264,7 @@ class GGraph(QtWidgets.QGraphicsView):
         # self.setMinimumSize(800, 800)
         self.gridSize = 50
 
-        self.scene.gridSize = self.gridSize
+        self.scene().gridSize = self.gridSize
 
         self.startPos = None
         self.pan = False
@@ -404,7 +404,7 @@ class GGraph(QtWidgets.QGraphicsView):
             return
         elif event.button() == QtCore.Qt.LeftButton:
             if QtGui.QGuiApplication.keyboardModifiers() & Qt.AltModifier:
-                items = self.scene.selectedItems()
+                items = self.scene().selectedItems()
                 
                 if len(items) == 0:
                     items = self.items(event.pos())
@@ -413,13 +413,17 @@ class GGraph(QtWidgets.QGraphicsView):
                     self.nodeToDuplicate = items[0] if type(items[0]) is GNode else None
 
             else:
-                self.scene.clearSelection()
-                self.scene.selectedItems()
+                # self.scene().clearSelection()
+                # self.scene().selectedItems()
                 self.setDragMode(QtWidgets.QGraphicsView.RubberBandDrag)
                 
             return super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
+        """
+        """
+        sceneSelection = self.scene().selectedItems()
+
         if self.pan:
             delta = self.prevPos - event.pos()
 
@@ -431,16 +435,29 @@ class GGraph(QtWidgets.QGraphicsView):
             self.setSceneRect(self.sceneRect().translated(deltaX, deltaY))
 
             self.prevPos = event.pos()
+        
+        elif len(sceneSelection) > 0:
+            for item in self.scene().selectedItems():
+                if isinstance(item, GNode): 
+                    item.adjustEdges()
             
-        else:    
+        if len(sceneSelection) == 1 and isinstance(sceneSelection[0], GNode):    
             # Handle when a node is passed on an edge and connect it to the two nodes
-            items = self.items(event.pos())
+            scenePos = event.pos()
+            
+            items = self.items(scenePos.x(), scenePos.y())
             
             self.movingNodeCanConnect = False
+            nodeToConnect = sceneSelection[0]
+
+            for item in self.scene().items():
+                if isinstance(item, GEdge):
+                    item.setHoveredByNode(False)
                 
             for item in items:
-                if type(item) is GEdge:
-                    nodeToConnect = self.scene.movingNode
+                if isinstance(item, GEdge):
+
+                    item.setHoveredByNode(True)
                     
                     if nodeToConnect is not None:
                         self.movingNodeCanConnect = True
@@ -643,7 +660,7 @@ class GGraph(QtWidgets.QGraphicsView):
     def prepareMovingNodeConnection(self, edge : GEdge) -> None:
         """
         """
-        nodeToConnect = self.scene.movingNode
+        nodeToConnect = self.scene().selectedItems()[0]
         
         self.movingNodeCanConnect = True
         
@@ -714,14 +731,14 @@ class GGraph(QtWidgets.QGraphicsView):
             tmpBeginGNode.setPos(position)
             tmpBeginGNode.setZValue(0)
             
-            self.scene.addItem(tmpBeginGNode)
+            self.scene().addItem(tmpBeginGNode)
             
             tmpEndGNode = GNode(tmpEndInternalNode, "", self, self.iconsLib)
             tmpEndGNode.hasBeenSelected.connect(self.onNodeSelectionChange)
             tmpEndGNode.setPos(position.x() + 400, position.y())
             tmpEndGNode.setZValue(0)
 
-            self.scene.addItem(tmpEndGNode)
+            self.scene().addItem(tmpEndGNode)
             
             self.addEdge(tmpBeginGNode.getOutputGPlug(index=0), tmpEndGNode.getInputGPlug(index=0))
 
@@ -741,7 +758,7 @@ class GGraph(QtWidgets.QGraphicsView):
 
             tmpGNode.setZValue(0)
 
-            self.scene.addItem(tmpGNode)
+            self.scene().addItem(tmpGNode)
 
             self.hasBeenEdited.emit()
 
@@ -759,7 +776,7 @@ class GGraph(QtWidgets.QGraphicsView):
 
         tmpGNode.hasBeenSelected.connect(self.onNodeSelectionChange)
 
-        self.scene.addItem(tmpGNode)
+        self.scene().addItem(tmpGNode)
 
     def deleteNode(self, node: GNode) -> None:
         """
@@ -811,9 +828,9 @@ class GGraph(QtWidgets.QGraphicsView):
                     block.nodes.remove(node2)
                     break
 
-        self.scene.removeItem(node)
+        self.scene().removeItem(node)
         
-        if node2 is not None: self.scene.removeItem(node2)
+        if node2 is not None: self.scene().removeItem(node2)
 
         self.blockSignals(False)
 
@@ -830,7 +847,7 @@ class GGraph(QtWidgets.QGraphicsView):
     def getNodeById(self, nodeId : str) -> GNode:
         """
         """
-        for item in self.scene.items():
+        for item in self.scene().items():
             if type(item) is GNode:
                 if item.id == nodeId:
                     return item
@@ -850,7 +867,7 @@ class GGraph(QtWidgets.QGraphicsView):
 
         newEdge = GEdge(outputGPlug, inputGPlug)
 
-        self.scene.addItem(newEdge)
+        self.scene().addItem(newEdge)
 
         self.hasBeenEdited.emit()
         
@@ -864,7 +881,7 @@ class GGraph(QtWidgets.QGraphicsView):
         edge.source.edges.remove(edge)
         edge.destination.edges.remove(edge)
 
-        self.scene.removeItem(edge)
+        self.scene().removeItem(edge)
 
         self.hasBeenEdited.emit()
 
@@ -883,7 +900,7 @@ class GGraph(QtWidgets.QGraphicsView):
 
         self.gBlocks.append(newBlock)
 
-        self.scene.addItem(newBlock)
+        self.scene().addItem(newBlock)
 
     def deleteBlock(self, anyBlockNode : GNode) -> None:
         """
@@ -900,7 +917,7 @@ class GGraph(QtWidgets.QGraphicsView):
 
             self.gBlocks.remove(blockToDelete)
 
-            self.scene.removeItem(blockToDelete)
+            self.scene().removeItem(blockToDelete)
 
     def deleteItem(self, item=None) -> None:
         """
@@ -915,19 +932,17 @@ class GGraph(QtWidgets.QGraphicsView):
                 self.deleteEdge(item)
         
         else:
-            items = self.scene.selectedItems()
+            items = self.scene().selectedItems()
 
             if len(items) > 0: 
-                item = items[0]
-            
-                if type(item) is GNode:
-                    self.deleteNode(item)
-                elif type(item) is GPlug:
-                    node = item.node
-                    self.deleteNode(node)
-                elif type(item) is GEdge:
-                    self.deleteEdge(item)
-            
+                # Remove edges first
+                for item in items:
+                    if type(item) is GEdge:
+                        self.deleteEdge(item)
+                
+                for item in items:
+                    if type(item) is GNode:
+                        self.deleteNode(item)        
 
     def cookGraph(self, lastNodeToCook : str = None, skipCookedNodes : bool = True) -> None:
         """
@@ -1063,7 +1078,7 @@ class GGraph(QtWidgets.QGraphicsView):
         """
         self.blockSignals(True)
 
-        for item in self.scene.items():
+        for item in self.scene().items():
             if type(item) is GNode:
                 self.deleteNode(item)
             elif type(item) is GPlug:
@@ -1118,7 +1133,7 @@ class GGraph(QtWidgets.QGraphicsView):
                             gNode.setPos(newPos.x() - 50 - pluggedNode.sizeX, newPos.y())
                             gNode.adjustEdges()
 
-                    for item in self.scene.items():
+                    for item in self.scene().items():
                         if type(item) is not GNode or item.id == gNode.id:
                             continue
 
@@ -1145,7 +1160,7 @@ class GGraph(QtWidgets.QGraphicsView):
             for node in self.getInternalGraph().sortedNodes:
                 gNode = self.getNodeById(node.GetID())
 
-            scene = self.scene
+            scene = self.scene()
             rect = scene.sceneRect()
 
             self.scaleView(0.5)
