@@ -177,11 +177,14 @@ class GraphsEditor(QtWidgets.QWidget):
     def keyPressEvent(self, event : QtGui.QKeyEvent) -> None:
         """
         """
-        index = self.getActiveTabIndex()
+        if self.tabs.count() > 0:
+            index = self.getActiveTabIndex()
+            activeLayout = self.tabs.widget(index).layout()
 
-        activeGraph = self.tabs.widget(index).layout().itemAt(0).widget()
+            if activeLayout.count():
+                activeGraph = activeLayout.itemAt(0).widget()
 
-        activeGraph.keyPressEvent(event)
+                activeGraph.keyPressEvent(event)
 
         return super().keyPressEvent(event)
     

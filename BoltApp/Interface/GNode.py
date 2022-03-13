@@ -802,6 +802,8 @@ class GNode(QtWidgets.QGraphicsObject):
         
         self.setZValue(2)
 
+        self.hasBeenSelected.emit(self.getInternalNode().GetID())
+
         return super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event : QtGui.QMouseEvent) -> None:
