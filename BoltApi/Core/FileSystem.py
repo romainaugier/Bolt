@@ -1,4 +1,7 @@
-import sys, pathlib, os, binascii
+import sys, pathlib, os, binascii, shutil
+
+from BoltApi.Utils.String import GetCurrentTimeAsStr, GetRandomStrId
+
 
 def GetRoamingDataDir() -> str:
     """
@@ -35,7 +38,7 @@ def GetNewRandomPyFile() -> str:
     Returns:
         str: path to the file
     """
-    return "{}/{}.py".format(GetRoamingDataDir(), binascii.hexlify(os.urandom(16)).hex())
+    return f"{GetRoamingDataDir()}/{binascii.hexlify(os.urandom(16)).hex()}.py"
 
 
 def CleanPath(path : str) -> str:
@@ -66,3 +69,47 @@ def GetCurrentExecPath() -> str:
         str: path to the directory of the current executable
     """
     return os.path.dirname(sys.executable)
+
+
+def GetJobsDir() -> str:
+    """
+    Returns the path to the roaming jobs directory, where
+    jobs from the JobSystem are located
+    
+    Returns:
+        str: path to the roaming jobs directory
+    """
+    jobsDirPath = f"{GetRoamingDataDir()}/jobs"
+    
+    if not os.path.exists(jobsDirPath):
+        os.makedirs(jobsDirPath)
+        
+    return jobsDirPath
+
+
+def CopyJob(jobId : str, pathToGraph : str) -> tuple:
+    """
+    Copies the given graph file to the roaming jobs dir with a random name
+
+    Args:
+        pathToGraph (str): path to the graph file to copy
+        
+    Returns:
+        tuple(str): job directory path and copied graph file path
+    """
+    if not os.path.exists(pathToGraph):
+        raise ValueError
+    
+    graphName, graphExtension = os.path.splitext(os.path.basename(pathToGraph))
+    
+    jobDirName = jobId
+    jobDirPath = f"{GetJobsDir()}/{jobDirName}"
+    
+    os.makedirs(jobDirPath)
+    
+    jobName = f"{graphName}_{GetCurrentTimeAsStr()}.{graphExtension}"
+    jobPath = f"{jobDirPath}/{jobName}"
+    
+    shutil.copy(pathToGraph, jobPath)
+    
+    return jobDirPath, jobPath

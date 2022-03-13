@@ -57,6 +57,9 @@ class GraphLibrary(QtWidgets.QWidget):
         self.libraryTree.setDragEnabled(True)
         self.libraryTree.setModel(self.filesystem)
         self.libraryTree.setRootIndex(self.filesystem.index(self.environment.ReplaceInString(self.libPaths[0])))
+        self.libraryTree.hideColumn(1)
+        self.libraryTree.hideColumn(2)
+        self.libraryTree.hideColumn(3)
         self.masterLayout.addWidget(self.libraryTree)
         
         self.setLayout(self.masterLayout)
@@ -79,6 +82,9 @@ class GraphLibrary(QtWidgets.QWidget):
         
         self.filesystem.setRootPath(currentPath)
         self.libraryTree.setRootIndex(self.filesystem.index(currentPath))
+        self.libraryTree.hideColumn(1)
+        self.libraryTree.hideColumn(2)
+        self.libraryTree.hideColumn(3)
         
         
         

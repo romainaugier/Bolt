@@ -254,11 +254,9 @@ class GGraph(QtWidgets.QGraphicsView):
         self.scene.setItemIndexMethod(QtWidgets.QGraphicsScene.NoIndex)
         self.scene.setSceneRect(0, 0, 800, 800)
         self.setScene(self.scene)
-        # self.setCacheMode(QtWidgets.QGraphicsView.CacheBackground)
         self.setViewportUpdateMode(QtWidgets.QGraphicsView.FullViewportUpdate)
-        self.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.TextAntialiasing | QtGui.QPainter.SmoothPixmapTransform | QtGui.QPainter.HighQualityAntialiasing)
         self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
-        self.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
+        self.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.TextAntialiasing | QtGui.QPainter.SmoothPixmapTransform | QtGui.QPainter.HighQualityAntialiasing)
         self.setContextMenuPolicy(Qt.DefaultContextMenu)
 
         self.setAcceptDrops(True)
@@ -338,6 +336,10 @@ class GGraph(QtWidgets.QGraphicsView):
             painter.drawPolygon(polygon)
 
     # UTILS
+    
+    @QtCore.pyqtSlot(str)
+    def onNodeSelectionChange(self, nodeId : str) -> None:
+        self.selectedNodeChanged.emit(nodeId)
 
     def showPlugEditor(self) -> None:
         """
@@ -346,10 +348,6 @@ class GGraph(QtWidgets.QGraphicsView):
             self.plugEditor.show()
         else:
             self.plugEditor.hide()
-
-    @QtCore.pyqtSlot(str)
-    def onNodeSelectionChange(self, nodeId : str) -> None:
-        self.selectedNodeChanged.emit(nodeId)
 
     def getAnimationLogoMovie(self) -> QtGui.QPixmap:
         """     
@@ -399,9 +397,11 @@ class GGraph(QtWidgets.QGraphicsView):
 
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
         if event.button() == QtCore.Qt.MiddleButton and self.startPos is None:
+            self.setDragMode(QtWidgets.QGraphicsView.NoDrag)
             self.startPos = event.pos()
             self.prevPos = event.pos()
             self.pan = True
+            return
         elif event.button() == QtCore.Qt.LeftButton:
             if QtGui.QGuiApplication.keyboardModifiers() & Qt.AltModifier:
                 items = self.scene.selectedItems()
@@ -409,16 +409,14 @@ class GGraph(QtWidgets.QGraphicsView):
                 if len(items) == 0:
                     items = self.items(event.pos())
                     
-                if len(items) == 0:
-                    return super().mousePressEvent(event)
-                else:
+                if len(items) != 0:
                     self.nodeToDuplicate = items[0] if type(items[0]) is GNode else None
 
             else:
                 self.scene.clearSelection()
                 self.scene.selectedItems()
-                return super().mousePressEvent(event)
-        else:
+                self.setDragMode(QtWidgets.QGraphicsView.RubberBandDrag)
+                
             return super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:

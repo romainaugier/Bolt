@@ -1,11 +1,11 @@
-import binascii, os, threading, json, copy
+import os, threading, json, copy
 
 from functools import lru_cache
 
 from BoltApi.Core.Node import *
 from BoltApi.Core.Logger import *
 from BoltApi.Core.Environment import *
-from BoltApi.Utils.String import Increment
+from BoltApi.Utils.String import Increment, GetRandomStrId
 from BoltApi.Utils.Timer import *
 
 
@@ -59,21 +59,30 @@ class Graph():
         """
         self.logger = logger
         self.environment = copy.deepcopy(environment)
+        
         self.name = name
         self.savePath = ""
+        
         self.hasError = False
         self.isCooked = False
         self.isCooking = False
         self.stopCook = False
+        
         self.cookTime = None
         self.cookProgress = None
         self.progressCallbackFunction = None
+        
         self.nodes : list[Node] = []
         self.exposedPlugs : list[Plug] = []
         self.sortedNodes : list[Node] = []
         self.ifBlocks : dict = {}
+        
         self.nodeCount = 0
-        self.lock = threading.Lock()
+        
+        self.__lock = threading.Lock()
+        self.__flag = threading.Event()
+        self.__flag.set()
+        
         self.tracker = Tracker(self)
 
         self.UpdateEnv()
@@ -110,7 +119,7 @@ class Graph():
     def GetLock(self) -> threading.Lock:
         """
         """
-        return self.lock
+        return self.__lock
 
     def SetAllDirty(self) -> None:
         """
@@ -508,6 +517,7 @@ class Graph():
         self.hasError = False
         self.isCooked = False
         self.isCooking = True
+        self.__flag.set()
         
         if not skipCookedNodes:
             self.SetAllDirty()
@@ -520,6 +530,8 @@ class Graph():
 
         if not self.hasError:
             for node in self.sortedNodes:
+                self.__flag.wait()
+                
                 with self.GetLock():
                     if self.stopCook:
                         self.stopCook = False
@@ -582,6 +594,18 @@ class Graph():
         if self.isCooking:
             with self.GetLock():
                 self.stopCook = True
+                
+    def PauseCook(self) -> None:
+        """
+        Pauses the graph cooking
+        """
+        self.__flag.clear()
+            
+    def ResumeCook(self) -> None:
+        """
+        Resume the graph cooking
+        """
+        self.__flag.set()
 
     def ReportError(self) -> None:
         """
@@ -604,7 +628,7 @@ class Graph():
     def AddNode(self, node : Node) -> None:
         """
         """
-        node.SetID(binascii.hexlify(os.urandom(16)).hex())
+        node.SetID(GetRandomStrId())
 
         while self.GetNodeWithName(node.GetName()) is not None:
             node.SetName(Increment(node.GetName()))

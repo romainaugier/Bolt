@@ -1,4 +1,4 @@
-import re
+import re, os, binascii
 from datetime import datetime
 
 
@@ -49,3 +49,13 @@ def GetCurrentTimeAsStr(format : str = "%m%d%Y_%H%M%S") -> str:
     currentTimeStr = now.strftime(format)
 
     return currentTimeStr
+
+
+def GetRandomStrId(bytes : int = 16) -> str:
+    """
+    Returns a random id as a string
+    
+    Args:
+        bytes (int): number of bytes to generate the id
+    """
+    return binascii.hexlify(os.urandom(bytes)).hex()
