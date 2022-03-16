@@ -23,7 +23,7 @@ class GraphLibrary(QtWidgets.QWidget):
             if path != "":
                 self.libPaths.append(path)
             
-        if len(self.libPaths) == 0:
+        if len(self.libPaths) == 0 or not "$BOLT_LIB/Graphs" in self.libPaths:
             self.libPaths.append("$BOLT_LIB/Graphs")
         
         self.filesystem = QtWidgets.QFileSystemModel()

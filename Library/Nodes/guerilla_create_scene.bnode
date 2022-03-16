@@ -113,6 +113,7 @@ utils.SetRange("{inframerange[0]}-{inframerange[1]}")
 renderPass = guerilla.Document().findchild("RenderPass")
 
 renderPass.FileLayerName.set("$o_$n")
+renderPass.DisplayDriver.set("exr")
 
 guerilla.Document().ProjectWidth.set(2048)
 guerilla.Document().ProjectHeight.set(858)

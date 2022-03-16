@@ -76,23 +76,23 @@ for arg in inargs:
 
 BoltLogMessage(f"NukeBatch Command : {' '.join(command)}")
 
-process = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, encoding="utf-8")
-stdout, stderr = process.communicate()
+process = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, encoding="ISO-8859-1")
 
-try:
-    stdoutAsStr = stdout
-    stderrAsStr = stderr
+stdout = []
 
-    if len(stderrAsStr) > 0:
-        BoltLogError(stderrAsStr)
-    else:
-        BoltLogMessage(f"NukeBatch : Finished executing script")
-        BoltLogMessage(stdoutAsStr)
+while True:
+    output = process.stdout.readline()
 
-        for line in stdoutAsStr.splitlines():
-            if line.startswith("OUTPUTFILE"):
-                outfile = line.split("=")[1].strip()
-except Exception as e:
-    BoltLogMessage(e)
+    if process.poll() is not None:
+        break
+    if output:
+        stdout.append(output)
+        print(output.strip())
+
+for line in stdout:
+    if line.startswith("OUTPUTFILE"):
+        outfile = line.split("=")[1].strip()
+
+BoltLogMessage(f"NukeBatch : Finished executing script")
 
 # EndOp

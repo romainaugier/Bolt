@@ -1,0 +1,356 @@
+{
+  "nodes": [
+    {
+      "name": "Directory",
+      "category": "Utility",
+      "id": "6666656665663564666133346231366631623736356464386634363039613439",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "$BOLT_ICONS/folder.png",
+      "definitionPath": "$BOLT_LIB/Nodes/directory.bnode",
+      "nodeType": "Utility/Directory",
+      "opCode": "\noutdir = indir\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indir": [
+          {
+            "shortName": "indir",
+            "longName": "Input Directory Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "D:/dev/Bolt",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outdir": [
+          {
+            "shortName": "outdir",
+            "longName": "Output Directory Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "D:/dev/Bolt",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "indirtobackup",
+            "connectionNodeId": "3763626431396335383964616339363938636663616135653337636531383163"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Backup_Directory",
+      "category": "Utility",
+      "id": "3763626431396335383964616339363938636663616135653337636531383163",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$BOLT_ICONS/util.png",
+      "definitionPath": "$BOLT_LIB/Nodes/backup_directory.bnode",
+      "nodeType": "Utility/Backup_Directory",
+      "opCode": "\nimport os, subprocess, multiprocessing\n\ncommand = [\"robocopy\", indirtobackup, inbackupdir]\n\nfor filter in infilefilters:\n    fileFilter = f\"*.{filter}\"\n    command.append(fileFilter)\n\noptions = [\"/s\", \"/j\", f\"/MT:{multiprocessing.cpu_count()}\", \"/NS\", \"/NC\", \"/IT\"]\n\nfor option in options:\n    command.append(option)\n\nBoltLogMessage(\"Starting backup\")\nBoltLogMessage(f\"Command : {' '.join(command)}\")\n\nprocess = subprocess.Popen(command, shell=False, stdout=subprocess.PIPE, encoding=\"ISO-8859-1\")\n\nwhile True:\n    output = process.stdout.readline()\n\n    if process.poll() is not None:\n        break\n    if output:\n        print(output.strip())\n\nBoltLogMessage(\"Finished backup\")\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indirtobackup": [
+          {
+            "shortName": "indirtobackup",
+            "longName": "Directory To Save",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "D:/dev/Bolt",
+            "defaultData": "D:/backup",
+            "type": 7,
+            "connectionName": "outdir",
+            "connectionNodeId": "6666656665663564666133346231366631623736356464386634363039613439"
+          }
+        ],
+        "inbackupdir": [
+          {
+            "shortName": "inbackupdir",
+            "longName": "Backup Directory",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/BOLT/Bolt",
+            "defaultData": "Z:/OEUF",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ],
+        "infilefilters": [
+          {
+            "shortName": "infilefilters",
+            "longName": "File Filters",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              "py",
+              "bnode",
+              "bgraph",
+              "png",
+              "style",
+              "nk",
+              "md",
+              "xml",
+              "gif"
+            ],
+            "defaultData": [
+              "abc",
+              "fbx",
+              "hipnc",
+              "hip",
+              "ma",
+              "mb",
+              "spp",
+              "zpr",
+              "gproject",
+              "grendergraph",
+              "json",
+              "exr",
+              "png",
+              "jpg",
+              "tex"
+            ],
+            "type": 9,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outbackupdir": [
+          {
+            "shortName": "outbackupdir",
+            "longName": "Output Backup Directory",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "C:/Python39",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "Backup_Directory1",
+      "category": "Utility",
+      "id": "3662393931346539663263393835343735316137656634646236333433373831",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$BOLT_ICONS/util.png",
+      "definitionPath": "$BOLT_LIB/Nodes/backup_directory.bnode",
+      "nodeType": "Utility/Backup_Directory",
+      "opCode": "\nimport os, subprocess, multiprocessing\n\ncommand = [\"robocopy\", indirtobackup, inbackupdir]\n\nif inenablefilters:\n    for filter in infilefilters:\n        fileFilter = f\"*.{filter}\"\n        command.append(fileFilter)\n\noptions = [\"/s\", \"/j\", f\"/MT:{multiprocessing.cpu_count()}\", \"/NS\", \"/NC\", \"/IT\"]\n\nfor option in options:\n    command.append(option)\n\nBoltLogMessage(\"Starting backup\")\nBoltLogMessage(f\"Command : {' '.join(command)}\")\n\nprocess = subprocess.Popen(command, shell=False, stdout=subprocess.PIPE, encoding=\"ISO-8859-1\")\n\nwhile True:\n    output = process.stdout.readline()\n\n    if process.poll() is not None:\n        break\n    if output:\n        print(output.strip())\n\nBoltLogMessage(\"Finished backup\")\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indirtobackup": [
+          {
+            "shortName": "indirtobackup",
+            "longName": "Directory To Save",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "C:/Python39",
+            "defaultData": "D:/backup",
+            "type": 7,
+            "connectionName": "outdir",
+            "connectionNodeId": "6534626532613265656133386239313762663030306561376261636234383933"
+          }
+        ],
+        "inbackupdir": [
+          {
+            "shortName": "inbackupdir",
+            "longName": "Backup Directory",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/BOLT/Python39",
+            "defaultData": "Z:/OEUF",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ],
+        "inenablefilters": [
+          {
+            "shortName": "inenablefilters",
+            "longName": "Enable File Filtering",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": false,
+            "defaultData": true,
+            "type": 8,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ],
+        "infilefilters": [
+          {
+            "shortName": "infilefilters",
+            "longName": "File Filters",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [],
+            "defaultData": [
+              "abc",
+              "fbx",
+              "hipnc",
+              "hip",
+              "ma",
+              "mb",
+              "spp",
+              "zpr",
+              "gproject",
+              "grendergraph",
+              "json",
+              "exr",
+              "png",
+              "jpg",
+              "tex"
+            ],
+            "type": 9,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outbackupdir": [
+          {
+            "shortName": "outbackupdir",
+            "longName": "Output Backup Directory",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "D:/dev/Bolt",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "Directory1",
+      "category": "Utility",
+      "id": "6534626532613265656133386239313762663030306561376261636234383933",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "$BOLT_ICONS/folder.png",
+      "definitionPath": "$BOLT_LIB/Nodes/directory.bnode",
+      "nodeType": "Utility/Directory",
+      "opCode": "\noutdir = indir\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indir": [
+          {
+            "shortName": "indir",
+            "longName": "Input Directory Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "C:/Python39",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outdir": [
+          {
+            "shortName": "outdir",
+            "longName": "Output Directory Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "C:/Python39",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "indirtobackup",
+            "connectionNodeId": "3662393931346539663263393835343735316137656634646236333433373831"
+          }
+        ]
+      }
+    }
+  ],
+  "tracker": null,
+  "positions": [
+    {
+      "id": "3763626431396335383964616339363938636663616135653337636531383163",
+      "x": 561.0,
+      "y": 314.0
+    },
+    {
+      "id": "6666656665663564666133346231366631623736356464386634363039613439",
+      "x": 8.0,
+      "y": 321.0
+    },
+    {
+      "id": "3662393931346539663263393835343735316137656634646236333433373831",
+      "x": 555.0,
+      "y": -126.0
+    },
+    {
+      "id": "6534626532613265656133386239313762663030306561376261636234383933",
+      "x": -3.0,
+      "y": -128.0
+    }
+  ]
+}

@@ -165,7 +165,7 @@ class MultiPlugWidgetInstance(QtWidgets.QWidget):
         masterLayout.addSpacing(5)
 
         self.closeButton = QtWidgets.QPushButton("")
-        self.closeButton.setIcon(Icons.LoadAndGetIcon("multiplug-instance-close", 10))
+        self.closeButton.setIcon(Icons.LoadAndGetIcon("close", 10))
         self.closeButton.setFixedSize(10, 10)
         self.closeButton.clicked.connect(self.closeWidget)
         masterLayout.addWidget(self.closeButton)
@@ -244,7 +244,7 @@ class DictPlugWidgetInstance(QtWidgets.QWidget):
         masterLayout.addSpacing(5)
 
         self.closeButton = QtWidgets.QPushButton("")
-        self.closeButton.setIcon(Icons.LoadAndGetIcon("multiplug-instance-close", 10))
+        self.closeButton.setIcon(Icons.LoadAndGetIcon("close", 10))
         self.closeButton.setFixedSize(10, 10)
         self.closeButton.clicked.connect(self.closeWidget)
         masterLayout.addWidget(self.closeButton)

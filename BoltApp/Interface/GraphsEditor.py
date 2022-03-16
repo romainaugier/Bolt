@@ -54,15 +54,15 @@ class GraphsEditor(QtWidgets.QWidget):
             
         gGraph.setFocusProxy(self)
 
-        self.tabs.addTab(self.newTab, self.iconsLib.GetIcon("graph-edited"), f"{gGraph.graph.GetName()}")
+        self.tabs.addTab(self.newTab, self.iconsLib.GetIcon("edited"), f"{gGraph.graph.GetName()}")
         self.tabs.setIconSize(QtCore.QSize(18, 18))
 
         self.newTab._layout = QtWidgets.QVBoxLayout()
         gGraph.setFrameStyle(QtWidgets.QFrame.NoFrame)
         gGraph.isCookingMovie.frameChanged.connect(lambda: self.tabs.setTabIcon(tabIndex, QtGui.QIcon(gGraph.getAnimationLogoMovie())))
-        gGraph.hasBeenEdited.connect(lambda: (self.tabs.setTabIcon(tabIndex, self.iconsLib.GetIcon("graph-edited")), 
+        gGraph.hasBeenEdited.connect(lambda: (self.tabs.setTabIcon(tabIndex, self.iconsLib.GetIcon("edited")), 
                                               self.tabs.setTabText(tabIndex, f"{gGraph.graph.GetName()}*")))
-        gGraph.finishedCooking.connect(lambda: self.tabs.setTabIcon(tabIndex, self.iconsLib.GetIcon("graph-done")))
+        gGraph.finishedCooking.connect(lambda: self.tabs.setTabIcon(tabIndex, self.iconsLib.GetIcon("done")))
         gGraph.errorCooking.connect(lambda: self.tabs.setTabIcon(tabIndex, self.iconsLib.GetIcon("error")))
         gGraph.selectedNodeChanged.connect(self.onNodeSelectionChange)
 

@@ -1,0 +1,185 @@
+{
+  "nodes": [
+    {
+      "name": "Directory",
+      "category": "Utility",
+      "id": "6666656665663564666133346231366631623736356464386634363039613439",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "$BOLT_ICONS/folder.png",
+      "definitionPath": "$BOLT_LIB/Nodes/directory.bnode",
+      "nodeType": "Utility/Directory",
+      "opCode": "\noutdir = indir\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indir": [
+          {
+            "shortName": "indir",
+            "longName": "Input Directory Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/FX",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outdir": [
+          {
+            "shortName": "outdir",
+            "longName": "Output Directory Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/FX",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "indirtobackup",
+            "connectionNodeId": "3763626431396335383964616339363938636663616135653337636531383163"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Backup_Directory",
+      "category": "Utility",
+      "id": "3763626431396335383964616339363938636663616135653337636531383163",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$BOLT_ICONS/util.png",
+      "definitionPath": "$BOLT_LIB/Nodes/backup_directory.bnode",
+      "nodeType": "Utility/Backup_Directory",
+      "opCode": "\nimport os, subprocess, multiprocessing\n\ncommand = [\"robocopy\", indirtobackup, inbackupdir]\n\nfor filter in infilefilters:\n    fileFilter = f\"*.{filter}\"\n    command.append(fileFilter)\n\noptions = [\"/s\", \"/j\", f\"/MT:{multiprocessing.cpu_count()}\", \"/NS\", \"/NC\", \"/IT\"]\n\nfor option in options:\n    command.append(option)\n\nBoltLogMessage(\"Starting backup\")\nBoltLogMessage(f\"Command : {' '.join(command)}\")\n\nprocess = subprocess.Popen(command, shell=False, stdout=subprocess.PIPE, encoding=\"ISO-8859-1\")\n\nwhile True:\n    output = process.stdout.readline()\n\n    if process.poll() is not None:\n        break\n    if output:\n        print(output.strip())\n\nBoltLogMessage(\"Finished backup\")\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indirtobackup": [
+          {
+            "shortName": "indirtobackup",
+            "longName": "Directory To Save",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/FX",
+            "defaultData": "D:/backup",
+            "type": 7,
+            "connectionName": "outdir",
+            "connectionNodeId": "6666656665663564666133346231366631623736356464386634363039613439"
+          }
+        ],
+        "inbackupdir": [
+          {
+            "shortName": "inbackupdir",
+            "longName": "Backup Directory",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "D:/backup/FX",
+            "defaultData": "Z:/OEUF",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ],
+        "infilefilters": [
+          {
+            "shortName": "infilefilters",
+            "longName": "File Filters",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              "abc",
+              "fbx",
+              "hipnc",
+              "hip",
+              "ma",
+              "mb",
+              "spp",
+              "zpr",
+              "gproject",
+              "grendergraph",
+              "json",
+              "exr",
+              "png",
+              "jpg",
+              "tex"
+            ],
+            "defaultData": [
+              "abc",
+              "fbx",
+              "hipnc",
+              "hip",
+              "ma",
+              "mb",
+              "spp",
+              "zpr",
+              "gproject",
+              "grendergraph",
+              "json",
+              "exr",
+              "png",
+              "jpg",
+              "tex"
+            ],
+            "type": 9,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outbackupdir": [
+          {
+            "shortName": "outbackupdir",
+            "longName": "Output Backup Directory",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    }
+  ],
+  "tracker": null,
+  "positions": [
+    {
+      "id": "6666656665663564666133346231366631623736356464386634363039613439",
+      "x": -224.0,
+      "y": 205.0
+    },
+    {
+      "id": "3763626431396335383964616339363938636663616135653337636531383163",
+      "x": 261.0,
+      "y": 194.0
+    }
+  ]
+}

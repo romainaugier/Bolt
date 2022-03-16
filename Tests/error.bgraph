@@ -1,0 +1,123 @@
+{
+  "nodes": [
+    {
+      "name": "Directory",
+      "category": "Utility",
+      "id": "3632383865366635356263653764376664373863633031306235386633376130",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "$BOLT_ICONS/folder.png",
+      "definitionPath": "$BOLT_LIB/Nodes/directory.bnode",
+      "nodeType": "Utility/Directory",
+      "opCode": "\noutdir = indir\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indir": [
+          {
+            "shortName": "indir",
+            "longName": "Input Directory Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outdir": [
+          {
+            "shortName": "outdir",
+            "longName": "Output Directory Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "indata",
+            "connectionNodeId": "6231346234313230356630323665346661326664346262306433646535356463"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Warning",
+      "category": "Debug",
+      "id": "6231346234313230356630323665346661326664346262306433646535356463",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$BOLT_ICONS/debug.png",
+      "definitionPath": "$BOLT_LIB/Nodes/warning.bnode",
+      "nodeType": "Debug/Warning",
+      "opCode": "\nBoltLogWarning(\"You have done something bad, but it's ok\")\n\noutdata = indata\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outdir",
+            "connectionNodeId": "3632383865366635356263653764376664373863633031306235386633376130"
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": null,
+            "type": 11,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    }
+  ],
+  "tracker": null,
+  "positions": [
+    {
+      "id": "6231346234313230356630323665346661326664346262306433646535356463",
+      "x": 397.10000000000014,
+      "y": 204.60000000000002
+    },
+    {
+      "id": "3632383865366635356263653764376664373863633031306235386633376130",
+      "x": -35.0,
+      "y": 183.99999999999994
+    }
+  ]
+}

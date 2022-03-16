@@ -413,8 +413,6 @@ class GGraph(QtWidgets.QGraphicsView):
                     self.nodeToDuplicate = items[0] if type(items[0]) is GNode else None
 
             else:
-                # self.scene().clearSelection()
-                # self.scene().selectedItems()
                 self.setDragMode(QtWidgets.QGraphicsView.RubberBandDrag)
                 
             return super().mousePressEvent(event)
@@ -460,10 +458,12 @@ class GGraph(QtWidgets.QGraphicsView):
                     item.setHoveredByNode(True)
                     
                     if nodeToConnect is not None:
-                        self.movingNodeCanConnect = True
-                        edge = item
-                        
-                        self.prepareMovingNodeConnection(edge)
+                        if nodeToConnect.getInputGPlug(0) is not None:
+                            if not nodeToConnect.getInputGPlug(0).IsConnected():
+                                self.movingNodeCanConnect = True
+                                edge = item
+                                
+                                self.prepareMovingNodeConnection(edge)
             
         return super().mouseMoveEvent(event)
 
@@ -563,7 +563,6 @@ class GGraph(QtWidgets.QGraphicsView):
 
         Mainly used to disconnect and expose/unexpose plugs
         """
-
         clickedNode = self.getNodeById(data[0])
         clickedPlug = clickedNode.getInputGPlug(data[1])
 

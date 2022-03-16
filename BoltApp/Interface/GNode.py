@@ -83,8 +83,8 @@ class Badge(QtWidgets.QGraphicsObject):
         self.state = BadgeState.DIRTY
         self.message = ""
 
-        self.dirtyPixmap = self.iconsLib.GetColoredPixmap("badge-dirty", GetQColorFromPalette(ColorPalette.FOREGROUND))
-        self.cookedPixmap = self.iconsLib.GetPixmap("badge-cooked")
+        self.dirtyPixmap = self.iconsLib.GetPixmap("clock")
+        self.cookedPixmap = self.iconsLib.GetPixmap("done")
         self.warningPixmap = self.iconsLib.GetPixmap("warning")
         self.errorPixmap = self.iconsLib.GetPixmap("error")
 

@@ -62,13 +62,13 @@ class App(QtWidgets.QMainWindow):
         shelfLayout.addWidget(self.cookGraphButton)
 
         self.saveGraphButton = QtWidgets.QPushButton("")
-        self.saveGraphButton.setIcon(self.icons.GetIcon("save-graph"))
+        self.saveGraphButton.setIcon(self.icons.GetIcon("save"))
         self.saveGraphButton.setToolTip("Save Active Graph")
         self.saveGraphButton.clicked.connect(lambda: self.saveGraph())
         shelfLayout.addWidget(self.saveGraphButton)
 
         self.loadGraphButton = QtWidgets.QPushButton("")
-        self.loadGraphButton.setIcon(self.icons.GetIcon("load-graph"))
+        self.loadGraphButton.setIcon(self.icons.GetIcon("open"))
         self.loadGraphButton.setToolTip("Load Graph from a file")
         self.loadGraphButton.clicked.connect(lambda: self.ctrlLShortcut())
         shelfLayout.addWidget(self.loadGraphButton)
