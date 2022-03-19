@@ -259,9 +259,15 @@ class GGraph(QtWidgets.QGraphicsView):
         self.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.TextAntialiasing | QtGui.QPainter.SmoothPixmapTransform | QtGui.QPainter.HighQualityAntialiasing)
         self.setContextMenuPolicy(Qt.DefaultContextMenu)
 
+        # OpenGL Rendering
+        glWidget = QtWidgets.QOpenGLWidget()
+        format = QtGui.QSurfaceFormat()
+        format.setSamples(16)
+        glWidget.setFormat(format)
+        self.setViewport(glWidget)
+
         self.setAcceptDrops(True)
 
-        # self.setMinimumSize(800, 800)
         self.gridSize = 50
 
         self.scene().gridSize = self.gridSize

@@ -41,9 +41,9 @@ class Icons():
         iconFolderPath = f"{BOLTROOT}/Library/Icons"
 
         for icon in os.listdir(iconFolderPath):
-            if name in icon:
+            iconName, _ = os.path.splitext(icon)
+            if name == iconName:
                 return QtGui.QIcon(QtGui.QPixmap(f"{iconFolderPath}/{icon}").scaled(size, size))
-
 
     def AddPixmap(self, path : str) -> str:
         """

@@ -20,6 +20,8 @@ class Plug():
 class PlugType(IntEnum):
     """
     Plug types available
+    
+    Plugs corresponds to both input and output of a node
     """
     INT = 1
     INT2 = 2
@@ -35,6 +37,7 @@ class PlugType(IntEnum):
 
 def GetPlugTypeAsStr(plugType : PlugType) -> str:
     """
+    Returns the plug type as a string
     """
     if plugType == PlugType.INT:
         return "int"
@@ -80,8 +83,16 @@ class Parser():
         self.opCode = ""
         
     @staticmethod
-    def CleanBrackets(text : str) -> list:
+    def CleanBrackets(text : str) -> str:
         """
+        Removes brackets [] from a string
+        Mostly used to ease the parsing process
+        
+        Args:
+            text (str) : text to remove brackets from
+            
+        Returns:
+            str: clean text
         """
         clean1 = text.replace("[", "")
         clean2 = clean1.replace("]", "")
@@ -91,6 +102,14 @@ class Parser():
     @staticmethod
     def SplitEqual(text : str) -> list:
         """
+        Split a string with the '=' sign
+        Mostly used to ease the parsing process
+        
+        Args: 
+            text (str): text to split
+            
+        Returns:
+            list: list containing the string before and after the '=' sign
         """
         return text.split("=")
 
@@ -98,6 +117,12 @@ class Parser():
         """
         Preprocesses the file to check if there are any error to return
         and removes comment
+        
+        Args:
+            text (str): text to preprocess
+            
+        Returns:
+            str: preprocessed text
         """
         commentPattern = re.compile(r"\s+\/\/.+|\/\/.+")
 
@@ -107,6 +132,13 @@ class Parser():
 
     def GetPlugType(self, plugTypeStr : str) -> PlugType:
         """
+        Returns the plugtype given a string that
+
+        Args:
+            plugTypeStr (str): string containing the plugType
+
+        Returns:
+            PlugType: PlugType enumeration corresponding to the given string
         """
         if plugTypeStr == "int":
             return PlugType.INT
@@ -135,6 +167,14 @@ class Parser():
 
     def GetAttributes(self, lines : list[str], lineIndex : int) -> int:
         """
+        Parse the attributes of the node definition
+        
+        Args:
+            lines (str): list containing the lines of the node definition file
+            lineIndex (int): current line index to start the parsing from
+        
+        Returns:
+            int : last line index of the attributes block
         """
         while True:
             line = lines[lineIndex]
@@ -170,6 +210,14 @@ class Parser():
 
     def GetPlugs(self, lines : list[str], lineIndex : int) -> int:
         """
+        Parse the plugs of the node definition
+        
+        Args:
+            lines (str): list containing the lines of the node definition file
+            lineIndex (int): current line index to start the parsing from
+        
+        Returns:
+            int : last line index of the plugs block
         """
         tmpShortName = ""
         tmpLongName = ""
@@ -248,6 +296,14 @@ class Parser():
 
     def GetOpCode(self, lines : list[str], lineIndex : int) -> int:
         """
+        Parse the op code of the node definition
+        
+        Args:
+            lines (str): list containing the lines of the node definition file
+            lineIndex (int): current line index to start the parsing from
+        
+        Returns:
+            int : last line index of the opcode block
         """
         while True:
             opLine = lines[lineIndex]
@@ -260,6 +316,13 @@ class Parser():
 
     def Parse(self, nodeFile : str) -> dict:
         """
+        Parse the node definition and returns it as a dictionnary
+        
+        Args: 
+            nodeFile (str): path to the node definition file
+        
+        Returns:
+            dict : node content as dictionnary
         """
         definition = {}
 
@@ -301,10 +364,15 @@ class Plug():
     A Plug has multiple attributes that defines how it can behave in the graph :
     - Exposed = The plug is not connectable to other plugs but can be set as a parameter. Exposed plugs must be input plugs
     - Hidden = The plug is not connectable to other plugs and does not appear in the interface, but can be set as a parameter 
-               will be exposed
+               and will be exposed
     - Exposed To Graph = The plug is not connectable to other plugs but can be set as a parameter and also as a parameter of the graph.
                          It can be useful when you have to deal with large graphs to expose the few important parameters of the nodes
     """
+    
+    isExposed = False
+    isExposedToGraph = False
+    isHidden = False
+    
     def __init__(self, shortName : str, longName : str, parentNode : Node, data = None, dataType : PlugType = None, index : int = 0, connectedPlug : Plug = None):
         """
         """

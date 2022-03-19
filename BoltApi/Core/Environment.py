@@ -29,6 +29,11 @@ class Environment():
         self.Variables["BOLT_ROOT"] = CleanPath(boltRoot)
         self.Variables["BOLT_LIB"] = f"{CleanPath(boltRoot)}/Library"
         self.Variables["BOLT_ICONS"] = f"{CleanPath(boltRoot)}/Library/Icons"
+        
+        if IsExecutable():
+            self.Variables["BOLT_COMMAND"] = f"{CleanPath(boltRoot)}/bin/BoltCommand.exe"
+        else:
+            self.Variables["BOLT_COMMAND"] = f"{CleanPath(boltRoot)}/BoltCommand/Command.py"
 
     def Get(self, varName : str) -> str:
         """
