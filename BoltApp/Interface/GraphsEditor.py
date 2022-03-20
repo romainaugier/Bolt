@@ -32,9 +32,24 @@ class GraphsEditor(QtWidgets.QWidget):
 
         self.addTab()
 
+    # SLOTS
+
     @QtCore.pyqtSlot(str)
     def onNodeSelectionChange(self, nodeId : str) -> None:
         self.selectedNodeChanged.emit(nodeId)
+        
+    # UTILS
+    
+    def updateGraphTabIndexes(self) -> None:
+        """
+        Updates the tab index of the different graphs
+        """
+        for i in range(self.tabs.count()):
+            graph = self.tabs.widget(i).layout().itemAt(0).widget()
+            
+            graph.setTabIndex(i)
+        
+    # TAB METHODS
         
     def addTab(self, graph : GGraph = None) -> None:
         """
@@ -53,17 +68,18 @@ class GraphsEditor(QtWidgets.QWidget):
             gGraph = GGraph(self.nodeLib, self.logger, self.environment)
             
         gGraph.setFocusProxy(self)
+        gGraph.setTabIndex(tabIndex)
 
         self.tabs.addTab(self.newTab, self.iconsLib.GetIcon("edited"), f"{gGraph.graph.GetName()}")
         self.tabs.setIconSize(QtCore.QSize(18, 18))
 
         self.newTab._layout = QtWidgets.QVBoxLayout()
         gGraph.setFrameStyle(QtWidgets.QFrame.NoFrame)
-        gGraph.isCookingMovie.frameChanged.connect(lambda: self.tabs.setTabIcon(tabIndex, QtGui.QIcon(gGraph.getAnimationLogoMovie())))
-        gGraph.hasBeenEdited.connect(lambda: (self.tabs.setTabIcon(tabIndex, self.iconsLib.GetIcon("edited")), 
-                                              self.tabs.setTabText(tabIndex, f"{gGraph.graph.GetName()}*")))
-        gGraph.finishedCooking.connect(lambda: self.tabs.setTabIcon(tabIndex, self.iconsLib.GetIcon("done")))
-        gGraph.errorCooking.connect(lambda: self.tabs.setTabIcon(tabIndex, self.iconsLib.GetIcon("error")))
+        gGraph.isCookingMovie.frameChanged.connect(lambda: self.tabs.setTabIcon(gGraph.getTabIndex(), QtGui.QIcon(gGraph.getAnimationLogoMovie())))
+        gGraph.hasBeenEdited.connect(lambda: (self.tabs.setTabIcon(gGraph.getTabIndex(), self.iconsLib.GetIcon("edited")), 
+                                              self.tabs.setTabText(gGraph.getTabIndex(), f"{gGraph.graph.GetName()}*")))
+        gGraph.finishedCooking.connect(lambda: self.tabs.setTabIcon(gGraph.getTabIndex(), self.iconsLib.GetIcon("done")))
+        gGraph.errorCooking.connect(lambda: self.tabs.setTabIcon(gGraph.getTabIndex(), self.iconsLib.GetIcon("error")))
         gGraph.selectedNodeChanged.connect(self.onNodeSelectionChange)
 
         self.newTab._layout.addWidget(gGraph)
@@ -80,11 +96,13 @@ class GraphsEditor(QtWidgets.QWidget):
         """
         self.tabs.removeTab(index)
         
+        self.updateGraphTabIndexes()
+        
     def removeActiveTab(self) -> None:
         """
         Removes the active tab
         """
-        self.tabs.removeTab(self.tabs.currentIndex())
+        self.removeTab(self.tabs.currentIndex())
 
     def getActiveTabIndex(self) -> int:
         """

@@ -1,18 +1,18 @@
 {
   "nodes": [
     {
-      "name": "Debug",
+      "name": "Sleep",
       "category": "Debug",
-      "id": "3562626334616538623730353064636439303939366465663638313338303030",
+      "id": "6536376335613762393233303764366337323039613131333065623739323639",
       "color": [
         50,
         222,
         132
       ],
       "iconPath": "$BOLT_ICONS/debug.png",
-      "definitionPath": "$BOLT_LIB/Nodes/debug.bnode",
-      "nodeType": "Debug/Debug",
-      "opCode": "\nBoltLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+      "definitionPath": "$BOLT_LIB/Nodes/sleep.bnode",
+      "nodeType": "Debug/Sleep",
+      "opCode": "\nimport time\n\nBoltLogMessage(f\"Sleeping for {intime} seconds\")\n\ntime.sleep(intime)\n\noutdata = indata\n\n",
       "disabled": false,
       "isIfBegin": false,
       "associatedEndBlockId": null,
@@ -27,9 +27,24 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": null,
+            "data": "",
             "defaultData": null,
             "type": 11,
+            "connectionName": "outfile",
+            "connectionNodeId": "6139363735366630346333306265626563353730653833626636363762616530"
+          }
+        ],
+        "intime": [
+          {
+            "shortName": "intime",
+            "longName": "Sleeping Time",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": 20,
+            "defaultData": null,
+            "type": 1,
             "connectionName": null,
             "connectionNodeId": null
           }
@@ -44,7 +59,7 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": null,
+            "data": "",
             "defaultData": null,
             "type": 11,
             "connectionName": null,
@@ -52,14 +67,75 @@
           }
         ]
       }
+    },
+    {
+      "name": "File",
+      "category": "Utility",
+      "id": "6139363735366630346333306265626563353730653833626636363762616530",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "$BOLT_ICONS/file.png",
+      "definitionPath": "$BOLT_LIB/Nodes/file.bnode",
+      "nodeType": "Utility/File",
+      "opCode": "\noutfile = infile\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infile": [
+          {
+            "shortName": "infile",
+            "longName": "Input File Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "indata",
+            "connectionNodeId": "6536376335613762393233303764366337323039613131333065623739323639"
+          }
+        ]
+      }
     }
   ],
-  "tracker": null,
+  "tracker": [
+    "6139363735366630346333306265626563353730653833626636363762616530",
+    "6536376335613762393233303764366337323039613131333065623739323639"
+  ],
   "positions": [
     {
-      "id": "3562626334616538623730353064636439303939366465663638313338303030",
-      "x": 93.0,
-      "y": 290.0
+      "id": "6536376335613762393233303764366337323039613131333065623739323639",
+      "x": 593.0,
+      "y": 297.0
+    },
+    {
+      "id": "6139363735366630346333306265626563353730653833626636363762616530",
+      "x": -40.0,
+      "y": 334.0
     }
   ]
 }

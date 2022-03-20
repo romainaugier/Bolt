@@ -739,18 +739,18 @@ class Graph():
             tmpNode = Node(self.environment)
             tmpNode.SetLogger(self.logger)
             tmpNode.FromDict(node)
+            
             if tmpNode.IsIfBeginBlock():   
                 self.ifBlocks[tmpNode.GetID()] = []
+            
             self.nodes.append(tmpNode)
 
-        # Connect nodes
         for i, node in enumerate(nodesAsDicts):
             for outputName, outputContent in node["outputs"].items():
                 for connection in outputContent:
                     if connection["connectionNodeId"] is not None:
                         nodeToConnect = self.GetNodeWithID(connection["connectionNodeId"])
                         nodeToConnect.SetInput(self.nodes[i].GetOutput(name=outputName), name=connection["connectionName"])
-
 
         if "tracker" in graphDict:
             self.tracker = graphDict["tracker"]
@@ -815,6 +815,7 @@ class Graph():
 
         if not os.path.exists(filePath):
             self.logger.Log(LogLevel.ERROR, f"Can't load graph from file {filePath}, it does not exist")
+            return
         else:
             self.savePath = filePath
             self.name, _ = os.path.splitext(os.path.basename(filePath))

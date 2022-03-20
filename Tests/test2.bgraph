@@ -1,0 +1,141 @@
+{
+  "nodes": [
+    {
+      "name": "Sleep",
+      "category": "Debug",
+      "id": "6636343263313836323737626135643063383039303231623965643262373566",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$BOLT_ICONS/debug.png",
+      "definitionPath": "$BOLT_LIB/Nodes/sleep.bnode",
+      "nodeType": "Debug/Sleep",
+      "opCode": "\nimport time\n\nBoltLogMessage(f\"Sleeping for {intime} seconds\")\n\ntime.sleep(intime)\n\noutdata = indata\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outstr",
+            "connectionNodeId": "6539626533626437663237653339356638623961623631313231316139616231"
+          }
+        ],
+        "intime": [
+          {
+            "shortName": "intime",
+            "longName": "Sleeping Time",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": 15,
+            "defaultData": null,
+            "type": 1,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": null,
+            "type": 11,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "String",
+      "category": "Utility",
+      "id": "6539626533626437663237653339356638623961623631313231316139616231",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "$BOLT_ICONS/string.png",
+      "definitionPath": "$BOLT_LIB/Nodes/string.bnode",
+      "nodeType": "Utility/String",
+      "opCode": "\noutstr = instr\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "instr": [
+          {
+            "shortName": "instr",
+            "longName": "Input String",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": true,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outstr": [
+          {
+            "shortName": "outstr",
+            "longName": "Output String",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "indata",
+            "connectionNodeId": "6636343263313836323737626135643063383039303231623965643262373566"
+          }
+        ]
+      }
+    }
+  ],
+  "tracker": [
+    "6539626533626437663237653339356638623961623631313231316139616231",
+    "6636343263313836323737626135643063383039303231623965643262373566"
+  ],
+  "positions": [
+    {
+      "id": "6636343263313836323737626135643063383039303231623965643262373566",
+      "x": 463.0,
+      "y": 280.0
+    },
+    {
+      "id": "6539626533626437663237653339356638623961623631313231316139616231",
+      "x": 33.0,
+      "y": 326.0
+    }
+  ]
+}

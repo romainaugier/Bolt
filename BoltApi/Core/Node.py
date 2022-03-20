@@ -1357,8 +1357,8 @@ class Node():
             tmpPlug = Plug(output["shortName"], output["longName"], self, output["defaultData"], output["type"])
             tmpPlug.SetData(output["data"])
             tmpPlug.SetExposed(output["isExposed"])
-            tmpPlug.SetHidden(input["isHidden"])
-            tmpPlug.SetExposedToGraph(input["isExposedToGraph"])
+            tmpPlug.SetHidden(output["isHidden"])
+            tmpPlug.SetExposedToGraph(output["isExposedToGraph"])
             tmpPlug.SetIndex(output["index"])
             self.outputs[outputName] = tmpPlug
 

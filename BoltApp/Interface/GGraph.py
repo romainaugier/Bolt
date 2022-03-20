@@ -204,6 +204,8 @@ class GGraph(QtWidgets.QGraphicsView):
     threadCanJoin = QtCore.pyqtSignal()
 
     selectedNodeChanged = QtCore.pyqtSignal(str)
+    
+    tabIndex = None
 
     def __init__(self, nodeLib : Lib, logger : Logger, env : Environment, graph : Graph = None) -> None:
         """
@@ -259,15 +261,6 @@ class GGraph(QtWidgets.QGraphicsView):
         self.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.TextAntialiasing | QtGui.QPainter.SmoothPixmapTransform | QtGui.QPainter.HighQualityAntialiasing)
         self.setContextMenuPolicy(Qt.DefaultContextMenu)
 
-        # OpenGL Rendering
-        glWidget = QtWidgets.QOpenGLWidget()
-        format = QtGui.QSurfaceFormat()
-        format.setSamples(16)
-        glWidget.setFormat(format)
-        self.setViewport(glWidget)
-
-        self.setAcceptDrops(True)
-
         self.gridSize = 50
 
         self.scene().gridSize = self.gridSize
@@ -303,6 +296,18 @@ class GGraph(QtWidgets.QGraphicsView):
         Sets the environment of the internal graph
         """
         self.getInternalGraph().SetEnv(environment)
+        
+    def getTabIndex(self) -> int:
+        """
+        Returns the graph tab index
+        """
+        return self.tabIndex
+    
+    def setTabIndex(self, tabIndex : int) -> None:
+        """
+        Sets the tab index
+        """
+        self.tabIndex = tabIndex
 
     # PAINTING
 

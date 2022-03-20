@@ -48,24 +48,24 @@
             "defaultData": "",
             "type": 7,
             "connectionName": "indata",
-            "connectionNodeId": "6231346234313230356630323665346661326664346262306433646535356463"
+            "connectionNodeId": "3839383066396134393635366138653938353361653561326330333332636539"
           }
         ]
       }
     },
     {
-      "name": "Warning",
+      "name": "Sleep",
       "category": "Debug",
-      "id": "6231346234313230356630323665346661326664346262306433646535356463",
+      "id": "3839383066396134393635366138653938353361653561326330333332636539",
       "color": [
         50,
         222,
         132
       ],
       "iconPath": "$BOLT_ICONS/debug.png",
-      "definitionPath": "$BOLT_LIB/Nodes/warning.bnode",
-      "nodeType": "Debug/Warning",
-      "opCode": "\nBoltLogWarning(\"You have done something bad, but it's ok\")\n\noutdata = indata\n\n",
+      "definitionPath": "$BOLT_LIB/Nodes/sleep.bnode",
+      "nodeType": "Debug/Sleep",
+      "opCode": "\nimport time\n\nBoltLogMessage(f\"Sleeping for {intime} seconds\")\n\ntime.sleep(intime)\n\noutdata = indata\n\n",
       "disabled": false,
       "isIfBegin": false,
       "associatedEndBlockId": null,
@@ -85,6 +85,74 @@
             "type": 11,
             "connectionName": "outdir",
             "connectionNodeId": "3632383865366635356263653764376664373863633031306235386633376130"
+          }
+        ],
+        "intime": [
+          {
+            "shortName": "intime",
+            "longName": "Sleeping Time",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": 5,
+            "defaultData": null,
+            "type": 1,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "indata",
+            "connectionNodeId": "3231643835353963333739386632393430626565656234393434373266653466"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Error",
+      "category": "Debug",
+      "id": "3231643835353963333739386632393430626565656234393434373266653466",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$BOLT_ICONS/debug.png",
+      "definitionPath": "$BOLT_LIB/Nodes/error.bnode",
+      "nodeType": "Debug/Error",
+      "opCode": "\nBoltLogError(\"You have done something bad\")\n\nBoltError()\n\noutdata = indata\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outdata",
+            "connectionNodeId": "3839383066396134393635366138653938353361653561326330333332636539"
           }
         ]
       },
@@ -107,12 +175,21 @@
       }
     }
   ],
-  "tracker": null,
+  "tracker": [
+    "3632383865366635356263653764376664373863633031306235386633376130",
+    "3839383066396134393635366138653938353361653561326330333332636539",
+    "3231643835353963333739386632393430626565656234393434373266653466"
+  ],
   "positions": [
     {
-      "id": "6231346234313230356630323665346661326664346262306433646535356463",
-      "x": 397.10000000000014,
-      "y": 204.60000000000002
+      "id": "3839383066396134393635366138653938353361653561326330333332636539",
+      "x": 268.0,
+      "y": 199.0
+    },
+    {
+      "id": "3231643835353963333739386632393430626565656234393434373266653466",
+      "x": 517.0,
+      "y": 235.0
     },
     {
       "id": "3632383865366635356263653764376664373863633031306235386633376130",
