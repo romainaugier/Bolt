@@ -27,7 +27,7 @@
             "isExposed": true,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "Z:/OEUF/RENDER/SQ060/SHOT010/LD1",
+            "data": "Z:/OEUF/RENDER/SQ060/SHOT010/LD9",
             "defaultData": "",
             "type": 7,
             "connectionName": null,
@@ -44,94 +44,11 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "Z:/OEUF/RENDER/SQ060/SHOT010/LD1",
+            "data": "Z:/OEUF/RENDER/SQ060/SHOT010/LD9",
             "defaultData": "",
             "type": 7,
             "connectionName": "inrenderdir",
-            "connectionNodeId": "3666383338663364396436393834306335336438363834656364623630393138"
-          }
-        ]
-      }
-    },
-    {
-      "name": "NK_GenerateDaily",
-      "category": "Nuke",
-      "id": "3666383338663364396436393834306335336438363834656364623630393138",
-      "color": [
-        0,
-        0,
-        0
-      ],
-      "iconPath": "$BOLT_ICONS/nuke.png",
-      "definitionPath": "$BOLT_LIB/Nodes/nk_generatedaily.bnode",
-      "nodeType": "Nuke/NK_GenerateDaily",
-      "opCode": "\ngeneratedScript = f\"\"\"import nuke, os, sys\n\nnuke.scriptOpen(\"{innuketemplate}\")\n\nseqs = nuke.getFileNameList(\"{inrenderdir}\")\n\nsupdir = os.path.basename(\"{inrenderdir}\")\nsupdir1 = os.path.basename(os.path.dirname(\"{inrenderdir}\"))\nsupdir2 = os.path.basename(os.path.dirname(os.path.dirname(\"{inrenderdir}\")))\n\noutputfile = \"{inrenderdir}/daily/{{}}_{{}}_{{}}_daily.mov\".format(supdir2, supdir1, supdir)\n\nprint(seqs)\n\nif len(seqs) > 0:\n    if not os.path.exists(outputfile):\n        os.makedirs(os.path.dirname(outputfile))\n\n    read = nuke.toNode(\"MAIN_READ\")\n    read.knob(\"file\").fromUserText(\"{inrenderdir}/\" + seqs[0])\n\n    write = nuke.toNode(\"MAIN_WRITE\")\n    write.knob(\"file\").fromUserText(outputfile)\n\n    first = int(read.knob(\"first\").getValue())\n    last = int(read.knob(\"last\").getValue())\n\n    nuke.execute(\"MAIN_WRITE\", start=first, end=last, incr=1)\n\nelse:\n    sys.stderr.write(\"[ERROR] Nk_GenerateDaily : No file sequence found\")\n\n\"\"\"\n\ntmpScriptFilePath = BoltTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as file:\n    file.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\n\n",
-      "disabled": false,
-      "isIfBegin": false,
-      "associatedEndBlockId": null,
-      "isIfEnd": false,
-      "associatedBeginBlockId": null,
-      "inputs": {
-        "inrenderdir": [
-          {
-            "shortName": "inrenderdir",
-            "longName": "Render Directory",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": "Z:/OEUF/RENDER/SQ060/SHOT010/LD1",
-            "defaultData": "",
-            "type": 7,
-            "connectionName": "outdir",
-            "connectionNodeId": "6361613533383534326539376133363263393736306265363937393532333562"
-          }
-        ],
-        "innuketemplate": [
-          {
-            "shortName": "innuketemplate",
-            "longName": "Nuke Template File",
-            "index": 0,
-            "isExposed": true,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": "D:/dev/Bolt/Library/Templates/Nuke/generate_daily.nk",
-            "defaultData": "D:/dev/Bolt/Library/Templates/Nuke/generate_daily.nk",
-            "type": 7,
-            "connectionName": null,
-            "connectionNodeId": null
-          }
-        ]
-      },
-      "outputs": {
-        "outscriptfile": [
-          {
-            "shortName": "outscriptfile",
-            "longName": "Script File",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Bolt/3462363064613562323732316461353261633131353735346138333534613836.py",
-            "defaultData": "",
-            "type": 7,
-            "connectionName": "inscriptfile",
-            "connectionNodeId": "3231396138376430653937353964616334653261303364326334383632346162"
-          }
-        ],
-        "outrenderdir": [
-          {
-            "shortName": "outrenderdir",
-            "longName": "Render Directory",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": "",
-            "defaultData": "",
-            "type": 7,
-            "connectionName": null,
-            "connectionNodeId": null
+            "connectionNodeId": "3738396565336231356266653933336633376436343864313235653237383830"
           }
         ]
       }
@@ -163,11 +80,11 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Bolt/3462363064613562323732316461353261633131353735346138333534613836.py",
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Bolt/6535333162346534396535333962343062313332383731336564353263333565.py",
             "defaultData": "",
             "type": 7,
             "connectionName": "outscriptfile",
-            "connectionNodeId": "3666383338663364396436393834306335336438363834656364623630393138"
+            "connectionNodeId": "3738396565336231356266653933336633376436343864313235653237383830"
           }
         ],
         "inargs": [
@@ -271,15 +188,113 @@
           }
         ]
       }
+    },
+    {
+      "name": "NK_GenerateDaily1",
+      "category": "Nuke",
+      "id": "3738396565336231356266653933336633376436343864313235653237383830",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$BOLT_ICONS/nuke.png",
+      "definitionPath": "$BOLT_LIB/Nodes/nk_generatedaily.bnode",
+      "nodeType": "Nuke/NK_GenerateDaily",
+      "opCode": "\nif inapplyaces:\n    writeNodeName = \"MAIN_WRITE\"\nelse:\n    writeNodeName = \"MAIN_WRITE_RAW\"\n\ngeneratedScript = f\"\"\"import nuke, os, sys\n\nnuke.scriptOpen(\"{innuketemplate}\")\n\nseqs = nuke.getFileNameList(\"{inrenderdir}\")\n\nsupdir = os.path.basename(\"{inrenderdir}\")\nsupdir1 = os.path.basename(os.path.dirname(\"{inrenderdir}\"))\nsupdir2 = os.path.basename(os.path.dirname(os.path.dirname(\"{inrenderdir}\")))\n\noutputfile = \"{inrenderdir}/daily/{{}}_{{}}_{{}}_daily.mov\".format(supdir2, supdir1, supdir)\n\nprint(seqs)\n\nif len(seqs) > 0:\n    if not os.path.exists(outputfile):\n        os.makedirs(os.path.dirname(outputfile))\n\n    read = nuke.toNode(\"MAIN_READ\")\n    read.knob(\"file\").fromUserText(\"{inrenderdir}/\" + seqs[0])\n\n    write = nuke.toNode(\"{writeNodeName}\")\n    write.knob(\"file\").fromUserText(outputfile)\n\n    first = int(read.knob(\"first\").getValue())\n    last = int(read.knob(\"last\").getValue())\n\n    nuke.execute(\"{writeNodeName}\", start=first, end=last, incr=1)\n\nelse:\n    sys.stderr.write(\"[ERROR] Nk_GenerateDaily : No file sequence found\")\n\n\"\"\"\n\ntmpScriptFilePath = BoltTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as file:\n    file.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "inrenderdir": [
+          {
+            "shortName": "inrenderdir",
+            "longName": "Render Directory",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/RENDER/SQ060/SHOT010/LD9",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outdir",
+            "connectionNodeId": "6361613533383534326539376133363263393736306265363937393532333562"
+          }
+        ],
+        "inapplyaces": [
+          {
+            "shortName": "inapplyaces",
+            "longName": "Apply ACES Correction",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": true,
+            "defaultData": true,
+            "type": 8,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ],
+        "innuketemplate": [
+          {
+            "shortName": "innuketemplate",
+            "longName": "Nuke Template File",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "D:/dev/Bolt/Library/Templates/Nuke/generate_daily.nk",
+            "defaultData": "D:/dev/Bolt/Library/Templates/Nuke/generate_daily.nk",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outscriptfile": [
+          {
+            "shortName": "outscriptfile",
+            "longName": "Script File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Bolt/6535333162346534396535333962343062313332383731336564353263333565.py",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "inscriptfile",
+            "connectionNodeId": "3231396138376430653937353964616334653261303364326334383632346162"
+          }
+        ],
+        "outrenderdir": [
+          {
+            "shortName": "outrenderdir",
+            "longName": "Render Directory",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
     }
   ],
-  "tracker": null,
+  "tracker": [
+    "6361613533383534326539376133363263393736306265363937393532333562",
+    "3738396565336231356266653933336633376436343864313235653237383830",
+    "3231396138376430653937353964616334653261303364326334383632346162",
+    "6165326261396234303866653161373766333562383036653436303266313339"
+  ],
   "positions": [
-    {
-      "id": "3666383338663364396436393834306335336438363834656364623630393138",
-      "x": 146.79000000000002,
-      "y": 301.00000000000006
-    },
     {
       "id": "6361613533383534326539376133363263393736306265363937393532333562",
       "x": -200.0,
@@ -294,6 +309,11 @@
       "id": "6165326261396234303866653161373766333562383036653436303266313339",
       "x": 1048.2940000000003,
       "y": 300.307
+    },
+    {
+      "id": "3738396565336231356266653933336633376436343864313235653237383830",
+      "x": 149.59999999999997,
+      "y": 300.3
     }
   ]
 }

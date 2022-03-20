@@ -1,21 +1,20 @@
 #! C:/Program Files/Nuke13.0v5/nuke-13.0.5.dll -nx
-#write_info MAIN_WRITE file:"D:/output.mov" format:"2048 858 1" chans:":rgba.red:rgba.green:rgba.blue:" framerange:"1 120" fps:"0" colorspace:"Output - Rec.709" datatype:"unknown" transfer:"unknown" views:"main" colorManagement:"OCIO"
 version 13.0 v5
 define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
 <layout version="1.0">
-    <window x="-1" y="-8" w="1920" h="1137" maximized="1" screen="0">
+    <window x="0" y="0" w="1917" h="1128" screen="0">
         <splitter orientation="1">
             <split size="40"/>
             <dock id="" hideTitles="1" activePageId="Toolbar.1">
                 <page id="Toolbar.1"/>
             </dock>
-            <split size="1257" stretch="1"/>
+            <split size="1254" stretch="1"/>
             <splitter orientation="2">
-                <split size="643"/>
+                <split size="638"/>
                 <dock id="" activePageId="Viewer.1">
                     <page id="Viewer.1"/>
                 </dock>
-                <split size="452"/>
+                <split size="448"/>
                 <dock id="" activePageId="DAG.1" focus="true">
                     <page id="DAG.1"/>
                     <page id="Curve Editor.1"/>
@@ -63,7 +62,7 @@ Read {
  xpos 110
  ypos -73
 }
-set Nee679800 [stack 0]
+set N1be19800 [stack 0]
 Viewer {
  frame 1
  frame_range 1-120
@@ -72,7 +71,7 @@ Viewer {
  xpos 271
  ypos 65
 }
-push $Nee679800
+push $N1be19800
 Write {
  file D:/output.mov
  colorspace "Output - Rec.709"
@@ -93,6 +92,30 @@ Write {
  create_directories true
  checkHashOnRead false
  name MAIN_WRITE
- xpos 110
- ypos 113
+ xpos -5
+ ypos 108
+}
+push $N1be19800
+Write {
+ file D:/output.mov
+ colorspace data
+ file_type mov
+ mov64_format "mov (QuickTime / MOV)"
+ mov64_codec h264
+ mov_h264_codec_profile "High 4:2:0 8-bit"
+ mov64_pixel_format {{0}}
+ mov64_quality High
+ mov64_fast_start true
+ mov64_write_timecode true
+ mov64_gop_size 12
+ mov64_b_frames 0
+ mov64_bitrate 28000
+ mov64_bitrate_tolerance 0
+ mov64_quality_min 1
+ mov64_quality_max 3
+ create_directories true
+ checkHashOnRead false
+ name MAIN_WRITE_RAW
+ xpos 180
+ ypos 112
 }

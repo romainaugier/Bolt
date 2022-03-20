@@ -20,6 +20,16 @@ exposed = False
 
 # BeginPlug
 
+shortName = inapplyaces
+longName = Apply ACES Correction
+defaultValue = True
+type = bool
+exposed = True
+
+# EndPlug
+
+# BeginPlug
+
 shortName = innuketemplate
 longName = Nuke Template File
 defaultValue = "D:/dev/Bolt/Library/Templates/Nuke/generate_daily.nk"
@@ -50,6 +60,11 @@ type = str
 
 # BeginOp
 
+if inapplyaces:
+    writeNodeName = "MAIN_WRITE"
+else:
+    writeNodeName = "MAIN_WRITE_RAW"
+
 generatedScript = f"""import nuke, os, sys
 
 nuke.scriptOpen("{innuketemplate}")
@@ -71,13 +86,13 @@ if len(seqs) > 0:
     read = nuke.toNode("MAIN_READ")
     read.knob("file").fromUserText("{inrenderdir}/" + seqs[0])
 
-    write = nuke.toNode("MAIN_WRITE")
+    write = nuke.toNode("{writeNodeName}")
     write.knob("file").fromUserText(outputfile)
 
     first = int(read.knob("first").getValue())
     last = int(read.knob("last").getValue())
 
-    nuke.execute("MAIN_WRITE", start=first, end=last, incr=1)
+    nuke.execute("{writeNodeName}", start=first, end=last, incr=1)
 
 else:
     sys.stderr.write("[ERROR] Nk_GenerateDaily : No file sequence found")
