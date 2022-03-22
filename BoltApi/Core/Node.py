@@ -373,7 +373,7 @@ class Plug():
     isExposedToGraph = False
     isHidden = False
     
-    def __init__(self, shortName : str, longName : str, parentNode : Node, data = None, dataType : PlugType = None, index : int = 0, connectedPlug : Plug = None):
+    def __init__(self, shortName : str, longName : str, parentNode : Node, data = None, dataType : PlugType = PlugType.CUSTOM, index : int = 0, connectedPlug : Plug = None):
         """
         """
         self.shortName : str = shortName
@@ -392,6 +392,8 @@ class Plug():
         self.isExposedToGraph = False
         self.isHidden = False
 
+    # GETTERS / SETTERS
+
     def GetShortName(self) -> str:
         """
         Returns:
@@ -408,6 +410,7 @@ class Plug():
 
     def SetNode(self, node : Node) -> None:
         """
+        Sets the parent node of the plug
         """
         self.parentNode = node
     
@@ -427,6 +430,7 @@ class Plug():
 
     def SetIndex(self, index : int) -> None:
         """
+        Sets the index of the plug
         """
         self.index = index
 
@@ -444,14 +448,19 @@ class Plug():
         """
         return self.type
 
-    def IsExposed(self) -> None:
+    def IsExposed(self) -> bool:
         """
-        Tells if a plug is exposed (as a parameter)
+        Returns:
+            bool: True if the plug is exposed
         """
         return self.isExposed
 
     def SetExposed(self, isExposed : bool) -> None:
         """
+        Sets the plug exposed state
+        
+        Args:
+            isExposed (bool): state of the exposition 
         """
         self.isExposed = isExposed
 
@@ -492,6 +501,8 @@ class Plug():
             self.SetExposed(True)
 
         self.isHidden = isHidden
+        
+    # CONNECTION METHODS
 
     def IsConnected(self) -> bool:
         """
@@ -571,6 +582,20 @@ class Plug():
         if self.connectedPlugs is not None:
             plug.connectedPlugs.remove(self)
             self.connectedPlugs.remove(plug)
+            
+    # OPERATORS
+    
+    def __rshift__(self, other : Plug) -> None:
+        """
+        Overload of the >> operator to connect plugs between each other
+        """
+        self.Connect(other)
+        
+    def __lshift__(self, other : Plug) -> None:
+        """
+        Overload of the << operator to connect plugs between each other
+        """
+        other.Connect(self)
 
 class Node():
     """
@@ -620,6 +645,8 @@ class Node():
         
         self.opCode = ""
         self.opCompiledCode = ""
+        
+    # SETTERS / GETTERS
 
     def SetName(self, name : str) -> None:
         """
@@ -675,22 +702,6 @@ class Node():
             str: opcode of the node
         """
         return self.opCode
-    
-    def ReloadOpCode(self) -> None:
-        """
-        Reloads the opcode from the definition file
-        """
-        tmpNode = Node(self.environment)
-        tmpNode.Load(self.definitionPath)
-        
-        self.SetOpCode(tmpNode.GetOpCode())
-        self.Compile()
-    
-    def Compile(self) -> None:
-        """
-        Compiles the node code to fasten the code execution
-        """
-        self.opCompiledCode = compile(self.opCode, "compiledCode", "exec")
 
     def SetID(self, id : str) -> None:
         """
@@ -850,6 +861,18 @@ class Node():
             bool: temp queue state of the node
         """
         return self.inTempQueue
+        
+    def GetDefinitionPath(self) -> str:
+        """
+        """
+        return self.definitionPath
+    
+    def SetDefinitionPath(self, path : str) -> None:
+        """
+        """
+        self.definitionPath = path
+    
+    # INPUTS / OUTPUTS 
     
     def GetInput(self, name : str = None, index : int = None) -> Plug:
         """
@@ -920,11 +943,31 @@ class Node():
             return list(self.inputs.values())[index].Connect(plug)
         else:
             return None
-            
+        
+    def AddInput(self, plug : Plug) -> None:
+        """
+        Adds an input to the node
+
+        Args:
+            plug (Plug): plug to add
+        """
+        self.inputs[plug.GetShortName()] = plug
+        
+    def RemoveInput(self, name : str) -> None:
+        """
+        Removes an input given its name
+
+        Args:
+            name (str): name of the input to remove
+        """
+        if name in self.inputs:
+            self.inputs.remove(name)
+                    
     def GetOutput(self, name : str = None, index : int = None) -> Plug:
         """
         Args:
             index (int): index of the output plug to return
+            
         Returns:
             Plug: output plug at the given index
         """
@@ -950,19 +993,74 @@ class Node():
         Checks if the node has no outputs connected
 
         Returns:
-            bool:
+            bool: True if the node has no outputs connected
         """
         for name, output in self.outputs.items():
             if output.IsConnected() and not output.IsExposed():
                 return False
 
         return True
+    
+    def AddOutput(self, plug : Plug) -> None:
+        """
+        Adds an output to the node
+
+        Args:
+            plug (Plug): plug to add
+        """
+        self.outputs[plug.GetShortName()] = plug
+        
+    def RemoveOutput(self, name : str) -> None:
+        """
+        Removes an output given its name
+
+        Args:
+            name (str): name of the output to remove
+        """
+        if name in self.outputs:
+            self.outputs.remove(name)
 
     def SetPlugValue(self, plugName : str, value) -> None:
         """
+        Sets the value of a plug given its name
+        
+        Args:
+            plugName (str): name of the plug to set value
         """
         if plugName in self.inputs:
             self.inputs[plugName].SetData(value)
+            
+    def __getitem__(self, name : str) -> Plug:
+        """
+        Overload of the [] operator to access plugs (input or output) by name
+        
+        Returns:
+            Plug: input or output if found, else None
+        """
+        if name in self.inputs: 
+            return self.GetInput(name=name)
+        elif name in self.outputs:
+            return self.GetOutput(name=name)
+        else:
+            return None
+        
+    # COOKING / OP
+    
+    def ReloadOpCode(self) -> None:
+        """
+        Reloads the opcode from the definition file
+        """
+        tmpNode = Node(self.environment)
+        tmpNode.Load(self.definitionPath)
+        
+        self.SetOpCode(tmpNode.GetOpCode())
+        self.Compile()
+    
+    def Compile(self) -> None:
+        """
+        Compiles the node code to fasten the code execution
+        """
+        self.opCompiledCode = compile(self.opCode, "compiledCode", "exec")
         
     def Cook(self) -> None:
         """
@@ -1200,16 +1298,6 @@ class Node():
         self.UpdateEnv()
 
         self.Compile()
-        
-    def GetDefinitionPath(self) -> str:
-        """
-        """
-        return self.definitionPath
-    
-    def SetDefinitionPath(self, path : str) -> None:
-        """
-        """
-        self.definitionPath = path
 
     def ToDict(self) -> dict:
         """

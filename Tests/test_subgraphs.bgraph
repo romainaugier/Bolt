@@ -1,0 +1,189 @@
+{
+  "nodes": [
+    {
+      "name": "File",
+      "category": "Utility",
+      "id": "3366356137316663613831336162333630373738373031343032333661373037",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "$BOLT_ICONS/file.png",
+      "definitionPath": "$BOLT_LIB/Nodes/file.bnode",
+      "nodeType": "Utility/File",
+      "opCode": "\noutfile = infile\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "infile": [
+          {
+            "shortName": "infile",
+            "longName": "Input File Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "prout",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "prout",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "input1",
+            "connectionNodeId": "3437373461613665346431313032353362323833343837373162316631646665"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Debug",
+      "category": "Debug",
+      "id": "6537333765646562323930383930373863343435663339373930316133646233",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$BOLT_ICONS/debug.png",
+      "definitionPath": "$BOLT_LIB/Nodes/debug.bnode",
+      "nodeType": "Debug/Debug",
+      "opCode": "\nBoltLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "output1",
+            "connectionNodeId": "3437373461613665346431313032353362323833343837373162316631646665"
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "SubGraph",
+      "category": "",
+      "id": "3437373461613665346431313032353362323833343837373162316631646665",
+      "color": [],
+      "iconPath": "",
+      "definitionPath": "",
+      "nodeType": "",
+      "opCode": "",
+      "disabled": false,
+      "isIfBegin": false,
+      "associatedEndBlockId": null,
+      "isIfEnd": false,
+      "associatedBeginBlockId": null,
+      "inputs": {
+        "input1": [
+          {
+            "shortName": "input1",
+            "longName": "Input 1",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "indata",
+            "connectionNodeId": "3837656238353232343734333264326137633539353162363765373031363535"
+          },
+          {
+            "shortName": "input1",
+            "longName": "Input 1",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outfile",
+            "connectionNodeId": "3366356137316663613831336162333630373738373031343032333661373037"
+          }
+        ]
+      },
+      "outputs": {
+        "output1": [
+          {
+            "shortName": "output1",
+            "longName": "Output 1",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outdata",
+            "connectionNodeId": "3837656238353232343734333264326137633539353162363765373031363535"
+          },
+          {
+            "shortName": "output1",
+            "longName": "Output 1",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "indata",
+            "connectionNodeId": "6537333765646562323930383930373863343435663339373930316133646233"
+          }
+        ]
+      }
+    }
+  ],
+  "tracker": [
+    "3366356137316663613831336162333630373738373031343032333661373037",
+    "6537333765646562323930383930373863343435663339373930316133646233"
+  ]
+}

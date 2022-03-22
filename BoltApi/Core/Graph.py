@@ -62,6 +62,7 @@ class Graph():
         
         self.name = name
         self.savePath = ""
+        self.isSubGraph = False
         
         self.hasError = False
         self.isCooked = False
@@ -131,6 +132,18 @@ class Graph():
         """
         """
         return self.ifBlocks
+    
+    def SetSubGraph(self, isSubGraph : bool = True) -> None:
+        """
+        """
+        self.isSubGraph = isSubGraph
+        
+    def IsSubGraph(self) -> bool:
+        """
+        If the graph is a subgraph (a graph of a SubGraph node) returns True,
+        else False
+        """
+        return self.isSubGraph
 
     # ENV
 
@@ -504,12 +517,13 @@ class Graph():
             
             skipCookedNodes (bool, optional): skips the node if they are already cooked. Defaults to True.
         """
-        if self.GetSavePath() == "":
+        if self.GetSavePath() == "" and not self.IsSubGraph():
             self.ReportError()
             self.logger.Log(LogLevel.ERROR, f"(Graph : {self.name}) : Graph needs to be saved before cooking it")
             return
         
-        self.SaveToFile(self.GetSavePath())
+        if not self.IsSubGraph():
+            self.SaveToFile(self.GetSavePath())
         
         cookStart = Timer.Start()
         self.UpdateProgress(0.0)
@@ -539,7 +553,9 @@ class Graph():
                         self.ReportError()
                         self.logger.Log(LogLevel.ERROR, f"(Graph : {self.name} : Cooking interrupted")
                         self.tracker.Update()
-                        self.SaveToFile(self.GetSavePath())
+                        
+                        if not self.IsSubGraph():
+                            self.SaveToFile(self.GetSavePath())
                         return
 
                 if skipCookedNodes:
@@ -552,8 +568,9 @@ class Graph():
                 node.Cook()
 
                 self.tracker.Update()
-                self.SaveToFile(self.GetSavePath())
-
+                
+                if not self.IsSubGraph():
+                    self.SaveToFile(self.GetSavePath())
 
                 # Check for errors
                 if node.hasError:
@@ -780,18 +797,22 @@ class Graph():
         self.name, _ = os.path.splitext(os.path.basename(filePath))
         self.savePath = filePath
         
-        with open(filePath, "r") as file:
-            oldFileContent = file.read()
-            oldFileData = json.loads(oldFileContent)
-            
+        fileAlreadyExists = os.path.exists(filePath)
+        
+        if fileAlreadyExists:
+            with open(filePath, "r") as file:
+                oldFileContent = file.read()
+                oldFileData = json.loads(oldFileContent)
+                
         if saveAsString:
             with open(filePath, "w") as file:
                 serializedGraph = self.Serialize()
                 
                 jsonGraph = json.loads(serializedGraph)
                 
-                if "positions" in oldFileData:
-                    jsonGraph["positions"] = oldFileData["positions"]
+                if fileAlreadyExists:
+                    if "positions" in oldFileData:
+                        jsonGraph["positions"] = oldFileData["positions"]
                 
                 serializedGraph = json.dumps(jsonGraph, indent=2)
                 

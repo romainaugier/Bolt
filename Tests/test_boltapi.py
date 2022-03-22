@@ -1,17 +1,4 @@
-import sys, os, copy, json
-
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-
-from BoltApi.Core.Node import *
-from BoltApi.Core.Graph import *
-from BoltApi.Core.Lib import *
-from BoltApi.Core.Logger import *
-from BoltApp import BOLTROOT
-
-TESTDIR = os.path.dirname(__file__)
-
-def PrintSeps():
-    print(f"\n{'#' * 30}\n")
+from Tests.test import *
 
 if __name__ == "__main__":
     logger = Logger(level=LogLevel.DEBUG)
@@ -55,8 +42,8 @@ if __name__ == "__main__":
     
     logger.Log(LogLevel.DEBUG, "Connecting Nodes...")
 
-    debugNode.SetInput(fileNode.GetOutput(name="outfile"), name="indata")
-    pythonNode.SetInput(debugNode.GetOutput(name="outdata"), name="inscript")
+    fileNode["outfile"] >> debugNode["indata"]
+    debugNode["outdata"] >> pythonNode["inscript"]
 
     for node in graph.GetNodes():
         PrintSeps()
