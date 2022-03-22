@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-class JobsQueue(QtWidgets.QWidget):
+class JobsManager(QtWidgets.QWidget):
     """
     The Jobs Queue widget holds the Job System enabling the user to submit new graph jobs, have a look at the different
     jobs running, and pause/resume some jobs

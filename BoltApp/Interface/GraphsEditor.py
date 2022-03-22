@@ -4,7 +4,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from BoltApp.Interface.GGraph import *
 
 
-class GraphsEditor(QtWidgets.QWidget):
+class GraphViewer(QtWidgets.QWidget):
     """
     """
 

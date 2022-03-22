@@ -25,11 +25,11 @@ class TabType(QtWidgets.QWidget):
         return self.name
 
 
-class TabTypeGraphsEditor(TabType):
+class TabTypeGraphViewer(TabType):
     """
     """
 
-    name = "Graphs Editor"
+    name = "Graphs Viewer"
 
     def __init__(self, iconsLib : Icons, logger : Logger, environment : Environment, parent=None) -> None:
         """
@@ -38,7 +38,7 @@ class TabTypeGraphsEditor(TabType):
 
         self.masterLayout = QtWidgets.QVBoxLayout()
 
-        self.graphsEditorWidget = GraphsEditor(iconsLib, logger, environment)
+        self.graphsEditorWidget = GraphViewer(iconsLib, logger, environment)
 
         self.masterLayout.addWidget(self.graphsEditorWidget)
 
@@ -174,7 +174,7 @@ class Tab(QtWidgets.QTabWidget):
     def addGraphEditor(self) -> None:
         """
         """
-        graphEditor = TabTypeGraphsEditor(self.iconsLib, self.logger, self.environment)
+        graphEditor = TabTypeGraphViewer(self.iconsLib, self.logger, self.environment)
 
         self.addTab(graphEditor, graphEditor.getName())
         
@@ -190,7 +190,7 @@ class Tab(QtWidgets.QTabWidget):
         """
         menu = ContextMenu()
         
-        addGraphAction = menu.addAction("Add Graph Editor")
+        addGraphAction = menu.addAction("Add Graph Viewer")
         addGraphAction.triggered.connect(self.addGraphEditor)
         
         addGraphLibAction = menu.addAction("Add Graph Library")
@@ -343,8 +343,6 @@ class Panel(QtWidgets.QWidget):
             if self.index == 0:
                 topParent = parent.parentWidget().parentWidget()
                 
-                print("idx0", topParent)
-                
                 if isinstance(topParent, Panel):
                     if self.isSplitterWidgetActive():
                         topParent.setSplitterWidget(self.splitterWidget)
@@ -354,8 +352,6 @@ class Panel(QtWidgets.QWidget):
                         topParent.showPrincipalWidget()
             else:
                 topParent = parent.parentWidget().parentWidget()
-                
-                print("idx1", topParent)
                 
                 if isinstance(topParent, Panel):
                     if self.isSplitterWidgetActive():

@@ -1,7 +1,6 @@
 import re, os, binascii
 from datetime import datetime
 
-
 def Increment(string : str) -> str:
     """
     Increments the value in a string
@@ -33,7 +32,6 @@ def Increment(string : str) -> str:
 
     return string
 
-
 def GetCurrentTimeAsStr(format : str = "%m%d%Y_%H%M%S") -> str:
     """
     Returns the current date and time as a string
@@ -49,7 +47,6 @@ def GetCurrentTimeAsStr(format : str = "%m%d%Y_%H%M%S") -> str:
     currentTimeStr = now.strftime(format)
 
     return currentTimeStr
-
 
 def GetRandomStrId(bytes : int = 16) -> str:
     """

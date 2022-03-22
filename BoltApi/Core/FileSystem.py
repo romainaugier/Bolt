@@ -29,7 +29,6 @@ def GetRoamingDataDir() -> str:
 
     return boltRoamingDataDirPath
 
-
 def GetNewRandomPyFile() -> str:
     """
     Returns a path to a script file with a randomly generated name
@@ -40,12 +39,10 @@ def GetNewRandomPyFile() -> str:
     """
     return f"{GetRoamingDataDir()}/{binascii.hexlify(os.urandom(16)).hex()}.py"
 
-
 def CleanPath(path : str) -> str:
     """
     """
     return path.replace("\\", "/")
-
 
 def IsExecutable() -> bool:
     """
@@ -60,7 +57,6 @@ def IsExecutable() -> bool:
     else:
         return True
 
-
 def GetCurrentExecPath() -> str:
     """
     Returns the path to the directory of the current executable
@@ -69,7 +65,6 @@ def GetCurrentExecPath() -> str:
         str: path to the directory of the current executable
     """
     return os.path.dirname(sys.executable)
-
 
 def GetJobsDir() -> str:
     """
@@ -85,7 +80,6 @@ def GetJobsDir() -> str:
         os.makedirs(jobsDirPath)
         
     return jobsDirPath
-
 
 def CopyJob(jobId : str, pathToGraph : str) -> tuple:
     """

@@ -151,7 +151,7 @@ class App(QtWidgets.QMainWindow):
         """
         focusedWidget = QtWidgets.QApplication.focusWidget()
         
-        if isinstance(focusedWidget, GraphsEditor):
+        if isinstance(focusedWidget, GraphViewer):
             focusedWidget.addTab()
 
     def ctrlWShortcut(self) -> None:
@@ -165,7 +165,7 @@ class App(QtWidgets.QMainWindow):
         """
         focusedWidget = QtWidgets.QApplication.focusWidget()
         
-        if isinstance(focusedWidget, GraphsEditor):
+        if isinstance(focusedWidget, GraphViewer):
             focusedWidget.removeActiveTab()
 
     def cShortcut(self) -> None:
@@ -177,7 +177,7 @@ class App(QtWidgets.QMainWindow):
         """
         focusedWidget = QtWidgets.QApplication.focusWidget()
         
-        if isinstance(focusedWidget, GraphsEditor):
+        if isinstance(focusedWidget, GraphViewer):
             focusedWidget.cookActiveGraph()
 
     def ctrlSShortcut(self) -> None:
@@ -189,7 +189,7 @@ class App(QtWidgets.QMainWindow):
         """
         focusedWidget = QtWidgets.QApplication.focusWidget()
         
-        if isinstance(focusedWidget, GraphsEditor):
+        if isinstance(focusedWidget, GraphViewer):
             focusedWidget.saveActiveGraph()
     
     def ctrlShiftSShortcut(self) -> None:
@@ -201,7 +201,7 @@ class App(QtWidgets.QMainWindow):
         """
         focusedWidget = QtWidgets.QApplication.focusWidget()
         
-        if isinstance(focusedWidget, GraphsEditor):
+        if isinstance(focusedWidget, GraphViewer):
             focusedWidget.saveActiveGraph(forceName=True)
 
     def ctrlLShortcut(self) -> None:
@@ -213,7 +213,7 @@ class App(QtWidgets.QMainWindow):
         """
         focusedWidget = QtWidgets.QApplication.focusWidget()
         
-        if isinstance(focusedWidget, GraphsEditor):
+        if isinstance(focusedWidget, GraphViewer):
             focusedWidget.loadNewGraph()
 
     def lShortcut(self) -> None:
@@ -225,7 +225,7 @@ class App(QtWidgets.QMainWindow):
         """
         focusedWidget = QtWidgets.QApplication.focusWidget()
         
-        if isinstance(focusedWidget, GraphsEditor):
+        if isinstance(focusedWidget, GraphViewer):
             focusedWidget.layoutActiveGraph()
         
     def escapeShortcut(self) -> None:
@@ -237,7 +237,7 @@ class App(QtWidgets.QMainWindow):
         """
         focusedWidget = QtWidgets.QApplication.focusWidget()
         
-        if isinstance(focusedWidget, GraphsEditor):
+        if isinstance(focusedWidget, GraphViewer):
             focusedWidget.stopActiveGraph()
         
     def pShortcut(self) -> None:
@@ -249,7 +249,7 @@ class App(QtWidgets.QMainWindow):
         """
         focusedWidget = QtWidgets.QApplication.focusWidget()
         
-        if isinstance(focusedWidget, GraphsEditor):
+        if isinstance(focusedWidget, GraphViewer):
             focusedWidget.showActiveGraphPlugEditor()
         
     def openNodeEditor(self) -> None:
@@ -264,7 +264,7 @@ class App(QtWidgets.QMainWindow):
         """
         focusedWidget = QtWidgets.QApplication.focusWidget()
         
-        if isinstance(focusedWidget, GraphsEditor):
+        if isinstance(focusedWidget, GraphViewer):
             index = focusedWidget.getActiveTabIndex()
             
             gGraph : GGraph = focusedWidget.tabs.widget(index).layout.itemAt(0).widget()
