@@ -41,21 +41,6 @@ class Lib():
             if os.path.exists(path):
                 for item in os.listdir(path):
                     if item.endswith(".bnode"):
-                        if item.startswith("if"):
-                            if not foundIfNode:
-                                foundIfNode = True
-                                
-                                self.nodePaths[f"Utility/If_Block"] = [f"{path}/ifbegin.bnode", f"{path}/ifend.bnode"]
-                                
-                            continue
-                        
-                        if item.startswith("for"):
-                            if not foundForNode:
-                                foundForNode = True
-                                
-                                self.nodePaths[f"Utility/For_Block"] = [f"{path}/forbegin.bnode", f"{path}/forend.bnode"]
-                                
-                            continue
                         
                         tmpNode = Node(self.environment)
                         tmpNode.Load(f"{path}/{item}")
@@ -63,6 +48,12 @@ class Lib():
                         self.nodePaths[f"{tmpNode.GetCategory()}/{tmpNode.GetName()}"] = f"{rawPath}/{item}"
 
                         self.logger.Log(LogLevel.DEBUG, f"Loaded node : {tmpNode.GetCategory()}/{tmpNode.GetName()}")
+                   
+        # Add builtin nodes
+             
+        self.nodePaths["Utility/SubGraph"] = ""
+        self.nodePaths["Utility/If_Block"] = ""
+        self.nodePaths["Utility/For_Block"] = ""
 
     def Reload(self) -> None:
         """

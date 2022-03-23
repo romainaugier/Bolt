@@ -53,6 +53,17 @@ class ColorPalette(Enum):
     NUMBERSCOLOR = ORANGECOLOR
     PARAMETERSCOLOR = ORANGECOLOR
     
+    ##############################################
+    
+    NODELABELCOLOR = HIGHLIGHT
+    NODEBODYCOLOR = ACTIVE
+    SUBGRAPHLABELCOLOR = QtGui.QColor(126, 184, 98)
+    SUBGRAPHBODYCOLOR = QtGui.QColor(73, 131, 49)
+    IFBLOCKLABELCOLOR = QtGui.QColor(130, 170, 255).darker(127)
+    IFBLOCKBODYCOLOR = QtGui.QColor(0, 170, 174)
+    FORBLOCKLABELCOLOR = QtGui.QColor(205, 104, 74)
+    FORBLOCKBODYCOLOR = QtGui.QColor(163, 69, 42)
+    
 
 QMENUSTYLE = f"""
     QMenu {{

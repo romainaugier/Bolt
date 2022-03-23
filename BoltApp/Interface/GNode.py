@@ -6,6 +6,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 
 from BoltApi.Core.Node import *
+from BoltApi.Core.Graph import *
 from BoltApp.Interface.Icons import *
 from BoltApp.Interface.Style import ColorPalette, GetQColorFromPalette
 from BoltApp.Interface.Widgets import *
@@ -263,7 +264,7 @@ class GPlug(QtWidgets.QGraphicsObject):
         
         color = QtGui.QColor(self.color)
         
-        if self.getInternalPlug().GetNode().IsDisabled():
+        if self.getInternalPlug().GetParentNode().IsDisabled():
             color.setAlpha(78)
 
         painter.setBrush(color)
@@ -441,13 +442,16 @@ class GPlug(QtWidgets.QGraphicsObject):
         for edge in self.edges:
             self.graph.deleteItem(edge)
 
+
 class GNode(QtWidgets.QGraphicsObject):
     """
+    GNode holds the representation of a node in the qgraphicsview
     """
 
     hasBeenSelected = QtCore.pyqtSignal(str)
     plugHasBeenClicked = QtCore.pyqtSignal(list)
     hasMoved = QtCore.pyqtSignal()
+    openSubGraph = QtCore.pyqtSignal(Graph)
 
     def __init__(self, node : Node, name : str, graph : GGraph, iconsLib : Icons):
         """
@@ -661,15 +665,25 @@ class GNode(QtWidgets.QGraphicsObject):
         
         ## Body
         
-        bodyColor = GetQColorFromPalette(ColorPalette.ACTIVE)
-
+        labelColor = GetQColorFromPalette(ColorPalette.NODELABELCOLOR)
+        bodyColor = GetQColorFromPalette(ColorPalette.NODEBODYCOLOR)
+        
+        nodeType = self.getInternalNode().GetNodeType()
+        
+        if "SubGraph" in nodeType:
+            labelColor = GetQColorFromPalette(ColorPalette.SUBGRAPHLABELCOLOR)
+        elif "IfBlock" in nodeType:
+            labelColor = GetQColorFromPalette(ColorPalette.IFBLOCKLABELCOLOR)
+        elif "ForBlock" in nodeType:
+            labelColor = GetQColorFromPalette(ColorPalette.FORBLOCKLABELCOLOR)
+            
         # Label
         path = QtGui.QPainterPath()
         path.setFillRule(Qt.WindingFill)
         path.addRoundedRect(QtCore.QRectF(0, 0, self.sizeX, self.labelSizeY), 10, 10)
         path.addRect(0, self.labelSizeY / 2, self.sizeX, self.labelSizeY / 2)
 
-        painter.setBrush(GetQColorFromPalette(ColorPalette.HIGHLIGHT))
+        painter.setBrush(labelColor)
         painter.setPen(Qt.NoPen)
         painter.drawPath(path.simplified())
 
@@ -805,6 +819,14 @@ class GNode(QtWidgets.QGraphicsObject):
         self.hasBeenSelected.emit(self.getInternalNode().GetID())
 
         return super().mousePressEvent(event)
+    
+    def mouseDoubleClickEvent(self, event : QtGui.QMouseEvent) -> None:
+        """
+        """
+        subGraphTypes = ["SubGraph", "IfBlock", "ForBlock"]
+        
+        if self.getInternalNode().GetNodeType() in subGraphTypes:
+            self.openSubGraph.emit(self.getInternalNode().GetGraph())
 
     def mouseMoveEvent(self, event : QtGui.QMouseEvent) -> None:
         """

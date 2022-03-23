@@ -200,6 +200,7 @@ class GGraph(QtWidgets.QGraphicsView):
     finishedCooking = QtCore.pyqtSignal()
     errorCooking = QtCore.pyqtSignal()
     hasBeenEdited = QtCore.pyqtSignal()
+    openSubGraph = QtCore.pyqtSignal(Graph)
 
     threadCanJoin = QtCore.pyqtSignal()
 
@@ -719,60 +720,43 @@ class GGraph(QtWidgets.QGraphicsView):
     def addNode(self, nodeType : str, position : QtCore.QPointF) -> GNode:
         """
         """
-        if "If_Block" in nodeType:
-            nodesPath = self.nodeLibrary.GetPath(nodeType)
-            
-            tmpBeginInternalNode = Node(self.getInternalGraph().GetEnv())
-            tmpBeginInternalNode.Load(nodesPath[0])
-            tmpBeginInternalNode.SetIfBeginBlock()
-            
-            tmpEndInternalNode = Node(self.getInternalGraph().GetEnv())
-            tmpEndInternalNode.Load(nodesPath[1])
-            tmpEndInternalNode.SetIfEndBlock()
-            
-            self.getInternalGraph().AddNode(tmpBeginInternalNode)
-            self.getInternalGraph().AddNode(tmpEndInternalNode)
-            
-            tmpBeginInternalNode.SetAssociatedBlockEnd(tmpEndInternalNode.GetID())
-            tmpEndInternalNode.SetAssociatedBlockBegin(tmpBeginInternalNode.GetID())
-            
-            tmpBeginGNode = GNode(tmpBeginInternalNode, "", self, self.iconsLib)
-            tmpBeginGNode.hasBeenSelected.connect(self.onNodeSelectionChange)
-            tmpBeginGNode.setPos(position)
-            tmpBeginGNode.setZValue(0)
-            
-            self.scene().addItem(tmpBeginGNode)
-            
-            tmpEndGNode = GNode(tmpEndInternalNode, "", self, self.iconsLib)
-            tmpEndGNode.hasBeenSelected.connect(self.onNodeSelectionChange)
-            tmpEndGNode.setPos(position.x() + 400, position.y())
-            tmpEndGNode.setZValue(0)
-
-            self.scene().addItem(tmpEndGNode)
-            
-            self.addEdge(tmpBeginGNode.getOutputGPlug(index=0), tmpEndGNode.getInputGPlug(index=0))
-
-            self.addBlock(tmpBeginGNode, tmpEndGNode)
-            
-            self.hasBeenEdited.emit()
-            
-            return tmpBeginGNode
+        env = self.getInternalGraph().GetEnv()
+        
+        if "SubGraph" in nodeType:
+            tmpInternalNode = SubGraph(env, 
+                                       self.logger, 
+                                       Graph(self.logger, env),
+                                       True)
+        
+        elif "For_Block" in nodeType:
+            tmpInternalNode = ForSubGraph(env, 
+                                          self.logger, 
+                                          Graph(self.logger, env),
+                                          True)
+        
+        elif "If_Block" in nodeType:
+            tmpInternalNode = IfSubGraph(env, 
+                                         self.logger, 
+                                         Graph(self.logger, env),
+                                         True)
         else:
             tmpInternalNode = self.nodeLibrary.Get(nodeType)
-            tmpInternalNode.SetEnv(self.getInternalGraph().GetEnv())
-            self.getInternalGraph().AddNode(tmpInternalNode)
+            tmpInternalNode.SetEnv(env)
+        
+        self.getInternalGraph().AddNode(tmpInternalNode)
 
-            tmpGNode = GNode(tmpInternalNode, "", self, self.iconsLib)
-            tmpGNode.hasBeenSelected.connect(self.onNodeSelectionChange)
-            tmpGNode.setPos(position)
+        tmpGNode = GNode(tmpInternalNode, "", self, self.iconsLib)
+        tmpGNode.hasBeenSelected.connect(self.onNodeSelectionChange)
+        tmpGNode.openSubGraph.connect(self.onOpenSubGraph)
+        tmpGNode.setPos(position)
 
-            tmpGNode.setZValue(0)
+        tmpGNode.setZValue(0)
 
-            self.scene().addItem(tmpGNode)
+        self.scene().addItem(tmpGNode)
 
-            self.hasBeenEdited.emit()
+        self.hasBeenEdited.emit()
 
-            return tmpGNode
+        return tmpGNode
 
     def addNodeFromInternalGraph(self, node : Node) -> None:
         """
@@ -853,6 +837,12 @@ class GGraph(QtWidgets.QGraphicsView):
         gNode = self.getNodeById(nodeId)
 
         self.plugEditor.setCurrentNode(gNode)
+        
+    @QtCore.pyqtSlot(Graph)
+    def onOpenSubGraph(self, graph : Graph) -> None:
+        """
+        """
+        self.openSubGraph.emit(graph)
 
     def getNodeById(self, nodeId : str) -> GNode:
         """
@@ -868,9 +858,9 @@ class GGraph(QtWidgets.QGraphicsView):
         if connectInternally: 
             outputGPlug.getInternalPlug().Connect(inputGPlug.getInternalPlug())
 
-        outputNodeName = outputGPlug.getInternalPlug().GetNode().GetName()
+        outputNodeName = outputGPlug.getInternalPlug().GetParentNode().GetName()
         outputPlugName = outputGPlug.getInternalPlug().GetShortName()
-        inputNodeName = inputGPlug.getInternalPlug().GetNode().GetName()
+        inputNodeName = inputGPlug.getInternalPlug().GetParentNode().GetName()
         inputPlugName = inputGPlug.getInternalPlug().GetShortName()
 
         self.logger.Log(LogLevel.DIAGNOSTIC, f"""New Connection : [{outputNodeName}] {outputPlugName} -> {inputPlugName} [{inputNodeName}] """)
@@ -1107,7 +1097,7 @@ class GGraph(QtWidgets.QGraphicsView):
                 if output.IsConnected():
 
                     for connection in output.GetConnections():
-                        connectedGNode =  self.getNodeById(connection.GetNode().GetID())
+                        connectedGNode =  self.getNodeById(connection.GetParentNode().GetID())
                         self.addEdge(gNode.getOutputGPlug(outputName), connectedGNode.getInputGPlug(connection.GetShortName()), False)
 
         self.blockSignals(False)
@@ -1134,11 +1124,11 @@ class GGraph(QtWidgets.QGraphicsView):
 
                         if output.IsConnected():
                             outGPlug = gNode.getOutputGPlug(output.GetShortName())
-                            otherGNode = self.getNodeById(output.GetConnections()[0].GetNode().GetID())
+                            otherGNode = self.getNodeById(output.GetConnections()[0].GetParentNode().GetID())
 
                             inGPlug = otherGNode.getInputGPlug(output.GetConnections()[0].GetShortName())
 
-                            pluggedNode = self.getNodeById(inGPlug.getInternalPlug().GetNode().GetID())
+                            pluggedNode = self.getNodeById(inGPlug.getInternalPlug().GetParentNode().GetID())
                             newPos = pluggedNode.pos() 
                             gNode.setPos(newPos.x() - 50 - pluggedNode.sizeX, newPos.y())
                             gNode.adjustEdges()

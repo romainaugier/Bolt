@@ -36,7 +36,17 @@ class GraphViewer(QtWidgets.QWidget):
 
     @QtCore.pyqtSlot(str)
     def onNodeSelectionChange(self, nodeId : str) -> None:
+        """
+        """
         self.selectedNodeChanged.emit(nodeId)
+        
+    @QtCore.pyqtSlot(Graph)
+    def onOpenSubGraph(self, graph : Graph) -> None:
+        """
+        """
+        gGraph = GGraph(self.nodeLib, self.logger, self.environment, graph)
+        
+        self.addTab(gGraph)
         
     # UTILS
     
@@ -81,6 +91,7 @@ class GraphViewer(QtWidgets.QWidget):
         gGraph.finishedCooking.connect(lambda: self.tabs.setTabIcon(gGraph.getTabIndex(), self.iconsLib.GetIcon("done")))
         gGraph.errorCooking.connect(lambda: self.tabs.setTabIcon(gGraph.getTabIndex(), self.iconsLib.GetIcon("error")))
         gGraph.selectedNodeChanged.connect(self.onNodeSelectionChange)
+        gGraph.openSubGraph.connect(self.onOpenSubGraph)
 
         self.newTab._layout.addWidget(gGraph)
         self.newTab.setLayout(self.newTab._layout)

@@ -391,6 +391,14 @@ class Plug():
         self.isExposed = False
         self.isExposedToGraph = False
         self.isHidden = False
+        
+    # AS STRING
+    
+    def __str__(self) -> str:
+        """
+        """
+        return f"""Plug :\n- shortName={self.GetShortName()}\n- longName={self.GetLongName()}
+- parentNode={self.GetParentNodeName()}\n- connection(s)=({[plug.GetShortName() for plug in self.GetConnections()]})"""
 
     # GETTERS / SETTERS
 
@@ -408,20 +416,20 @@ class Plug():
         """
         return self.longName
 
-    def SetNode(self, node : Node) -> None:
+    def SetParentNode(self, node : Node) -> None:
         """
         Sets the parent node of the plug
         """
         self.parentNode = node
     
-    def GetNode(self) -> Node:
+    def GetParentNode(self) -> Node:
         """
         Returns:
             Node: parent node of the plug
         """
         return self.parentNode
 
-    def GetNodeName(self) -> str:
+    def GetParentNodeName(self) -> str:
         """
         Returns:
             str: name of the parent node
@@ -569,7 +577,7 @@ class Plug():
                 self.IsExposedToGraph() or plug.IsExposedToGraph() or
                 self.IsHidden() or plug.IsHidden()):
                 return
-            elif plug.GetNode().GetID() == self.GetNode().GetID():
+            elif plug.GetParentNode().GetID() == self.GetParentNode().GetID():
                 return
             else:
                 self.connectedPlugs.append(plug)
@@ -645,6 +653,23 @@ class Node():
         
         self.opCode = ""
         self.opCompiledCode = ""
+        
+    # AS STR
+    
+    def __str__(self) -> str:
+        """
+        """
+        inputsStr = ""
+        
+        for plugName, plug in self.GetInputs().items():
+            inputsStr += plug.__str__()
+            
+        outputsStr = ""
+        
+        for plugName, plug in self.GetOutputs().items():
+            outputsStr += plug.__str__()
+        
+        return f"Node: \n- name={self.GetName()}\n- inputPlugs={inputsStr}\n- outputPlugs={outputsStr}"
         
     # SETTERS / GETTERS
 
@@ -1289,10 +1314,10 @@ class Node():
 
         for plug in nodeDefinition["plugs"]:
             if plug.GetShortName().startswith("in"):
-                plug.SetNode(self)
+                plug.SetParentNode(self)
                 self.inputs[plug.GetShortName()] = plug
             elif plug.GetShortName().startswith("out"):
-                plug.SetNode(self)
+                plug.SetParentNode(self)
                 self.outputs[plug.GetShortName()] = plug
 
         self.UpdateEnv()
@@ -1317,6 +1342,7 @@ class Node():
         nodeAsDict["nodeType"] = self.GetNodeType()
         nodeAsDict["opCode"] = self.GetOpCode()
         nodeAsDict["disabled"] = self.IsDisabled()
+        nodeAsDict["isSubGraph"] = False
         
         if self.IsIfBeginBlock():
             nodeAsDict["isIfBegin"] = True
@@ -1351,7 +1377,7 @@ class Node():
                                                                         "defaultData" : input.GetDefaultData(),
                                                                         "type" : input.GetType(),
                                                                         "connectionName" : connection.GetShortName(), 
-                                                                        "connectionNodeId" : connection.GetNode().GetID() })
+                                                                        "connectionNodeId" : connection.GetParentNode().GetID() })
             else:
                 nodeAsDict["inputs"][input.GetShortName()] = [{ "shortName" : input.GetShortName(),
                                                                "longName" : input.GetLongName(),
@@ -1381,7 +1407,7 @@ class Node():
                                                                     "defaultData" : output.GetDefaultData(),
                                                                     "type" : output.GetType(),
                                                                     "connectionName" : connection.GetShortName(), 
-                                                                    "connectionNodeId" : connection.GetNode().GetID() })
+                                                                    "connectionNodeId" : connection.GetParentNode().GetID() })
             else:
                 nodeAsDict["outputs"][output.GetShortName()] = [{ "shortName" : output.GetShortName(),
                                                                  "longName" : output.GetLongName(),
@@ -1394,6 +1420,7 @@ class Node():
                                                                  "type" : output.GetType(),
                                                                  "connectionName" : None, 
                                                                  "connectionNodeId" : None }]
+                
         return nodeAsDict
 
     def FromDict(self, nodeAsDict : dict) -> None:

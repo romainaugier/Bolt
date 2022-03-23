@@ -18,4 +18,3 @@ Bolt provides a few utilities for the python script executed by the node :
 - a library is provided to the client with various functions and classes
 
 Graph files saves the content of every node, thus ensuring backward compatibility if you modify the definition of a node. You can always update the node either with the Bolt Application or with the BoltCommand in interact mode.
-

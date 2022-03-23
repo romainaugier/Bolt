@@ -3,6 +3,7 @@ import os, threading, json, copy
 from functools import lru_cache
 
 from BoltApi.Core.Node import *
+from BoltApi.Core.SubGraph import *
 from BoltApi.Core.Logger import *
 from BoltApi.Core.Environment import *
 from BoltApi.Utils.String import Increment, GetRandomStrId
@@ -202,7 +203,7 @@ class Graph():
             self.UpdateExposedPlugs()
 
         for plug in self.exposedPlugs: 
-            if plugName == plug.GetShortName() and nodeName == plug.GetNodeName():
+            if plugName == plug.GetShortName() and nodeName == plug.GetParentNodeName():
                 return plug
 
         return None
@@ -244,7 +245,7 @@ class Graph():
         for outputName, output in node.GetOutputs().items():
             if output.IsConnected():
                 for connection in output.GetConnections():
-                    self.VisitNode(connection.GetNode())
+                    self.VisitNode(connection.GetParentNode())
 
         node.SetInTempQueue(False)
         node.SetInQueue()
@@ -259,7 +260,7 @@ class Graph():
         for inputName, input in node.GetInputs().items():
             if input.IsConnected():
                 for connection in input.GetConnections():
-                    connectedNode = connection.GetNode()
+                    connectedNode = connection.GetParentNode()
                     
                     if connectedNode == beginBlock:
                         return True
@@ -290,7 +291,7 @@ class Graph():
         for outputName, output in node.GetOutputs().items():
             if output.IsConnected():
                 for connection in output.GetConnections():
-                    connectedNode = connection.GetNode()
+                    connectedNode = connection.GetParentNode()
                     
                     if connectedNode == endBlock:
                         return True
@@ -533,6 +534,8 @@ class Graph():
         self.isCooking = True
         self.__flag.set()
         
+        self.tracker = Tracker(self)
+        
         if not skipCookedNodes:
             self.SetAllDirty()
 
@@ -589,7 +592,11 @@ class Graph():
                         with self.GetLock():
                             self.isCooking = False
                             self.isCooked = True
-                            self.tracker.Clean()
+                            self.tracker = None
+                        
+                        if not self.IsSubGraph():
+                            self.SaveToFile(self.GetSavePath())
+                        
                         break
 
             if not self.hasError:
@@ -602,7 +609,10 @@ class Graph():
                 with self.GetLock():
                     self.isCooking = False
                     self.isCooked = True
-                    self.tracker.Clean()
+                    self.tracker = None
+                
+                if not self.IsSubGraph():
+                    self.SaveToFile(self.GetSavePath())
 
     def StopCook(self) -> None:
         """
@@ -753,8 +763,17 @@ class Graph():
         nodesAsDicts = graphDict["nodes"]
 
         for node in nodesAsDicts:
-            tmpNode = Node(self.environment)
-            tmpNode.SetLogger(self.logger)
+            if "isSubGraph" in node:
+                if "isIfBlock" in node:
+                    tmpNode = IfSubGraph(self.environment, self.logger, Graph(self.logger, self.environment))
+                elif "isForBlock" in node:
+                    tmpNode = ForSubGraph(self.environment, self.logger, Graph(self.logger, self.environment))
+                else:
+                    tmpNode = SubGraph(self.environment, self.logger, Graph(self.logger, self.environment))
+            else:
+                tmpNode = Node(self.environment)
+                tmpNode.SetLogger(self.logger)
+            
             tmpNode.FromDict(node)
             
             if tmpNode.IsIfBeginBlock():   

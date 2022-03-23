@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from BoltApp.Interface.GraphsEditor import *
+from BoltApp.Interface.GraphViewer import *
 from BoltApp.Interface.GraphLibrary import *
 
 
