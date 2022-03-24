@@ -200,7 +200,8 @@ class GGraph(QtWidgets.QGraphicsView):
     finishedCooking = QtCore.pyqtSignal()
     errorCooking = QtCore.pyqtSignal()
     hasBeenEdited = QtCore.pyqtSignal()
-    openSubGraph = QtCore.pyqtSignal(Graph)
+    hasBeenSaved = QtCore.pyqtSignal()
+    openSubGraph = QtCore.pyqtSignal(list)
 
     threadCanJoin = QtCore.pyqtSignal()
 
@@ -769,6 +770,7 @@ class GGraph(QtWidgets.QGraphicsView):
         tmpGNode.setZValue(0)
 
         tmpGNode.hasBeenSelected.connect(self.onNodeSelectionChange)
+        tmpGNode.openSubGraph.connect(self.onOpenSubGraph)
 
         self.scene().addItem(tmpGNode)
 
@@ -841,8 +843,11 @@ class GGraph(QtWidgets.QGraphicsView):
     @QtCore.pyqtSlot(Graph)
     def onOpenSubGraph(self, graph : Graph) -> None:
         """
+        When a subgraph needs to be opened, we send a signal with the subgraph to open, and also the current GGraph to
+        be able to retrieve informations such as the parent graph name, to have clear names in the GraphViewer (when 
+        multiple subgraphs are opened, it can be confusing to have the same names everywhere)
         """
-        self.openSubGraph.emit(graph)
+        self.openSubGraph.emit([graph, self])
 
     def getNodeById(self, nodeId : str) -> GNode:
         """
@@ -1043,6 +1048,8 @@ class GGraph(QtWidgets.QGraphicsView):
 
         with open(filePath, "w") as file:
             file.write(graphSerialized)
+            
+        self.hasBeenSaved.emit()
 
     def loadGraph(self, filePath : str) -> None:
         """
@@ -1104,6 +1111,7 @@ class GGraph(QtWidgets.QGraphicsView):
 
     def layoutGraph(self) -> None:
         """
+        Tries to automatically layout the graph according to its topology
         """
         self.getInternalGraph().Sort()
         

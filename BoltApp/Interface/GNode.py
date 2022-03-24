@@ -461,7 +461,7 @@ class GNode(QtWidgets.QGraphicsObject):
         super().__init__()
         
         self.internalNode = node
-        self.graph = graph
+        self.gGraph = graph
         self.iconsLib = iconsLib
 
         self.name = self.getInternalNode().GetName()
@@ -519,7 +519,7 @@ class GNode(QtWidgets.QGraphicsObject):
             positionX = self.pos().x() + 5
             positionY = self.pos().y() + self.labelSizeY + (bodySizeYPerPlug * i)
             
-            newGPlug = GPlug(positionX, positionY, input, self, self.graph, parent=self)
+            newGPlug = GPlug(positionX, positionY, input, self, self.gGraph, parent=self)
             newGPlug.hasBeenRightClicked.connect(self.onPlugClicked)
             self.inputGPlugs.append(newGPlug)
 
@@ -531,7 +531,7 @@ class GNode(QtWidgets.QGraphicsObject):
             positionX = self.pos().x() + self.sizeX - 12.5
             positionY = self.pos().y() + self.labelSizeY + (bodySizeYPerPlug * i)
             
-            newGPlug = GPlug(positionX, positionY, output, self, self.graph, input=False, parent=self)
+            newGPlug = GPlug(positionX, positionY, output, self, self.gGraph, input=False, parent=self)
             newGPlug.hasBeenRightClicked.connect(self.onPlugClicked)
             self.outputGPlugs.append(newGPlug)
 
@@ -541,10 +541,14 @@ class GNode(QtWidgets.QGraphicsObject):
         self.numOuputs = numOutputs
         self.color = QtGui.QColor(self.internalNode.GetColor()[0], self.internalNode.GetColor()[1], self.internalNode.GetColor()[2])
 
-        self.badge = Badge(self.pos().x() + self.sizeX - 7, self.pos().y() + 7, self.getInternalNode(), self.iconsLib, parent=self)
+        # If the parent GGraph is a subgraph, no need for status badge (because we won't cook a subgraph)
+        if self.getGGraph().getInternalGraph().IsSubGraph():
+            self.badge = None
+        else:
+            self.badge = Badge(self.pos().x() + self.sizeX - 7, self.pos().y() + 7, self.getInternalNode(), self.iconsLib, parent=self)
 
-        self.badge.startsCooking.connect(lambda: (self.badge.startMovie()))
-        self.badge.stopsCooking.connect(lambda: (self.badge.stopMovie()))
+            self.badge.startsCooking.connect(lambda: (self.badge.startMovie()))
+            self.badge.stopsCooking.connect(lambda: (self.badge.stopMovie()))
 
         self.canMove = True
         self.isHovered = False
@@ -567,6 +571,13 @@ class GNode(QtWidgets.QGraphicsObject):
         """
         return self.internalNode
     
+    def getGGraph(self) -> GGraph:
+        """
+        Returns:
+            GGraph: parent GGraph
+        """
+        return self.gGraph
+    
     def reloadNode(self) -> None:
         """
         """
@@ -574,7 +585,7 @@ class GNode(QtWidgets.QGraphicsObject):
         
         self.getInternalNode().Load(definitionPath)
         
-        self = GNode(self.getInternalNode(), self.getInternalNode().GetName(), self.graph, self.iconsLib)
+        self = GNode(self.getInternalNode(), self.getInternalNode().GetName(), self.gGraph, self.iconsLib)
         
         QtCore.QTimer.singleShot(10, self.updateAfterReload)
         
@@ -622,7 +633,8 @@ class GNode(QtWidgets.QGraphicsObject):
     def updateBadge(self) -> None:
         """
         """
-        self.badge.updateState()
+        if self.badge is not None:
+            self.badge.updateState()
 
     def getPixmap(self) -> QtGui.QPixmap:
         """
@@ -639,9 +651,9 @@ class GNode(QtWidgets.QGraphicsObject):
         """
         """
         if self.getInternalNode().IsCooked():
-            self.graph.launchGraphCooking(lastNodeToCook=self.getInternalNode().GetID(), skipCookedNodes=False)
+            self.gGraph.launchGraphCooking(lastNodeToCook=self.getInternalNode().GetID(), skipCookedNodes=False)
         else:
-            self.graph.launchGraphCooking(lastNodeToCook=self.getInternalNode().GetID())
+            self.gGraph.launchGraphCooking(lastNodeToCook=self.getInternalNode().GetID())
 
     # PAINT
 
@@ -760,7 +772,7 @@ class GNode(QtWidgets.QGraphicsObject):
         menu.addAction(cookAction)
         
         infoAction = QtWidgets.QAction("Infos")
-        infoAction.triggered.connect(lambda: self.graph.showNodeInfosPanel(self))
+        infoAction.triggered.connect(lambda: self.gGraph.showNodeInfosPanel(self))
         menu.addAction(infoAction)
         
         reloadOpCode = QtWidgets.QAction("Reload Op Code")
@@ -780,7 +792,7 @@ class GNode(QtWidgets.QGraphicsObject):
         
         deleteAction = QtWidgets.QAction("Delete")
         deleteAction.setToolTip("Delete this node from the graph")
-        deleteAction.triggered.connect(lambda: (self.graph.deleteNode(self), self.graph.plugEditor.setCurrentNode(None)))
+        deleteAction.triggered.connect(lambda: (self.gGraph.deleteNode(self), self.gGraph.plugEditor.setCurrentNode(None)))
         menu.addAction(deleteAction)
 
         menu.exec(QtCore.QPoint(position.x(), position.y()))
@@ -808,10 +820,10 @@ class GNode(QtWidgets.QGraphicsObject):
         """
         When a node is clicked, set it on top of the other ones
         """
-        for item in self.graph.items():
+        for item in self.gGraph.items():
             item.setZValue(1)
         
-        for item in self.graph.items():
+        for item in self.gGraph.items():
             if isinstance(item, GEdge): item.setZValue(0)
         
         self.setZValue(2)

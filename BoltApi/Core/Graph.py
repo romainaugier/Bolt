@@ -764,12 +764,16 @@ class Graph():
 
         for node in nodesAsDicts:
             if "isSubGraph" in node:
-                if "isIfBlock" in node:
-                    tmpNode = IfSubGraph(self.environment, self.logger, Graph(self.logger, self.environment))
-                elif "isForBlock" in node:
-                    tmpNode = ForSubGraph(self.environment, self.logger, Graph(self.logger, self.environment))
+                if node["isSubGraph"]:
+                    if "isIfBlock" in node:
+                        tmpNode = IfSubGraph(self.environment, self.logger, Graph(self.logger, self.environment))
+                    elif "isForBlock" in node:
+                        tmpNode = ForSubGraph(self.environment, self.logger, Graph(self.logger, self.environment))
+                    else:
+                        tmpNode = SubGraph(self.environment, self.logger, Graph(self.logger, self.environment))
                 else:
-                    tmpNode = SubGraph(self.environment, self.logger, Graph(self.logger, self.environment))
+                    tmpNode = Node(self.environment)
+                    tmpNode.SetLogger(self.logger)
             else:
                 tmpNode = Node(self.environment)
                 tmpNode.SetLogger(self.logger)

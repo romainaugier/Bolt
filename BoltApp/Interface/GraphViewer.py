@@ -40,13 +40,30 @@ class GraphViewer(QtWidgets.QWidget):
         """
         self.selectedNodeChanged.emit(nodeId)
         
-    @QtCore.pyqtSlot(Graph)
-    def onOpenSubGraph(self, graph : Graph) -> None:
+    @QtCore.pyqtSlot(list)
+    def onOpenSubGraph(self, graphList : list) -> None:
         """
         """
+        graph : Graph = graphList[0]
+        parentGGraph : GGraph = graphList[1]
+        graphName = f"{parentGGraph.getInternalGraph().GetName()} | {graph.GetName()}"
+        
+        # In case the subgraph is already open, set the current tab index to it but do not
+        # open a new graph
+        for i in range(self.tabs.count()):
+            tabName = self.tabs.tabText(i)
+            
+            if tabName == graphName:
+                self.tabs.setCurrentIndex(i)
+                return
+        
         gGraph = GGraph(self.nodeLib, self.logger, self.environment, graph)
         
-        self.addTab(gGraph)
+        newTabIndex = self.addTab(gGraph)
+        
+        self.setTabName(newTabIndex, graphName)
+        
+        parentGGraph.hasBeenSaved.connect(lambda: self.tabs.setTabText(gGraph.getTabIndex(), f"{parentGGraph.getInternalGraph().GetName()} | {graph.GetName()}"))
         
     # UTILS
     
@@ -61,12 +78,15 @@ class GraphViewer(QtWidgets.QWidget):
         
     # TAB METHODS
         
-    def addTab(self, graph : GGraph = None) -> None:
+    def addTab(self, graph : GGraph = None) -> int:
         """
         Adds a new tab with a graph if provided
 
         Args:
             graph (GGraph, optional): Graph to load. Defaults to None.
+            
+        Returns:
+            int: index of the tab
         """
         tabIndex = self.tabs.count()
 
@@ -86,17 +106,23 @@ class GraphViewer(QtWidgets.QWidget):
         self.newTab._layout = QtWidgets.QVBoxLayout()
         gGraph.setFrameStyle(QtWidgets.QFrame.NoFrame)
         gGraph.isCookingMovie.frameChanged.connect(lambda: self.tabs.setTabIcon(gGraph.getTabIndex(), QtGui.QIcon(gGraph.getAnimationLogoMovie())))
-        gGraph.hasBeenEdited.connect(lambda: (self.tabs.setTabIcon(gGraph.getTabIndex(), self.iconsLib.GetIcon("edited")), 
-                                              self.tabs.setTabText(gGraph.getTabIndex(), f"{gGraph.graph.GetName()}*")))
         gGraph.finishedCooking.connect(lambda: self.tabs.setTabIcon(gGraph.getTabIndex(), self.iconsLib.GetIcon("done")))
         gGraph.errorCooking.connect(lambda: self.tabs.setTabIcon(gGraph.getTabIndex(), self.iconsLib.GetIcon("error")))
         gGraph.selectedNodeChanged.connect(self.onNodeSelectionChange)
         gGraph.openSubGraph.connect(self.onOpenSubGraph)
 
+        if gGraph.getInternalGraph().IsSubGraph():
+            pass
+        else:
+            gGraph.hasBeenEdited.connect(lambda: (self.tabs.setTabIcon(gGraph.getTabIndex(), self.iconsLib.GetIcon("edited")), 
+                                                  self.tabs.setTabText(gGraph.getTabIndex(), f"{gGraph.graph.GetName()}*")))
+        
         self.newTab._layout.addWidget(gGraph)
         self.newTab.setLayout(self.newTab._layout)
 
         self.tabs.setCurrentIndex(tabIndex)
+        
+        return tabIndex
 
     def removeTab(self, index : int) -> None:
         """

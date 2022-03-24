@@ -151,10 +151,45 @@ class SubGraph(Node):
         """
         self.UpdateInputs()
         
-        self.graph.Cook(skipCookedNodes=False)
-        
-        self.UpdateOutputs()
-        
+        if not self.IsDisabled():
+            startTime = Timer.Start()
+
+            with self.GetLock():
+                self.isCooking = True
+                self.isCooked = False
+
+                self.hasError = False
+                self.errorMessage = ""
+                self.hasWarning = False
+                self.warningMessage = ""
+            
+                self.graph.Cook(skipCookedNodes=False)
+                
+                if self.graph.HasError():
+                    self.ReportError()
+                    self.LogError(f"Error cooking node {self.GetName()}")
+                    self.cookTime = None
+                    self.isCooking = False
+                    self.isCooked = False
+                    return
+
+            with self.GetLock():
+                self.isDirty = False
+                self.isCooking = False
+                self.isCooked = True
+
+            endTime = Timer.Stop()
+            
+            self.UpdateOutputs()
+
+            self.cookTime = Timer.Time(startTime, endTime)
+        else:
+            firstInput = self.GetInput(index=0)
+            firstInput.UpdateInputs()
+
+            for outputName, output in self.outputs.items():
+                output.SetData(firstInput.GetData())
+           
     # I/O
 
     def ToDict(self) -> dict:
