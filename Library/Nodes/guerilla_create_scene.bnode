@@ -93,19 +93,17 @@ exposedToGraph = False
 
 # BeginOp
 
-import os
+generatedScript = f"""import guerilla, os
 
-if os.path.exists(infilepath):
-    os.remove(infilepath)
+import RomanoTools.Guerilla.Utils as utils
 
-dir = os.path.dirname(infilepath)
+if os.path.exists("{infilepath}"):
+    os.remove("{infilepath}")
+
+dir = os.path.dirname("{infilepath}")
 
 if not os.path.exists(dir):
     os.makedirs(dir)
-
-generatedScript = f"""import guerilla
-
-import RomanoTools.Guerilla.Utils as utils
 
 utils.SetOptims()
 utils.SetRange("{inframerange[0]}-{inframerange[1]}")
@@ -144,8 +142,5 @@ with open(tmpScriptFilePath, "w") as scriptFile:
 
 outscriptfile = tmpScriptFilePath
 outscripttext = generatedScript
-
-
-
 
 # EndOp

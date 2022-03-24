@@ -1,9 +1,109 @@
 {
   "nodes": [
     {
+      "name": "SubGraph",
+      "category": "Utility",
+      "id": "3832656261613838353336343061326237386531326635343261393065373337",
+      "color": [
+        137,
+        221,
+        255
+      ],
+      "iconPath": "$BOLT_ICONS/subgraph.png",
+      "definitionPath": "",
+      "nodeType": "SubGraph",
+      "opCode": "",
+      "disabled": false,
+      "isSubGraph": true,
+      "inputs": {
+        "input0": [
+          {
+            "shortName": "input0",
+            "longName": "Input0",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "input 1",
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outfile",
+            "connectionNodeId": "3663333561383139346566306664633535343137366435313662666537313935"
+          }
+        ],
+        "input1": [
+          {
+            "shortName": "input1",
+            "longName": "Input1",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "input 2",
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outfile",
+            "connectionNodeId": "3536616163623466373162303862323264636162666262616437616363316266"
+          }
+        ],
+        "input2": [
+          {
+            "shortName": "input2",
+            "longName": "Input2",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "input 3",
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outfile",
+            "connectionNodeId": "6562376663366165336535343165366236663764323431326237353538356366"
+          }
+        ]
+      },
+      "outputs": {
+        "output0": [
+          {
+            "shortName": "output0",
+            "longName": "Output0",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              "input 1",
+              "input 2",
+              "input 3"
+            ],
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "indata",
+            "connectionNodeId": "6638623661663361363861393539616166633630366563323935373830333366"
+          }
+        ],
+        "output1": [
+          {
+            "shortName": "output1",
+            "longName": "Output1",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "from subgraph input 1",
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "indata",
+            "connectionNodeId": "6636356637393061343466363535363533376437323066656132336539386433"
+          }
+        ]
+      },
+      "subgraph": "{\n  \"nodes\": [\n    {\n      \"name\": \"Inputs\",\n      \"category\": \"Utility\",\n      \"id\": \"3261653362343738396634636263353462323838643864343034303635366130\",\n      \"color\": [\n        137,\n        221,\n        255\n      ],\n      \"iconPath\": \"$BOLT_ICONS/inputs.png\",\n      \"definitionPath\": \"\",\n      \"nodeType\": \"Inputs\",\n      \"opCode\": \"\",\n      \"disabled\": false,\n      \"isSubGraph\": false,\n      \"inputs\": {},\n      \"outputs\": {\n        \"input0\": [\n          {\n            \"shortName\": \"input0\",\n            \"longName\": \"Input0\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"input 1\",\n            \"defaultData\": null,\n            \"type\": 11,\n            \"connectionName\": \"indata\",\n            \"connectionNodeId\": \"6237666663363834366266633566313635356134343162356134363838613733\"\n          }\n        ],\n        \"input1\": [\n          {\n            \"shortName\": \"input1\",\n            \"longName\": \"Input1\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"input 2\",\n            \"defaultData\": null,\n            \"type\": 11,\n            \"connectionName\": \"indata\",\n            \"connectionNodeId\": \"3533346166646331343264323163626266313265393132333837316263326339\"\n          }\n        ],\n        \"input2\": [\n          {\n            \"shortName\": \"input2\",\n            \"longName\": \"Input2\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"input 3\",\n            \"defaultData\": null,\n            \"type\": 11,\n            \"connectionName\": \"indata\",\n            \"connectionNodeId\": \"3666333661393965393034386331323137646335383138623863323036633461\"\n          }\n        ]\n      }\n    },\n    {\n      \"name\": \"Outputs\",\n      \"category\": \"Utility\",\n      \"id\": \"6562343939373263326330613632663366343731383464366332373062613639\",\n      \"color\": [\n        137,\n        221,\n        255\n      ],\n      \"iconPath\": \"$BOLT_ICONS/outputs.png\",\n      \"definitionPath\": \"\",\n      \"nodeType\": \"Outputs\",\n      \"opCode\": \"\",\n      \"disabled\": false,\n      \"isSubGraph\": false,\n      \"inputs\": {\n        \"output0\": [\n          {\n            \"shortName\": \"output0\",\n            \"longName\": \"Output0\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": [\n              \"input 1\",\n              \"input 2\",\n              \"input 3\"\n            ],\n            \"defaultData\": null,\n            \"type\": 11,\n            \"connectionName\": \"output\",\n            \"connectionNodeId\": \"3539666236393363303439306264333663373462396430633965346261343764\"\n          }\n        ],\n        \"output1\": [\n          {\n            \"shortName\": \"output1\",\n            \"longName\": \"Output1\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"from subgraph input 1\",\n            \"defaultData\": null,\n            \"type\": 11,\n            \"connectionName\": \"outfile\",\n            \"connectionNodeId\": \"3565633763643661666664353837646534316634633337303630306335326465\"\n          }\n        ]\n      },\n      \"outputs\": {}\n    },\n    {\n      \"name\": \"Debug\",\n      \"category\": \"Debug\",\n      \"id\": \"6237666663363834366266633566313635356134343162356134363838613733\",\n      \"color\": [\n        50,\n        222,\n        132\n      ],\n      \"iconPath\": \"$BOLT_ICONS/debug.png\",\n      \"definitionPath\": \"$BOLT_LIB/Nodes/debug.bnode\",\n      \"nodeType\": \"Debug/Debug\",\n      \"opCode\": \"\\nBoltLogMessage(f\\\"Debug Node : {indata}\\\")\\n\\noutdata = indata\\n\\n\",\n      \"disabled\": false,\n      \"isSubGraph\": false,\n      \"inputs\": {\n        \"indata\": [\n          {\n            \"shortName\": \"indata\",\n            \"longName\": \"Input Data\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"input 1\",\n            \"defaultData\": null,\n            \"type\": 11,\n            \"connectionName\": \"input0\",\n            \"connectionNodeId\": \"3261653362343738396634636263353462323838643864343034303635366130\"\n          }\n        ]\n      },\n      \"outputs\": {\n        \"outdata\": [\n          {\n            \"shortName\": \"outdata\",\n            \"longName\": \"Output Data\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"input 1\",\n            \"defaultData\": null,\n            \"type\": 11,\n            \"connectionName\": \"input1\",\n            \"connectionNodeId\": \"6238353631386361393063636436636663633264353064313335623735316434\"\n          }\n        ]\n      }\n    },\n    {\n      \"name\": \"Debug1\",\n      \"category\": \"Debug\",\n      \"id\": \"3533346166646331343264323163626266313265393132333837316263326339\",\n      \"color\": [\n        50,\n        222,\n        132\n      ],\n      \"iconPath\": \"$BOLT_ICONS/debug.png\",\n      \"definitionPath\": \"$BOLT_LIB/Nodes/debug.bnode\",\n      \"nodeType\": \"Debug/Debug\",\n      \"opCode\": \"\\nBoltLogMessage(f\\\"Debug Node : {indata}\\\")\\n\\noutdata = indata\\n\\n\",\n      \"disabled\": false,\n      \"isSubGraph\": false,\n      \"inputs\": {\n        \"indata\": [\n          {\n            \"shortName\": \"indata\",\n            \"longName\": \"Input Data\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"input 2\",\n            \"defaultData\": null,\n            \"type\": 11,\n            \"connectionName\": \"input1\",\n            \"connectionNodeId\": \"3261653362343738396634636263353462323838643864343034303635366130\"\n          }\n        ]\n      },\n      \"outputs\": {\n        \"outdata\": [\n          {\n            \"shortName\": \"outdata\",\n            \"longName\": \"Output Data\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"input 2\",\n            \"defaultData\": null,\n            \"type\": 11,\n            \"connectionName\": \"input2\",\n            \"connectionNodeId\": \"6238353631386361393063636436636663633264353064313335623735316434\"\n          }\n        ]\n      }\n    },\n    {\n      \"name\": \"Debug2\",\n      \"category\": \"Debug\",\n      \"id\": \"3666333661393965393034386331323137646335383138623863323036633461\",\n      \"color\": [\n        50,\n        222,\n        132\n      ],\n      \"iconPath\": \"$BOLT_ICONS/debug.png\",\n      \"definitionPath\": \"$BOLT_LIB/Nodes/debug.bnode\",\n      \"nodeType\": \"Debug/Debug\",\n      \"opCode\": \"\\nBoltLogMessage(f\\\"Debug Node : {indata}\\\")\\n\\noutdata = indata\\n\\n\",\n      \"disabled\": false,\n      \"isSubGraph\": false,\n      \"inputs\": {\n        \"indata\": [\n          {\n            \"shortName\": \"indata\",\n            \"longName\": \"Input Data\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"input 3\",\n            \"defaultData\": null,\n            \"type\": 11,\n            \"connectionName\": \"input2\",\n            \"connectionNodeId\": \"3261653362343738396634636263353462323838643864343034303635366130\"\n          }\n        ]\n      },\n      \"outputs\": {\n        \"outdata\": [\n          {\n            \"shortName\": \"outdata\",\n            \"longName\": \"Output Data\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"input 3\",\n            \"defaultData\": null,\n            \"type\": 11,\n            \"connectionName\": \"input2\",\n            \"connectionNodeId\": \"3539666236393363303439306264333663373462396430633965346261343764\"\n          }\n        ]\n      }\n    },\n    {\n      \"name\": \"Merge\",\n      \"category\": \"Utility\",\n      \"id\": \"6238353631386361393063636436636663633264353064313335623735316434\",\n      \"color\": [\n        0,\n        0,\n        0\n      ],\n      \"iconPath\": \"$BOLT_ICONS/util.png\",\n      \"definitionPath\": \"$BOLT_LIB/Nodes/merge.bnode\",\n      \"nodeType\": \"Utility/Merge\",\n      \"opCode\": \"\\n# BeginOp\\n\\nif type(input1) is list:\\n    if type(input2) is list:\\n        output = [*input1, *input2]\\n    else:\\n        output = [*input1, input2]\\nelif type(input2) is list:\\n    output = [input1, *input2]\\nelse:\\n    output = [input1, input2]\\n\\n\\n\",\n      \"disabled\": false,\n      \"isSubGraph\": false,\n      \"inputs\": {\n        \"input1\": [\n          {\n            \"shortName\": \"input1\",\n            \"longName\": \"Input 1\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"input 1\",\n            \"defaultData\": null,\n            \"type\": 11,\n            \"connectionName\": \"outdata\",\n            \"connectionNodeId\": \"6237666663363834366266633566313635356134343162356134363838613733\"\n          }\n        ],\n        \"input2\": [\n          {\n            \"shortName\": \"input2\",\n            \"longName\": \"Input 2\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"input 2\",\n            \"defaultData\": null,\n            \"type\": 11,\n            \"connectionName\": \"outdata\",\n            \"connectionNodeId\": \"3533346166646331343264323163626266313265393132333837316263326339\"\n          }\n        ]\n      },\n      \"outputs\": {\n        \"output\": [\n          {\n            \"shortName\": \"output\",\n            \"longName\": \"Output\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": [\n              \"input 1\",\n              \"input 2\"\n            ],\n            \"defaultData\": [],\n            \"type\": 9,\n            \"connectionName\": \"input1\",\n            \"connectionNodeId\": \"3539666236393363303439306264333663373462396430633965346261343764\"\n          }\n        ]\n      }\n    },\n    {\n      \"name\": \"Merge1\",\n      \"category\": \"Utility\",\n      \"id\": \"3539666236393363303439306264333663373462396430633965346261343764\",\n      \"color\": [\n        0,\n        0,\n        0\n      ],\n      \"iconPath\": \"$BOLT_ICONS/util.png\",\n      \"definitionPath\": \"$BOLT_LIB/Nodes/merge.bnode\",\n      \"nodeType\": \"Utility/Merge\",\n      \"opCode\": \"\\n# BeginOp\\n\\nif type(input1) is list:\\n    if type(input2) is list:\\n        output = [*input1, *input2]\\n    else:\\n        output = [*input1, input2]\\nelif type(input2) is list:\\n    output = [input1, *input2]\\nelse:\\n    output = [input1, input2]\\n\\n\\n\",\n      \"disabled\": false,\n      \"isSubGraph\": false,\n      \"inputs\": {\n        \"input1\": [\n          {\n            \"shortName\": \"input1\",\n            \"longName\": \"Input 1\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": [\n              \"input 1\",\n              \"input 2\"\n            ],\n            \"defaultData\": null,\n            \"type\": 11,\n            \"connectionName\": \"output\",\n            \"connectionNodeId\": \"6238353631386361393063636436636663633264353064313335623735316434\"\n          }\n        ],\n        \"input2\": [\n          {\n            \"shortName\": \"input2\",\n            \"longName\": \"Input 2\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"input 3\",\n            \"defaultData\": null,\n            \"type\": 11,\n            \"connectionName\": \"outdata\",\n            \"connectionNodeId\": \"3666333661393965393034386331323137646335383138623863323036633461\"\n          }\n        ]\n      },\n      \"outputs\": {\n        \"output\": [\n          {\n            \"shortName\": \"output\",\n            \"longName\": \"Output\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": [\n              \"input 1\",\n              \"input 2\",\n              \"input 3\"\n            ],\n            \"defaultData\": [],\n            \"type\": 9,\n            \"connectionName\": \"output0\",\n            \"connectionNodeId\": \"6562343939373263326330613632663366343731383464366332373062613639\"\n          }\n        ]\n      }\n    },\n    {\n      \"name\": \"File\",\n      \"category\": \"Utility\",\n      \"id\": \"3565633763643661666664353837646534316634633337303630306335326465\",\n      \"color\": [\n        255,\n        220,\n        106\n      ],\n      \"iconPath\": \"$BOLT_ICONS/file.png\",\n      \"definitionPath\": \"$BOLT_LIB/Nodes/file.bnode\",\n      \"nodeType\": \"Utility/File\",\n      \"opCode\": \"\\noutfile = infile\\n\\n\",\n      \"disabled\": false,\n      \"isSubGraph\": false,\n      \"inputs\": {\n        \"infile\": [\n          {\n            \"shortName\": \"infile\",\n            \"longName\": \"Input File Path\",\n            \"index\": 0,\n            \"isExposed\": true,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"from subgraph input 1\",\n            \"defaultData\": \"\",\n            \"type\": 7,\n            \"connectionName\": null,\n            \"connectionNodeId\": null\n          }\n        ]\n      },\n      \"outputs\": {\n        \"outfile\": [\n          {\n            \"shortName\": \"outfile\",\n            \"longName\": \"Output File Path\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"from subgraph input 1\",\n            \"defaultData\": \"\",\n            \"type\": 7,\n            \"connectionName\": \"output1\",\n            \"connectionNodeId\": \"6562343939373263326330613632663366343731383464366332373062613639\"\n          }\n        ]\n      }\n    }\n  ],\n  \"tracker\": null\n}"
+    },
+    {
       "name": "File",
       "category": "Utility",
-      "id": "3535393739373037316332316562643966373036373261656661343931643737",
+      "id": "3663333561383139346566306664633535343137366435313662666537313935",
       "color": [
         255,
         220,
@@ -15,10 +115,6 @@
       "opCode": "\noutfile = infile\n\n",
       "disabled": false,
       "isSubGraph": false,
-      "isIfBegin": false,
-      "associatedEndBlockId": null,
-      "isIfEnd": false,
-      "associatedBeginBlockId": null,
       "inputs": {
         "infile": [
           {
@@ -28,7 +124,7 @@
             "isExposed": true,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "test",
+            "data": "input 1",
             "defaultData": "",
             "type": 7,
             "connectionName": null,
@@ -45,77 +141,119 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "test",
+            "data": "input 1",
             "defaultData": "",
             "type": 7,
-            "connectionName": "input1",
-            "connectionNodeId": "6366666237306162663034333563613239356163306438356466643534373438"
+            "connectionName": "input0",
+            "connectionNodeId": "3832656261613838353336343061326237386531326635343261393065373337"
           }
         ]
       }
     },
     {
-      "name": "SubGraph",
+      "name": "File1",
       "category": "Utility",
-      "id": "6366666237306162663034333563613239356163306438356466643534373438",
+      "id": "3536616163623466373162303862323264636162666262616437616363316266",
       "color": [
-        137,
-        221,
-        255
+        255,
+        220,
+        106
       ],
-      "iconPath": "$BOLT_ICONS/subgraph.png",
-      "definitionPath": "",
-      "nodeType": "SubGraph",
-      "opCode": "",
+      "iconPath": "$BOLT_ICONS/file.png",
+      "definitionPath": "$BOLT_LIB/Nodes/file.bnode",
+      "nodeType": "Utility/File",
+      "opCode": "\noutfile = infile\n\n",
       "disabled": false,
-      "isSubGraph": true,
-      "isIfBegin": false,
-      "associatedEndBlockId": null,
-      "isIfEnd": false,
-      "associatedBeginBlockId": null,
+      "isSubGraph": false,
       "inputs": {
-        "input1": [
+        "infile": [
           {
-            "shortName": "input1",
-            "longName": "Input 1",
+            "shortName": "infile",
+            "longName": "Input File Path",
             "index": 0,
-            "isExposed": false,
+            "isExposed": true,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "test",
-            "defaultData": null,
-            "type": 11,
-            "connectionName": "outfile",
-            "connectionNodeId": "3535393739373037316332316562643966373036373261656661343931643737"
+            "data": "input 2",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
           }
         ]
       },
       "outputs": {
-        "output1": [
+        "outfile": [
           {
-            "shortName": "output1",
-            "longName": "Output 1",
+            "shortName": "outfile",
+            "longName": "Output File Path",
             "index": 0,
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": [
-              "test",
-              "bonjour subgraph"
-            ],
-            "defaultData": null,
-            "type": 11,
-            "connectionName": "indata",
-            "connectionNodeId": "3432636563626362336466353934383738663837343734653133303263316334"
+            "data": "input 2",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "input1",
+            "connectionNodeId": "3832656261613838353336343061326237386531326635343261393065373337"
+          }
+        ]
+      }
+    },
+    {
+      "name": "File2",
+      "category": "Utility",
+      "id": "6562376663366165336535343165366236663764323431326237353538356366",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "$BOLT_ICONS/file.png",
+      "definitionPath": "$BOLT_LIB/Nodes/file.bnode",
+      "nodeType": "Utility/File",
+      "opCode": "\noutfile = infile\n\n",
+      "disabled": false,
+      "isSubGraph": false,
+      "inputs": {
+        "infile": [
+          {
+            "shortName": "infile",
+            "longName": "Input File Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "input 3",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
           }
         ]
       },
-      "subgraph": "{\n  \"nodes\": [\n    {\n      \"name\": \"Inputs\",\n      \"category\": \"Utility\",\n      \"id\": \"3765623631306337643963363735303565656235356563306633313866333462\",\n      \"color\": [\n        137,\n        221,\n        255\n      ],\n      \"iconPath\": \"$BOLT_ICONS/inputs.png\",\n      \"definitionPath\": \"\",\n      \"nodeType\": \"Inputs\",\n      \"opCode\": \"\",\n      \"disabled\": false,\n      \"isSubGraph\": false,\n      \"isIfBegin\": false,\n      \"associatedEndBlockId\": null,\n      \"isIfEnd\": false,\n      \"associatedBeginBlockId\": null,\n      \"inputs\": {},\n      \"outputs\": {\n        \"input1\": [\n          {\n            \"shortName\": \"input1\",\n            \"longName\": \"Input 1\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"test\",\n            \"defaultData\": null,\n            \"type\": 11,\n            \"connectionName\": \"indata\",\n            \"connectionNodeId\": \"6635346463366661323938386131363833336562356632393366353836303130\"\n          }\n        ]\n      }\n    },\n    {\n      \"name\": \"Outputs\",\n      \"category\": \"Utility\",\n      \"id\": \"3437616265323364656161333234303134366235386565333630323131633434\",\n      \"color\": [\n        137,\n        221,\n        255\n      ],\n      \"iconPath\": \"$BOLT_ICONS/outputs.png\",\n      \"definitionPath\": \"\",\n      \"nodeType\": \"Outputs\",\n      \"opCode\": \"\",\n      \"disabled\": false,\n      \"isSubGraph\": false,\n      \"isIfBegin\": false,\n      \"associatedEndBlockId\": null,\n      \"isIfEnd\": false,\n      \"associatedBeginBlockId\": null,\n      \"inputs\": {\n        \"output1\": [\n          {\n            \"shortName\": \"output1\",\n            \"longName\": \"Output 1\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": [\n              \"test\",\n              \"bonjour subgraph\"\n            ],\n            \"defaultData\": null,\n            \"type\": 11,\n            \"connectionName\": \"outdata\",\n            \"connectionNodeId\": \"3163356264366362313733336234356339386565363665356631373837376363\"\n          }\n        ]\n      },\n      \"outputs\": {}\n    },\n    {\n      \"name\": \"Merge\",\n      \"category\": \"Utility\",\n      \"id\": \"3938613236306435326330623438333832646264626566626135633030633837\",\n      \"color\": [\n        0,\n        0,\n        0\n      ],\n      \"iconPath\": \"$BOLT_ICONS/util.png\",\n      \"definitionPath\": \"$BOLT_LIB/Nodes/merge.bnode\",\n      \"nodeType\": \"Utility/Merge\",\n      \"opCode\": \"\\n# BeginOp\\n\\nif type(input1) is list:\\n    if type(input2) is list:\\n        output = [*input1, *input2]\\n    else:\\n        output = [*input1, input2]\\nelif type(input2) is list:\\n    output = [input1, *input2]\\nelse:\\n    output = [input1, input2]\\n\\n\\n\",\n      \"disabled\": false,\n      \"isSubGraph\": false,\n      \"isIfBegin\": false,\n      \"associatedEndBlockId\": null,\n      \"isIfEnd\": false,\n      \"associatedBeginBlockId\": null,\n      \"inputs\": {\n        \"input1\": [\n          {\n            \"shortName\": \"input1\",\n            \"longName\": \"Input 1\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"test\",\n            \"defaultData\": null,\n            \"type\": 11,\n            \"connectionName\": \"outdata\",\n            \"connectionNodeId\": \"6635346463366661323938386131363833336562356632393366353836303130\"\n          }\n        ],\n        \"input2\": [\n          {\n            \"shortName\": \"input2\",\n            \"longName\": \"Input 2\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"bonjour subgraph\",\n            \"defaultData\": null,\n            \"type\": 11,\n            \"connectionName\": \"outfile\",\n            \"connectionNodeId\": \"3439393734306439303634643032653434333832326366343435353565303931\"\n          }\n        ]\n      },\n      \"outputs\": {\n        \"output\": [\n          {\n            \"shortName\": \"output\",\n            \"longName\": \"Output\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": [\n              \"test\",\n              \"bonjour subgraph\"\n            ],\n            \"defaultData\": [],\n            \"type\": 9,\n            \"connectionName\": \"indata\",\n            \"connectionNodeId\": \"3163356264366362313733336234356339386565363665356631373837376363\"\n          }\n        ]\n      }\n    },\n    {\n      \"name\": \"File\",\n      \"category\": \"Utility\",\n      \"id\": \"3439393734306439303634643032653434333832326366343435353565303931\",\n      \"color\": [\n        255,\n        220,\n        106\n      ],\n      \"iconPath\": \"$BOLT_ICONS/file.png\",\n      \"definitionPath\": \"$BOLT_LIB/Nodes/file.bnode\",\n      \"nodeType\": \"Utility/File\",\n      \"opCode\": \"\\noutfile = infile\\n\\n\",\n      \"disabled\": false,\n      \"isSubGraph\": false,\n      \"isIfBegin\": false,\n      \"associatedEndBlockId\": null,\n      \"isIfEnd\": false,\n      \"associatedBeginBlockId\": null,\n      \"inputs\": {\n        \"infile\": [\n          {\n            \"shortName\": \"infile\",\n            \"longName\": \"Input File Path\",\n            \"index\": 0,\n            \"isExposed\": true,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"bonjour subgraph\",\n            \"defaultData\": \"\",\n            \"type\": 7,\n            \"connectionName\": null,\n            \"connectionNodeId\": null\n          }\n        ]\n      },\n      \"outputs\": {\n        \"outfile\": [\n          {\n            \"shortName\": \"outfile\",\n            \"longName\": \"Output File Path\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"bonjour subgraph\",\n            \"defaultData\": \"\",\n            \"type\": 7,\n            \"connectionName\": \"input2\",\n            \"connectionNodeId\": \"3938613236306435326330623438333832646264626566626135633030633837\"\n          }\n        ]\n      }\n    },\n    {\n      \"name\": \"Debug\",\n      \"category\": \"Debug\",\n      \"id\": \"3163356264366362313733336234356339386565363665356631373837376363\",\n      \"color\": [\n        50,\n        222,\n        132\n      ],\n      \"iconPath\": \"$BOLT_ICONS/debug.png\",\n      \"definitionPath\": \"$BOLT_LIB/Nodes/debug.bnode\",\n      \"nodeType\": \"Debug/Debug\",\n      \"opCode\": \"\\nBoltLogMessage(f\\\"Debug Node : {indata}\\\")\\n\\noutdata = indata\\n\\n\",\n      \"disabled\": false,\n      \"isSubGraph\": false,\n      \"isIfBegin\": false,\n      \"associatedEndBlockId\": null,\n      \"isIfEnd\": false,\n      \"associatedBeginBlockId\": null,\n      \"inputs\": {\n        \"indata\": [\n          {\n            \"shortName\": \"indata\",\n            \"longName\": \"Input Data\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": [\n              \"test\",\n              \"bonjour subgraph\"\n            ],\n            \"defaultData\": null,\n            \"type\": 11,\n            \"connectionName\": \"output\",\n            \"connectionNodeId\": \"3938613236306435326330623438333832646264626566626135633030633837\"\n          }\n        ]\n      },\n      \"outputs\": {\n        \"outdata\": [\n          {\n            \"shortName\": \"outdata\",\n            \"longName\": \"Output Data\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": [\n              \"test\",\n              \"bonjour subgraph\"\n            ],\n            \"defaultData\": null,\n            \"type\": 11,\n            \"connectionName\": \"output1\",\n            \"connectionNodeId\": \"3437616265323364656161333234303134366235386565333630323131633434\"\n          }\n        ]\n      }\n    },\n    {\n      \"name\": \"Debug1\",\n      \"category\": \"Debug\",\n      \"id\": \"6635346463366661323938386131363833336562356632393366353836303130\",\n      \"color\": [\n        50,\n        222,\n        132\n      ],\n      \"iconPath\": \"$BOLT_ICONS/debug.png\",\n      \"definitionPath\": \"$BOLT_LIB/Nodes/debug.bnode\",\n      \"nodeType\": \"Debug/Debug\",\n      \"opCode\": \"\\nBoltLogMessage(f\\\"Debug Node : {indata}\\\")\\n\\noutdata = indata\\n\\n\",\n      \"disabled\": false,\n      \"isSubGraph\": false,\n      \"isIfBegin\": false,\n      \"associatedEndBlockId\": null,\n      \"isIfEnd\": false,\n      \"associatedBeginBlockId\": null,\n      \"inputs\": {\n        \"indata\": [\n          {\n            \"shortName\": \"indata\",\n            \"longName\": \"Input Data\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"test\",\n            \"defaultData\": null,\n            \"type\": 11,\n            \"connectionName\": \"input1\",\n            \"connectionNodeId\": \"3765623631306337643963363735303565656235356563306633313866333462\"\n          }\n        ]\n      },\n      \"outputs\": {\n        \"outdata\": [\n          {\n            \"shortName\": \"outdata\",\n            \"longName\": \"Output Data\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"test\",\n            \"defaultData\": null,\n            \"type\": 11,\n            \"connectionName\": \"input1\",\n            \"connectionNodeId\": \"3938613236306435326330623438333832646264626566626135633030633837\"\n          }\n        ]\n      }\n    }\n  ],\n  \"tracker\": null\n}"
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "input 3",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "input2",
+            "connectionNodeId": "3832656261613838353336343061326237386531326635343261393065373337"
+          }
+        ]
+      }
     },
     {
       "name": "Debug",
       "category": "Debug",
-      "id": "3432636563626362336466353934383738663837343734653133303263316334",
+      "id": "6638623661663361363861393539616166633630366563323935373830333366",
       "color": [
         50,
         222,
@@ -127,10 +265,6 @@
       "opCode": "\nBoltLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
       "disabled": false,
       "isSubGraph": false,
-      "isIfBegin": false,
-      "associatedEndBlockId": null,
-      "isIfEnd": false,
-      "associatedBeginBlockId": null,
       "inputs": {
         "indata": [
           {
@@ -141,13 +275,14 @@
             "isHidden": false,
             "isExposedToGraph": false,
             "data": [
-              "test",
-              "bonjour subgraph"
+              "input 1",
+              "input 2",
+              "input 3"
             ],
             "defaultData": null,
             "type": 11,
-            "connectionName": "output1",
-            "connectionNodeId": "6366666237306162663034333563613239356163306438356466643534373438"
+            "connectionName": "output0",
+            "connectionNodeId": "3832656261613838353336343061326237386531326635343261393065373337"
           }
         ]
       },
@@ -161,8 +296,193 @@
             "isHidden": false,
             "isExposedToGraph": false,
             "data": [
-              "test",
-              "bonjour subgraph"
+              "input 1",
+              "input 2",
+              "input 3"
+            ],
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "input1",
+            "connectionNodeId": "3066396364656137313961633030313864373039653234343562353130386539"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Debug1",
+      "category": "Debug",
+      "id": "6636356637393061343466363535363533376437323066656132336539386433",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$BOLT_ICONS/debug.png",
+      "definitionPath": "$BOLT_LIB/Nodes/debug.bnode",
+      "nodeType": "Debug/Debug",
+      "opCode": "\nBoltLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+      "disabled": false,
+      "isSubGraph": false,
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "from subgraph input 1",
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "output1",
+            "connectionNodeId": "3832656261613838353336343061326237386531326635343261393065373337"
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "from subgraph input 1",
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "input2",
+            "connectionNodeId": "3066396364656137313961633030313864373039653234343562353130386539"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Merge",
+      "category": "Utility",
+      "id": "3066396364656137313961633030313864373039653234343562353130386539",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$BOLT_ICONS/util.png",
+      "definitionPath": "$BOLT_LIB/Nodes/merge.bnode",
+      "nodeType": "Utility/Merge",
+      "opCode": "\n# BeginOp\n\nif type(input1) is list:\n    if type(input2) is list:\n        output = [*input1, *input2]\n    else:\n        output = [*input1, input2]\nelif type(input2) is list:\n    output = [input1, *input2]\nelse:\n    output = [input1, input2]\n\n\n",
+      "disabled": false,
+      "isSubGraph": false,
+      "inputs": {
+        "input1": [
+          {
+            "shortName": "input1",
+            "longName": "Input 1",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              "input 1",
+              "input 2",
+              "input 3"
+            ],
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outdata",
+            "connectionNodeId": "6638623661663361363861393539616166633630366563323935373830333366"
+          }
+        ],
+        "input2": [
+          {
+            "shortName": "input2",
+            "longName": "Input 2",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "from subgraph input 1",
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outdata",
+            "connectionNodeId": "6636356637393061343466363535363533376437323066656132336539386433"
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              "input 1",
+              "input 2",
+              "input 3",
+              "from subgraph input 1"
+            ],
+            "defaultData": [],
+            "type": 9,
+            "connectionName": "indata",
+            "connectionNodeId": "6561306363363963633663373933383139396137356230323133313139663230"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Debug2",
+      "category": "Debug",
+      "id": "6561306363363963633663373933383139396137356230323133313139663230",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$BOLT_ICONS/debug.png",
+      "definitionPath": "$BOLT_LIB/Nodes/debug.bnode",
+      "nodeType": "Debug/Debug",
+      "opCode": "\nBoltLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+      "disabled": false,
+      "isSubGraph": false,
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              "input 1",
+              "input 2",
+              "input 3",
+              "from subgraph input 1"
+            ],
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "output",
+            "connectionNodeId": "3066396364656137313961633030313864373039653234343562353130386539"
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              "input 1",
+              "input 2",
+              "input 3",
+              "from subgraph input 1"
             ],
             "defaultData": null,
             "type": 11,
@@ -176,19 +496,44 @@
   "tracker": null,
   "positions": [
     {
-      "id": "3535393739373037316332316562643966373036373261656661343931643737",
-      "x": -190.0,
-      "y": 372.0
+      "id": "3832656261613838353336343061326237386531326635343261393065373337",
+      "x": 651.0,
+      "y": 111.0
     },
     {
-      "id": "6366666237306162663034333563613239356163306438356466643534373438",
-      "x": 263.0,
-      "y": 380.0
+      "id": "3663333561383139346566306664633535343137366435313662666537313935",
+      "x": 83.0,
+      "y": -72.0
     },
     {
-      "id": "3432636563626362336466353934383738663837343734653133303263316334",
-      "x": 755.0,
-      "y": 372.0
+      "id": "3536616163623466373162303862323264636162666262616437616363316266",
+      "x": 66.0,
+      "y": 100.0
+    },
+    {
+      "id": "6562376663366165336535343165366236663764323431326237353538356366",
+      "x": 129.0,
+      "y": 256.0
+    },
+    {
+      "id": "6638623661663361363861393539616166633630366563323935373830333366",
+      "x": 1023.0,
+      "y": 69.0
+    },
+    {
+      "id": "6636356637393061343466363535363533376437323066656132336539386433",
+      "x": 1023.0,
+      "y": 247.0
+    },
+    {
+      "id": "3066396364656137313961633030313864373039653234343562353130386539",
+      "x": 1379.0,
+      "y": 108.0
+    },
+    {
+      "id": "6561306363363963633663373933383139396137356230323133313139663230",
+      "x": 1695.2100000000003,
+      "y": 113.74000000000007
     }
   ]
 }

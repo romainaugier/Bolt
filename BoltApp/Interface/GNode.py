@@ -1,3 +1,7 @@
+"""
+This file contains the classes for graphical representation of status badge, plugs, nodes and edges.
+"""
+
 import binascii, os, math, time
 
 from enum import Enum
@@ -5,17 +9,21 @@ from enum import Enum
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 
+from BoltApi.Utils.String import UpperFirstLetter
 from BoltApi.Core.Node import *
 from BoltApi.Core.Graph import *
 from BoltApp.Interface.Icons import *
 from BoltApp.Interface.Style import ColorPalette, GetQColorFromPalette
 from BoltApp.Interface.Widgets import *
 
+
 class GNode():
     pass
 
+
 class GEdge():
     pass
+
 
 class GGraph():
     pass
@@ -23,7 +31,13 @@ class GGraph():
 
 def GetPlugColor(plugType : PlugType) -> QtGui.QColor:
     """
-    Plug types available
+    Returns the QColor corresponding to the given plug type
+    
+    Args:
+        plugType (PlugType): PlugType to get color from
+        
+    Returns:
+        QtGui.QColor: QColor corresponding to the given PlugType
     """
     if plugType == PlugType.INT: return GetQColorFromPalette(ColorPalette.BLUECOLOR)
     elif plugType == PlugType.INT2: return GetQColorFromPalette(ColorPalette.BLUECOLOR)
@@ -40,13 +54,15 @@ def GetPlugColor(plugType : PlugType) -> QtGui.QColor:
 
 def GetFontRect(text : str, font : str, size : int) -> QtCore.QRect:
     """
-    Gets size of a text
+    Calculates the bounding rect of a text
 
     Args:
-        text (str): text
+        text (str): text to calculate bounding rect from
+        font (str): font name
+        size (int): size of the font
 
     Returns:
-        QtCore.QRect: bounding box of the text
+        QtCore.QRect: bounding rect of the text
     """
     metric = QtGui.QFontMetrics(QtGui.QFont(font, size))
     return metric.boundingRect(text)
@@ -54,6 +70,8 @@ def GetFontRect(text : str, font : str, size : int) -> QtCore.QRect:
 
 class BadgeState(Enum):
     """
+    Enumeration of the different states a badge can have, corresponding
+    to the state of a node
     """
     DIRTY = 0
     COOKED = 1
@@ -64,7 +82,7 @@ class BadgeState(Enum):
 
 class Badge(QtWidgets.QGraphicsObject):
     """
-    Information badge that displays the cooking state of a node (cook, warning, error)
+    Information badge that displays the cooking state of a node (dirty, cook, warning, error)
     """
 
     startsCooking = QtCore.pyqtSignal(str)
@@ -84,7 +102,7 @@ class Badge(QtWidgets.QGraphicsObject):
         self.state = BadgeState.DIRTY
         self.message = ""
 
-        self.dirtyPixmap = self.iconsLib.GetPixmap("clock")
+        self.dirtyPixmap = self.iconsLib.GetPixmap("waiting")
         self.cookedPixmap = self.iconsLib.GetPixmap("done")
         self.warningPixmap = self.iconsLib.GetPixmap("warning")
         self.errorPixmap = self.iconsLib.GetPixmap("error")
@@ -305,12 +323,16 @@ class GPlug(QtWidgets.QGraphicsObject):
         return super().hoverLeaveEvent(ev)
 
     def mousePressEvent(self, event: 'QGraphicsSceneMouseEvent') -> None:
+        """
+        """
         if event.buttons() & QtCore.Qt.RightButton:
             self.hasBeenRightClicked.emit([self.node.getInternalNode().GetID(), self.getInternalPlug().GetShortName()])
         
         return super().mousePressEvent(event)
     
     def mouseMoveEvent(self, event) -> None:
+        """
+        """
         x = event.scenePos().x()
         y = event.scenePos().y()
 
@@ -334,6 +356,8 @@ class GPlug(QtWidgets.QGraphicsObject):
         return super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event : 'QGraphicsSceneMouseEvent') -> None:
+        """
+        """
         if self.closestGPlug is not None and not self.closestGPlug.id == self.id:
             condition1 = True
 
@@ -498,48 +522,7 @@ class GNode(QtWidgets.QGraphicsObject):
         self.inputGPlugs : list[GPlug] = []
         self.outputGPlugs : list[GPlug] = []
 
-        numInputs = self.getInternalNode().GetInputCount()
-        numOutputs = self.getInternalNode().GetOutputCount()
-
-        maxNumPlugs = numInputs if numInputs > numOutputs else numOutputs
-        
-        bodySizeYPerPlug = (self.sizeY - self.labelSizeY) / 3 
-
-        bodySizeY = bodySizeYPerPlug * (maxNumPlugs + 2)
-        
-        if bodySizeY > self.sizeY:
-            self.sizeY = bodySizeY 
-        else:
-            bodySizeYPerPlug = (self.sizeY - self.labelSizeY) / 3
-            self.sizeY = bodySizeYPerPlug * 3
-
-        i = 1
-
-        for inputName, input in self.getInternalNode().GetInputs().items():
-            positionX = self.pos().x() + 5
-            positionY = self.pos().y() + self.labelSizeY + (bodySizeYPerPlug * i)
-            
-            newGPlug = GPlug(positionX, positionY, input, self, self.gGraph, parent=self)
-            newGPlug.hasBeenRightClicked.connect(self.onPlugClicked)
-            self.inputGPlugs.append(newGPlug)
-
-            i += 1
-
-        i = 1
-        
-        for outputName, output in self.getInternalNode().GetOutputs().items():
-            positionX = self.pos().x() + self.sizeX - 12.5
-            positionY = self.pos().y() + self.labelSizeY + (bodySizeYPerPlug * i)
-            
-            newGPlug = GPlug(positionX, positionY, output, self, self.gGraph, input=False, parent=self)
-            newGPlug.hasBeenRightClicked.connect(self.onPlugClicked)
-            self.outputGPlugs.append(newGPlug)
-
-            i += 1
-
-        self.numInputs = numInputs
-        self.numOuputs = numOutputs
-        self.color = QtGui.QColor(self.internalNode.GetColor()[0], self.internalNode.GetColor()[1], self.internalNode.GetColor()[2])
+        self.updatePlugs()
 
         # If the parent GGraph is a subgraph, no need for status badge (because we won't cook a subgraph)
         if self.getGGraph().getInternalGraph().IsSubGraph():
@@ -562,6 +545,51 @@ class GNode(QtWidgets.QGraphicsObject):
         
         self.setToolTip(f"{self.getInternalNode().GetName()}")
 
+    # SUBGRAPH UTILS
+    
+    def isSubGraph(self) -> bool:
+        """
+        Tests if the internal node is a subgraph node by checking its nodetype and
+
+        Returns:
+            bool: True if the internal node is a subgraph
+        """
+        subGraphTypes = ["SubGraph", "IfBlock", "ForBlock"]
+        
+        if self.getInternalNode().GetNodeType() in subGraphTypes:
+            return True
+
+    def addInput(self) -> None:
+        """
+        Adds a new input to the node
+        """
+        inputName = "input0"
+        
+        while self.getInputGPlug(name=inputName) is not None:
+            inputName = Increment(inputName)
+        
+        newInput = Plug(inputName, UpperFirstLetter(inputName), self.getInternalNode())
+        
+        self.getInternalNode().AddInput(newInput)
+        
+        self.updatePlugs()
+        
+        
+    def addOutput(self) -> None:
+        """
+        Adds a new output to the node
+        """
+        outputName = "output0"
+        
+        while self.getOutputGPlug(name=outputName) is not None:
+            outputName = Increment(outputName)
+        
+        newOutput = Plug(outputName, UpperFirstLetter(outputName), self.getInternalNode())
+        
+        self.getInternalNode().AddOutput(newOutput)
+        
+        self.updatePlugs()
+        
     # NODE UTILS
 
     def getInternalNode(self) -> Node:
@@ -630,6 +658,59 @@ class GNode(QtWidgets.QGraphicsObject):
         
         return None
 
+    def updatePlugs(self) -> None:
+        """
+        """
+        for inputGPlug in self.inputGPlugs:
+            self.getGGraph().scene().removeItem(inputGPlug)
+        
+        for outputGPlug in self.outputGPlugs:
+            self.getGGraph().scene().removeItem(outputGPlug)
+        
+        self.inputGPlugs.clear()
+        self.outputGPlugs.clear()
+        
+        self.numInputs = self.getInternalNode().GetInputCount()
+        self.numOutputs = self.getInternalNode().GetOutputCount()
+
+        maxNumPlugs = self.numInputs if self.numInputs > self.numOutputs else self.numOutputs
+        
+        self.sizeY = 125
+        
+        bodySizeYPerPlug = (self.sizeY - self.labelSizeY) / 3 
+
+        bodySizeY = bodySizeYPerPlug * (maxNumPlugs + 2)
+        
+        if bodySizeY > self.sizeY:
+            self.sizeY = bodySizeY 
+        else:
+            bodySizeYPerPlug = (self.sizeY - self.labelSizeY) / 3
+            self.sizeY = bodySizeYPerPlug * 3
+        
+        i = 1
+
+        for inputName, input in self.getInternalNode().GetInputs().items():
+            positionX = 5
+            positionY = self.labelSizeY + (bodySizeYPerPlug * i)
+            
+            newGPlug = GPlug(positionX, positionY, input, self, self.gGraph, parent=self)
+            newGPlug.hasBeenRightClicked.connect(self.onPlugClicked)
+            self.inputGPlugs.append(newGPlug)
+
+            i += 1
+
+        i = 1
+        
+        for outputName, output in self.getInternalNode().GetOutputs().items():
+            positionX = self.sizeX - 12.5
+            positionY = self.labelSizeY + (bodySizeYPerPlug * i)
+            
+            newGPlug = GPlug(positionX, positionY, output, self, self.gGraph, input=False, parent=self)
+            newGPlug.hasBeenRightClicked.connect(self.onPlugClicked)
+            self.outputGPlugs.append(newGPlug)
+
+            i += 1
+
     def updateBadge(self) -> None:
         """
         """
@@ -640,12 +721,6 @@ class GNode(QtWidgets.QGraphicsObject):
         """
         """
         return self.pixMap
-
-    def boundingRect(self):
-        """
-        """
-        adjust = 10
-        return QtCore.QRectF(-adjust, -adjust, self.sizeX + adjust * 2, self.sizeY + adjust * 2)
     
     def cook(self) -> None:
         """
@@ -656,6 +731,12 @@ class GNode(QtWidgets.QGraphicsObject):
             self.gGraph.launchGraphCooking(lastNodeToCook=self.getInternalNode().GetID())
 
     # PAINT
+    
+    def boundingRect(self):
+        """
+        """
+        adjust = 10
+        return QtCore.QRectF(-adjust, -adjust, self.sizeX + adjust * 2, self.sizeY + adjust * 2)
 
     def paint(self, painter : QtGui.QPainter, option : QtWidgets.QStyleOptionGraphicsItem, widget : QtWidgets.QWidget) -> None:
         """
@@ -746,7 +827,7 @@ class GNode(QtWidgets.QGraphicsObject):
             painter.setBrush(disabledColor)
             painter.drawPath(path.simplified())
             
-    def updateGPlugs(self) -> None:
+    def updateGPlugsBounds(self) -> None:
         """
         """
         for plug in self.inputGPlugs:
@@ -787,13 +868,24 @@ class GNode(QtWidgets.QGraphicsObject):
         
         disableActionName = "Enable" if self.getInternalNode().IsDisabled() else "Disable"
         disable = QtWidgets.QAction(disableActionName)
-        disable.triggered.connect(lambda: (self.getInternalNode().SetDisabled(True), self.updateBadge(), self.updateGPlugs()))
+        disable.triggered.connect(lambda: (self.getInternalNode().SetDisabled(True), self.updateBadge(), self.updateGPlugsBounds()))
         menu.addAction(disable)
         
         deleteAction = QtWidgets.QAction("Delete")
         deleteAction.setToolTip("Delete this node from the graph")
         deleteAction.triggered.connect(lambda: (self.gGraph.deleteNode(self), self.gGraph.plugEditor.setCurrentNode(None)))
         menu.addAction(deleteAction)
+        
+        if self.isSubGraph():
+            addInputAction = QtWidgets.QAction("Add Input")
+            addInputAction.setToolTip("Add a new input to the node")
+            addInputAction.triggered.connect(lambda: self.addInput())
+            menu.addAction(addInputAction)
+            
+            addOutputAction = QtWidgets.QAction("Add Output")
+            addOutputAction.setToolTip("Add a new Output to the node")
+            addOutputAction.triggered.connect(lambda: self.addOutput())
+            menu.addAction(addOutputAction)
 
         menu.exec(QtCore.QPoint(position.x(), position.y()))
         
@@ -835,9 +927,7 @@ class GNode(QtWidgets.QGraphicsObject):
     def mouseDoubleClickEvent(self, event : QtGui.QMouseEvent) -> None:
         """
         """
-        subGraphTypes = ["SubGraph", "IfBlock", "ForBlock"]
-        
-        if self.getInternalNode().GetNodeType() in subGraphTypes:
+        if self.isSubGraph():
             self.openSubGraph.emit(self.getInternalNode().GetGraph())
 
     def mouseMoveEvent(self, event : QtGui.QMouseEvent) -> None:

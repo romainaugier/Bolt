@@ -14,10 +14,7 @@
       "nodeType": "Utility/File",
       "opCode": "\noutfile = infile\n\n",
       "disabled": false,
-      "isIfBegin": false,
-      "associatedEndBlockId": null,
-      "isIfEnd": false,
-      "associatedBeginBlockId": null,
+      "isSubGraph": false,
       "inputs": {
         "infile": [
           {
@@ -67,10 +64,7 @@
       "nodeType": "Oeuf/Oeuf_GuerillaEnv",
       "opCode": "\noutenvironment = inenvironment\n\n",
       "disabled": false,
-      "isIfBegin": false,
-      "associatedEndBlockId": null,
-      "isIfEnd": false,
-      "associatedBeginBlockId": null,
+      "isSubGraph": false,
       "inputs": {
         "inenvironment": [
           {
@@ -136,10 +130,7 @@
       "nodeType": "Oeuf/Oeuf_RenderOptionsLD",
       "opCode": "\noutrenderoptions = inrenderoptions\n\n",
       "disabled": false,
-      "isIfBegin": false,
-      "associatedEndBlockId": null,
-      "isIfEnd": false,
-      "associatedBeginBlockId": null,
+      "isSubGraph": false,
       "inputs": {
         "inrenderoptions": [
           {
@@ -203,10 +194,7 @@
       "nodeType": "Guerilla/Guerilla_PrepareDeadlineJob",
       "opCode": "\n# BeginOp\n\n# BeginOp\n\n# BeginOp\n\nfrom datetime import datetime\nimport re, os, subprocess, platform\n\nnow = datetime.now()\n\ncurrentTimeStr = now.strftime('%m%d%Y_%H%M%S')\n\n# Setup job and batch name\nteamName = inrenderoptions[\"Team\"]\njobType = inrenderoptions[\"Type\"]\nsequenceName = inrenderoptions[\"SequenceName\"] \nshotName = inrenderoptions[\"ShotName\"]\nframeRange = inrenderoptions[\"FrameRange\"]\n\njobName = f\"{teamName}_{jobType}_{sequenceName}_{shotName}\"\nbatchName = f\"{jobName}-{currentTimeStr}\"\n\nif jobType == \"LD\":\n    injoboptions[\"Priority\"] = 50\nelif jobType == \"FML\":\n    injoboptions[\"Priority\"] = 75\nelif jobType == \"HD\":\n    injoboptions[\"Priority\"] = 25\n\nrenderDir = f\"{inrenderdir}/{sequenceName}/{shotName}/{jobType}1\"\n\nwhile os.path.exists(renderDir):   \n    numPattern = r\"(\\d+)$\"\n\n    match = re.search(numPattern, renderDir)\n\n    value = int(match.group()) + 1\n\n    renderDir = f\"{renderDir[:match.start()]}{value}\"\n\nos.makedirs(renderDir)\nBoltLogMessage(f\"RenderDir : {renderDir}\")\n\nrenderFile = f\"{renderDir}/render_{sequenceName}_{shotName}_$f.$x\"\nopenExrIdFile = f\"{renderDir}/render_{sequenceName}_{shotName}_id_$f.$x\"\n\n# Setup job options\ninjoboptions[\"Plugin\"] = \"Guerilla\"\ninjoboptions[\"Name\"] = jobName\ninjoboptions[\"BatchName\"] = batchName\ninjoboptions[\"Frames\"] = frameRange\ninjoboptions[\"OutputDirectory0\"] = renderDir\n\n# Render Job Infos\ngeneratedRenderJobInfos = \"\"\n\nfor key, item in injoboptions.items():\n    generatedRenderJobInfos += f\"{key}={item}\\n\"\n\n# Ribgen Job Infos\ninjoboptions[\"Name\"] = f\"{jobName}_ribgen\"\ninjoboptions[\"Frames\"] = 0\n\ngeneratedRibgenJobInfos = \"\"\n\nfor key, item in injoboptions.items():\n    generatedRibgenJobInfos += f\"{key}={item}\\n\"\n\n# Generate Guerilla script\n\ngeneratedScript = f\"\"\"import guerilla, os\nimport RomanoTools.Guerilla.Utils as utils\n\nlayer = guerilla.Document().findchild(\"RenderPass|Layer\")\n\naovs = {inrenderpasses}\n\nexistingAovs = [aov.PlugName.get() for aov in layer.children()]\n\naovsToAdd = {inrenderpasses}\n\nfor aov in aovs:\n    if aov in existingAovs:\n        aovsToAdd.remove(aov)\n\nwith guerilla.Modifier() as mod:\n\n    for aov in layer.children():\n        if aov.PlugName.get() == \"Albedo\":\n            aov.OverrideSettings.set(True)\n            aov.DisplayDriver.set(\"exrid\")\n            aov.FileName.set(\"{openExrIdFile}\")\n\n    utils.SetRange(\"{frameRange}\")\n    utils.SetOptims()\n\n    if \"{jobType}\" == \"LD\":\n        utils.SetLowRenderParms()\n    else:\n        utils.SetFinalRenderParms()\n\n    prefNode = guerilla.Document().findchild(\"Preferences\")\n\n    prefNode.RenderfarmSequence.set(\"{jobName}\")\n    prefNode.DeferredRibGen.set(True)\n\n    renderPass = guerilla.Document().findchild(\"RenderPass\")\n    renderPass.FileName.set(\"{renderFile}\")\n    renderPass.DisplayDriver.set(\"exr\")\n\nsceneDir = guerilla.envcontext.getenv(\"SCENE_PATH\")\njobsDir = \"{{}}/jobs\".format(sceneDir)\n\noptions = guerilla.renderoptions({{}})\n\noptions[\"JobsDirectory\"] = jobsDir\noptions[\"DeferredRibGenBatch\"] = 0\noptions[\"DeferredFile\"] = \"{{}}/{{}}_ribgen_{{}}.gproject\".format(jobsDir, options[\"FilePrefix\"], options[\"RenderId\"])\n\nscriptFiles = guerilla.render(\"none\", options)\n\nribgenScriptFile = scriptFiles[0].getscriptfile(0)\nrenderScriptFile = scriptFiles[1].getscriptfile(0)\n\nprint(\"RIBGEN_SCRIPT_FILE={{}}\".format(\"{{}}/{{}}\".format(jobsDir, ribgenScriptFile)))\nprint(\"RENDER_SCRIPT_FILE={{}}\".format(\"{{}}/{{}}\".format(jobsDir, renderScriptFile)))\n\nguerilla.Document().save()\n\"\"\"\n\n# Start the guerilla scene and execute the script to prepare it\n\ntmpScriptFilePath = BoltTempScript()\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(generatedScript)\n\nBoltLogMessage(f\"GuerillaBatch : Start executing script : {tmpScriptFilePath}\")\n\nif platform.system == \"windows\":\n    command = [f\"{inenvironment['GUERILLA']}/guerillaBatch\", \"--nogui\"] \n    \n    if os.path.exists(inguerillafile):\n        command.append(inguerillafile)\n    \n    command.append(tmpScriptFilePath)\nelse:\n    command = [f\"{inenvironment['GUERILLA']}/guerilla\", \"--nogui\"]\n\n    if os.path.exists(inguerillafile):\n        command.append(inguerillafile)\n    \n    command.append(tmpScriptFilePath)\n\nBoltLogMessage(f\"GuerillaBatch Command : {' '.join(command)}\")\n\nenv = os.environ.copy()\nenv.update(inenvironment)\n\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, env=env)\n\nstdout, stderr = process.communicate()\n\nstdoutAsStr = stdout.decode(\"utf-8\")\nstderrAsStr = stderr.decode(\"utf-8\")\n\nif len(stderrAsStr) > 0:\n    BoltLogError(stderrAsStr)\nelse:\n    BoltLogMessage(f\"GuerillaBatch : Finished executing script : {tmpScriptFilePath}\")\n    BoltLogMessage(stdoutAsStr)\n\n# Get the generated guerilla scriptfiles paths\n\nribgenScriptPattern = r\"RIBGEN_SCRIPT_FILE=(\\S+)\"\nrenderScriptPattern = r\"RENDER_SCRIPT_FILE=(\\S+)\"\n\nribGenScriptFilePath = re.findall(ribgenScriptPattern, stdoutAsStr)[0]\nrenderScriptFilePath = re.findall(renderScriptPattern, stdoutAsStr)[0]\n\ntmpDirPath = BoltTempDir()\n\n# Render Job Infos\nrenderJobInfoFile = f\"{tmpDirPath}/render_job_info_{currentTimeStr}.job\"\n\nwith open(renderJobInfoFile, \"w\") as file:\n    file.write(generatedRenderJobInfos) \n\n# Render Plugin Infos\nrenderJobPluginFile = f\"{tmpDirPath}/render_plugin_info_{currentTimeStr}.job\"\n\nwith open(renderJobPluginFile, \"w\") as file:\n    file.write(f\"ScriptFile={renderScriptFilePath}\\nScriptArgs=\\\"--frame={frameRange.split('-')[0]}\\\"\")\n\n# Ribgen Job Infos\nribgenJobInfoFile = f\"{tmpDirPath}/ribgen_job_info_{currentTimeStr}.job\"\n\nwith open(ribgenJobInfoFile, \"w\") as file:\n    file.write(generatedRibgenJobInfos)\n\n# Ribgen Plugin Infos\nribgenJobPluginFile = f\"{tmpDirPath}/ribgen_plugin_info_{currentTimeStr}.job\"\n\nwith open(ribgenJobPluginFile, \"w\") as file:\n    file.write(f\"ScriptFile={ribGenScriptFilePath}\\nScriptArgs=\")\n\noutribgenjobinfofile = ribgenJobInfoFile\noutribgenplugininfofile = ribgenJobPluginFile\noutrenderjobinfofile = renderJobInfoFile\noutrenderplugininfofile = renderJobPluginFile\noutrenderdir = renderDir\n\n\n\n\n",
       "disabled": false,
-      "isIfBegin": false,
-      "associatedEndBlockId": null,
-      "isIfEnd": false,
-      "associatedBeginBlockId": null,
+      "isSubGraph": false,
       "inputs": {
         "inguerillafile": [
           {
@@ -485,10 +473,7 @@
       "nodeType": "Deadline/Deadline_WaitForJobFinished",
       "opCode": "\nimport subprocess, time\n\nBoltLogMessage(f\"Deadline : Waiting for job {injobid}\")\n\njobIsNotComplete = True\n\nwhile jobIsNotComplete:\n\n    process = subprocess.Popen([\"deadlinecommand\", \"-GetJob\", injobid], stdout = subprocess.PIPE, stderr = subprocess.PIPE)\n    stdout, stderr = process.communicate()\n\n    stdoutAsStr = stdout.decode(\"utf-8\")\n    stderrAsStr = stderr.decode(\"utf-8\")\n\n    for line in stdoutAsStr.splitlines():\n        if line.startswith(\"JobStatus\"):\n            jobStatus = line.split(\"=\")[1]\n\n            if jobStatus == \"Completed\":\n                jobIsNotComplete = False\n                outjobcomplete = True\n                BoltLogMessage(f\"Deadline : Job {injobid} is complete\")\n                break\n            elif jobStatus == \"Failed\":\n                jobIsNotComplete = False\n                outjobcomplete = False\n                BoltLogWarning(f\"Deadline : Job {injobid} is failed\")\n                break\n            else:\n                time.sleep(60)\n                break\n\n",
       "disabled": false,
-      "isIfBegin": false,
-      "associatedEndBlockId": null,
-      "isIfEnd": false,
-      "associatedBeginBlockId": null,
+      "isSubGraph": false,
       "inputs": {
         "injobid": [
           {
@@ -519,7 +504,7 @@
             "defaultData": true,
             "type": 8,
             "connectionName": "incondition",
-            "connectionNodeId": "6139623863323131323932323566643431643862373166643462376138643335"
+            "connectionNodeId": "6665323633616566353333386637373235303036393563653430316436653463"
           }
         ]
       }
@@ -538,10 +523,7 @@
       "nodeType": "Debug/Debug",
       "opCode": "\nBoltLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
       "disabled": false,
-      "isIfBegin": false,
-      "associatedEndBlockId": null,
-      "isIfEnd": false,
-      "associatedBeginBlockId": null,
+      "isSubGraph": false,
       "inputs": {
         "indata": [
           {
@@ -571,348 +553,8 @@
             "data": null,
             "defaultData": null,
             "type": 11,
-            "connectionName": "input",
-            "connectionNodeId": "6139623863323131323932323566643431643862373166643462376138643335"
-          }
-        ]
-      }
-    },
-    {
-      "name": "If_Begin",
-      "category": "Utility",
-      "id": "6139623863323131323932323566643431643862373166643462376138643335",
-      "color": [
-        0,
-        0,
-        0
-      ],
-      "iconPath": "$BOLT_ICONS/block.png",
-      "definitionPath": "D:/dev/Bolt/Library/Nodes/ifbegin.bnode",
-      "nodeType": "Utility/If_Begin",
-      "opCode": "\noutput = input\n\n",
-      "disabled": false,
-      "isIfBegin": true,
-      "associatedEndBlockId": "6532623361303334613830333737393034303764653062613765626435356635",
-      "isIfEnd": false,
-      "associatedBeginBlockId": null,
-      "inputs": {
-        "input": [
-          {
-            "shortName": "input",
-            "longName": "Input",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": null,
-            "defaultData": null,
-            "type": 11,
-            "connectionName": "outdata",
-            "connectionNodeId": "3034663162366363643930373837623530663031313362353236306532343237"
-          }
-        ],
-        "incondition": [
-          {
-            "shortName": "incondition",
-            "longName": "Condition",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": true,
-            "defaultData": true,
-            "type": 8,
-            "connectionName": "outjobcomplete",
-            "connectionNodeId": "3934303435383636343131383961653666623734393730623333653536663535"
-          }
-        ]
-      },
-      "outputs": {
-        "output": [
-          {
-            "shortName": "output",
-            "longName": "Output",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": null,
-            "defaultData": null,
-            "type": 11,
-            "connectionName": "inrenderdir",
-            "connectionNodeId": "3139336132656639393435656665363762393165333261623033653835306339"
-          }
-        ]
-      }
-    },
-    {
-      "name": "If_End",
-      "category": "Utility",
-      "id": "6532623361303334613830333737393034303764653062613765626435356635",
-      "color": [
-        0,
-        0,
-        0
-      ],
-      "iconPath": "$BOLT_ICONS/block.png",
-      "definitionPath": "D:/dev/Bolt/Library/Nodes/ifend.bnode",
-      "nodeType": "Utility/If_End",
-      "opCode": "\noutput = input\n\n",
-      "disabled": false,
-      "isIfBegin": false,
-      "associatedEndBlockId": null,
-      "isIfEnd": true,
-      "associatedBeginBlockId": "6139623863323131323932323566643431643862373166643462376138643335",
-      "inputs": {
-        "input": [
-          {
-            "shortName": "input",
-            "longName": "Input",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": null,
-            "defaultData": null,
-            "type": 11,
-            "connectionName": "outfile",
-            "connectionNodeId": "3237346335613734336532323564643862356435653466313763343563636638"
-          }
-        ]
-      },
-      "outputs": {
-        "output": [
-          {
-            "shortName": "output",
-            "longName": "Output",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": null,
-            "defaultData": null,
-            "type": 11,
-            "connectionName": null,
-            "connectionNodeId": null
-          }
-        ]
-      }
-    },
-    {
-      "name": "NK_GenerateDaily",
-      "category": "Nuke",
-      "id": "3139336132656639393435656665363762393165333261623033653835306339",
-      "color": [
-        0,
-        0,
-        0
-      ],
-      "iconPath": "$BOLT_ICONS/nuke.png",
-      "definitionPath": "$BOLT_LIB/Nodes/nk_generatedaily.bnode",
-      "nodeType": "Nuke/NK_GenerateDaily",
-      "opCode": "\ngeneratedScript = f\"\"\"import nuke, os, sys\n\nnuke.scriptOpen(\"{innuketemplate}\")\n\nseqs = nuke.getFileNameList(\"{inrenderdir}\")\n\noutputfile = \"{inrenderdir}/daily/daily.mov\"\n\nif len(seqs) > 0:\n    if not os.path.exists(outputfile):\n        os.makedirs(os.path.dirname(outputfile))\n\n    read = nuke.toNode(\"MAIN_READ\")\n    read.knob(\"file\").fromUserText(\"{inrenderdir}/\" + seqs[0])\n\n    write = nuke.toNode(\"MAIN_WRITE\")\n    write.knob(\"file\").fromUserText(outputfile)\n\n    first = int(read.knob(\"first\").getValue())\n    last = int(read.knob(\"last\").getValue())\n\n    nuke.execute(\"MAIN_WRITE\", start=first, end=last, incr=1)\n\nelse:\n    sys.stderr.write(\"[ERROR] Nk_GenerateDaily : No file sequence found\")\n\n\"\"\"\n\ntmpScriptFilePath = BoltTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as file:\n    file.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\n\n",
-      "disabled": false,
-      "isIfBegin": false,
-      "associatedEndBlockId": null,
-      "isIfEnd": false,
-      "associatedBeginBlockId": null,
-      "inputs": {
-        "inrenderdir": [
-          {
-            "shortName": "inrenderdir",
-            "longName": "Render Directory",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": "",
-            "defaultData": "",
-            "type": 7,
-            "connectionName": "output",
-            "connectionNodeId": "6139623863323131323932323566643431643862373166643462376138643335"
-          }
-        ],
-        "innuketemplate": [
-          {
-            "shortName": "innuketemplate",
-            "longName": "Nuke Template File",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": "D:/dev/Bolt/Library/Templates/Nuke/generate_daily.nk",
-            "defaultData": "D:/dev/Bolt/Library/Templates/Nuke/generate_daily.nk",
-            "type": 7,
-            "connectionName": "outfile",
-            "connectionNodeId": "6561643865303663626362386536663164393838623130643862376639303535"
-          }
-        ]
-      },
-      "outputs": {
-        "outscriptfile": [
-          {
-            "shortName": "outscriptfile",
-            "longName": "Script File",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": "",
-            "defaultData": "",
-            "type": 7,
-            "connectionName": "inscriptfile",
-            "connectionNodeId": "3237346335613734336532323564643862356435653466313763343563636638"
-          }
-        ],
-        "outrenderdir": [
-          {
-            "shortName": "outrenderdir",
-            "longName": "Render Directory",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": "",
-            "defaultData": "",
-            "type": 7,
-            "connectionName": null,
-            "connectionNodeId": null
-          }
-        ]
-      }
-    },
-    {
-      "name": "NK_NukePy",
-      "category": "Nuke",
-      "id": "3237346335613734336532323564643862356435653466313763343563636638",
-      "color": [
-        0,
-        0,
-        0
-      ],
-      "iconPath": "$BOLT_ICONS/nuke.png",
-      "definitionPath": "$BOLT_LIB/Nodes/nk_nukepy.bnode",
-      "nodeType": "Nuke/NK_NukePy",
-      "opCode": "\n# BeginOp\n\nimport subprocess, os\n\nBoltLogMessage(f\"NukeBatch : Start executing script : {inscriptfile}\")\n\ncommand = [f\"{innukebindir}\", \"-t\", inscriptfile]\n\nfor arg in inargs:\n    command.append(arg)\n\nBoltLogMessage(f\"NukeBatch Command : {' '.join(command)}\")\n\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, encoding=\"utf-8\")\nstdout, stderr = process.communicate()\n\ntry:\n    stdoutAsStr = stdout\n    stderrAsStr = stderr\n\n    if len(stderrAsStr) > 0:\n        BoltLogError(stderrAsStr)\n    else:\n        BoltLogMessage(f\"NukeBatch : Finished executing script\")\n        BoltLogMessage(stdoutAsStr)\n\n        for line in stdoutAsStr.splitlines():\n            if line.startswith(\"OUTPUTFILE\"):\n                outfile = line.split(\"=\")[1].strip()\nexcept Exception as e:\n    BoltLogMessage(e)\n\n",
-      "disabled": false,
-      "isIfBegin": false,
-      "associatedEndBlockId": null,
-      "isIfEnd": false,
-      "associatedBeginBlockId": null,
-      "inputs": {
-        "inscriptfile": [
-          {
-            "shortName": "inscriptfile",
-            "longName": "Script File",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": "",
-            "defaultData": "",
-            "type": 7,
-            "connectionName": "outscriptfile",
-            "connectionNodeId": "3139336132656639393435656665363762393165333261623033653835306339"
-          }
-        ],
-        "inargs": [
-          {
-            "shortName": "inargs",
-            "longName": "Script Arguments",
-            "index": 0,
-            "isExposed": true,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": [],
-            "defaultData": [],
-            "type": 9,
-            "connectionName": null,
-            "connectionNodeId": null
-          }
-        ],
-        "innukebindir": [
-          {
-            "shortName": "innukebindir",
-            "longName": "Nuke Binary Directory",
-            "index": 0,
-            "isExposed": true,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": "C:/Program Files/Nuke13.0v5/Nuke13.0.exe",
-            "defaultData": "C:/Program Files/Nuke13.0v5/Nuke13.0.exe",
-            "type": 7,
-            "connectionName": null,
-            "connectionNodeId": null
-          }
-        ]
-      },
-      "outputs": {
-        "outfile": [
-          {
-            "shortName": "outfile",
-            "longName": "Output File",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": "",
-            "defaultData": "",
-            "type": 7,
-            "connectionName": "input",
-            "connectionNodeId": "6532623361303334613830333737393034303764653062613765626435356635"
-          }
-        ]
-      }
-    },
-    {
-      "name": "File1",
-      "category": "Utility",
-      "id": "6561643865303663626362386536663164393838623130643862376639303535",
-      "color": [
-        255,
-        220,
-        106
-      ],
-      "iconPath": "$BOLT_ICONS/file.png",
-      "definitionPath": "$BOLT_LIB/Nodes/file.bnode",
-      "nodeType": "Utility/File",
-      "opCode": "\noutfile = infile\n\n",
-      "disabled": false,
-      "isIfBegin": false,
-      "associatedEndBlockId": null,
-      "isIfEnd": false,
-      "associatedBeginBlockId": null,
-      "inputs": {
-        "infile": [
-          {
-            "shortName": "infile",
-            "longName": "Input File Path",
-            "index": 0,
-            "isExposed": true,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": "D:/dev/Bolt/Library/Templates/Nuke/generate_daily.nk",
-            "defaultData": "",
-            "type": 7,
-            "connectionName": null,
-            "connectionNodeId": null
-          }
-        ]
-      },
-      "outputs": {
-        "outfile": [
-          {
-            "shortName": "outfile",
-            "longName": "Output File Path",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": "",
-            "defaultData": "",
-            "type": 7,
-            "connectionName": "innuketemplate",
-            "connectionNodeId": "3139336132656639393435656665363762393165333261623033653835306339"
+            "connectionName": "input0",
+            "connectionNodeId": "6665323633616566353333386637373235303036393563653430316436653463"
           }
         ]
       }
@@ -931,10 +573,7 @@
       "nodeType": "Deadline/Deadline_SubmitGuerillaJob",
       "opCode": "\nimport subprocess, re\n\njobRibgenName = \"\"\njobRenderName = \"\"\n\nwith open(inribgenjobinfo, \"r\") as file:\n    for line in file.readlines():\n        if line.startswith(\"Name\"):\n            jobRibgenName = line.split(\"=\")[1]\n\nwith open(inrenderjobinfo, \"r\") as file:\n    for line in file.readlines():\n        if line.startswith(\"Name\"):\n            jobRenderName = line.split(\"=\")[1]\n\nBoltLogMessage(f\"Deadline : Submitting ribgen job {jobRibgenName}\")\nBoltLogMessage(f\"Deadline : Submitting render job {jobRenderName}\")\n\ncommand = [\n    \"deadlinecommand\",\n    \"-Multi\",\n    \"-job\",\n    inribgenjobinfo,\n    inribgenplugininfo,\n    \"-job\",\n    \"-dependsOnPrevious\",\n    inrenderjobinfo,\n    inrenderplugininfo\n]\n\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE)\nstdout, stderr = process.communicate()\n\nstdoutAsStr = stdout.decode(\"utf-8\")\nstderrAsStr = stderr.decode(\"utf-8\")\n\nif len(stderrAsStr) > 0:\n    BoltLogError(stderrAsStr)\nelse:\n    jobIdPattern = r\"JobID=(\\S+)\"\n\n    matches = re.findall(jobIdPattern, stdoutAsStr)\n\n    outribgenjobid = matches[0]\n    outrenderjobid = matches[1]\n\n    BoltLogMessage(f\"Deadline : Finished submitting job. \\n    Ribgen Job ID = {outribgenjobid}\\n    Render Job ID = {outrenderjobid}\")\n\n    BoltLogMessage(stdoutAsStr)\n\n",
       "disabled": false,
-      "isIfBegin": false,
-      "associatedEndBlockId": null,
-      "isIfEnd": false,
-      "associatedBeginBlockId": null,
+      "isSubGraph": false,
       "inputs": {
         "inribgenjobinfo": [
           {
@@ -1029,13 +668,130 @@
           }
         ]
       }
+    },
+    {
+      "name": "IfBlock",
+      "category": "Utility",
+      "id": "6665323633616566353333386637373235303036393563653430316436653463",
+      "color": [
+        104,
+        240,
+        222
+      ],
+      "iconPath": "$BOLT_ICONS/if-block.png",
+      "definitionPath": "",
+      "nodeType": "IfBlock",
+      "opCode": "",
+      "disabled": false,
+      "isSubGraph": true,
+      "inputs": {
+        "input0": [
+          {
+            "shortName": "input0",
+            "longName": "Input0",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "outdata",
+            "connectionNodeId": "3034663162366363643930373837623530663031313362353236306532343237"
+          }
+        ],
+        "incondition": [
+          {
+            "shortName": "incondition",
+            "longName": "Condition",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": false,
+            "defaultData": null,
+            "type": 8,
+            "connectionName": "outjobcomplete",
+            "connectionNodeId": "3934303435383636343131383961653666623734393730623333653536663535"
+          }
+        ]
+      },
+      "outputs": {
+        "output0": [
+          {
+            "shortName": "output0",
+            "longName": "Output0",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "indata",
+            "connectionNodeId": "3562393435626434353364326137653137303831643961383933303335353235"
+          }
+        ]
+      },
+      "subgraph": "{\n  \"nodes\": [\n    {\n      \"name\": \"Inputs\",\n      \"category\": \"Utility\",\n      \"id\": \"3239346264643534306266663538656635663134386531343030393930303061\",\n      \"color\": [\n        137,\n        221,\n        255\n      ],\n      \"iconPath\": \"$BOLT_ICONS/inputs.png\",\n      \"definitionPath\": \"\",\n      \"nodeType\": \"Inputs\",\n      \"opCode\": \"\",\n      \"disabled\": false,\n      \"isSubGraph\": false,\n      \"inputs\": {},\n      \"outputs\": {\n        \"input0\": [\n          {\n            \"shortName\": \"input0\",\n            \"longName\": \"Input0\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": null,\n            \"defaultData\": null,\n            \"type\": 11,\n            \"connectionName\": \"inrenderdir\",\n            \"connectionNodeId\": \"6166656539633430343066313436393466376437613766373737333838626266\"\n          }\n        ],\n        \"incondition\": [\n          {\n            \"shortName\": \"incondition\",\n            \"longName\": \"Condition\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": null,\n            \"defaultData\": null,\n            \"type\": 8,\n            \"connectionName\": null,\n            \"connectionNodeId\": null\n          }\n        ]\n      }\n    },\n    {\n      \"name\": \"Outputs\",\n      \"category\": \"Utility\",\n      \"id\": \"3862383339306265643532373565326633613034303265623639313066643830\",\n      \"color\": [\n        137,\n        221,\n        255\n      ],\n      \"iconPath\": \"$BOLT_ICONS/outputs.png\",\n      \"definitionPath\": \"\",\n      \"nodeType\": \"Outputs\",\n      \"opCode\": \"\",\n      \"disabled\": false,\n      \"isSubGraph\": false,\n      \"inputs\": {\n        \"output0\": [\n          {\n            \"shortName\": \"output0\",\n            \"longName\": \"Output0\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": null,\n            \"defaultData\": null,\n            \"type\": 11,\n            \"connectionName\": \"outfile\",\n            \"connectionNodeId\": \"3562663738323364663932636537663963363566323633303130663062323931\"\n          }\n        ]\n      },\n      \"outputs\": {}\n    },\n    {\n      \"name\": \"NK_GenerateDaily\",\n      \"category\": \"Nuke\",\n      \"id\": \"6166656539633430343066313436393466376437613766373737333838626266\",\n      \"color\": [\n        0,\n        0,\n        0\n      ],\n      \"iconPath\": \"$BOLT_ICONS/nuke.png\",\n      \"definitionPath\": \"$BOLT_LIB/Nodes/nk_generatedaily.bnode\",\n      \"nodeType\": \"Nuke/NK_GenerateDaily\",\n      \"opCode\": \"\\nif inapplyaces:\\n    writeNodeName = \\\"MAIN_WRITE\\\"\\nelse:\\n    writeNodeName = \\\"MAIN_WRITE_RAW\\\"\\n\\ngeneratedScript = f\\\"\\\"\\\"import nuke, os, sys\\n\\nnuke.scriptOpen(\\\"{innuketemplate}\\\")\\n\\nseqs = nuke.getFileNameList(\\\"{inrenderdir}\\\")\\n\\nsupdir = os.path.basename(\\\"{inrenderdir}\\\")\\nsupdir1 = os.path.basename(os.path.dirname(\\\"{inrenderdir}\\\"))\\nsupdir2 = os.path.basename(os.path.dirname(os.path.dirname(\\\"{inrenderdir}\\\")))\\n\\noutputfile = \\\"{inrenderdir}/daily/{{}}_{{}}_{{}}_daily.mov\\\".format(supdir2, supdir1, supdir)\\n\\nprint(seqs)\\n\\nif len(seqs) > 0:\\n    if not os.path.exists(outputfile):\\n        os.makedirs(os.path.dirname(outputfile))\\n\\n    read = nuke.toNode(\\\"MAIN_READ\\\")\\n    read.knob(\\\"file\\\").fromUserText(\\\"{inrenderdir}/\\\" + seqs[0])\\n\\n    write = nuke.toNode(\\\"{writeNodeName}\\\")\\n    write.knob(\\\"file\\\").fromUserText(outputfile)\\n\\n    first = int(read.knob(\\\"first\\\").getValue())\\n    last = int(read.knob(\\\"last\\\").getValue())\\n\\n    nuke.execute(\\\"{writeNodeName}\\\", start=first, end=last, incr=1)\\n\\nelse:\\n    sys.stderr.write(\\\"[ERROR] Nk_GenerateDaily : No file sequence found\\\")\\n\\n\\\"\\\"\\\"\\n\\ntmpScriptFilePath = BoltTempScript()\\n\\nwith open(tmpScriptFilePath, \\\"w\\\") as file:\\n    file.write(generatedScript)\\n\\noutscriptfile = tmpScriptFilePath\\n\\n\",\n      \"disabled\": false,\n      \"isSubGraph\": false,\n      \"inputs\": {\n        \"inrenderdir\": [\n          {\n            \"shortName\": \"inrenderdir\",\n            \"longName\": \"Render Directory\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"\",\n            \"defaultData\": \"\",\n            \"type\": 7,\n            \"connectionName\": \"input0\",\n            \"connectionNodeId\": \"3239346264643534306266663538656635663134386531343030393930303061\"\n          }\n        ],\n        \"inapplyaces\": [\n          {\n            \"shortName\": \"inapplyaces\",\n            \"longName\": \"Apply ACES Correction\",\n            \"index\": 0,\n            \"isExposed\": true,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": true,\n            \"defaultData\": true,\n            \"type\": 8,\n            \"connectionName\": null,\n            \"connectionNodeId\": null\n          }\n        ],\n        \"innuketemplate\": [\n          {\n            \"shortName\": \"innuketemplate\",\n            \"longName\": \"Nuke Template File\",\n            \"index\": 0,\n            \"isExposed\": true,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"D:/dev/Bolt/Library/Templates/Nuke/generate_daily.nk\",\n            \"defaultData\": \"D:/dev/Bolt/Library/Templates/Nuke/generate_daily.nk\",\n            \"type\": 7,\n            \"connectionName\": null,\n            \"connectionNodeId\": null\n          }\n        ]\n      },\n      \"outputs\": {\n        \"outscriptfile\": [\n          {\n            \"shortName\": \"outscriptfile\",\n            \"longName\": \"Script File\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"\",\n            \"defaultData\": \"\",\n            \"type\": 7,\n            \"connectionName\": \"inscriptfile\",\n            \"connectionNodeId\": \"3562663738323364663932636537663963363566323633303130663062323931\"\n          }\n        ],\n        \"outrenderdir\": [\n          {\n            \"shortName\": \"outrenderdir\",\n            \"longName\": \"Render Directory\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"\",\n            \"defaultData\": \"\",\n            \"type\": 7,\n            \"connectionName\": null,\n            \"connectionNodeId\": null\n          }\n        ]\n      }\n    },\n    {\n      \"name\": \"NK_NukePy\",\n      \"category\": \"Nuke\",\n      \"id\": \"3562663738323364663932636537663963363566323633303130663062323931\",\n      \"color\": [\n        0,\n        0,\n        0\n      ],\n      \"iconPath\": \"$BOLT_ICONS/nuke.png\",\n      \"definitionPath\": \"$BOLT_LIB/Nodes/nk_nukepy.bnode\",\n      \"nodeType\": \"Nuke/NK_NukePy\",\n      \"opCode\": \"\\n# BeginOp\\n\\nimport subprocess, os\\n\\nBoltLogMessage(f\\\"NukeBatch : Start executing script : {inscriptfile}\\\")\\n\\ncommand = [f\\\"{innukebindir}\\\", \\\"-t\\\", inscriptfile]\\n\\nfor arg in inargs:\\n    command.append(arg)\\n\\nBoltLogMessage(f\\\"NukeBatch Command : {' '.join(command)}\\\")\\n\\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, encoding=\\\"ISO-8859-1\\\")\\n\\nstdout = []\\n\\nwhile True:\\n    output = process.stdout.readline()\\n\\n    if process.poll() is not None:\\n        break\\n    if output:\\n        stdout.append(output)\\n        print(output.strip())\\n\\nfor line in stdout:\\n    if line.startswith(\\\"OUTPUTFILE\\\"):\\n        outfile = line.split(\\\"=\\\")[1].strip()\\n\\nBoltLogMessage(f\\\"NukeBatch : Finished executing script\\\")\\n\\n\",\n      \"disabled\": false,\n      \"isSubGraph\": false,\n      \"inputs\": {\n        \"inscriptfile\": [\n          {\n            \"shortName\": \"inscriptfile\",\n            \"longName\": \"Script File\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"\",\n            \"defaultData\": \"\",\n            \"type\": 7,\n            \"connectionName\": \"outscriptfile\",\n            \"connectionNodeId\": \"6166656539633430343066313436393466376437613766373737333838626266\"\n          }\n        ],\n        \"inargs\": [\n          {\n            \"shortName\": \"inargs\",\n            \"longName\": \"Script Arguments\",\n            \"index\": 0,\n            \"isExposed\": true,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": [],\n            \"defaultData\": [],\n            \"type\": 9,\n            \"connectionName\": null,\n            \"connectionNodeId\": null\n          }\n        ],\n        \"innukebindir\": [\n          {\n            \"shortName\": \"innukebindir\",\n            \"longName\": \"Nuke Binary Directory\",\n            \"index\": 0,\n            \"isExposed\": true,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"C:/Program Files/Nuke13.0v5/Nuke13.0.exe\",\n            \"defaultData\": \"C:/Program Files/Nuke13.0v5/Nuke13.0.exe\",\n            \"type\": 7,\n            \"connectionName\": null,\n            \"connectionNodeId\": null\n          }\n        ]\n      },\n      \"outputs\": {\n        \"outfile\": [\n          {\n            \"shortName\": \"outfile\",\n            \"longName\": \"Output File\",\n            \"index\": 0,\n            \"isExposed\": false,\n            \"isHidden\": false,\n            \"isExposedToGraph\": false,\n            \"data\": \"\",\n            \"defaultData\": \"\",\n            \"type\": 7,\n            \"connectionName\": \"output0\",\n            \"connectionNodeId\": \"3862383339306265643532373565326633613034303265623639313066643830\"\n          }\n        ]\n      }\n    }\n  ],\n  \"tracker\": null\n}",
+      "isIfBlock": true
+    },
+    {
+      "name": "Debug1",
+      "category": "Debug",
+      "id": "3562393435626434353364326137653137303831643961383933303335353235",
+      "color": [
+        50,
+        222,
+        132
+      ],
+      "iconPath": "$BOLT_ICONS/debug.png",
+      "definitionPath": "$BOLT_LIB/Nodes/debug.bnode",
+      "nodeType": "Debug/Debug",
+      "opCode": "\nBoltLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
+      "disabled": false,
+      "isSubGraph": false,
+      "inputs": {
+        "indata": [
+          {
+            "shortName": "indata",
+            "longName": "Input Data",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": "output0",
+            "connectionNodeId": "6665323633616566353333386637373235303036393563653430316436653463"
+          }
+        ]
+      },
+      "outputs": {
+        "outdata": [
+          {
+            "shortName": "outdata",
+            "longName": "Output Data",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
     }
   ],
   "tracker": null,
   "positions": [
     {
-      "id": "6133313433643361616136663439393130343533663633393430336237373161",
-      "x": -150.0,
+      "id": "3534396663623431333835383834373461636530363139306432346462303061",
+      "x": 350.0,
       "y": 300.0
     },
     {
@@ -1044,19 +800,14 @@
       "y": 450.0
     },
     {
+      "id": "6133313433643361616136663439393130343533663633393430336237373161",
+      "x": -150.0,
+      "y": 300.0
+    },
+    {
       "id": "3732386138313437336136623862333263616630366262333961643030663837",
       "x": -150.0,
       "y": 600.0
-    },
-    {
-      "id": "3534396663623431333835383834373461636530363139306432346462303061",
-      "x": 350.0,
-      "y": 300.0
-    },
-    {
-      "id": "3934303435383636343131383961653666623734393730623333653536663535",
-      "x": 1450.0,
-      "y": 300.0
     },
     {
       "id": "3034663162366363643930373837623530663031313362353236306532343237",
@@ -1064,34 +815,24 @@
       "y": 700.0
     },
     {
-      "id": "6139623863323131323932323566643431643862373166643462376138643335",
-      "x": 2000.0,
+      "id": "3934303435383636343131383961653666623734393730623333653536663535",
+      "x": 1450.0,
       "y": 300.0
-    },
-    {
-      "id": "6532623361303334613830333737393034303764653062613765626435356635",
-      "x": 2950.0,
-      "y": 300.0
-    },
-    {
-      "id": "3139336132656639393435656665363762393165333261623033653835306339",
-      "x": 2250.0,
-      "y": 300.0
-    },
-    {
-      "id": "3237346335613734336532323564643862356435653466313763343563636638",
-      "x": 2650.0,
-      "y": 300.0
-    },
-    {
-      "id": "6561643865303663626362386536663164393838623130643862376639303535",
-      "x": 2000.0,
-      "y": 500.0
     },
     {
       "id": "3833383766363136663338353232646164333534633830623733663936323464",
       "x": 900.0,
       "y": 300.0
+    },
+    {
+      "id": "6665323633616566353333386637373235303036393563653430316436653463",
+      "x": 2050.9500000000003,
+      "y": 301.29000000000013
+    },
+    {
+      "id": "3562393435626434353364326137653137303831643961383933303335353235",
+      "x": 2351.0299999999997,
+      "y": 301.29
     }
   ]
 }

@@ -1,23 +1,151 @@
 {
   "nodes": [
     {
-      "name": "Sleep",
+      "name": "Oeuf_ShotSpecs",
+      "category": "Oeuf",
+      "id": "3263366635663533646366336262626633346334613438396239636637663864",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$BOLT_ICONS/volcan.png",
+      "definitionPath": "$BOLT_LIB/Nodes/oeuf_shot_specs.bnode",
+      "nodeType": "Oeuf/Oeuf_ShotSpecs",
+      "opCode": "\noutshotspecs = inshotspecs\n\n",
+      "disabled": false,
+      "isSubGraph": false,
+      "inputs": {
+        "inshotspecs": [
+          {
+            "shortName": "inshotspecs",
+            "longName": "Shot Specs",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {
+              "FrameRange": "100-240",
+              "Sequence": "SQ010",
+              "Shot": "SHOT010"
+            },
+            "defaultData": {
+              "FrameRange": "100-240",
+              "Sequence": "seq010",
+              "Shot": "shot010"
+            },
+            "type": 10,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outshotspecs": [
+          {
+            "shortName": "outshotspecs",
+            "longName": "Output Shot Specs",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {
+              "FrameRange": "100-240",
+              "Sequence": "SQ010",
+              "Shot": "SHOT010"
+            },
+            "defaultData": {},
+            "type": 10,
+            "connectionName": "inshotspecs",
+            "connectionNodeId": "3963633731303165396463393662373731616334613938373961353361386439"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Oeuf_GenerateGuerillaFilePath",
+      "category": "Oeuf",
+      "id": "3963633731303165396463393662373731616334613938373961353361386439",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$BOLT_ICONS/volcan.png",
+      "definitionPath": "$BOLT_LIB/Nodes/oeuf_genguerillafilepath.bnode",
+      "nodeType": "Oeuf/Oeuf_GenerateGuerillaFilePath",
+      "opCode": "\nimport os\n\nseqName = inshotspecs[\"Sequence\"]\nshotName = inshotspecs[\"Shot\"]\nfileName = f\"{seqName.lower()}_{shotName.lower()}\"\n\noutfilepath = f\"{indir}/{seqName}/{shotName}/{fileName}.gproject\"\n\n",
+      "disabled": false,
+      "isSubGraph": false,
+      "inputs": {
+        "inshotspecs": [
+          {
+            "shortName": "inshotspecs",
+            "longName": "Shot Specs",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {
+              "FrameRange": "100-240",
+              "Sequence": "SQ010",
+              "Shot": "SHOT010"
+            },
+            "defaultData": {},
+            "type": 10,
+            "connectionName": "outshotspecs",
+            "connectionNodeId": "3263366635663533646366336262626633346334613438396239636637663864"
+          }
+        ],
+        "indir": [
+          {
+            "shortName": "indir",
+            "longName": "Directory",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/LIGHTING",
+            "defaultData": "Z:/OEUF/LIGHTING",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfilepath": [
+          {
+            "shortName": "outfilepath",
+            "longName": "Guerilla File Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/LIGHTING/SQ010/SHOT010/sq010_shot010.gproject",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "indata",
+            "connectionNodeId": "3535326632316236323963383336313138313731306164363265646136616232"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Debug",
       "category": "Debug",
-      "id": "6536376335613762393233303764366337323039613131333065623739323639",
+      "id": "3535326632316236323963383336313138313731306164363265646136616232",
       "color": [
         50,
         222,
         132
       ],
       "iconPath": "$BOLT_ICONS/debug.png",
-      "definitionPath": "$BOLT_LIB/Nodes/sleep.bnode",
-      "nodeType": "Debug/Sleep",
-      "opCode": "\nimport time\n\nBoltLogMessage(f\"Sleeping for {intime} seconds\")\n\ntime.sleep(intime)\n\noutdata = indata\n\n",
+      "definitionPath": "$BOLT_LIB/Nodes/debug.bnode",
+      "nodeType": "Debug/Debug",
+      "opCode": "\nBoltLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
       "disabled": false,
-      "isIfBegin": false,
-      "associatedEndBlockId": null,
-      "isIfEnd": false,
-      "associatedBeginBlockId": null,
+      "isSubGraph": false,
       "inputs": {
         "indata": [
           {
@@ -27,26 +155,11 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "",
+            "data": "Z:/OEUF/LIGHTING/SQ010/SHOT010/sq010_shot010.gproject",
             "defaultData": null,
             "type": 11,
-            "connectionName": "outfile",
-            "connectionNodeId": "6139363735366630346333306265626563353730653833626636363762616530"
-          }
-        ],
-        "intime": [
-          {
-            "shortName": "intime",
-            "longName": "Sleeping Time",
-            "index": 0,
-            "isExposed": true,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": 20,
-            "defaultData": null,
-            "type": 1,
-            "connectionName": null,
-            "connectionNodeId": null
+            "connectionName": "outfilepath",
+            "connectionNodeId": "3963633731303165396463393662373731616334613938373961353361386439"
           }
         ]
       },
@@ -59,7 +172,7 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "",
+            "data": "Z:/OEUF/LIGHTING/SQ010/SHOT010/sq010_shot010.gproject",
             "defaultData": null,
             "type": 11,
             "connectionName": null,
@@ -67,75 +180,24 @@
           }
         ]
       }
-    },
-    {
-      "name": "File",
-      "category": "Utility",
-      "id": "6139363735366630346333306265626563353730653833626636363762616530",
-      "color": [
-        255,
-        220,
-        106
-      ],
-      "iconPath": "$BOLT_ICONS/file.png",
-      "definitionPath": "$BOLT_LIB/Nodes/file.bnode",
-      "nodeType": "Utility/File",
-      "opCode": "\noutfile = infile\n\n",
-      "disabled": false,
-      "isIfBegin": false,
-      "associatedEndBlockId": null,
-      "isIfEnd": false,
-      "associatedBeginBlockId": null,
-      "inputs": {
-        "infile": [
-          {
-            "shortName": "infile",
-            "longName": "Input File Path",
-            "index": 0,
-            "isExposed": true,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": "",
-            "defaultData": "",
-            "type": 7,
-            "connectionName": null,
-            "connectionNodeId": null
-          }
-        ]
-      },
-      "outputs": {
-        "outfile": [
-          {
-            "shortName": "outfile",
-            "longName": "Output File Path",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": "",
-            "defaultData": "",
-            "type": 7,
-            "connectionName": "indata",
-            "connectionNodeId": "6536376335613762393233303764366337323039613131333065623739323639"
-          }
-        ]
-      }
     }
   ],
-  "tracker": [
-    "6139363735366630346333306265626563353730653833626636363762616530",
-    "6536376335613762393233303764366337323039613131333065623739323639"
-  ],
+  "tracker": null,
   "positions": [
     {
-      "id": "6536376335613762393233303764366337323039613131333065623739323639",
-      "x": 593.0,
-      "y": 297.0
+      "id": "3263366635663533646366336262626633346334613438396239636637663864",
+      "x": 108.0,
+      "y": 233.0
     },
     {
-      "id": "6139363735366630346333306265626563353730653833626636363762616530",
-      "x": -40.0,
-      "y": 334.0
+      "id": "3963633731303165396463393662373731616334613938373961353361386439",
+      "x": 591.0,
+      "y": 217.0
+    },
+    {
+      "id": "3535326632316236323963383336313138313731306164363265646136616232",
+      "x": 1267.0,
+      "y": 210.0
     }
   ]
 }

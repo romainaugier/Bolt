@@ -77,7 +77,6 @@ class Graph():
         self.nodes : list[Node] = []
         self.exposedPlugs : list[Plug] = []
         self.sortedNodes : list[Node] = []
-        self.ifBlocks : dict = {}
         
         self.nodeCount = 0
         
@@ -250,175 +249,6 @@ class Graph():
         node.SetInTempQueue(False)
         node.SetInQueue()
         self.sortedNodes.insert(0, node)
-        
-    # @lru_cache(maxsize=10)
-    def FindIfBeginBlock(self, node : Node, beginBlock : Node, endBlock : Node, comingFromNoOutput : bool = False) -> bool:
-        """
-        """
-        foundBeginBlock = False
-        
-        for inputName, input in node.GetInputs().items():
-            if input.IsConnected():
-                for connection in input.GetConnections():
-                    connectedNode = connection.GetParentNode()
-                    
-                    if connectedNode == beginBlock:
-                        return True
-                    elif connectedNode == endBlock:
-                        return False
-                    elif connectedNode.IsIfBeginBlock():
-                        if node.IsIfEndBlock() and connectedNode.GetID() == node.GetAssociatedBlockBegin():
-                            continue
-                        return False
-                    elif connectedNode.HasNoInputsConnected():
-                        if comingFromNoOutput: return False
-                        
-                        return self.FindIfEndBlock(connectedNode, beginBlock, endBlock, True)
-                    else:
-                        foundBeginBlock = self.FindIfBeginBlock(connectedNode, beginBlock, endBlock, comingFromNoOutput)
-                        
-                        if foundBeginBlock:
-                            return True
-        
-        return foundBeginBlock
-    
-    # @lru_cache(maxsize=10)
-    def FindIfEndBlock(self, node : Node, beginBlock : Node, endBlock : Node, comingFromNoInput : bool = False) -> bool:
-        """
-        """
-        foundEndBlock = False
-        
-        for outputName, output in node.GetOutputs().items():
-            if output.IsConnected():
-                for connection in output.GetConnections():
-                    connectedNode = connection.GetParentNode()
-                    
-                    if connectedNode == endBlock:
-                        return True
-                    elif connectedNode == beginBlock:
-                        return False
-                    elif connectedNode.IsIfEndBlock():
-                        if node.IsIfBeginBlock():
-                            continue
-                        else:
-                            return False
-                    elif connectedNode.HasNoOutputsConnected():
-                        if comingFromNoInput: return False
-                        
-                        return self.FindIfBeginBlock(connectedNode, beginBlock, endBlock, True)
-                    else:
-                        foundEndBlock = self.FindIfEndBlock(connectedNode, beginBlock, endBlock, comingFromNoInput)
-                        
-                        if foundEndBlock:
-                            return True
-        
-        return foundEndBlock        
-        
-    def FindNodesInIfBlock(self, silent : bool = False) -> None:
-        """
-        Finds which nodes are in a if block if there are any
-        """
-        self.logger.Log(LogLevel.DIAGNOSTIC,  f"(Graph : {self.name}) : Looking for if blocks")
-        
-        findStart = Timer.Start()
-                
-        if not silent:
-            for block in self.ifBlocks:
-                beginBlock = self.GetNodeWithID(block)
-                endBlock = self.GetNodeWithID(beginBlock.GetAssociatedBlockEnd())
-                
-                if beginBlock.HasNoOutputsConnected():
-                    self.ReportError()
-                    self.logger.Log(LogLevel.ERROR, f"(Graph : {self.name}) : Error in if block sorting. Node [{beginBlock.GetName()}] has no output connections.")
-                    return
-                
-                if endBlock.HasNoInputsConnected():
-                    self.ReportError()
-                    self.logger.Log(LogLevel.ERROR, f"(Graph : {self.name}) : Error in if block sorting. Node [{endBlock.GetName()}] has no input connections.")
-                    return
-                        
-        for node in self.nodes:
-            if node.IsInsideIfBlock():
-                continue
-            
-            for block in self.ifBlocks:     
-                beginBlock = self.GetNodeWithID(block)
-                endBlock = self.GetNodeWithID(beginBlock.GetAssociatedBlockEnd())
-                
-                if node == beginBlock or node == endBlock:
-                    continue
-                else:
-                    foundBegin = self.FindIfBeginBlock(node, beginBlock, endBlock)
-                    foundEnd = self.FindIfEndBlock(node, beginBlock, endBlock)
-                    
-                    if foundBegin and node.HasNoOutputsConnected():
-                        self.ifBlocks[block].append(node.GetID())
-                        node.SetInsideIfBlock()
-                        break
-                    elif foundEnd and node.HasNoInputsConnected() and not foundBegin:
-                        self.ifBlocks[block].append(node.GetID())
-                        node.SetInsideIfBlock()
-                        break
-                    elif foundBegin and foundEnd and not node.HasNoInputsConnected():
-                        self.ifBlocks[block].append(node.GetID())
-                        node.SetInsideIfBlock()
-                        break
-                
-                    if not silent:
-                        if foundEnd and not foundBegin:
-                            self.ReportError()
-                            self.logger.Log(LogLevel.ERROR, 
-                                            (f"(Graph : {self.name}) : Error in if block sorting. "
-                                             f"Node [{node.GetName()}] is connected to an end block "
-                                             f"but not to a begin block [{endBlock.GetName()}]."))
-                            return
-                        elif foundBegin and not foundEnd:
-                            self.ReportError()
-                            self.logger.Log(LogLevel.ERROR, 
-                                            f"(Graph : {self.name}) : Error in if block sorting. "
-                                            f"Node [{node.GetName()}] is connected to a begin block "
-                                            f"but not to an end block [{beginBlock.GetName()}].")
-                            return
-                        elif foundBegin and foundEnd and node.HasNoInputsConnected():
-                            self.ReportError()
-                            self.logger.Log(LogLevel.ERROR, f"(Graph : {self.name}) : Error in if block sorting. Node [{node.GetName()}] has no inputs.")
-                            return
-
-        findEnd = Timer.Stop()
-        
-        self.logger.Log(LogLevel.DIAGNOSTIC, f"(Graph : {self.name}) : If blocks sorted in {Timer.Time(findStart, findEnd):.3f} seconds")
-
-    def ArrangeIfBlocksAfterGlobalSorting(self) -> None:
-        """
-        """
-        
-        if len(self.ifBlocks) > 0:
-        
-            self.logger.Log(LogLevel.DIAGNOSTIC, f"(Graph : {self.name}) : Rearranging sorted node order for if blocks")
-            
-            newSortedNodes = []
-            
-            for node in self.sortedNodes: 
-                if not node.IsInsideIfBlock():
-                    newSortedNodes.append(node)
-                    
-            for node in self.sortedNodes: 
-                if node.IsInsideIfBlock():
-                    
-                    ifBlock = None
-                    
-                    for block, blockNodes in self.ifBlocks.items():
-                        if node.GetID() in blockNodes:
-                            ifBlock = block
-                            
-                    beginBlockNode = self.GetNodeWithID(ifBlock)
-                    endBlockNode = self.GetNodeWithID(beginBlockNode.GetAssociatedBlockEnd())
-                    
-                    beginBlockSortedIndex = newSortedNodes.index(endBlockNode)
-                    
-                    newSortedNodes.insert(beginBlockSortedIndex, node)
-                    
-            self.sortedNodes = newSortedNodes
 
     def Sort(self) -> None:
         """
@@ -427,29 +257,24 @@ class Graph():
         """
         self.logger.Log(LogLevel.DIAGNOSTIC, f"(Graph : {self.name}) : Sorting nodes")
         
-        self.FindNodesInIfBlock()
-        
-        if not self.HasError():
-            for node in self.nodes:
-                node.SetInQueue(False)
-                node.SetInTempQueue(False)
+        for node in self.nodes:
+            node.SetInQueue(False)
+            node.SetInTempQueue(False)
 
-            self.sortedNodes.clear()
+        self.sortedNodes.clear()
 
-            while self.HasNodesToSort():
-                nodeToSort = self.GetNodeToSort()
-                if nodeToSort.HasInputsNotConnected() and not nodeToSort.IsDisabled():
-                    nodeToSort.ReportError()
-                    self.ReportError()
-                    self.logger.Log(LogLevel.ERROR, f"(Graph : {self.name}) : Error in node sorting. Node [{nodeToSort.GetName()}] has unconnected input(s)")
-                    break
+        while self.HasNodesToSort():
+            nodeToSort = self.GetNodeToSort()
+            if nodeToSort.HasInputsNotConnected() and not nodeToSort.IsDisabled():
+                nodeToSort.ReportError()
+                self.ReportError()
+                self.logger.Log(LogLevel.ERROR, f"(Graph : {self.name}) : Error in node sorting. Node [{nodeToSort.GetName()}] has unconnected input(s)")
+                break
 
-                self.VisitNode(nodeToSort)
+            self.VisitNode(nodeToSort)
 
-            if not self.hasError:        
-                self.logger.Log(LogLevel.DIAGNOSTIC, f"(Graph : {self.name}) : Nodes sorted")
-                
-                self.ArrangeIfBlocksAfterGlobalSorting()
+        if not self.hasError:        
+            self.logger.Log(LogLevel.DIAGNOSTIC, f"(Graph : {self.name}) : Nodes sorted")
 
     # Cooking
 
@@ -491,23 +316,6 @@ class Graph():
 
         if self.progressCallbackFunction is not None:
             self.progressCallbackFunction(round(self.cookProgress))
-                
-    def HandleIfBlock(self, node : Node) -> None:
-        """
-        Handles an if block, i.e when the graph is being cooked and an if block is encountered, test the condition and if it is true,
-        cook the if block, else jump to the end of the block
-        """
-        node.GetInput(name="incondition").UpdateInputs()
-        condition = node.GetInput(name="incondition").GetData()
-        
-        if condition:
-            return
-        else:
-            for blockNode in self.ifBlocks[node.GetID()]:
-                nodeToRemove = self.GetNodeWithID(blockNode)
-                
-                if nodeToRemove in self.sortedNodes:
-                    self.sortedNodes.pop(self.sortedNodes.index(nodeToRemove))
 
     def Cook(self, lastNodeToCook : str = None, skipCookedNodes : bool = True) -> None:
         """
@@ -564,9 +372,6 @@ class Graph():
                 if skipCookedNodes:
                     if node.IsCooked():
                         continue
-                    
-                if node.IsIfBeginBlock():
-                    self.HandleIfBlock(node)
 
                 node.Cook()
 
@@ -664,10 +469,6 @@ class Graph():
 
         self.nodeCount += 1
         
-        if node.IsIfBeginBlock():   
-            self.ifBlocks[node.GetID()] = []
-            self.logger.Log(LogLevel.DIAGNOSTIC, f"(Graph : {self.name}) : New If Block [{node.GetName()}]")
-        
         self.logger.Log(LogLevel.DIAGNOSTIC, f"(Graph : {self.name}) : Added node [{node.GetName()}]")
 
     def RemoveNode(self, node : Node) -> None:
@@ -680,12 +481,6 @@ class Graph():
         for output in node.GetOutputs().values():
             for connection in output.GetConnections():
                 output.Disconnect(connection)
-                
-        if node.IsInsideIfBlock():
-            for blockName, blockNodes in self.ifBlocks.items():
-                if node.GetID() in blockNodes:
-                    blockNodes.remove(node.GetID())
-                    break
 
         self.nodes.remove(node)
 
@@ -779,9 +574,6 @@ class Graph():
                 tmpNode.SetLogger(self.logger)
             
             tmpNode.FromDict(node)
-            
-            if tmpNode.IsIfBeginBlock():   
-                self.ifBlocks[tmpNode.GetID()] = []
             
             self.nodes.append(tmpNode)
 

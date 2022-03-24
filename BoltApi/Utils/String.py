@@ -14,6 +14,8 @@ def Increment(string : str) -> str:
     Returns:
         str: string incremented
     """
+    assert len(string) > 0, "string cannot be empty"
+    
     numPattern = r"\d+"
 
     hasValue = False
@@ -56,3 +58,17 @@ def GetRandomStrId(bytes : int = 16) -> str:
         bytes (int): number of bytes to generate the id
     """
     return binascii.hexlify(os.urandom(bytes)).hex()
+
+def UpperFirstLetter(text : str) -> str:
+    """
+    Returns the text with the first letter in uppercase
+
+    Args:
+        text (str): text to upper
+
+    Returns:
+        str: text with first letter as uppercase
+    """
+    assert len(text) > 0, "text cannot be empty"
+    
+    return f"{text[0].upper()}{text[1:]}"

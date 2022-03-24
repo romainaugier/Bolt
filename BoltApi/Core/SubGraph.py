@@ -97,8 +97,8 @@ class SubGraph(Node):
         self.inputNode = Inputs(self.environment)
         self.outputNode = Outputs(self.environment)
         
-        self.AddInput(Plug("input1", "Input 1", self))
-        self.AddOutput(Plug("output1", "Output 1", self))
+        self.AddInput(Plug("input0", "Input0", self))
+        self.AddOutput(Plug("output0", "Output0", self))
         
         self.graph.AddNode(self.inputNode)
         self.graph.AddNode(self.outputNode)
@@ -121,7 +121,7 @@ class SubGraph(Node):
         """
         self.inputs[plug.GetShortName()] = plug
         
-        inputNodePlug = Plug(plug.GetShortName(), plug.GetLongName(), self.inputNode)
+        inputNodePlug = Plug(plug.GetShortName(), plug.GetLongName(), self.inputNode, dataType=plug.GetType())
         
         self.inputNode.AddOutput(inputNodePlug)
             
@@ -142,7 +142,7 @@ class SubGraph(Node):
         """
         self.outputs[plug.GetShortName()] = plug
         
-        outputNodePlug = Plug(plug.GetShortName(), plug.GetLongName(), self.outputNode)
+        outputNodePlug = Plug(plug.GetShortName(), plug.GetLongName(), self.outputNode, dataType=plug.GetType())
         
         self.outputNode.AddInput(outputNodePlug)
         
@@ -240,19 +240,55 @@ class IfSubGraph(SubGraph):
         """
         super().Initialize()
         
-        self.AddInput(Plug("incondition", "Condition", self))
+        self.AddInput(Plug("incondition", "Condition", self, dataType=PlugType.BOOL))
+        self.SetPlugValue("incondition", False)
         
     def Cook(self) -> None:
         """
         """
         self.UpdateInputs()
         
-        if self.GetInput(name="incondition").GetData():
-            self.graph.Cook(skipCookedNodes=False)
-            self.UpdateOutputs()
+        if not self.IsDisabled():
+            if self.GetInput(name="incondition").GetData():
+                startTime = Timer.Start()
+
+                with self.GetLock():
+                    self.isCooking = True
+                    self.isCooked = False
+
+                    self.hasError = False
+                    self.errorMessage = ""
+                    self.hasWarning = False
+                    self.warningMessage = ""
+                
+                    self.graph.Cook(skipCookedNodes=False)
+                    
+                    if self.graph.HasError():
+                        self.ReportError()
+                        self.LogError(f"Error cooking node {self.GetName()}")
+                        self.cookTime = None
+                        self.isCooking = False
+                        self.isCooked = False
+                        return
+
+                with self.GetLock():
+                    self.isDirty = False
+                    self.isCooking = False
+                    self.isCooked = True
+
+                endTime = Timer.Stop()
+                
+                self.UpdateOutputs()
+
+                self.cookTime = Timer.Time(startTime, endTime)
+                
+                return
             
-        else:
-            pass
+        firstInput = self.GetInput(index=0)
+        firstInput.UpdateInputs()
+
+        for outputName, output in self.outputs.items():
+            output.SetData(firstInput.GetData())
         
     # I/O
 

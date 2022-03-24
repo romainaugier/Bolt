@@ -147,17 +147,10 @@ exposedToGraph = False
 
 # BeginOp
 
-# BeginOp
-
-# BeginOp
-
-# BeginOp
-
 from datetime import datetime
 import re, os, subprocess, platform
 
 now = datetime.now()
-
 currentTimeStr = now.strftime('%m%d%Y_%H%M%S')
 
 # Setup job and batch name
@@ -358,8 +351,5 @@ outribgenplugininfofile = ribgenJobPluginFile
 outrenderjobinfofile = renderJobInfoFile
 outrenderplugininfofile = renderJobPluginFile
 outrenderdir = renderDir
-
-
-
 
 # EndOp

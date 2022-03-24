@@ -397,8 +397,8 @@ class Plug():
     def __str__(self) -> str:
         """
         """
-        return f"""Plug :\n- shortName={self.GetShortName()}\n- longName={self.GetLongName()}
-- parentNode={self.GetParentNodeName()}\n- connection(s)=({[plug.GetShortName() for plug in self.GetConnections()]})"""
+        return f"""Plug :\n- shortName = {self.GetShortName()}\n- longName = {self.GetLongName()}
+- parentNode = {self.GetParentNodeName()}\n- connection(s) = ({[plug.GetShortName() for plug in self.GetConnections()]})"""
 
     # GETTERS / SETTERS
 
@@ -596,12 +596,18 @@ class Plug():
     def __rshift__(self, other : Plug) -> None:
         """
         Overload of the >> operator to connect plugs between each other
+        
+        Args:
+            other (Plug): plug to connect the current plug to
         """
         self.Connect(other)
         
     def __lshift__(self, other : Plug) -> None:
         """
         Overload of the << operator to connect plugs between each other
+        
+        Args:
+            other (Plug): plug to connect to the current plug
         """
         other.Connect(self)
 
@@ -621,15 +627,6 @@ class Node():
         # If a node is disabled, all its outputs will have the value
         # of the input 1
         self.isDisabled = False
-        
-        # Special case for if begin/end nodes
-        self.isIfBegin = False
-        self.isIfEnd = False
-        self.isInsideIfBlock = False
-        
-        # Special case for forloop begin/end nodes
-        self.isForBegin = False
-        self.isForEnd = False
 
         self.cookTime = None
         self.hasError = False
@@ -1214,76 +1211,6 @@ class Node():
         used in the user code
         """
         self.logger.Log(LogLevel.MESSAGE, f"(Node : {self.GetName()}) : {message}")
-        
-    # Special functions for blocks (if/for)
-    
-    def IsInsideIfBlock(self) -> bool:
-        """
-        """
-        return self.isInsideIfBlock
-    
-    def SetInsideIfBlock(self) -> None:
-        """
-        """
-        self.isInsideIfBlock = True
-    
-    def IsIfBeginBlock(self) -> bool:
-        """
-        """
-        return self.isIfBegin
-    
-    def SetIfBeginBlock(self) -> None:
-        """
-        """
-        self.isIfBegin = True
-    
-    def IsIfEndBlock(self) -> bool:
-        """
-        """
-        return self.isIfEnd
-    
-    def SetIfEndBlock(self) -> None:
-        """
-        """
-        self.isIfEnd = True
-    
-    def IsForBeginBlock(self) -> bool:
-        """
-        """
-        return self.isForBegin
-    
-    def IsForEndBlock(self) -> bool:
-        """
-        """
-        return self.isForEnd
-    
-    def SetAssociatedBlockBegin(self, nodeId : str) -> None:
-        """
-        If this node is an end block, sets the associated begin block id
-
-        Args:
-            nodeId (str): associated if block begin node id
-        """
-        self.associatedBlockBeginId = nodeId
-        
-    def GetAssociatedBlockBegin(self) -> str:
-        """
-        """
-        return self.associatedBlockBeginId
-        
-    def SetAssociatedBlockEnd(self, nodeId : str) -> None:
-        """
-        If this node is an begin block, sets the associated end blocks
-
-        Args:
-            nodeId (str): associated if block end node if
-        """
-        self.associatedBlockEndId = nodeId
-        
-    def GetAssociatedBlockEnd(self) -> str:
-        """
-        """
-        return self.associatedBlockEndId
     
     # I/O Functions
         
@@ -1343,20 +1270,6 @@ class Node():
         nodeAsDict["opCode"] = self.GetOpCode()
         nodeAsDict["disabled"] = self.IsDisabled()
         nodeAsDict["isSubGraph"] = False
-        
-        if self.IsIfBeginBlock():
-            nodeAsDict["isIfBegin"] = True
-            nodeAsDict["associatedEndBlockId"] = self.GetAssociatedBlockEnd()
-        else:
-            nodeAsDict["isIfBegin"] = False
-            nodeAsDict["associatedEndBlockId"] = None
-            
-        if self.IsIfEndBlock():
-            nodeAsDict["isIfEnd"] = True
-            nodeAsDict["associatedBeginBlockId"] = self.GetAssociatedBlockBegin()
-        else:
-            nodeAsDict["isIfEnd"] = False
-            nodeAsDict["associatedBeginBlockId"] = None
 
         nodeAsDict["inputs"] = {}
         nodeAsDict["outputs"] = {}
@@ -1448,14 +1361,6 @@ class Node():
         
         if "disabled" in nodeAsDict:
             self.isDisabled = nodeAsDict["disabled"]
-        
-        if "isIfBegin" in nodeAsDict or "isIfEnd" in nodeAsDict:
-            if nodeAsDict["isIfBegin"]: 
-                self.SetIfBeginBlock()
-                self.SetAssociatedBlockEnd(nodeAsDict["associatedEndBlockId"])
-            elif nodeAsDict["isIfEnd"]: 
-                self.SetIfEndBlock()
-                self.SetAssociatedBlockBegin(nodeAsDict["associatedBeginBlockId"])
 
         for inputName, input in nodeAsDict["inputs"].items():
             input = input[0]

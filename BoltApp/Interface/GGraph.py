@@ -11,172 +11,6 @@ from BoltApp.Interface.Icons import *
 from BoltApp.Interface.PlugEditor import *
 
 
-class GBlock(QtWidgets.QGraphicsObject):
-    """
-    Construct a convex hull that will contain all the nodes in the block
-    """
-    def __init__(self, blockBegin : GNode, blockEnd : GNode, graph : GGraph) -> None:
-        """
-        """
-        self.id = binascii.hexlify(os.urandom(16)).hex()
-
-        super().__init__()
-
-        self.blockBegin = blockBegin
-        self.blockEnd = blockEnd
-        self.gGraph = graph
-
-        self.offset = 10
-
-        self.nodes = [self.blockBegin, self.blockEnd]
-
-        self.blockId = self.blockBegin.getInternalNode().GetID()
-
-        self.hullPoints : list[QtCore.QPoint] = []
-
-        self.setFlag(QtWidgets.QGraphicsItem.ItemIsFocusable, False)
-        self.setFlag(QtWidgets.QGraphicsItem.ItemIsSelectable, False)
-        self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable, False)
-        self.setAcceptHoverEvents(False)
-        self.setAcceptedMouseButtons(Qt.MouseButton.NoButton)
-
-        self.blockBegin.hasMoved.connect(self.adjust)
-        self.blockEnd.hasMoved.connect(self.adjust)
-
-        self.adjust()
-
-    def getBlockBeginNode(self) -> GNode:
-        """
-        """
-        return self.blockBegin
-    
-    def getBlockEndNode(self) -> GNode:
-        """
-        """
-        return self.blockEnd
-
-    def addNode(self, node : GNode) -> None:
-        """
-        """
-        self.nodes.append(node)
-
-        node.hasMoved.connect(self.adjust)
-
-        self.adjust()
-
-    def removeNode(self, node : GNode) -> None:
-        """
-        """
-        self.nodes.remove(node)
-        
-        node.hasMoved.disconnect()
-        
-        self.adjust()
-
-    def getPoints(self) -> list[QtCore.QPoint]:
-        """
-        """
-        points = []
-
-        for node in self.nodes:
-            width = node.sizeX
-            height = node.sizeY
-            pos = node.pos()
-
-            points.append(QtCore.QPoint(int(pos.x()) - self.offset,
-                                        int(pos.y()) - self.offset))
-            points.append(QtCore.QPoint(int(pos.x() + width) + self.offset,
-                                        int(pos.y()) - self.offset))
-            points.append(QtCore.QPoint(int(pos.x() + width) + self.offset,
-                                        int(pos.y() + height) + self.offset))
-            points.append(QtCore.QPoint(int(pos.x()) - self.offset,
-                                        int(pos.y() + height) + self.offset))
-
-        return points
-
-    def getLeftMostPoint(self, points : list[QtCore.QPoint]) -> int:
-        """
-        """
-        xMax = 2 ** 31
-
-        index = 0
-
-        for i, point in enumerate(points):
-            if point.x() < xMax:
-                xMax = point.x()
-                index = i
-
-        return index
-
-    @staticmethod
-    def getOrientation(p1 : QtCore.QPoint, p2 : QtCore.QPoint, p3 : QtCore.QPoint) -> int:
-        """
-        """
-        val = (p2.y() - p1.y()) * (p3.x() - p2.x()) - (p2.x() - p1.x()) * (p3.y() - p2.y())
-
-        if val == 0:
-            return 0
-        elif val > 0:
-            return 1
-        else:
-            return 2
-
-    def updateShape(self):
-        """
-        """
-        self.hullPoints.clear()
-
-        points = self.getPoints()
-
-        n = len(points)
-
-        leftMostIndex = self.getLeftMostPoint(points)
-
-        hull : list[int] = []
-
-        p = leftMostIndex
-        q = 0
-
-        maxIters = 50
-
-        iter = 0
-
-        while True:
-            if iter > maxIters: 
-                break
-
-            hull.append(p)
-
-            q = (p + 1) % n
-
-            for i in range(n):
-                if(self.getOrientation(points[p], points[i], points[q]) == 2):
-                    q = i
-
-            p = q
-
-            if p == leftMostIndex:
-                break
-
-            iter += 1
-
-        for each in hull:
-            self.hullPoints.append(points[each])
-
-    def boundingRect(self) -> QtCore.QRectF: 
-        return QtCore.QRectF(QtGui.QPolygon(self.hullPoints).boundingRect())
-
-    def adjust(self) -> None:
-        self.updateShape()
-        # self.setZValue(-100)
-        self.update(self.boundingRect())
-        self.gGraph.update(self.pos().x(), self.pos().y(), self.pos().x() + self.boundingRect().width(), self.pos().y() + self.boundingRect().height())
-
-    def paint(self, painter : QtGui.QPainter, option : QtWidgets.QStyleOptionGraphicsItem, widget : QtWidgets.QWidget):
-        """
-        """
-        pass
-
 class GraphicsScene(QtWidgets.QGraphicsScene):
     """
     Reimplementation of the graphics scene
@@ -232,10 +66,6 @@ class GGraph(QtWidgets.QGraphicsView):
 
         self.gEdges = []
 
-        # Blocks are polygons that encapsulate all the nodes inside 
-        # an if/for block
-        self.gBlocks : list[GBlock] = []
-
         # Graphic nodes
         self.gNodes : list[GNode] = []
         
@@ -281,7 +111,7 @@ class GGraph(QtWidgets.QGraphicsView):
         self.threadCanJoin.connect(lambda: self.joinGraphThread())
 
         self.selectedNodeChanged.connect(self.onSelectedNodeChange)
-        self.hasBeenEdited.connect(lambda: (self.stopGraphCooking(), self.getInternalGraph().SetAllDirty(), self.updateNodeBadges(), self.updateBlocks()))
+        self.hasBeenEdited.connect(lambda: (self.stopGraphCooking(), self.getInternalGraph().SetAllDirty(), self.updateNodeBadges()))
 
         QtWidgets.QApplication.instance().installEventFilter(self)
 
@@ -339,14 +169,6 @@ class GGraph(QtWidgets.QGraphicsView):
             gridLines.append(QtCore.QLineF(rect.left(), y, rect.right(), y))
 
         painter.drawLines(gridLines)
-
-        for block in self.gBlocks: 
-            polygon = QtGui.QPolygon(block.hullPoints)
-
-            painter.setBrush(QtGui.QColor(104, 240, 222, 43))
-            painter.setPen(QtGui.QPen(QtGui.QColor(104, 240, 222, 255)))
-
-            painter.drawPolygon(polygon)
 
     # UTILS
     
@@ -628,33 +450,6 @@ class GGraph(QtWidgets.QGraphicsView):
             scenePos = self.mapToScene(event.pos())
 
             self.contextMenu(globalPos.x(), globalPos.y(), scenePos.x(), scenePos.y())
-
-    # BLOCKS
-
-    def updateBlocks(self):
-        """
-        """
-        self.getInternalGraph().FindNodesInIfBlock(silent=True)
-
-        for blockId in self.getInternalGraph().ifBlocks:
-            gBlockExists = False
-
-            for gBlock in self.gBlocks: 
-                if gBlock.blockId == blockId:
-                    gBlockExists = True
-
-            if not gBlockExists:
-                blockBeginNode = self.getNodeById(blockId)
-                blockEndNode = self.getNodeById(blockBeginNode.getInternalNode().GetAssociatedBlockEnd())
-
-                self.addBlock(blockBeginNode, blockEndNode)
-
-        for blockId, blockNodes in self.getInternalGraph().ifBlocks.items():  
-            for gBlock in self.gBlocks:
-                if blockId == gBlock.blockId:
-                    for blockNode in blockNodes:
-                        if not blockNode in gBlock.nodes:
-                            gBlock.addNode(self.getNodeById(blockNode))
             
     # NODES FUNCTIONS
     
@@ -786,47 +581,10 @@ class GGraph(QtWidgets.QGraphicsView):
         for sock in node.outputGPlugs:
             for edge in sock.edges[:]:
                 self.deleteEdge(edge)
-                
-        if node.getInternalNode().IsIfBeginBlock():
-            node2 = self.getNodeById(node.getInternalNode().GetAssociatedBlockEnd())
-
-            self.deleteBlock(node)
-
-        elif node.getInternalNode().IsIfEndBlock():
-            node2 = self.getNodeById(node.getInternalNode().GetAssociatedBlockBegin())
-            
-            self.deleteBlock(node2)
-
-        else:
-            node2 = None
             
         self.getInternalGraph().RemoveNode(node.getInternalNode())
-        
-        if node2 is not None: 
-            for sock in node2.inputGPlugs:
-                for edge in sock.edges[:]:
-                    self.deleteEdge(edge)
-            
-            for sock in node2.outputGPlugs:
-                for edge in sock.edges[:]:
-                    self.deleteEdge(edge)
-                    
-            self.getInternalGraph().RemoveNode(node2.getInternalNode())
-        
-        for block in self.gBlocks:
-            if node in block.nodes:
-                block.nodes.remove(node)
-                break
-
-        if node2 is not None:
-            for block in self.gBlocks:
-                if node2 in block.nodes:
-                    block.nodes.remove(node2)
-                    break
 
         self.scene().removeItem(node)
-        
-        if node2 is not None: self.scene().removeItem(node2)
 
         self.blockSignals(False)
 
@@ -896,33 +654,6 @@ class GGraph(QtWidgets.QGraphicsView):
         for item in self.items():
             if type(item) is GEdge:
                 item.adjust()
-
-    def addBlock(self, beginBlockNode : GNode, endBlockNode : GNode) -> None:
-        """
-        """
-        newBlock = GBlock(beginBlockNode, endBlockNode, self)
-        newBlock.setZValue(-100)
-
-        self.gBlocks.append(newBlock)
-
-        self.scene().addItem(newBlock)
-
-    def deleteBlock(self, anyBlockNode : GNode) -> None:
-        """
-        """
-        blockToDelete = None
-
-        for block in self.gBlocks:
-            if (block.getBlockBeginNode() == anyBlockNode or
-                block.getBlockEndNode() == anyBlockNode):
-                blockToDelete = block
-
-        if blockToDelete is not None:
-            self.getInternalGraph().ifBlocks.pop(blockToDelete.blockId)
-
-            self.gBlocks.remove(blockToDelete)
-
-            self.scene().removeItem(blockToDelete)
 
     def deleteItem(self, item=None) -> None:
         """
@@ -1007,17 +738,6 @@ class GGraph(QtWidgets.QGraphicsView):
 
         print("Sorted Nodes : ")
         print(json.dumps([node.GetName() for node in self.getInternalGraph().sortedNodes], indent=4))
-        
-        print("Found If Blocks : ")
-        for blockName, nodes in self.getInternalGraph().ifBlocks.items():
-            blockBegin = self.getInternalGraph().GetNodeWithID(blockName)
-            print(f"Block Begin [{blockBegin.GetName()}]")
-            
-            for node in nodes:
-                print(f"- {self.getInternalGraph().GetNodeWithID(node).GetName()}")
-                
-            blockEnd = self.getInternalGraph().GetNodeWithID(blockBegin.GetAssociatedBlockEnd())
-            print(f"Block End [{blockEnd.GetName()}]")
 
     def saveGraph(self, filePath : str) -> None:
         """
@@ -1076,8 +796,6 @@ class GGraph(QtWidgets.QGraphicsView):
 
         self.updateAllEdges()
         self.updateNodeBadges()
-        self.updateBlocks()
-        # self.hasBeenEdited.emit()
 
     def constructGraphFromInternalGraph(self) -> None:
         """

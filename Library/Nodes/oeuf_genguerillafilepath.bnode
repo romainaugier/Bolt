@@ -1,0 +1,54 @@
+# Generate the file path to a guerilla lighting file given shot specs
+
+# BeginAttr
+
+name = Oeuf_GenerateGuerillaFilePath
+icon = $BOLT_ICONS/volcan.png
+category = Oeuf
+
+# EndAttr
+
+# BeginPlugs
+
+# BeginPlug
+
+shortName = inshotspecs
+longName = Shot Specs
+defaultValue = {}
+type = dict
+exposed = False
+
+# EndPlug
+
+# BeginPlug
+
+shortName = indir
+longName = Directory
+defaultValue = "Z:/OEUF/LIGHTING"
+type = str
+exposed = True
+
+# EndPlug
+
+# BeginPlug
+
+shortName = outfilepath
+longName = Guerilla File Path
+defaultValue = ""
+type = str
+
+# EndPlug
+
+# EndPlugs
+
+# BeginOp
+
+import os
+
+seqName = inshotspecs["Sequence"]
+shotName = inshotspecs["Shot"]
+fileName = f"{seqName.lower()}_{shotName.lower()}"
+
+outfilepath = f"{indir}/{seqName}/{shotName}/{fileName}.gproject"
+
+# EndOp

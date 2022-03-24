@@ -15,10 +15,6 @@
       "opCode": "\noutdir = indir\n\n",
       "disabled": false,
       "isSubGraph": false,
-      "isIfBegin": false,
-      "associatedEndBlockId": null,
-      "isIfEnd": false,
-      "associatedBeginBlockId": null,
       "inputs": {
         "indir": [
           {
@@ -28,7 +24,7 @@
             "isExposed": true,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "Z:/OEUF/FX/seq110/shot060/flip/rbd_03",
+            "data": "Z:/OEUF/RENDER/SQ010/SHOT060/LD29",
             "defaultData": "",
             "type": 7,
             "connectionName": null,
@@ -45,7 +41,7 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "Z:/OEUF/FX/seq110/shot060/flip/rbd_03",
+            "data": "Z:/OEUF/RENDER/SQ010/SHOT060/LD29",
             "defaultData": "",
             "type": 7,
             "connectionName": "inrenderdir",
@@ -69,10 +65,6 @@
       "opCode": "\n# BeginOp\n\nimport subprocess, os\n\nBoltLogMessage(f\"NukeBatch : Start executing script : {inscriptfile}\")\n\ncommand = [f\"{innukebindir}\", \"-t\", inscriptfile]\n\nfor arg in inargs:\n    command.append(arg)\n\nBoltLogMessage(f\"NukeBatch Command : {' '.join(command)}\")\n\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, encoding=\"ISO-8859-1\")\n\nstdout = []\n\nwhile True:\n    output = process.stdout.readline()\n\n    if process.poll() is not None:\n        break\n    if output:\n        stdout.append(output)\n        print(output.strip())\n\nfor line in stdout:\n    if line.startswith(\"OUTPUTFILE\"):\n        outfile = line.split(\"=\")[1].strip()\n\nBoltLogMessage(f\"NukeBatch : Finished executing script\")\n\n",
       "disabled": false,
       "isSubGraph": false,
-      "isIfBegin": false,
-      "associatedEndBlockId": null,
-      "isIfEnd": false,
-      "associatedBeginBlockId": null,
       "inputs": {
         "inscriptfile": [
           {
@@ -82,7 +74,7 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Bolt/3165666131343337376564386166613133633834656236323237343363643934.py",
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Bolt/6436393132306664313035313762613564643435356636616333393762393139.py",
             "defaultData": "",
             "type": 7,
             "connectionName": "outscriptfile",
@@ -153,10 +145,6 @@
       "opCode": "\nBoltLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
       "disabled": false,
       "isSubGraph": false,
-      "isIfBegin": false,
-      "associatedEndBlockId": null,
-      "isIfEnd": false,
-      "associatedBeginBlockId": null,
       "inputs": {
         "indata": [
           {
@@ -207,10 +195,6 @@
       "opCode": "\nif inapplyaces:\n    writeNodeName = \"MAIN_WRITE\"\nelse:\n    writeNodeName = \"MAIN_WRITE_RAW\"\n\ngeneratedScript = f\"\"\"import nuke, os, sys\n\nnuke.scriptOpen(\"{innuketemplate}\")\n\nseqs = nuke.getFileNameList(\"{inrenderdir}\")\n\nsupdir = os.path.basename(\"{inrenderdir}\")\nsupdir1 = os.path.basename(os.path.dirname(\"{inrenderdir}\"))\nsupdir2 = os.path.basename(os.path.dirname(os.path.dirname(\"{inrenderdir}\")))\n\noutputfile = \"{inrenderdir}/daily/{{}}_{{}}_{{}}_daily.mov\".format(supdir2, supdir1, supdir)\n\nprint(seqs)\n\nif len(seqs) > 0:\n    if not os.path.exists(outputfile):\n        os.makedirs(os.path.dirname(outputfile))\n\n    read = nuke.toNode(\"MAIN_READ\")\n    read.knob(\"file\").fromUserText(\"{inrenderdir}/\" + seqs[0])\n\n    write = nuke.toNode(\"{writeNodeName}\")\n    write.knob(\"file\").fromUserText(outputfile)\n\n    first = int(read.knob(\"first\").getValue())\n    last = int(read.knob(\"last\").getValue())\n\n    nuke.execute(\"{writeNodeName}\", start=first, end=last, incr=1)\n\nelse:\n    sys.stderr.write(\"[ERROR] Nk_GenerateDaily : No file sequence found\")\n\n\"\"\"\n\ntmpScriptFilePath = BoltTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as file:\n    file.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\n\n",
       "disabled": false,
       "isSubGraph": false,
-      "isIfBegin": false,
-      "associatedEndBlockId": null,
-      "isIfEnd": false,
-      "associatedBeginBlockId": null,
       "inputs": {
         "inrenderdir": [
           {
@@ -220,7 +204,7 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "Z:/OEUF/FX/seq110/shot060/flip/rbd_03",
+            "data": "Z:/OEUF/RENDER/SQ010/SHOT060/LD29",
             "defaultData": "",
             "type": 7,
             "connectionName": "outdir",
@@ -235,7 +219,7 @@
             "isExposed": true,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": false,
+            "data": true,
             "defaultData": true,
             "type": 8,
             "connectionName": null,
@@ -267,7 +251,7 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Bolt/3165666131343337376564386166613133633834656236323237343363643934.py",
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Bolt/6436393132306664313035313762613564643435356636616333393762393139.py",
             "defaultData": "",
             "type": 7,
             "connectionName": "inscriptfile",
@@ -297,7 +281,7 @@
     {
       "id": "6361613533383534326539376133363263393736306265363937393532333562",
       "x": -200.0,
-      "y": 302.0
+      "y": 301.0
     },
     {
       "id": "3231396138376430653937353964616334653261303364326334383632346162",
