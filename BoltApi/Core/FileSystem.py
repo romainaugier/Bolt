@@ -1,7 +1,24 @@
-import sys, pathlib, os, binascii, shutil
+import sys, pathlib, os, binascii, shutil, subprocess
 
 from BoltApi.Utils.String import GetCurrentTimeAsStr, GetRandomStrId
 
+
+def GetDocumentsFolder() -> str:
+    """
+    Returns the path to the user documents folder 
+
+    Returns:
+        str: path to the user documents folder
+    """
+    if sys.platform == "win32":
+        path = subprocess.check_output(["powershell", "[Environment]::GetFolderPath(\"MyDocuments\")"])
+        pathDecoded = path.decode()
+        pathClean = pathDecoded.replace("\n", "")
+        pathClean = pathClean.replace("\r", "")
+        pathClean = pathClean.replace("\\", "/")
+        return pathClean
+    else:
+        return None
 
 def GetRoamingDataDir() -> str:
     """

@@ -104,22 +104,22 @@ class PlugWidget(QtWidgets.QWidget):
 
         elif (self.plugType == PlugType.INT or
             self.plugType == PlugType.FLOAT):
-            editBoxValue1 = literal_eval(f"{self.editBox1.text()}")
+            editBoxValue1 = self.editBox1.text()
 
             self.plug.SetData(editBoxValue1)
 
         elif (self.plugType == PlugType.INT2 or 
               self.plugType == PlugType.FLOAT2):
-            editBoxValue1 = literal_eval(f"{self.editBox1.text()}")
-            editBoxValue2 = literal_eval(f"{self.editBox2.text()}")
+            editBoxValue1 = self.editBox1.text()
+            editBoxValue2 = self.editBox2.text()
             
             self.plug.SetData([editBoxValue1, editBoxValue2])
         
         elif (self.plugType == PlugType.INT3 or 
               self.plugType == PlugType.FLOAT3):
-            editBoxValue1 = literal_eval(f"{self.editBox1.text()}")
-            editBoxValue2 = literal_eval(f"{self.editBox2.text()}")
-            editBoxValue3 = literal_eval(f"{self.editBox3.text()}")
+            editBoxValue1 = self.editBox1.text()
+            editBoxValue2 = self.editBox2.text()
+            editBoxValue3 = self.editBox3.text()
             
             self.plug.SetData([editBoxValue1, editBoxValue2, editBoxValue3])
 

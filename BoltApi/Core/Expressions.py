@@ -1,11 +1,31 @@
-class Expression():
-    """
-    Defines a set of expressions that are availables to set plug values
-    """
-    pass
+from BoltApi.Core.Environment import *
+from BoltApi.Core.Logger import *
 
-class ExprEvaluator():
+def EnvEvaluator(expression : str, environment : Environment) -> any:
     """
-    Evaluates expressions in plugs
+    Evaluates the environment in the given expression, i.e if any environment variable
+    is in the expression, it will be replaced
     """
-    pass
+    return environment.ReplaceInString(expression)
+
+def SafeExprEvaluator(expression : str) -> any:
+    """
+    Evaluates an expression, only allowing math and str functions from Python
+    """
+    import math
+    
+    allowedFunctions = {}
+    
+    mathFunctions = {k: v for k, v in math.__dict__.items() if not k.startswith("__")}
+    allowedFunctions.update(mathFunctions)
+    
+    strFunctions = {k: v for k, v in str.__dict__.items() if not k.startswith("__")}
+    allowedFunctions.update(strFunctions)
+    
+    code = compile(expression, "<string>", "eval")
+    
+    for name in code.co_names:
+        if name not in allowedFunctions:
+            raise NameError(f"The use of '{name}' is not allowed")
+        
+    return eval(code, {"__builtins__" : {}}, allowedFunctions)

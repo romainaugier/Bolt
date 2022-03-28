@@ -19,6 +19,7 @@ class App(QtWidgets.QMainWindow):
         self.logger = Logger(level=LogLevel.MESSAGE)
 
         self.environment = Environment()
+        self.environment.BuildEnvironmentFromFiles(self.logger)
 
         self.nodeLib = Lib(self.logger, self.environment)
         

@@ -163,15 +163,15 @@ class SubGraph(Node):
                 self.hasWarning = False
                 self.warningMessage = ""
             
-                self.graph.Cook(skipCookedNodes=False)
-                
-                if self.graph.HasError():
-                    self.ReportError()
-                    self.LogError(f"Error cooking node {self.GetName()}")
-                    self.cookTime = None
-                    self.isCooking = False
-                    self.isCooked = False
-                    return
+            self.graph.Cook(skipCookedNodes=False)
+            
+            if self.graph.HasError():
+                self.ReportError()
+                self.LogError(f"Error cooking node {self.GetName()}")
+                self.cookTime = None
+                self.isCooking = False
+                self.isCooked = False
+                return
 
             with self.GetLock():
                 self.isDirty = False
@@ -261,15 +261,15 @@ class IfSubGraph(SubGraph):
                     self.hasWarning = False
                     self.warningMessage = ""
                 
-                    self.graph.Cook(skipCookedNodes=False)
-                    
-                    if self.graph.HasError():
-                        self.ReportError()
-                        self.LogError(f"Error cooking node {self.GetName()}")
-                        self.cookTime = None
-                        self.isCooking = False
-                        self.isCooked = False
-                        return
+                self.graph.Cook(skipCookedNodes=False)
+                
+                if self.graph.HasError():
+                    self.ReportError()
+                    self.LogError(f"Error cooking node {self.GetName()}")
+                    self.cookTime = None
+                    self.isCooking = False
+                    self.isCooked = False
+                    return
 
                 with self.GetLock():
                     self.isDirty = False
@@ -320,6 +320,21 @@ class ForSubGraph(SubGraph):
         self.SetIconPath("$BOLT_ICONS/for-block.png")
         self.SetCategory("Utility")
         self.SetNodeType("ForBlock")
+        
+    def Initialize(self) -> None:
+        """
+        Initializes the node and its graph by adding the input and output node, 
+        and specifies the type of the plugs (list)
+        """
+        self.inputNode = Inputs(self.environment)
+        self.outputNode = Outputs(self.environment)
+        
+        self.AddInput(Plug("input0", "Input0", self, dataType=PlugType.LIST))
+        self.AddOutput(Plug("output0", "Output0", self, dataType=PlugType.LIST))
+        
+        self.graph.AddNode(self.inputNode)
+        self.graph.AddNode(self.outputNode)
+        
         
     def Cook(self) -> None:
         """

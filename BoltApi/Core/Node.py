@@ -5,6 +5,7 @@ import re, copy, os, threading, io
 import BoltApi.Core.FileSystem as FileSystem
 from BoltApi.Core.Logger import *
 from BoltApi.Core.Environment import *
+from BoltApi.Core.Expressions import *
 from BoltApi.Utils.Timer import Timer
 
 # Pre declaration of classes
@@ -1084,6 +1085,75 @@ class Node():
         """
         self.opCompiledCode = compile(self.opCode, "compiledCode", "exec")
         
+    def EvaluateInputs(self) -> dict:
+        """
+        Evaluates each input of the node. 
+        If the input is connected, query the value from the connected output
+        If the input is exposed, evaluate what could be an expression
+        
+        Returns:
+            dict: dictionnary containing pairs { input name : input value evaluated }
+        """
+        inputValues = {}
+        
+        for inputName, input in self.inputs.items():
+            if input.IsConnected():
+                input.UpdateInputs()
+                
+                inputValues[inputName] = input.GetData()
+            else:
+                dataToEvaluate = input.GetData()
+                
+                # Environment Evaluation
+                dataToEvaluate = EnvEvaluator(dataToEvaluate, self.GetEnv())
+                
+                result = None
+                
+                if input.GetType() == PlugType.STR:
+                    """
+                    Evaluates the given expression from a string parameter. The expressions should be passed between ``
+                    to be parsed correctly      
+                    """
+                    exprPattern = re.compile(r"`[^`]*`")
+                    
+                    if re.search(exprPattern, dataToEvaluate) is not None:
+                        for match in re.finditer(exprPattern, dataToEvaluate):
+                            try:
+                                exprResult = SafeExprEvaluator(match.group().replace("`", ""))
+                            except SyntaxError as err:
+                                self.logger.Log(LogLevel.ERROR, f"""Node : {self.GetName()} | Plug : {inputName}
+Invalid expression syntax '{err}'\nExpression will be evaluated to empty string""")
+                                exprResult = ""
+                            except (NameError, ValueError) as err:
+                                self.logger.Log(LogLevel.ERROR, f"""Node : {self.GetName()} | Plug : {inputName}\n'{err}'
+Expression will be evaluated to empty string""")
+                                exprResult = ""
+                                
+                            dataToEvaluate = dataToEvaluate.replace(match.group(), exprResult)        
+                            
+                        result = dataToEvaluate
+                    else:
+                        dataToEvaluate = "'{}'".format(dataToEvaluate)
+                        result = SafeExprEvaluator(dataToEvaluate)
+                else:
+                    """
+                    Evaluates the given expression from a parameter (other than string)
+                    """
+                    try:
+                        result = SafeExprEvaluator(dataToEvaluate)
+                    except SyntaxError as err:
+                        self.logger.Log(LogLevel.ERROR, f"""Node : {self.GetName()} | Plug : {inputName}
+Invalid expression syntax '{err}'\nExpression will be evaluated to None""")
+                        result = None
+                    except (NameError, ValueError) as err:
+                        self.logger.Log(LogLevel.ERROR, f"""Node : {self.GetName()} | Plug : {inputName}\n'{err}'
+Expression will be evaluated to None""")
+                        result = None
+                
+                inputValues[inputName] = result
+        
+        return inputValues
+                    
     def Cook(self) -> None:
         """
         Executes the node operation
@@ -1101,12 +1171,8 @@ class Node():
                 self.hasWarning = False
                 self.warningMessage = ""
 
-            locals = {}
-                
-            for inputName, input in self.inputs.items():
-                input.UpdateInputs()
-                locals[inputName] = input.GetData()
-                
+            locals = self.EvaluateInputs()
+                        
             globals = { "BoltTempDir" : FileSystem.GetRoamingDataDir,
                         "BoltTempScript" : FileSystem.GetNewRandomPyFile,
                         "BoltLogError" : self.LogError,
@@ -1463,3 +1529,8 @@ class Node():
         """
         """
         self.environment = environment
+        
+    def GetEnv(self) -> Environment:
+        """
+        """
+        return self.environment

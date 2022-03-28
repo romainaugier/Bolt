@@ -14,9 +14,19 @@ category = Oeuf
 
 shortName = inrenderoptions
 longName = Render Options
-defaultValue = {"Type":"LD","Team":"oeuf","SequenceName":"sequence","ShotName":"shot","Optims":True,"FrameRange":"100-240"}
+defaultValue = {"Type":"LD","Team":"oeuf","Optims":True}
 type = dict
 exposed = True
+
+# EndPlug
+
+# BeginPlug
+
+shortName = inshotspecs
+longName = Shot Specs
+defaultValue = {}
+type = dict
+exposed = False
 
 # EndPlug
 
@@ -34,5 +44,12 @@ type = dict
 # BeginOp
 
 outrenderoptions = inrenderoptions
+
+if "Sequence" in inshotspecs:
+    outrenderoptions["SequenceName"] = inshotspecs["Sequence"]
+if "Shot" in inshotspecs:
+    outrenderoptions["ShotName"] = inshotspecs["Shot"]
+if "FrameRange" in inshotspecs:
+    outrenderoptions["FrameRange"] = inshotspecs["FrameRange"]
 
 # EndOp

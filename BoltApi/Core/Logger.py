@@ -42,6 +42,9 @@ class Logger():
     """
     Utility class to log informations to the user
     """
+    
+    file = None
+    
     def __init__(self, level=LogLevel.WARNING, logToConsole=True, logToFile=False, logToCustomConsole=False, file=None):
         self.level = level
         self.logToConsole = logToConsole
@@ -52,8 +55,6 @@ class Logger():
         if file:
             self.file = open(file, "w")
             self.LogToFile(self.Log(LogLevel.MESSAGE, "File logging session started"))
-        else:
-            self.file = None
             
     def __del__(self):
         if self.file:
