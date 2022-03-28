@@ -1094,6 +1094,7 @@ class Node():
         Returns:
             dict: dictionnary containing pairs { input name : input value evaluated }
         """
+        exprPattern = re.compile(r"`[^`]*`")
         inputValues = {}
         
         for inputName, input in self.inputs.items():
@@ -1104,17 +1105,13 @@ class Node():
             else:
                 dataToEvaluate = input.GetData()
                 
-                # Environment Evaluation
-                dataToEvaluate = EnvEvaluator(dataToEvaluate, self.GetEnv())
                 
                 result = None
                 
                 if input.GetType() == PlugType.STR:
-                    """
-                    Evaluates the given expression from a string parameter. The expressions should be passed between ``
-                    to be parsed correctly      
-                    """
-                    exprPattern = re.compile(r"`[^`]*`")
+                    # Evaluates the given expression from a string parameter. The expressions should be passed between ``
+                    # to be parsed correctly
+                    dataToEvaluate = EnvEvaluator(dataToEvaluate, self.GetEnv())
                     
                     if re.search(exprPattern, dataToEvaluate) is not None:
                         for match in re.finditer(exprPattern, dataToEvaluate):
@@ -1135,10 +1132,76 @@ Expression will be evaluated to empty string""")
                     else:
                         dataToEvaluate = "'{}'".format(dataToEvaluate)
                         result = SafeExprEvaluator(dataToEvaluate)
+                        
+                elif input.GetType() == PlugType.DICT:
+                    # Evaluates each value of the dict
+                    result = {}
+                    
+                    for key, value in dataToEvaluate.items():
+                        if not isinstance(value, str):
+                            value = f"{value}"
+                        
+                        value = EnvEvaluator(value, self.GetEnv())
+                        
+                        if re.search(exprPattern, value) is not None:
+                            for match in re.finditer(exprPattern, value):
+                                try:
+                                    exprResult = SafeExprEvaluator(match.group().replace("`", ""))
+                                except SyntaxError as err:
+                                    self.logger.Log(LogLevel.ERROR, f"""Node : {self.GetName()} | Plug : {inputName} | Key : {key}
+Invalid expression syntax '{err}'\nExpression will be evaluated to empty string""")
+                                    exprResult = ""
+                                except (NameError, ValueError) as err:
+                                    self.logger.Log(LogLevel.ERROR, f"""Node : {self.GetName()} | Plug : {inputName}\n'{err}' | Key : {key}
+Expression will be evaluated to empty string""")
+                                    exprResult = ""
+                                    
+                                value = value.replace(match.group(), exprResult)        
+                                
+                            result[key] = value
+                        else:
+                            value = "'{}'".format(value)
+                            result[key] = SafeExprEvaluator(value)
+                        
+                elif (input.GetType() == PlugType.LIST or 
+                      input.GetType() == PlugType.FLOAT2 or input.GetType() == PlugType.FLOAT3 or
+                      input.GetType() == PlugType.INT2 or input.GetType() == PlugType.INT3):
+                    # Evaluates each item of the list
+                    result = []
+                    
+                    for i, item in enumerate(dataToEvaluate):
+                        value = item
+                        
+                        if not isinstance(value, str):
+                            value = f"{value}"
+                        
+                        value = EnvEvaluator(value, self.GetEnv())
+                        
+                        if re.search(exprPattern, value) is not None:
+                            for match in re.finditer(exprPattern, value):
+                                try:
+                                    exprResult = SafeExprEvaluator(match.group().replace("`", ""))
+                                except SyntaxError as err:
+                                    self.logger.Log(LogLevel.ERROR, f"""Node : {self.GetName()} | Plug : {inputName} | Index : {i}
+Invalid expression syntax '{err}'\nExpression will be evaluated to empty string""")
+                                    exprResult = ""
+                                except (NameError, ValueError) as err:
+                                    self.logger.Log(LogLevel.ERROR, f"""Node : {self.GetName()} | Plug : {inputName}\n'{err}' | Index : {i}
+Expression will be evaluated to empty string""")
+                                    exprResult = ""
+                                    
+                                value = value.replace(match.group(), exprResult)        
+                                
+                            result.append(value)
+                        else:
+                            value = "'{}'".format(value)
+                            result.append(SafeExprEvaluator(value))
+                elif input.GetType() == PlugType.BOOL:
+                    result = dataToEvaluate
                 else:
-                    """
-                    Evaluates the given expression from a parameter (other than string)
-                    """
+                    # Evaluates the given expression from a parameter
+                    dataToEvaluate = EnvEvaluator(dataToEvaluate, self.GetEnv())
+                    
                     try:
                         result = SafeExprEvaluator(dataToEvaluate)
                     except SyntaxError as err:

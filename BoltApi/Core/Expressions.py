@@ -6,7 +6,10 @@ def EnvEvaluator(expression : str, environment : Environment) -> any:
     Evaluates the environment in the given expression, i.e if any environment variable
     is in the expression, it will be replaced
     """
-    return environment.ReplaceInString(expression)
+    if environment.SearchInString(expression):
+        return environment.ReplaceInString(expression)
+    else:
+        return expression
 
 def SafeExprEvaluator(expression : str) -> any:
     """
