@@ -274,7 +274,7 @@ class GGraph(QtWidgets.QGraphicsView):
                 if isinstance(item, GNode): 
                     item.adjustEdges()
             
-        if len(sceneSelection) == 1 and isinstance(sceneSelection[0], GNode):    
+        if len(sceneSelection) == 1 and isinstance(sceneSelection[0], GNode) and QtGui.QGuiApplication.mouseButtons() & QtCore.Qt.LeftButton:    
             # Handle when a node is passed on an edge and connect it to the two nodes
             scenePos = event.pos()
             

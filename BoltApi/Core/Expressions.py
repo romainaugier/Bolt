@@ -19,10 +19,10 @@ def SafeExprEvaluator(expression : str) -> any:
     
     allowedFunctions = {}
     
-    mathFunctions = {k: v for k, v in math.__dict__.items() if not k.startswith("__")}
+    mathFunctions = { k : v for k, v in math.__dict__.items() if not k.startswith("__") }
     allowedFunctions.update(mathFunctions)
     
-    strFunctions = {k: v for k, v in str.__dict__.items() if not k.startswith("__")}
+    strFunctions = { k : v for k, v in str.__dict__.items() if not k.startswith("__") }
     allowedFunctions.update(strFunctions)
     
     code = compile(expression, "<string>", "eval")

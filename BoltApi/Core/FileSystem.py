@@ -1,4 +1,4 @@
-import sys, pathlib, os, binascii, shutil, subprocess
+import sys, pathlib, os, binascii, shutil, subprocess, re
 
 from BoltApi.Utils.String import GetCurrentTimeAsStr, GetRandomStrId
 
@@ -124,3 +124,36 @@ def CopyJob(jobId : str, pathToGraph : str) -> tuple:
     shutil.copy(pathToGraph, jobPath)
     
     return jobDirPath, jobPath
+
+def GetLastVersionDir(directory : str) -> str:
+    """
+    Returns the path to the last version of the directory. For example,
+    when you have multiple "0000", "0001", "0002"... directories, 
+    it finds the last one and return the full path to it
+
+    Args:
+        directory (str): directory containing the multiple directory versions
+
+    Returns:
+        str: full path to the last version of the directory
+    """
+    lastVersionPath = ""
+    lastVersionNum = -1
+    noNumPattern = re.compile(r"[^\d+]")
+    
+    for dir in os.listdir(directory):
+        fullPath = f"{directory}/{dir}"
+        
+        if not os.path.isdir(fullPath):
+            continue
+        else:
+            dirAsNum = int(re.sub(noNumPattern, "", dir))
+            
+            if dirAsNum > lastVersionNum:
+                lastVersionPath = fullPath
+                lastVersionNum = dirAsNum
+                
+    assert(len(lastVersionPath) > 0)
+                
+    return lastVersionPath.replace("\\", "/")
+        

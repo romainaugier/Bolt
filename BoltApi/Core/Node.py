@@ -7,6 +7,7 @@ from BoltApi.Core.Logger import *
 from BoltApi.Core.Environment import *
 from BoltApi.Core.Expressions import *
 from BoltApi.Utils.Timer import Timer
+from BoltApi.Utils import Client
 
 # Pre declaration of classes
 
@@ -1242,7 +1243,8 @@ Expression will be evaluated to None""")
                         "BoltLogWarning" : self.LogWarning,
                         "BoltLogMessage" : self.LogMessage,
                         "BoltError" : self.ReportError,
-                        "BoltWarning" : self.ReportWarning }
+                        "BoltWarning" : self.ReportWarning,
+                        "ClientUtils" : Client } 
             
             try:
                 exec(self.opCompiledCode, globals, locals)
