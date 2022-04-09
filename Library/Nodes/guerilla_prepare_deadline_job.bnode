@@ -75,7 +75,7 @@ exposedToGraph = False
 
 shortName = inrenderpasses
 longName = Render Passes
-defaultValue = ['Albedo', 'Diffuse', 'IndDiffuse', 'Specular', 'Reflection', 'Refraction', 'SSS', 'Incandescence', 'Z', 'MotionVector', 'Shadows', 'ShadowMask', 'BeautyKey', 'BeautyFill', 'BeautyRim', 'BeautyEnv']
+defaultValue = ['Albedo', 'Diffuse', 'IndDiffuse', 'Specular', 'Reflection', 'Refraction', 'SSS', 'Incandescence', 'Z', 'MotionVector', 'Nworld', 'BeautyKey', 'BeautyFill', 'BeautyRim', 'BeautyEnv']
 type = list
 exposed = True
 hidden = False
@@ -85,10 +85,20 @@ exposedToGraph = False
 
 # BeginPlug
 
-shortName = outribgenjobinfofile
-longName = Output Ribgen Job Info File
-defaultValue = ""
-type = str
+shortName = inribgenbatchsize
+longName = RibGen Batch Size
+defaultValue = 10
+type = int
+exposed = True
+
+# EndPlug
+
+# BeginPlug
+
+shortName = outribgenjobinfofiles
+longName = Output Ribgen Job Info Files
+defaultValue = []
+type = list
 exposed = False
 hidden = False
 exposedToGraph = False
@@ -97,10 +107,10 @@ exposedToGraph = False
 
 # BeginPlug
 
-shortName = outribgenplugininfofile
-longName = Output Ribgen Plugin Info File
-defaultValue = ""
-type = str
+shortName = outribgenplugininfofiles
+longName = Output Ribgen Plugin Info Files
+defaultValue = []
+type = list
 exposed = False
 hidden = False
 exposedToGraph = False
@@ -109,10 +119,10 @@ exposedToGraph = False
 
 # BeginPlug
 
-shortName = outrenderjobinfofile
-longName = Output Render Job Info File
-defaultValue = ""
-type = str
+shortName = outrenderjobinfofiles
+longName = Output Render Job Info Files
+defaultValue = []
+type = list
 exposed = False
 hidden = False
 exposedToGraph = False
@@ -121,10 +131,10 @@ exposedToGraph = False
 
 # BeginPlug
 
-shortName = outrenderplugininfofile
-longName = Output Render Plugin Info File
-defaultValue = ""
-type = str
+shortName = outrenderplugininfofiles
+longName = Output Render Plugin Info Files
+defaultValue = []
+type = list
 exposed = False
 hidden = False
 exposedToGraph = False
@@ -148,7 +158,7 @@ exposedToGraph = False
 # BeginOp
 
 from datetime import datetime
-import re, os, subprocess, platform
+import re, os, subprocess, platform, ast
 
 now = datetime.now()
 currentTimeStr = now.strftime('%m%d%Y_%H%M%S')
@@ -159,6 +169,7 @@ jobType = inrenderoptions["Type"]
 sequenceName = inrenderoptions["SequenceName"] 
 shotName = inrenderoptions["ShotName"]
 frameRange = inrenderoptions["FrameRange"]
+adaptiveThreshold = inrenderoptions["AdaptiveThreshold"]
 
 jobName = f"{teamName}_{jobType}_{sequenceName}_{shotName}"
 batchName = f"{jobName}-{currentTimeStr}"
@@ -167,6 +178,12 @@ if jobType == "LD":
     injoboptions["Priority"] = 50
 elif jobType == "FML":
     injoboptions["Priority"] = 75
+
+    frame1 = frameRange.split("-")[0]
+    frame3 = frameRange.split("-")[1]
+    frame2 = int(int(frame3) / 2)
+
+    frameRange = f"{frame1} {frame2} {frame3}"
 elif jobType == "HD":
     injoboptions["Priority"] = 25
 
@@ -211,7 +228,9 @@ for key, item in injoboptions.items():
 
 # Generate Guerilla script
 
-generatedScript = f"""import guerilla, os
+boltTmpDir = BoltTempDir().replace("\\", "/")
+
+generatedScript = f"""import guerilla, os, binascii
 import RomanoTools.Guerilla.Utils as utils
 
 layer = guerilla.Document().findchild("RenderPass|Layer")
@@ -240,7 +259,9 @@ with guerilla.Modifier() as mod:
     if "{jobType}" == "LD":
         utils.SetLowRenderParms()
     else:
-        utils.SetFinalRenderParms()
+        utils.SetFinalRenderParms(adaptiveThreshold={adaptiveThreshold})
+
+        print("Set final adaptive threshold : {adaptiveThreshold}")
 
     prefNode = guerilla.Document().findchild("Preferences")
 
@@ -257,16 +278,57 @@ jobsDir = "{{}}/jobs".format(sceneDir)
 options = guerilla.renderoptions({{}})
 
 options["JobsDirectory"] = jobsDir
-options["DeferredRibGenBatch"] = 0
+options["DeferredRibGenBatch"] = {inribgenbatchsize}
 options["DeferredFile"] = "{{}}/{{}}_ribgen_{{}}.gproject".format(jobsDir, options["FilePrefix"], options["RenderId"])
 
 scriptFiles = guerilla.render("none", options)
 
-ribgenScriptFile = scriptFiles[0].getscriptfile(0)
-renderScriptFile = scriptFiles[1].getscriptfile(0)
+tmpDirPath = "{boltTmpDir}"
 
-print("RIBGEN_SCRIPT_FILE={{}}".format("{{}}/{{}}".format(jobsDir, ribgenScriptFile)))
-print("RENDER_SCRIPT_FILE={{}}".format("{{}}/{{}}".format(jobsDir, renderScriptFile)))
+ribgenJobInfoFiles = []
+ribgenJobPluginFiles = []
+renderJobInfoFiles = []
+renderJobPluginFiles = []
+
+for scriptFile in scriptFiles:
+    args = scriptFile.getscriptargs(0)
+    file = scriptFile.getscriptfile(0)
+
+    randomStr = binascii.hexlify(os.urandom(6))
+
+    if "ribgen" in file:
+        ribgenJobInfoFile = "{{}}/ribgen_job_info_{{}}.job".format(tmpDirPath, randomStr)
+
+        with open(ribgenJobInfoFile, "w") as f:
+            f.write(\"\"\"{generatedRibgenJobInfos}\"\"\")
+
+        ribgenJobInfoFiles.append(ribgenJobInfoFile)
+
+        ribgenJobPluginFile = "{{}}/ribgen_plugin_info_{{}}.job".format(tmpDirPath, randomStr)
+
+        with open(ribgenJobPluginFile, "w") as f:
+            f.write(\"\"\"ScriptFile={{}}/{{}}\nScriptArgs=\\\"{{}}\\\"\"\"\".format(jobsDir, file, args[0]))
+
+        ribgenJobPluginFiles.append(ribgenJobPluginFile)
+    else:
+        renderJobInfoFile = "{{}}/render_job_info_{{}}.job".format(tmpDirPath, randomStr)
+
+        with open(renderJobInfoFile, "w") as f:
+            f.write(\"\"\"{generatedRenderJobInfos}\"\"\")
+
+        renderJobInfoFiles.append(renderJobInfoFile)
+
+        renderJobPluginFile = "{{}}/render_plugin_info_{{}}.job".format(tmpDirPath, randomStr)
+
+        with open(renderJobPluginFile, "w") as f:
+            f.write(\"\"\"ScriptFile={{}}/{{}}\nScriptArgs=\\\"{{}}\\\"\"\"\".format(jobsDir, file, args[0]))
+
+        renderJobPluginFiles.append(renderJobPluginFile)
+
+print("RIBGEN_JOB_INFO_FILES={{}}".format(ribgenJobInfoFiles))
+print("RIBGEN_JOB_PLUGIN_FILES={{}}".format(ribgenJobPluginFiles))
+print("RENDER_JOB_INFO_FILES={{}}".format(renderJobInfoFiles))
+print("RENDER_JOB_PLUGIN_FILES={{}}".format(renderJobPluginFiles))
 
 guerilla.Document().save()
 """
@@ -279,7 +341,7 @@ with open(tmpScriptFilePath, "w") as scriptFile:
 
 BoltLogMessage(f"GuerillaBatch : Start executing script : {tmpScriptFilePath}")
 
-if platform.system == "windows":
+if platform.system() == "Windows":
     command = [f"{inenvironment['GUERILLA']}/guerillaBatch", "--nogui"] 
     
     if os.path.exists(inguerillafile):
@@ -314,42 +376,22 @@ else:
 
 # Get the generated guerilla scriptfiles paths
 
-ribgenScriptPattern = r"RIBGEN_SCRIPT_FILE=(\S+)"
-renderScriptPattern = r"RENDER_SCRIPT_FILE=(\S+)"
+ribgenJobInfoPattern = r"RIBGEN_JOB_INFO_FILES=(\S+)"
+ribgenJobPluginPattern = r"RIBGEN_JOB_PLUGIN_FILES=(\S+)"
+renderJobInfoPattern = r"RENDER_JOB_INFO_FILES=(\S+)"
+renderJobPluginPattern = r"RENDER_JOB_PLUGIN_FILES=(\S+)"
 
-ribGenScriptFilePath = re.findall(ribgenScriptPattern, stdoutAsStr)[0]
-renderScriptFilePath = re.findall(renderScriptPattern, stdoutAsStr)[0]
+stdoutAsStr = re.sub(r"(,)\s(\S)", r"\g<1>\g<2>", stdoutAsStr)
 
-tmpDirPath = BoltTempDir()
+ribgenJobInfoFileList = re.findall(ribgenJobInfoPattern, stdoutAsStr)[0]
+ribgenJobPluginFileList = re.findall(ribgenJobPluginPattern, stdoutAsStr)[0]
+renderJobInfoFileList = re.findall(renderJobInfoPattern, stdoutAsStr)[0]
+renderJobPluginFileList = re.findall(renderJobPluginPattern, stdoutAsStr)[0]
 
-# Render Job Infos
-renderJobInfoFile = f"{tmpDirPath}/render_job_info_{currentTimeStr}.job"
-
-with open(renderJobInfoFile, "w") as file:
-    file.write(generatedRenderJobInfos) 
-
-# Render Plugin Infos
-renderJobPluginFile = f"{tmpDirPath}/render_plugin_info_{currentTimeStr}.job"
-
-with open(renderJobPluginFile, "w") as file:
-    file.write(f"ScriptFile={renderScriptFilePath}\nScriptArgs=\"--frame={frameRange.split('-')[0]}\"")
-
-# Ribgen Job Infos
-ribgenJobInfoFile = f"{tmpDirPath}/ribgen_job_info_{currentTimeStr}.job"
-
-with open(ribgenJobInfoFile, "w") as file:
-    file.write(generatedRibgenJobInfos)
-
-# Ribgen Plugin Infos
-ribgenJobPluginFile = f"{tmpDirPath}/ribgen_plugin_info_{currentTimeStr}.job"
-
-with open(ribgenJobPluginFile, "w") as file:
-    file.write(f"ScriptFile={ribGenScriptFilePath}\nScriptArgs=")
-
-outribgenjobinfofile = ribgenJobInfoFile
-outribgenplugininfofile = ribgenJobPluginFile
-outrenderjobinfofile = renderJobInfoFile
-outrenderplugininfofile = renderJobPluginFile
+outribgenjobinfofiles = ast.literal_eval(ribgenJobInfoFileList.replace(" ", ""))
+outribgenplugininfofiles = ast.literal_eval(ribgenJobPluginFileList.replace(" ", ""))
+outrenderjobinfofiles = ast.literal_eval(renderJobInfoFileList.replace(" ", ""))
+outrenderplugininfofiles = ast.literal_eval(renderJobPluginFileList.replace(" ", ""))
 outrenderdir = renderDir
 
 # EndOp

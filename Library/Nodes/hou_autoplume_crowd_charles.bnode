@@ -96,6 +96,8 @@ cacheDir = f"{incachedir}/{inshotspecs['Sequence']}/{inshotspecs['Shot']}/CrowdC
 
 generatedScript = f"""import hou,sys
 
+hou.playbar.setFrameRange({framerange[0]}, {framerange[1]})
+
 animSopNode = None
 plumeSopNode = None
 crowdSplitter = None
@@ -105,12 +107,14 @@ crowdCount = 0
 for node in hou.node("/obj").children():
     if node.name() == "anim_import":
         animSopNode = node
+        print("Found anim import node\\n")
     elif node.name() == "EXPORT":
         plumeSopNode = node
+        print("Found export node\\n")
 
 if animSopNode is not None and plumeSopNode is not None:
     for node in animSopNode.children():
-        if node.type().name() == "alembic":
+        if node.name() == "alembic_import_crowd":
             node.parm("fileName").set("{inanimationfile}")
         elif node.name() == "CROWD_SPLIT":
             crowdSplitter = node
@@ -121,12 +125,12 @@ if animSopNode is not None and plumeSopNode is not None:
 
 if animSopNode is not None and plumeSopNode is not None and crowdSplitter is not None and crowdCache is not None:
 
-    sys.stdout.write("Starting cache splitting...\\n")
+    print("Starting cache splitting...\\n")
 
     # for i in range({framerange[0]}, {framerange[1] + 1}):
-    #    sys.stdout.write("Splitting frame {{}}...\\n".format(i))
+    #    print("Splitting frame {{}}...\\n".format(i))
     #    hou.setFrame(i)
- 
+
     #    for j in range(crowdCount):
     #        crowdSplitter.parm("birdid").set(j)
     #        crowdCachePath = "{cacheDir}/geo_temp/crowdChar{{}}_GeoCache.{{}}.bgeo.sc".format(j, i)
@@ -134,24 +138,24 @@ if animSopNode is not None and plumeSopNode is not None and crowdSplitter is not
     #        crowdCache.parm("trange").set(0)
     #        crowdCache.parm("execute").pressButton()
 
-    sys.stdout.write("Cache splitting finished\\n")
-    sys.stdout.write("Starting fur and feathers cache export...\\n")
+    print("Cache splitting finished\\n")
+    print("Starting fur and feathers cache export...\\n")
 
     crowdCache.parm("loadfromdisk").set(1)
 
     for i in range(crowdCount):
-        sys.stdout.write("Exporting fur and feathers cache for bird {{}}...\\n".format(i))
+        print("Exporting fur and feathers cache for bird {{}}...\\n".format(i))
         crowdCachePath = "{cacheDir}/geo_temp/crowdChar{{}}_GeoCache.$F.bgeo.sc".format(i)
         crowdCache.parm("file").set(crowdCachePath)
         
         for node in plumeSopNode.children():
             if node.name() == "rop_alembic_fur":
-                node.parm("filename").set("{cacheDir}/{inshotspecs['Sequence']}_{inshotspecs['Shot']}_crowdCharles{{}}_cache_fur.abc".format(i))
+                node.parm("filename").set("{cacheDir}/{inshotspecs['Sequence']}_{inshotspecs['Shot']}_crowd_charles{{}}_cache_fur.abc".format(i))
                 node.parm("f1").set({framerange[0]})
                 node.parm("f2").set({framerange[1]})
                 node.parm("execute").pressButton()
             if node.name() == "rop_alembic_plumes":
-                node.parm("filename").set("{cacheDir}/{inshotspecs['Sequence']}_{inshotspecs['Shot']}_crowdCharles{{}}_cache_plumes.abc".format(i))
+                node.parm("filename").set("{cacheDir}/{inshotspecs['Sequence']}_{inshotspecs['Shot']}_crowd_charles{{}}_cache_plumes.abc".format(i))
                 node.parm("f1").set({framerange[0]})
                 node.parm("f2").set({framerange[1]})
                 node.parm("execute").pressButton()

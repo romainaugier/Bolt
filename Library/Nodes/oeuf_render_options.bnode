@@ -2,7 +2,7 @@
 
 # BeginAttr
 
-name = Oeuf_RenderOptionsLD
+name = Oeuf_RenderOptions
 icon = $BOLT_ICONS/volcan.png
 category = Oeuf
 
@@ -14,7 +14,7 @@ category = Oeuf
 
 shortName = inrenderoptions
 longName = Render Options
-defaultValue = {"Type":"LD","Team":"oeuf","Optims":True}
+defaultValue = {"Type":"LD","Team":"oeuf","Optims":True,"AdaptiveThreshold":0.1}
 type = dict
 exposed = True
 

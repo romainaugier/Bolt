@@ -89,6 +89,9 @@ exposedToGraph = False
 
 import os
 
+if isinstance(inanimationfile, list):
+    inanimationfile = inanimationfile[0]
+
 fr = inshotspecs["FrameRange"].split("-")
 framerange = [int(fr[0]), int(fr[1])]
 

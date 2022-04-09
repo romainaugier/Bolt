@@ -39,7 +39,7 @@ exposedToGraph = False
 
 shortName = inrenderpasses
 longName = Render Passes
-defaultValue = ['Albedo', 'Diffuse', 'IndDiffuse', 'Specular', 'Reflection', 'Refraction', 'SSS', 'Incandescence', 'Z', 'MotionVector', 'Shadows', 'ShadowMask', 'BeautyKey', 'BeautyFill', 'BeautyRim', 'BeautyEnv']
+defaultValue = ['Albedo', 'Diffuse', 'IndDiffuse', 'Specular', 'Reflection', 'Refraction', 'SSS', 'Incandescence', 'Z', 'MotionVector', 'Nworld', 'BeautyKey', 'BeautyFill', 'BeautyRim', 'BeautyEnv']
 type = list
 exposed = True
 hidden = False
@@ -107,6 +107,8 @@ if not os.path.exists(dir):
 
 utils.SetOptims()
 utils.SetRange("{inframerange[0]}-{inframerange[1]}")
+
+utils.SetLowRenderParms()
 
 renderPass = guerilla.Document().findchild("RenderPass")
 

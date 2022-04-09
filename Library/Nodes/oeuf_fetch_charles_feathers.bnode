@@ -2,7 +2,7 @@
 
 # BeginAttr
 
-name = Oeuf_FetchFeathers
+name = Oeuf_FetchCharlesFeathers
 category = Oeuf
 color = [0, 0, 0]
 icon = $BOLT_ICONS/volcan.png

@@ -52,6 +52,8 @@ paths = {inabcfiles}
 for path in paths:
     name = os.path.basename(path)
 
+    name = name.replace(".abc", "")
+
     with guerilla.Modifier() as mod:
         mod.createref(name, path, options={{ 'prefixnodes' : False,'containschildren' : True }})
 

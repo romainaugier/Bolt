@@ -58,7 +58,7 @@ import subprocess, platform, os
 
 BoltLogMessage(f"GuerillaBatch : Start executing script : {inscript}")
 
-if platform.system == "windows":
+if platform.system() == "Windows":
     command = [f"{inenvironment['GUERILLA']}/guerillaBatch", "--nogui"] 
     
     if os.path.exists(inguerillafile):

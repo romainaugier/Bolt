@@ -491,6 +491,8 @@ class GNode(QtWidgets.QGraphicsObject):
         self.name = self.getInternalNode().GetName()
         self.id = self.getInternalNode().GetID()
         self.iconPath = self.getInternalNode().GetIconPath()
+        
+        self.positionHasBeenSet = False
 
         if self.iconPath != "":
             pixname = self.iconsLib.AddPixmap(self.iconPath)

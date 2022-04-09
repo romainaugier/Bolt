@@ -116,6 +116,13 @@ class Graph():
             list[Node]: nodes of the graph
         """
         return self.nodes
+    
+    def GetSortedNodes(self) -> list[Node]:
+        """
+        Returns:
+            list[Node]: sorted nodes of the graph
+        """
+        return self.sortedNodes
 
     def GetLock(self) -> threading.Lock:
         """

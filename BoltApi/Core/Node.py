@@ -1201,7 +1201,7 @@ Expression will be evaluated to empty string""")
                     result = dataToEvaluate
                 else:
                     # Evaluates the given expression from a parameter
-                    dataToEvaluate = EnvEvaluator(dataToEvaluate, self.GetEnv())
+                    dataToEvaluate = EnvEvaluator(f"{dataToEvaluate}", self.GetEnv())
                     
                     try:
                         result = SafeExprEvaluator(dataToEvaluate)

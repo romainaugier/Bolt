@@ -24,7 +24,7 @@
             "isExposed": true,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "Z:/OEUF/RENDER/SQ060/SHOT010/LD26",
+            "data": "Z:/OEUF/RENDER/SQ080/SHOT010/LD4",
             "defaultData": "",
             "type": 7,
             "connectionName": null,
@@ -41,7 +41,7 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "Z:/OEUF/RENDER/SQ060/SHOT010/LD26",
+            "data": "Z:/OEUF/RENDER/SQ080/SHOT010/LD4",
             "defaultData": "",
             "type": 7,
             "connectionName": "inrenderdir",
@@ -74,7 +74,7 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Bolt/6537613766656239663736653039383562343763636231306661656462366366.py",
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Bolt/6337326664306334666537356135356563323166356332623838356636323164.py",
             "defaultData": "",
             "type": 7,
             "connectionName": "outscriptfile",
@@ -204,7 +204,7 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "Z:/OEUF/RENDER/SQ060/SHOT010/LD26",
+            "data": "Z:/OEUF/RENDER/SQ080/SHOT010/LD4",
             "defaultData": "",
             "type": 7,
             "connectionName": "outdir",
@@ -251,7 +251,7 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Bolt/6537613766656239663736653039383562343763636231306661656462366366.py",
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Bolt/6337326664306334666537356135356563323166356332623838356636323164.py",
             "defaultData": "",
             "type": 7,
             "connectionName": "inscriptfile",
@@ -295,7 +295,7 @@
     },
     {
       "id": "3738396565336231356266653933336633376436343864313235653237383830",
-      "x": 149.59999999999997,
+      "x": 150.69999999999993,
       "y": 300.3
     }
   ]

@@ -3,7 +3,7 @@
     {
       "name": "Oeuf_ShotSpecs",
       "category": "Oeuf",
-      "id": "3931616262336232373538326531616233323966386632616639656663613533",
+      "id": "3333623632316630646664336566636530333337336230313564343065653737",
       "color": [
         0,
         0,
@@ -25,7 +25,7 @@
             "isHidden": false,
             "isExposedToGraph": false,
             "data": {
-              "FrameRange": "100-240",
+              "FrameRange": "100-212",
               "Sequence": "SQ020",
               "Shot": "SHOT060"
             },
@@ -50,14 +50,14 @@
             "isHidden": false,
             "isExposedToGraph": false,
             "data": {
-              "FrameRange": "100-240",
+              "FrameRange": "100-212",
               "Sequence": "SQ020",
               "Shot": "SHOT060"
             },
             "defaultData": {},
             "type": 10,
             "connectionName": "inshotspecs",
-            "connectionNodeId": "6265323761343234636237373139323937346437383433343630646136643361"
+            "connectionNodeId": "6465316432306432613032366364363732623330373434613233383539663863"
           },
           {
             "shortName": "outshotspecs",
@@ -67,229 +67,56 @@
             "isHidden": false,
             "isExposedToGraph": false,
             "data": {
-              "FrameRange": "100-240",
+              "FrameRange": "100-212",
               "Sequence": "SQ020",
               "Shot": "SHOT060"
             },
             "defaultData": {},
             "type": 10,
             "connectionName": "inshotspecs",
-            "connectionNodeId": "6463653565393961623264643730346465353732613338336166663931393436"
-          }
-        ]
-      }
-    },
-    {
-      "name": "Oeuf_FetchCamera",
-      "category": "Oeuf",
-      "id": "6265323761343234636237373139323937346437383433343630646136643361",
-      "color": [
-        0,
-        0,
-        0
-      ],
-      "iconPath": "$BOLT_ICONS/camera.png",
-      "definitionPath": "$BOLT_LIB/Nodes/oeuf_fetch_camera.bnode",
-      "nodeType": "Oeuf/Oeuf_FetchCamera",
-      "opCode": "\nimport os\n\nsequence = inshotspecs[\"Sequence\"]\nshot = inshotspecs[\"Shot\"]\ncamDir = f\"{inanimationdir}/{sequence}/{shot}/cam\"\n\ncamLastVersionDir = ClientUtils.GetLastVersionDir(camDir)\nfileCount = len(os.listdir(camLastVersionDir))\n\nif fileCount == 0:\n    BoltLogError(f\"No file is available in directory '{camLastVersionDir}'\")\nelif fileCount > 1:\n    BoltLogWarning(f\"More than one file has been found in directory '{camLastVersionDir}'\")\n    outcampath = f\"{camLastVersionDir}/{os.listdir(camLastVersionDir)[0]}\"\nelse:\n    outcampath = f\"{camLastVersionDir}/{os.listdir(camLastVersionDir)[0]}\"\n\n",
-      "disabled": false,
-      "isSubGraph": false,
-      "inputs": {
-        "inshotspecs": [
+            "connectionNodeId": "6462633236623966643832333937343266666639333138363136636366383263"
+          },
           {
-            "shortName": "inshotspecs",
-            "longName": "Shot Specs",
+            "shortName": "outshotspecs",
+            "longName": "Output Shot Specs",
             "index": 0,
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
             "data": {
-              "FrameRange": "100-240",
+              "FrameRange": "100-212",
               "Sequence": "SQ020",
               "Shot": "SHOT060"
             },
             "defaultData": {},
             "type": 10,
-            "connectionName": "outshotspecs",
-            "connectionNodeId": "3931616262336232373538326531616233323966386632616639656663613533"
-          }
-        ],
-        "inanimationdir": [
+            "connectionName": "inshotspecs",
+            "connectionNodeId": "3961366134663562383861336135303663633165663330633334313831626630"
+          },
           {
-            "shortName": "inanimationdir",
-            "longName": "Animation Directory Path",
-            "index": 0,
-            "isExposed": true,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": "$ANIM_DIR",
-            "defaultData": "$ANIM_DIR",
-            "type": 7,
-            "connectionName": null,
-            "connectionNodeId": null
-          }
-        ]
-      },
-      "outputs": {
-        "outcampath": [
-          {
-            "shortName": "outcampath",
-            "longName": "Camera Path",
+            "shortName": "outshotspecs",
+            "longName": "Output Shot Specs",
             "index": 0,
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "Z:/OEUF/ANIMATION/SQ020/SHOT060/cam/0001/SQ020_SHOT060_cam.abc",
-            "defaultData": "",
-            "type": 7,
-            "connectionName": "input1",
-            "connectionNodeId": "6132303765313539626435306332656636333236643934646535313165313735"
+            "data": {
+              "FrameRange": "100-212",
+              "Sequence": "SQ020",
+              "Shot": "SHOT060"
+            },
+            "defaultData": {},
+            "type": 10,
+            "connectionName": "inshotspecs",
+            "connectionNodeId": "6261366537633462613737613963323232656635613836353536386565356630"
           }
         ]
       }
     },
     {
-      "name": "Debug",
-      "category": "Debug",
-      "id": "6230366532643134333638333361323937393638656263646430316231663364",
-      "color": [
-        50,
-        222,
-        132
-      ],
-      "iconPath": "$BOLT_ICONS/debug.png",
-      "definitionPath": "$BOLT_LIB/Nodes/debug.bnode",
-      "nodeType": "Debug/Debug",
-      "opCode": "\nBoltLogMessage(f\"Debug Node : {indata}\")\n\noutdata = indata\n\n",
-      "disabled": false,
-      "isSubGraph": false,
-      "inputs": {
-        "indata": [
-          {
-            "shortName": "indata",
-            "longName": "Input Data",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": [
-              "Z:/OEUF/ANIMATION/SQ020/SHOT060/cam/0001/SQ020_SHOT060_cam.abc",
-              "Z:/OEUF/ANIMATION/SQ020/SHOT060/CHARLES/0001/SQ020_SHOT060_CHARLES_anim.abc",
-              "Z:/OEUF/ANIMATION/SQ020/SHOT060/CORINNE/0001/SQ020_SHOT060_CHARLES_anim.abc",
-              "Z:/OEUF/ANIMATION/SQ020/SHOT060/OEUF1/0001/SQ020_SHOT060_OEUF_anim.abc",
-              "Z:/OEUF/ANIMATION/SQ020/SHOT060/OEUF2/0001/SQ020_SHOT060_OEUF_anim.abc"
-            ],
-            "defaultData": null,
-            "type": 11,
-            "connectionName": "output",
-            "connectionNodeId": "6132303765313539626435306332656636333236643934646535313165313735"
-          }
-        ]
-      },
-      "outputs": {
-        "outdata": [
-          {
-            "shortName": "outdata",
-            "longName": "Output Data",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": [
-              "Z:/OEUF/ANIMATION/SQ020/SHOT060/cam/0001/SQ020_SHOT060_cam.abc",
-              "Z:/OEUF/ANIMATION/SQ020/SHOT060/CHARLES/0001/SQ020_SHOT060_CHARLES_anim.abc",
-              "Z:/OEUF/ANIMATION/SQ020/SHOT060/CORINNE/0001/SQ020_SHOT060_CHARLES_anim.abc",
-              "Z:/OEUF/ANIMATION/SQ020/SHOT060/OEUF1/0001/SQ020_SHOT060_OEUF_anim.abc",
-              "Z:/OEUF/ANIMATION/SQ020/SHOT060/OEUF2/0001/SQ020_SHOT060_OEUF_anim.abc"
-            ],
-            "defaultData": null,
-            "type": 11,
-            "connectionName": null,
-            "connectionNodeId": null
-          }
-        ]
-      }
-    },
-    {
-      "name": "Merge",
-      "category": "Utility",
-      "id": "6132303765313539626435306332656636333236643934646535313165313735",
-      "color": [
-        0,
-        0,
-        0
-      ],
-      "iconPath": "$BOLT_ICONS/util.png",
-      "definitionPath": "$BOLT_LIB/Nodes/merge.bnode",
-      "nodeType": "Utility/Merge",
-      "opCode": "\n# BeginOp\n\nif type(input1) is list:\n    if type(input2) is list:\n        output = [*input1, *input2]\n    else:\n        output = [*input1, input2]\nelif type(input2) is list:\n    output = [input1, *input2]\nelse:\n    output = [input1, input2]\n\n\n",
-      "disabled": false,
-      "isSubGraph": false,
-      "inputs": {
-        "input1": [
-          {
-            "shortName": "input1",
-            "longName": "Input 1",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": "Z:/OEUF/ANIMATION/SQ020/SHOT060/cam/0001/SQ020_SHOT060_cam.abc",
-            "defaultData": null,
-            "type": 11,
-            "connectionName": "outcampath",
-            "connectionNodeId": "6265323761343234636237373139323937346437383433343630646136643361"
-          }
-        ],
-        "input2": [
-          {
-            "shortName": "input2",
-            "longName": "Input 2",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": [
-              "Z:/OEUF/ANIMATION/SQ020/SHOT060/CHARLES/0001/SQ020_SHOT060_CHARLES_anim.abc",
-              "Z:/OEUF/ANIMATION/SQ020/SHOT060/CORINNE/0001/SQ020_SHOT060_CHARLES_anim.abc",
-              "Z:/OEUF/ANIMATION/SQ020/SHOT060/OEUF1/0001/SQ020_SHOT060_OEUF_anim.abc",
-              "Z:/OEUF/ANIMATION/SQ020/SHOT060/OEUF2/0001/SQ020_SHOT060_OEUF_anim.abc"
-            ],
-            "defaultData": null,
-            "type": 11,
-            "connectionName": "outanimpaths",
-            "connectionNodeId": "6463653565393961623264643730346465353732613338336166663931393436"
-          }
-        ]
-      },
-      "outputs": {
-        "output": [
-          {
-            "shortName": "output",
-            "longName": "Output",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": [
-              "Z:/OEUF/ANIMATION/SQ020/SHOT060/cam/0001/SQ020_SHOT060_cam.abc",
-              "Z:/OEUF/ANIMATION/SQ020/SHOT060/CHARLES/0001/SQ020_SHOT060_CHARLES_anim.abc",
-              "Z:/OEUF/ANIMATION/SQ020/SHOT060/CORINNE/0001/SQ020_SHOT060_CHARLES_anim.abc",
-              "Z:/OEUF/ANIMATION/SQ020/SHOT060/OEUF1/0001/SQ020_SHOT060_OEUF_anim.abc",
-              "Z:/OEUF/ANIMATION/SQ020/SHOT060/OEUF2/0001/SQ020_SHOT060_OEUF_anim.abc"
-            ],
-            "defaultData": [],
-            "type": 9,
-            "connectionName": "indata",
-            "connectionNodeId": "6230366532643134333638333361323937393638656263646430316231663364"
-          }
-        ]
-      }
-    },
-    {
-      "name": "Oeuf_FetchAnimation1",
+      "name": "Oeuf_FetchAnimation",
       "category": "Oeuf",
-      "id": "6463653565393961623264643730346465353732613338336166663931393436",
+      "id": "6465316432306432613032366364363732623330373434613233383539663863",
       "color": [
         0,
         0,
@@ -298,7 +125,7 @@
       "iconPath": "$BOLT_ICONS/animation.png",
       "definitionPath": "$BOLT_LIB/Nodes/oeuf_fetch_animation.bnode",
       "nodeType": "Oeuf/Oeuf_FetchAnimation",
-      "opCode": "\nimport os, re\n\nsequence = inshotspecs[\"Sequence\"]\nshot = inshotspecs[\"Shot\"]\nanimDir = f\"{inanimationdir}/{sequence}/{shot}\"\n\ncharlesMatches = [\"CHARLES\", \"Charles\", \"charles\"]\ncorinneMatches = [\"CORINNE\", \"Corinne\", \"corinne\"]\noeufsMatches = [\"OEUFS\", \"OEUF\", \"Oeufs\", \"Oeuf\", \"oeufs\", \"oeuf\"]\n\nfetchCharles = False\nfetchCorinne = False\nfetchOeufs = False\n\nfor item in inanimtofetch:\n    if item in charlesMatches:\n        fetchCharles = True\n    elif item in corinneMatches:\n        fetchCorinne = True\n    elif item in oeufsMatches:\n        fetchOeufs = True\n\noutanimpaths = []\n\nfor dir in os.listdir(animDir):\n    if fetchCharles:\n        if dir in charlesMatches:\n            charlesDirPath = f\"{animDir}/{dir}\"\n            lastVersionDir = ClientUtils.GetLastVersionDir(charlesDirPath)\n\n            fileCount = len(os.listdir(lastVersionDir))\n\n            if fileCount == 0:\n                BoltLogError(f\"No animation export of Charles is available in directory '{lastVersionDir}'\")\n            elif fileCount > 1:\n                BoltLogWarning(f\"More than one file exists in directory '{lastVersionDir}'. Using the first available\")\n                charlesAnimPath = f\"{lastVersionDir}/{os.listdir(lastVersionDir)[0]}\"\n                outanimpaths.append(charlesAnimPath)\n            else:\n                charlesAnimPath = f\"{lastVersionDir}/{os.listdir(lastVersionDir)[0]}\"\n                outanimpaths.append(charlesAnimPath)\n            \n            continue\n    if fetchCorinne:\n        if dir in corinneMatches:\n            corinneDirPath = f\"{animDir}/{dir}\"\n            lastVersionDir = ClientUtils.GetLastVersionDir(corinneDirPath)\n\n            fileCount = len(os.listdir(lastVersionDir))\n\n            if fileCount == 0:\n                BoltLogError(f\"No animation export of Corinne is available in directory '{lastVersionDir}'\")\n            elif fileCount > 1:\n                BoltLogWarning(f\"More than one file exists in directory '{lastVersionDir}'. Using the first available\")\n                corinneAnimPath = f\"{lastVersionDir}/{os.listdir(lastVersionDir)[0]}\"\n                outanimpaths.append(corinneAnimPath)\n            else:\n                corinneAnimPath = f\"{lastVersionDir}/{os.listdir(lastVersionDir)[0]}\"\n                outanimpaths.append(corinneAnimPath)\n            \n            continue\n    if fetchOeufs:\n        oeufPattern = re.compile(r\".*OEUF.*|.*Oeuf.*|.*oeuf.*|.*OEUFS.*|.*Oeufs.*|.*oeufs.*\")\n\n        if re.search(oeufPattern, dir):\n            oeufDirPath = f\"{animDir}/{dir}\"\n            lastVersionDir = ClientUtils.GetLastVersionDir(oeufDirPath)\n\n            fileCount = len(os.listdir(lastVersionDir))\n\n            if fileCount == 0:\n                BoltLogError(f\"No animation export of oeuf is available in directory '{lastVersionDir}'\")\n            elif fileCount > 1:\n                BoltLogWarning(f\"More than one file exists in directory '{lastVersionDir}'. Using the first available\")\n                oeufAnimPath = f\"{lastVersionDir}/{os.listdir(lastVersionDir)[0]}\"\n                outanimpaths.append(oeufAnimPath)\n            else:\n                oeufAnimPath = f\"{lastVersionDir}/{os.listdir(lastVersionDir)[0]}\"\n                outanimpaths.append(oeufAnimPath)\n            \n            continue\n\n    print(dir)\n\n",
+      "opCode": "\nimport os, re\n\nsequence = inshotspecs[\"Sequence\"]\nshot = inshotspecs[\"Shot\"]\nanimDir = f\"{inanimationdir}/{sequence}/{shot}\"\n\ncharlesMatches = [\"CHARLES\", \"Charles\", \"charles\"]\ncorinneMatches = [\"CORINNE\", \"Corinne\", \"corinne\"]\noeufsMatches = [\"OEUFS\", \"OEUF\", \"Oeufs\", \"Oeuf\", \"oeufs\", \"oeuf\"]\n\nfetchCharles = False\nfetchCorinne = False\nfetchOeufs = False\n\nfor item in inanimtofetch:\n    if item in charlesMatches:\n        fetchCharles = True\n    elif item in corinneMatches:\n        fetchCorinne = True\n    elif item in oeufsMatches:\n        fetchOeufs = True\n\noutanimpaths = []\n\nfor dir in os.listdir(animDir):\n    if fetchCharles:\n        if dir in charlesMatches:\n            charlesDirPath = f\"{animDir}/{dir}\"\n            lastVersionDir = ClientUtils.GetLastVersionDir(charlesDirPath)\n\n            fileCount = len(os.listdir(lastVersionDir))\n\n            if fileCount == 0:\n                BoltLogError(f\"No animation export of Charles is available in directory '{lastVersionDir}'\")\n            elif fileCount > 1:\n                BoltLogWarning(f\"More than one file exists in directory '{lastVersionDir}'. Using the first available\")\n                charlesAnimPath = f\"{lastVersionDir}/{os.listdir(lastVersionDir)[0]}\"\n                outanimpaths.append(charlesAnimPath)\n            else:\n                charlesAnimPath = f\"{lastVersionDir}/{os.listdir(lastVersionDir)[0]}\"\n                outanimpaths.append(charlesAnimPath)\n            \n            continue\n    if fetchCorinne:\n        if dir in corinneMatches:\n            corinneDirPath = f\"{animDir}/{dir}\"\n            lastVersionDir = ClientUtils.GetLastVersionDir(corinneDirPath)\n\n            fileCount = len(os.listdir(lastVersionDir))\n\n            if fileCount == 0:\n                BoltLogError(f\"No animation export of Corinne is available in directory '{lastVersionDir}'\")\n            elif fileCount > 1:\n                BoltLogWarning(f\"More than one file exists in directory '{lastVersionDir}'. Using the first available\")\n                corinneAnimPath = f\"{lastVersionDir}/{os.listdir(lastVersionDir)[0]}\"\n                outanimpaths.append(corinneAnimPath)\n            else:\n                corinneAnimPath = f\"{lastVersionDir}/{os.listdir(lastVersionDir)[0]}\"\n                outanimpaths.append(corinneAnimPath)\n            \n            continue\n    if fetchOeufs:\n        oeufPattern = re.compile(r\".*OEUF.*|.*Oeuf.*|.*oeuf.*|.*OEUFS.*|.*Oeufs.*|.*oeufs.*\")\n\n        if re.search(oeufPattern, dir):\n            oeufDirPath = f\"{animDir}/{dir}\"\n            lastVersionDir = ClientUtils.GetLastVersionDir(oeufDirPath)\n\n            fileCount = len(os.listdir(lastVersionDir))\n\n            if fileCount == 0:\n                BoltLogError(f\"No animation export of oeuf is available in directory '{lastVersionDir}'\")\n            elif fileCount > 1:\n                BoltLogWarning(f\"More than one file exists in directory '{lastVersionDir}'. Using the first available\")\n                oeufAnimPath = f\"{lastVersionDir}/{os.listdir(lastVersionDir)[0]}\"\n                outanimpaths.append(oeufAnimPath)\n            else:\n                oeufAnimPath = f\"{lastVersionDir}/{os.listdir(lastVersionDir)[0]}\"\n                outanimpaths.append(oeufAnimPath)\n            \n            continue\n\n",
       "disabled": false,
       "isSubGraph": false,
       "inputs": {
@@ -310,15 +137,11 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": {
-              "FrameRange": "100-240",
-              "Sequence": "SQ020",
-              "Shot": "SHOT060"
-            },
+            "data": {},
             "defaultData": {},
             "type": 10,
             "connectionName": "outshotspecs",
-            "connectionNodeId": "3931616262336232373538326531616233323966386632616639656663613533"
+            "connectionNodeId": "3333623632316630646664336566636530333337336230313564343065653737"
           }
         ],
         "inanimationdir": [
@@ -345,9 +168,7 @@
             "isHidden": false,
             "isExposedToGraph": false,
             "data": [
-              "CHARLES",
-              "CORINNE",
-              "OEUFS"
+              "CHARLES"
             ],
             "defaultData": [
               "CHARLES",
@@ -369,16 +190,447 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": [
-              "Z:/OEUF/ANIMATION/SQ020/SHOT060/CHARLES/0001/SQ020_SHOT060_CHARLES_anim.abc",
-              "Z:/OEUF/ANIMATION/SQ020/SHOT060/CORINNE/0001/SQ020_SHOT060_CHARLES_anim.abc",
-              "Z:/OEUF/ANIMATION/SQ020/SHOT060/OEUF1/0001/SQ020_SHOT060_OEUF_anim.abc",
-              "Z:/OEUF/ANIMATION/SQ020/SHOT060/OEUF2/0001/SQ020_SHOT060_OEUF_anim.abc"
-            ],
+            "data": [],
             "defaultData": [],
             "type": 9,
-            "connectionName": "input2",
-            "connectionNodeId": "6132303765313539626435306332656636333236643934646535313165313735"
+            "connectionName": "inanimationfile",
+            "connectionNodeId": "3961366134663562383861336135303663633165663330633334313831626630"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Oeuf_FetchAnimation1",
+      "category": "Oeuf",
+      "id": "6462633236623966643832333937343266666639333138363136636366383263",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$BOLT_ICONS/animation.png",
+      "definitionPath": "$BOLT_LIB/Nodes/oeuf_fetch_animation.bnode",
+      "nodeType": "Oeuf/Oeuf_FetchAnimation",
+      "opCode": "\nimport os, re\n\nsequence = inshotspecs[\"Sequence\"]\nshot = inshotspecs[\"Shot\"]\nanimDir = f\"{inanimationdir}/{sequence}/{shot}\"\n\ncharlesMatches = [\"CHARLES\", \"Charles\", \"charles\"]\ncorinneMatches = [\"CORINNE\", \"Corinne\", \"corinne\"]\noeufsMatches = [\"OEUFS\", \"OEUF\", \"Oeufs\", \"Oeuf\", \"oeufs\", \"oeuf\"]\n\nfetchCharles = False\nfetchCorinne = False\nfetchOeufs = False\n\nfor item in inanimtofetch:\n    if item in charlesMatches:\n        fetchCharles = True\n    elif item in corinneMatches:\n        fetchCorinne = True\n    elif item in oeufsMatches:\n        fetchOeufs = True\n\noutanimpaths = []\n\nfor dir in os.listdir(animDir):\n    if fetchCharles:\n        if dir in charlesMatches:\n            charlesDirPath = f\"{animDir}/{dir}\"\n            lastVersionDir = ClientUtils.GetLastVersionDir(charlesDirPath)\n\n            fileCount = len(os.listdir(lastVersionDir))\n\n            if fileCount == 0:\n                BoltLogError(f\"No animation export of Charles is available in directory '{lastVersionDir}'\")\n            elif fileCount > 1:\n                BoltLogWarning(f\"More than one file exists in directory '{lastVersionDir}'. Using the first available\")\n                charlesAnimPath = f\"{lastVersionDir}/{os.listdir(lastVersionDir)[0]}\"\n                outanimpaths.append(charlesAnimPath)\n            else:\n                charlesAnimPath = f\"{lastVersionDir}/{os.listdir(lastVersionDir)[0]}\"\n                outanimpaths.append(charlesAnimPath)\n            \n            continue\n    if fetchCorinne:\n        if dir in corinneMatches:\n            corinneDirPath = f\"{animDir}/{dir}\"\n            lastVersionDir = ClientUtils.GetLastVersionDir(corinneDirPath)\n\n            fileCount = len(os.listdir(lastVersionDir))\n\n            if fileCount == 0:\n                BoltLogError(f\"No animation export of Corinne is available in directory '{lastVersionDir}'\")\n            elif fileCount > 1:\n                BoltLogWarning(f\"More than one file exists in directory '{lastVersionDir}'. Using the first available\")\n                corinneAnimPath = f\"{lastVersionDir}/{os.listdir(lastVersionDir)[0]}\"\n                outanimpaths.append(corinneAnimPath)\n            else:\n                corinneAnimPath = f\"{lastVersionDir}/{os.listdir(lastVersionDir)[0]}\"\n                outanimpaths.append(corinneAnimPath)\n            \n            continue\n    if fetchOeufs:\n        oeufPattern = re.compile(r\".*OEUF.*|.*Oeuf.*|.*oeuf.*|.*OEUFS.*|.*Oeufs.*|.*oeufs.*\")\n\n        if re.search(oeufPattern, dir):\n            oeufDirPath = f\"{animDir}/{dir}\"\n            lastVersionDir = ClientUtils.GetLastVersionDir(oeufDirPath)\n\n            fileCount = len(os.listdir(lastVersionDir))\n\n            if fileCount == 0:\n                BoltLogError(f\"No animation export of oeuf is available in directory '{lastVersionDir}'\")\n            elif fileCount > 1:\n                BoltLogWarning(f\"More than one file exists in directory '{lastVersionDir}'. Using the first available\")\n                oeufAnimPath = f\"{lastVersionDir}/{os.listdir(lastVersionDir)[0]}\"\n                outanimpaths.append(oeufAnimPath)\n            else:\n                oeufAnimPath = f\"{lastVersionDir}/{os.listdir(lastVersionDir)[0]}\"\n                outanimpaths.append(oeufAnimPath)\n            \n            continue\n\n",
+      "disabled": false,
+      "isSubGraph": false,
+      "inputs": {
+        "inshotspecs": [
+          {
+            "shortName": "inshotspecs",
+            "longName": "Shot Specs",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {},
+            "defaultData": {},
+            "type": 10,
+            "connectionName": "outshotspecs",
+            "connectionNodeId": "3333623632316630646664336566636530333337336230313564343065653737"
+          }
+        ],
+        "inanimationdir": [
+          {
+            "shortName": "inanimationdir",
+            "longName": "Animation Directory Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "$ANIM_DIR",
+            "defaultData": "$ANIM_DIR",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ],
+        "inanimtofetch": [
+          {
+            "shortName": "inanimtofetch",
+            "longName": "Animation To Fetch",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [
+              "CORINNE"
+            ],
+            "defaultData": [
+              "CHARLES",
+              "CORINNE",
+              "OEUFS"
+            ],
+            "type": 9,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outanimpaths": [
+          {
+            "shortName": "outanimpaths",
+            "longName": "Animations Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": [],
+            "defaultData": [],
+            "type": 9,
+            "connectionName": "inanimationfile",
+            "connectionNodeId": "6261366537633462613737613963323232656635613836353536386565356630"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Hou_AutoPlume_Charles",
+      "category": "Houdini",
+      "id": "3961366134663562383861336135303663633165663330633334313831626630",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$BOLT_ICONS/houdini.png",
+      "definitionPath": "$BOLT_LIB/Nodes/hou_autoplume_charles.bnode",
+      "nodeType": "Houdini/Hou_AutoPlume_Charles",
+      "opCode": "\nimport os\n\nfr = inshotspecs[\"FrameRange\"].split(\"-\")\nframerange = [int(fr[0]), int(fr[1])]\n\ncacheDir = f\"{incachedir}/{inshotspecs['Sequence']}/{inshotspecs['Shot']}/Charles\"\noutputfilefur = f\"{cacheDir}/{inshotspecs['Sequence']}_{inshotspecs['Shot']}_charles_cache_fur.abc\"\noutputfileplumes = f\"{cacheDir}/{inshotspecs['Sequence']}_{inshotspecs['Shot']}_charles_cache_plumes.abc\"\n\ngeneratedScript = f\"\"\"import hou\nanimSopNode = None\nplumeSopNode = None\n\nfor node in hou.node(\"/obj\").children():\n    if node.name() == \"anim_import\":\n        animSopNode = node\n    elif node.name() == \"EXPORT\":\n        plumeSopNode = node\n\nif animSopNode != None:\n    for node in animSopNode.children():\n        if node.type().name() == \"alembic\":\n            node.parm(\"fileName\").set(\"{inanimationfile}\")\n            break\n\nif plumeSopNode != None:\n    for node in plumeSopNode.children():\n        if node.name() == \"rop_alembic_fur\":\n            node.parm(\"filename\").set(\"{outputfilefur}\")\n            node.parm(\"f1\").set({framerange[0]})\n            node.parm(\"f2\").set({framerange[1]})\n            node.parm(\"execute\").pressButton()\n        if node.name() == \"rop_alembic_plumes\":\n            node.parm(\"filename\").set(\"{outputfileplumes}\")\n            node.parm(\"f1\").set({framerange[0]})\n            node.parm(\"f2\").set({framerange[1]})\n            node.parm(\"execute\").pressButton()\n\"\"\"\n\ntmpScriptFilePath = BoltTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\noutabccachefile = [outputfilefur, outputfileplumes]\n\n\n\n\n\n",
+      "disabled": false,
+      "isSubGraph": false,
+      "inputs": {
+        "inanimationfile": [
+          {
+            "shortName": "inanimationfile",
+            "longName": "Animation",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outanimpaths",
+            "connectionNodeId": "6465316432306432613032366364363732623330373434613233383539663863"
+          }
+        ],
+        "intemplatefile": [
+          {
+            "shortName": "intemplatefile",
+            "longName": "Template File",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/Bird_feathers_template.hipnc",
+            "defaultData": "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/Bird_feathers_template.hipnc",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ],
+        "inshotspecs": [
+          {
+            "shortName": "inshotspecs",
+            "longName": "Shot Specs",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 10,
+            "connectionName": "outshotspecs",
+            "connectionNodeId": "3333623632316630646664336566636530333337336230313564343065653737"
+          }
+        ],
+        "incachedir": [
+          {
+            "shortName": "incachedir",
+            "longName": "Cache Directory",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/CACHE",
+            "defaultData": "Z:/OEUF/CACHE",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outscriptfile": [
+          {
+            "shortName": "outscriptfile",
+            "longName": "Output Script",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "inscript",
+            "connectionNodeId": "3931633066333235393734336636396564653166356331373835306532383663"
+          }
+        ],
+        "outabccachefile": [
+          {
+            "shortName": "outabccachefile",
+            "longName": "Output Cache File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 9,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "Hou_AutoPlume_Corinne",
+      "category": "Houdini",
+      "id": "6261366537633462613737613963323232656635613836353536386565356630",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$BOLT_ICONS/houdini.png",
+      "definitionPath": "$BOLT_LIB/Nodes/hou_autoplume_corinne.bnode",
+      "nodeType": "Houdini/Hou_AutoPlume_Corinne",
+      "opCode": "\nimport os\n\nfr = inshotspecs[\"FrameRange\"].split(\"-\")\nframerange = [int(fr[0]), int(fr[1])]\n\ncacheDir = f\"{incachedir}/{inshotspecs['Sequence']}/{inshotspecs['Shot']}/Corinne\"\noutputfilefur = f\"{cacheDir}/{inshotspecs['Sequence']}_{inshotspecs['Shot']}_corinne_cache_fur.abc\"\noutputfileplumes = f\"{cacheDir}/{inshotspecs['Sequence']}_{inshotspecs['Shot']}_corinne_cache_plumes.abc\"\n\ngeneratedScript = f\"\"\"import hou\nanimSopNode = None\nplumeSopNode = None\n\nfor node in hou.node(\"/obj\").children():\n    if node.name() == \"anim_import\":\n        animSopNode = node\n    elif node.name() == \"EXPORT\":\n        plumeSopNode = node\n\nif animSopNode != None:\n    for node in animSopNode.children():\n        if node.type().name() == \"alembic\":\n            node.parm(\"fileName\").set(\"{inanimationfile}\")\n            break\n\nif plumeSopNode != None:\n    for node in plumeSopNode.children():\n        if node.name() == \"rop_alembic_fur\":\n            node.parm(\"filename\").set(\"{outputfilefur}\")\n            node.parm(\"f1\").set({framerange[0]})\n            node.parm(\"f2\").set({framerange[1]})\n            node.parm(\"execute\").pressButton()\n        if node.name() == \"rop_alembic_plumes\":\n            node.parm(\"filename\").set(\"{outputfileplumes}\")\n            node.parm(\"f1\").set({framerange[0]})\n            node.parm(\"f2\").set({framerange[1]})\n            node.parm(\"execute\").pressButton()\n\"\"\"\n\ntmpScriptFilePath = BoltTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as scriptFile:\n    scriptFile.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\noutabccachefile = [outputfilefur, outputfileplumes]\n\n",
+      "disabled": false,
+      "isSubGraph": false,
+      "inputs": {
+        "inanimationfile": [
+          {
+            "shortName": "inanimationfile",
+            "longName": "Animation",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outanimpaths",
+            "connectionNodeId": "6462633236623966643832333937343266666639333138363136636366383263"
+          }
+        ],
+        "intemplatefile": [
+          {
+            "shortName": "intemplatefile",
+            "longName": "Template File",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/assets/characters/Bird/modeling/femelle/Houdini/Bird_feathers_template.hipnc",
+            "defaultData": "Z:/OEUF/assets/characters/Bird/modeling/femelle/Houdini/Bird_feathers_template.hipnc",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ],
+        "inshotspecs": [
+          {
+            "shortName": "inshotspecs",
+            "longName": "Shot Specs",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 10,
+            "connectionName": "outshotspecs",
+            "connectionNodeId": "3333623632316630646664336566636530333337336230313564343065653737"
+          }
+        ],
+        "incachedir": [
+          {
+            "shortName": "incachedir",
+            "longName": "Cache Directory",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/CACHE",
+            "defaultData": "Z:/OEUF/CACHE",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outscriptfile": [
+          {
+            "shortName": "outscriptfile",
+            "longName": "Output Script",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "inscript",
+            "connectionNodeId": "3736616365326537613030613764396335623738353865363630343130646333"
+          }
+        ],
+        "outabccachefile": [
+          {
+            "shortName": "outabccachefile",
+            "longName": "Output Cache File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 9,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "Hou_Hython",
+      "category": "Houdini",
+      "id": "3931633066333235393734336636396564653166356331373835306532383663",
+      "color": [
+        255,
+        87,
+        34
+      ],
+      "iconPath": "$BOLT_ICONS/houdini.png",
+      "definitionPath": "$BOLT_LIB/Nodes/hou_hython.bnode",
+      "nodeType": "Houdini/Hou_Hython",
+      "opCode": "\nimport subprocess, os, sys\n\nBoltLogMessage(f\"Hython : Start executing script : {inscript}\")\n\ncommand = [\"hython\"]\n\nif os.path.exists(inhoufile):\n    command.append(inhoufile)\n\ncommand.append(inscript)\n\nBoltLogMessage(f\"Hython Command : {' '.join(command)}\")\n\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, encoding=\"ISO-8859-1\")\n\nwhile True:\n    output = process.stdout.readline()\n    errput = process.stderr.readline()\n\n    if process.poll() is not None:\n        break\n    if len(errput) > 0:\n        BoltLogError(errput)\n        BoltLogError(f\"Hython error, terminating subprocess. Check the log for more details\")\n        sys.stderr.flush()\n        process.terminate()\n        break\n    if output:\n        print(output.strip())\n\n\nBoltLogMessage(f\"Hython : Finished executing script : {inscript}\")\n\n",
+      "disabled": false,
+      "isSubGraph": false,
+      "inputs": {
+        "inscript": [
+          {
+            "shortName": "inscript",
+            "longName": "Input Script Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outscriptfile",
+            "connectionNodeId": "3961366134663562383861336135303663633165663330633334313831626630"
+          }
+        ],
+        "inhoufile": [
+          {
+            "shortName": "inhoufile",
+            "longName": "Input Houdini File",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/assets/characters/Bird/modeling/main/Houdini/Bird_feathers_template.hipnc",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "Hou_Hython1",
+      "category": "Houdini",
+      "id": "3736616365326537613030613764396335623738353865363630343130646333",
+      "color": [
+        255,
+        87,
+        34
+      ],
+      "iconPath": "$BOLT_ICONS/houdini.png",
+      "definitionPath": "$BOLT_LIB/Nodes/hou_hython.bnode",
+      "nodeType": "Houdini/Hou_Hython",
+      "opCode": "\nimport subprocess, os, sys\n\nBoltLogMessage(f\"Hython : Start executing script : {inscript}\")\n\ncommand = [\"hython\"]\n\nif os.path.exists(inhoufile):\n    command.append(inhoufile)\n\ncommand.append(inscript)\n\nBoltLogMessage(f\"Hython Command : {' '.join(command)}\")\n\nprocess = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, encoding=\"ISO-8859-1\")\n\nwhile True:\n    output = process.stdout.readline()\n    errput = process.stderr.readline()\n\n    if process.poll() is not None:\n        break\n    if len(errput) > 0:\n        BoltLogError(errput)\n        BoltLogError(f\"Hython error, terminating subprocess. Check the log for more details\")\n        sys.stderr.flush()\n        process.terminate()\n        break\n    if output:\n        print(output.strip())\n\n\nBoltLogMessage(f\"Hython : Finished executing script : {inscript}\")\n\n",
+      "disabled": false,
+      "isSubGraph": false,
+      "inputs": {
+        "inscript": [
+          {
+            "shortName": "inscript",
+            "longName": "Input Script Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outscriptfile",
+            "connectionNodeId": "6261366537633462613737613963323232656635613836353536386565356630"
+          }
+        ],
+        "inhoufile": [
+          {
+            "shortName": "inhoufile",
+            "longName": "Input Houdini File",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/assets/characters/Bird/modeling/femelle/Houdini/Bird_feathers_template.hipnc",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "output": [
+          {
+            "shortName": "output",
+            "longName": "Output",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": null,
+            "defaultData": null,
+            "type": 11,
+            "connectionName": null,
+            "connectionNodeId": null
           }
         ]
       }
@@ -387,29 +639,39 @@
   "tracker": null,
   "positions": [
     {
-      "id": "6463653565393961623264643730346465353732613338336166663931393436",
-      "x": 319.0,
-      "y": 550.0
+      "id": "3333623632316630646664336566636530333337336230313564343065653737",
+      "x": -307.0,
+      "y": 253.0
     },
     {
-      "id": "3931616262336232373538326531616233323966386632616639656663613533",
-      "x": -217.0,
-      "y": 295.0
+      "id": "6465316432306432613032366364363732623330373434613233383539663863",
+      "x": 205.97400000000016,
+      "y": -27.464
     },
     {
-      "id": "6265323761343234636237373139323937346437383433343630646136643361",
-      "x": 327.0,
-      "y": 303.0
+      "id": "6462633236623966643832333937343266666639333138363136636366383263",
+      "x": 205.31900000000007,
+      "y": 482.701
     },
     {
-      "id": "6132303765313539626435306332656636333236643934646535313165313735",
-      "x": 853.0,
-      "y": 302.0
+      "id": "3961366134663562383861336135303663633165663330633334313831626630",
+      "x": 700.0,
+      "y": -23.0
     },
     {
-      "id": "6230366532643134333638333361323937393638656263646430316231663364",
-      "x": 1154.0,
-      "y": 299.0
+      "id": "6261366537633462613737613963323232656635613836353536386565356630",
+      "x": 710.0,
+      "y": 485.0
+    },
+    {
+      "id": "3931633066333235393734336636396564653166356331373835306532383663",
+      "x": 1208.7900000000002,
+      "y": -22.989999999999924
+    },
+    {
+      "id": "3736616365326537613030613764396335623738353865363630343130646333",
+      "x": 1180.96,
+      "y": 486.4200000000001
     }
   ]
 }

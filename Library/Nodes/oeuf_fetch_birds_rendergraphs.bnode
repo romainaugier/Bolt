@@ -15,7 +15,7 @@ icon = $BOLT_ICONS/volcan.png
 
 shortName = inrgpath
 longName = Rendergraphs Path
-defaultValue = ["Z:/OEUF/assets/characters/Bird/shading/main/_EXPORT/RG_shading_Bird_charles.grendergraph", "Z:/OEUF/assets/characters/Bird/shading/femelle/_EXPORT/RG_shading_Bird_corinne.grendergraph"]
+defaultValue = ["Z:/OEUF/assets/characters/Bird/shading/main/_EXPORT/RG_shading_Bird_charles.grendergraph", "Z:/OEUF/assets/characters/Bird/shading/femelle/_EXPORT/RG_shading_Bird_corinne.grendergraph", "Z:/OEUF/assets/characters/Oeuf/shading/main/_EXPORT/RG_shading_oeuf.grendergraph"]
 type = list
 exposed = True
 hidden = False

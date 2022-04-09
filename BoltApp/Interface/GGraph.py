@@ -833,60 +833,17 @@ class GGraph(QtWidgets.QGraphicsView):
         """
         self.getInternalGraph().Sort()
         
+        for node in self.getInternalGraph().sortedNodes:
+            gNode = self.getNodeById(node.GetID())
+            gNode.positionHasBeenSet = False
+        
         if not self.getInternalGraph().HasError():
             nodesNeedLayout = True
-
-            iterations = 0
-
-            while nodesNeedLayout == True:
-            # while iterations < 2:
-                for i, node in enumerate(self.getInternalGraph().sortedNodes):
-                    gNode = self.getNodeById(node.GetID())
-
-                    gNodePos = gNode.pos() + QtCore.QPointF(gNode.sizeX / 2, gNode.sizeY / 2)
-
-                    if gNode.getInternalNode().GetOutputCount() > 0:
-                        output = gNode.getInternalNode().GetOutput(index=0)
-
-                        if output.IsConnected():
-                            outGPlug = gNode.getOutputGPlug(output.GetShortName())
-                            otherGNode = self.getNodeById(output.GetConnections()[0].GetParentNode().GetID())
-
-                            inGPlug = otherGNode.getInputGPlug(output.GetConnections()[0].GetShortName())
-
-                            pluggedNode = self.getNodeById(inGPlug.getInternalPlug().GetParentNode().GetID())
-                            newPos = pluggedNode.pos() 
-                            gNode.setPos(newPos.x() - 50 - pluggedNode.sizeX, newPos.y())
-                            gNode.adjustEdges()
-
-                    for item in self.scene().items():
-                        if type(item) is not GNode or item.id == gNode.id:
-                            continue
-
-                        itemPos = item.scenePos()
-                        itemPos = QtCore.QPointF(itemPos.x() + item.sizeX / 2, itemPos.y() + item.sizeY / 2)
-
-                        if abs(itemPos.x() - gNodePos.x()) < (gNode.sizeX / 2):
-                            item.setPos(itemPos.x() + 100 + gNode.sizeX / 2, itemPos.y())
-                            nodesNeedLayout = True
-                            gNode.adjustEdges()
-                            item.adjustEdges()
-                        elif abs(itemPos.y() - gNodePos.y()) < (gNode.sizeY / 2):
-                            item.setPos(itemPos.x(), itemPos.y() + gNode.sizeY / 2 + 100)
-                            nodesNeedLayout = True
-                            gNode.adjustEdges()
-                            item.adjustEdges()
-                        else:
-                            nodesNeedLayout = False
-
-                iterations += 1
-
             
-
-            for node in self.getInternalGraph().sortedNodes:
-                gNode = self.getNodeById(node.GetID())
-
-            scene = self.scene()
-            rect = scene.sceneRect()
-
-            self.scaleView(0.5)
+            internalNodes = self.getInternalGraph().GetSortedNodes()
+            
+            rootGNode = self.getNodeById(internalNodes[0].GetID())
+            
+            while nodesNeedLayout:
+                break
+                
