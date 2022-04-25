@@ -1,4 +1,4 @@
-import os, threading, json, copy
+import os, threading, json, copy, socket
 
 from functools import lru_cache
 
@@ -60,6 +60,9 @@ class Graph():
         """
         self.logger = logger
         self.environment = copy.deepcopy(environment)
+        
+        self.socket = socket.socket()
+        self.port = self.environment.Get("BOLT_PORT")
         
         self.name = name
         self.savePath = ""

@@ -1084,8 +1084,17 @@ class Node():
         """
         Compiles the node code to fasten the code execution
         """
-        self.opCompiledCode = compile(self.opCode, "compiledCode", "exec")
-        
+        try:
+            self.opCompiledCode = compile(self.opCode, "compiledCode", "exec")
+        except SyntaxError as err:
+            self.logger.Log(LogLevel.ERROR, f"""Node : {self.GetName()} | Code Compilation | Syntax error :
+Node won't execute any code and the outputs values will be set to None""")
+            
+            self.opCompiledCode = compile("", "compiledCode", "exec")
+            
+            for output in self.GetOutputs().values():
+                output.SetData(None)
+             
     def EvaluateInputs(self) -> dict:
         """
         Evaluates each input of the node. 

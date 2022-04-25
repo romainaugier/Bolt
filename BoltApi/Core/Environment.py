@@ -53,6 +53,7 @@ class Environment():
         self.Variables["BOLT_LIB"] = f"{CleanPath(boltRoot)}/Library"
         self.Variables["BOLT_ICONS"] = f"{CleanPath(boltRoot)}/Library/Icons"
         self.Variables["BOLT_PREFS"] = f"{GetDocumentsFolder()}/Bolt"
+        self.Variables["BOLT_PORT"] = 1
         
         if not os.path.exists(self.Get("BOLT_PREFS")):
             os.makedirs(self.Get("BOLT_PREFS"))
