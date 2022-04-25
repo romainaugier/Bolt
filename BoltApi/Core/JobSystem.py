@@ -12,7 +12,7 @@ class JobStatus(Enum):
     COOKING = 1
     PAUSED = 2
     COMPLETE = 3
-    STOPPED = 4
+    FAILED = 4
 
 class Job():
     """
@@ -23,17 +23,48 @@ class Job():
         """
         """
         self.logger = logger
-        self.environment = environment
+        self.environment = copy.deepcopy(environment)
         
         self.id = GetRandomStrId(8)
         
-        self.dirPath, self.graphPath = CopyJob(self.id, pathToGraphToRun)
+        self.dirPath, self.graphPath = self.Copy(pathToGraphToRun)
         
         self.progress = 0
         self.status = JobStatus.WAITING
         
         self.process = None
         self.progressThread = None
+
+    def Copy(self, pathToGraph : str) -> tuple:
+        """
+        Copies the given graph file to the roaming jobs dir with a random name
+
+        Args:
+            pathToGraph (str): path to the graph file to copy
+            
+        Returns:
+            tuple(str): job directory path and copied graph file path
+        """
+        if not os.path.exists(pathToGraph):
+            self.logger.Log(LogLevel.ERROR, f"Graph {pathToGraph} does not exist")
+
+            self.status = JobStatus.FAILED
+            
+            return None, None
+        
+        graphName, graphExtension = os.path.splitext(os.path.basename(pathToGraph))
+        
+        jobDirName = self.id
+        jobDirPath = f"{GetJobsDir()}/{jobDirName}"
+        
+        os.makedirs(jobDirPath)
+        
+        jobName = f"{graphName}_{GetCurrentTimeAsStr()}.{graphExtension}"
+        jobPath = f"{jobDirPath}/{jobName}"
+        
+        shutil.copy(pathToGraph, jobPath)
+        
+        return jobDirPath, jobPath
         
     def Start(self) -> None:
         """
@@ -115,3 +146,12 @@ class Job():
                 if stderrOutput:
                     self.logger.Log(LogLevel.ERROR, f"Job ({self.id}) : STDERR : {stderrOutput}")
             
+
+class JobSystem():
+    """
+    """
+    def __init__(self, environment : Environment, logger : Logger) -> None:
+        """
+        """
+        self.environment = copy.deepcopy(environment)
+        self.logger = logger

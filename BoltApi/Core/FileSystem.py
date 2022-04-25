@@ -98,33 +98,6 @@ def GetJobsDir() -> str:
         
     return jobsDirPath
 
-def CopyJob(jobId : str, pathToGraph : str) -> tuple:
-    """
-    Copies the given graph file to the roaming jobs dir with a random name
-
-    Args:
-        pathToGraph (str): path to the graph file to copy
-        
-    Returns:
-        tuple(str): job directory path and copied graph file path
-    """
-    if not os.path.exists(pathToGraph):
-        raise ValueError
-    
-    graphName, graphExtension = os.path.splitext(os.path.basename(pathToGraph))
-    
-    jobDirName = jobId
-    jobDirPath = f"{GetJobsDir()}/{jobDirName}"
-    
-    os.makedirs(jobDirPath)
-    
-    jobName = f"{graphName}_{GetCurrentTimeAsStr()}.{graphExtension}"
-    jobPath = f"{jobDirPath}/{jobName}"
-    
-    shutil.copy(pathToGraph, jobPath)
-    
-    return jobDirPath, jobPath
-
 def GetLastVersionDir(directory : str) -> str:
     """
     Returns the path to the last version of the directory. For example,
