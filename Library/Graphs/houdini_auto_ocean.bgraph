@@ -1,106 +1,6 @@
 {
   "nodes": [
     {
-      "name": "File",
-      "category": "Utility",
-      "id": "3530313263663930393166623661363933396465333430653963326465353661",
-      "color": [
-        255,
-        220,
-        106
-      ],
-      "iconPath": "$BOLT_ICONS/file.png",
-      "definitionPath": "$BOLT_LIB/Nodes/file.bnode",
-      "nodeType": "Utility/File",
-      "opCode": "\noutfile = infile\n\n",
-      "disabled": false,
-      "isSubGraph": false,
-      "inputs": {
-        "infile": [
-          {
-            "shortName": "infile",
-            "longName": "Input File Path",
-            "index": 0,
-            "isExposed": true,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": "Z:/OEUF/FX/seq020/shot050/seq020_shot_050_cam.abc",
-            "defaultData": "",
-            "type": 7,
-            "connectionName": null,
-            "connectionNodeId": null
-          }
-        ]
-      },
-      "outputs": {
-        "outfile": [
-          {
-            "shortName": "outfile",
-            "longName": "Output File Path",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": "Z:/OEUF/FX/seq020/shot050/seq020_shot_050_cam.abc",
-            "defaultData": "",
-            "type": 7,
-            "connectionName": "incameraabcfile",
-            "connectionNodeId": "3930333666316136653265666263323562653735346662376139636662623530"
-          }
-        ]
-      }
-    },
-    {
-      "name": "File1",
-      "category": "Utility",
-      "id": "6337616237373736623931613063613964366535616237303065373037663931",
-      "color": [
-        255,
-        220,
-        106
-      ],
-      "iconPath": "$BOLT_ICONS/file.png",
-      "definitionPath": "$BOLT_LIB/Nodes/file.bnode",
-      "nodeType": "Utility/File",
-      "opCode": "\noutfile = infile\n\n",
-      "disabled": false,
-      "isSubGraph": false,
-      "inputs": {
-        "infile": [
-          {
-            "shortName": "infile",
-            "longName": "Input File Path",
-            "index": 0,
-            "isExposed": true,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": "Z:/OEUF/FX/seq020/shot050/seq020_shot050_watter_plane.abc",
-            "defaultData": "",
-            "type": 7,
-            "connectionName": null,
-            "connectionNodeId": null
-          }
-        ]
-      },
-      "outputs": {
-        "outfile": [
-          {
-            "shortName": "outfile",
-            "longName": "Output File Path",
-            "index": 0,
-            "isExposed": false,
-            "isHidden": false,
-            "isExposedToGraph": false,
-            "data": "Z:/OEUF/FX/seq020/shot050/seq020_shot050_watter_plane.abc",
-            "defaultData": "",
-            "type": 7,
-            "connectionName": "inplanefile",
-            "connectionNodeId": "3930333666316136653265666263323562653735346662376139636662623530"
-          }
-        ]
-      }
-    },
-    {
       "name": "Oeuf_ShotSpecs",
       "category": "Oeuf",
       "id": "3263383937653232313961333230373534326238323936383563656638663165",
@@ -125,9 +25,9 @@
             "isHidden": false,
             "isExposedToGraph": false,
             "data": {
-              "FrameRange": "100-139",
-              "Sequence": "SQ020",
-              "Shot": "SHOT050"
+              "FrameRange": "100-333",
+              "Sequence": "SQ090",
+              "Shot": "SHOT010"
             },
             "defaultData": {
               "FrameRange": "100-240",
@@ -150,14 +50,31 @@
             "isHidden": false,
             "isExposedToGraph": false,
             "data": {
-              "FrameRange": "100-139",
-              "Sequence": "SQ020",
-              "Shot": "SHOT050"
+              "FrameRange": "100-333",
+              "Sequence": "SQ090",
+              "Shot": "SHOT010"
             },
             "defaultData": {},
             "type": 10,
             "connectionName": "inshotspecs",
             "connectionNodeId": "3930333666316136653265666263323562653735346662376139636662623530"
+          },
+          {
+            "shortName": "outshotspecs",
+            "longName": "Output Shot Specs",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {
+              "FrameRange": "100-333",
+              "Sequence": "SQ090",
+              "Shot": "SHOT010"
+            },
+            "defaultData": {},
+            "type": 10,
+            "connectionName": "inshotspecs",
+            "connectionNodeId": "3266366532316261666438343964363532633130616534343531666464393839"
           }
         ]
       }
@@ -186,7 +103,7 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Bolt/3235316132363365636138633631326135353262323265336162663065383563.py",
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Bolt/6134373033646639343066653465343236323561383061663037306664336630.py",
             "defaultData": "",
             "type": 7,
             "connectionName": "outscriptfile",
@@ -251,11 +168,11 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "Z:/OEUF/FX/seq020/shot050/seq020_shot_050_cam.abc",
+            "data": "Z:/OEUF/ANIMATION/SQ090/SHOT010/cam/0001/SQ090_SHOT010_cam_anim.abc",
             "defaultData": "",
             "type": 7,
-            "connectionName": "outfile",
-            "connectionNodeId": "3530313263663930393166623661363933396465333430653963326465353661"
+            "connectionName": "outcampath",
+            "connectionNodeId": "3266366532316261666438343964363532633130616534343531666464393839"
           }
         ],
         "inplanefile": [
@@ -266,11 +183,11 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "Z:/OEUF/FX/seq020/shot050/seq020_shot050_watter_plane.abc",
+            "data": "Z:/OEUF/FX/SQ090/SHOT010/SQ090_SHOT010_water_plane.abc",
             "defaultData": "",
             "type": 7,
             "connectionName": "outfile",
-            "connectionNodeId": "6337616237373736623931613063613964366535616237303065373037663931"
+            "connectionNodeId": "6166373939383564323035346162666362653433376135353466303062353230"
           }
         ],
         "inshotspecs": [
@@ -282,9 +199,9 @@
             "isHidden": false,
             "isExposedToGraph": false,
             "data": {
-              "FrameRange": "100-139",
-              "Sequence": "SQ020",
-              "Shot": "SHOT050"
+              "FrameRange": "100-333",
+              "Sequence": "SQ090",
+              "Shot": "SHOT010"
             },
             "defaultData": {},
             "type": 10,
@@ -332,11 +249,130 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Bolt/3235316132363365636138633631326135353262323265336162663065383563.py",
+            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Bolt/6134373033646639343066653465343236323561383061663037306664336630.py",
             "defaultData": "",
             "type": 7,
             "connectionName": "inscript",
             "connectionNodeId": "6630386237333535386166323662303730393235366138346666376466656432"
+          }
+        ]
+      }
+    },
+    {
+      "name": "File1",
+      "category": "Utility",
+      "id": "6166373939383564323035346162666362653433376135353466303062353230",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "$BOLT_ICONS/file.png",
+      "definitionPath": "$BOLT_LIB/Nodes/file.bnode",
+      "nodeType": "Utility/File",
+      "opCode": "\noutfile = infile\n\n",
+      "disabled": false,
+      "isSubGraph": false,
+      "inputs": {
+        "infile": [
+          {
+            "shortName": "infile",
+            "longName": "Input File Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/FX/SQ090/SHOT010/SQ090_SHOT010_water_plane.abc",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/FX/SQ090/SHOT010/SQ090_SHOT010_water_plane.abc",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "inplanefile",
+            "connectionNodeId": "3930333666316136653265666263323562653735346662376139636662623530"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Oeuf_FetchCamera",
+      "category": "Oeuf",
+      "id": "3266366532316261666438343964363532633130616534343531666464393839",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$BOLT_ICONS/camera.png",
+      "definitionPath": "$BOLT_LIB/Nodes/oeuf_fetch_camera.bnode",
+      "nodeType": "Oeuf/Oeuf_FetchCamera",
+      "opCode": "\nimport os\n\nsequence = inshotspecs[\"Sequence\"]\nshot = inshotspecs[\"Shot\"]\ncamDir = f\"{inanimationdir}/{sequence}/{shot}/cam\"\n\ncamLastVersionDir = ClientUtils.GetLastVersionDir(camDir)\nfileCount = len(os.listdir(camLastVersionDir))\n\nif fileCount == 0:\n    BoltLogError(f\"No file is available in directory '{camLastVersionDir}'\")\nelif fileCount > 1:\n    BoltLogWarning(f\"More than one file has been found in directory '{camLastVersionDir}'\")\n    outcampath = f\"{camLastVersionDir}/{os.listdir(camLastVersionDir)[0]}\"\nelse:\n    outcampath = f\"{camLastVersionDir}/{os.listdir(camLastVersionDir)[0]}\"\n\n",
+      "disabled": false,
+      "isSubGraph": false,
+      "inputs": {
+        "inshotspecs": [
+          {
+            "shortName": "inshotspecs",
+            "longName": "Shot Specs",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": {
+              "FrameRange": "100-333",
+              "Sequence": "SQ090",
+              "Shot": "SHOT010"
+            },
+            "defaultData": {},
+            "type": 10,
+            "connectionName": "outshotspecs",
+            "connectionNodeId": "3263383937653232313961333230373534326238323936383563656638663165"
+          }
+        ],
+        "inanimationdir": [
+          {
+            "shortName": "inanimationdir",
+            "longName": "Animation Directory Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "$ANIM_DIR",
+            "defaultData": "$ANIM_DIR",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outcampath": [
+          {
+            "shortName": "outcampath",
+            "longName": "Camera Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/ANIMATION/SQ090/SHOT010/cam/0001/SQ090_SHOT010_cam_anim.abc",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "incameraabcfile",
+            "connectionNodeId": "3930333666316136653265666263323562653735346662376139636662623530"
           }
         ]
       }
@@ -346,8 +382,13 @@
   "positions": [
     {
       "id": "3263383937653232313961333230373534326238323936383563656638663165",
-      "x": -470.8000000000001,
-      "y": 283.79999999999995
+      "x": -771.8000000000002,
+      "y": 235.79999999999995
+    },
+    {
+      "id": "6630386237333535386166323662303730393235366138346666376466656432",
+      "x": 614.13,
+      "y": 50.599999999999994
     },
     {
       "id": "3930333666316136653265666263323562653735346662376139636662623530",
@@ -355,19 +396,14 @@
       "y": 48.40000000000009
     },
     {
-      "id": "3530313263663930393166623661363933396465333430653963326465353661",
-      "x": -315.70000000000005,
-      "y": -148.50000000000006
+      "id": "6166373939383564323035346162666362653433376135353466303062353230",
+      "x": -272.00000000000006,
+      "y": 55.50000000000003
     },
     {
-      "id": "6337616237373736623931613063613964366535616237303065373037663931",
-      "x": -370.69999999999993,
-      "y": 41.800000000000026
-    },
-    {
-      "id": "6630386237333535386166323662303730393235366138346666376466656432",
-      "x": 614.13,
-      "y": 50.599999999999994
+      "id": "3266366532316261666438343964363532633130616534343531666464393839",
+      "x": -298.0,
+      "y": -132.0
     }
   ]
 }

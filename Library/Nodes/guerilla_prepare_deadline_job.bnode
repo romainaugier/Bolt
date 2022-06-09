@@ -170,6 +170,7 @@ sequenceName = inrenderoptions["SequenceName"]
 shotName = inrenderoptions["ShotName"]
 frameRange = inrenderoptions["FrameRange"]
 adaptiveThreshold = inrenderoptions["AdaptiveThreshold"]
+denoise = inrenderoptions["Denoise"]
 
 jobName = f"{teamName}_{jobType}_{sequenceName}_{shotName}"
 batchName = f"{jobName}-{currentTimeStr}"
@@ -204,6 +205,9 @@ BoltLogMessage(f"RenderDir : {renderDir}")
 renderFile = f"{renderDir}/render_{sequenceName}_{shotName}_$f.$x"
 openExrIdFile = f"{renderDir}/render_{sequenceName}_{shotName}_id_$f.$x"
 
+renderFileMultipleLayers = f"{renderDir}/$n/render_{sequenceName}_{shotName}_$f.$x"
+openExrIdFileMultipleLayers = f"{renderDir}/$n/render_{sequenceName}_{shotName}_id_$f.$x"
+
 # Setup job options
 injoboptions["Plugin"] = "Guerilla"
 injoboptions["Name"] = jobName
@@ -233,35 +237,53 @@ boltTmpDir = BoltTempDir().replace("\\", "/")
 generatedScript = f"""import guerilla, os, binascii
 import RomanoTools.Guerilla.Utils as utils
 
-layer = guerilla.Document().findchild("RenderPass|Layer")
+renderPass = guerilla.Document().findchild("RenderPass")
+
+layers = [child for child in guerilla.listchildren(renderPass) if isinstance(child, guerilla.RenderLayer)]
+
+print("Found layers : \\n- {{}}".format("\\n- ".join([layer.Name.get() for layer in layers])))
 
 aovs = {inrenderpasses}
 
-existingAovs = [aov.PlugName.get() for aov in layer.children()]
+for layer in layers:
+    existingAovs = [aov.PlugName.get() for aov in layer.children()]
 
-aovsToAdd = {inrenderpasses}
+    aovsToAdd = {inrenderpasses}
 
-for aov in aovs:
-    if aov in existingAovs:
-        aovsToAdd.remove(aov)
+    for aov in aovs:
+        if aov in existingAovs:
+            aovsToAdd.remove(aov)
+
+    with guerilla.Modifier() as mod:
+        for aov in aovsToAdd:
+            layer.addaov(aov)
+
+    print("Layer : {{}}".format(layer))
+    print("AOVs : \\n- {{}}".format("\\n- ".join([aov.PlugName.get() for aov in layer.children()])))
 
 with guerilla.Modifier() as mod:
 
-    for aov in layer.children():
-        if aov.PlugName.get() == "Albedo":
-            aov.OverrideSettings.set(True)
-            aov.DisplayDriver.set("exrid")
-            aov.FileName.set("{openExrIdFile}")
+    for layer in layers:
+        for aov in layer.children():
+            if aov.PlugName.get() == "Albedo":
+                aov.OverrideSettings.set(True)
+                aov.DisplayDriver.set("exrid")
+
+                if len(layers) > 1:
+                    aov.FileName.set("{openExrIdFileMultipleLayers}")
+                else:
+                    aov.FileName.set("{openExrIdFile}")
 
     utils.SetRange("{frameRange}")
-    utils.SetOptims()
+    # utils.SetOptims()
 
     if "{jobType}" == "LD":
         utils.SetLowRenderParms()
     else:
-        utils.SetFinalRenderParms(adaptiveThreshold={adaptiveThreshold})
+        utils.SetFinalRenderParms(adaptiveThreshold={adaptiveThreshold}, denoise={denoise})
 
         print("Set final adaptive threshold : {adaptiveThreshold}")
+        print("Set Denoiser : {{}}".format({denoise}))
 
     prefNode = guerilla.Document().findchild("Preferences")
 
@@ -269,7 +291,12 @@ with guerilla.Modifier() as mod:
     prefNode.DeferredRibGen.set(True)
 
     renderPass = guerilla.Document().findchild("RenderPass")
-    renderPass.FileName.set("{renderFile}")
+    
+    if len(layers) > 1:    
+        renderPass.FileName.set("{renderFileMultipleLayers}")
+    else:
+        renderPass.FileName.set("{renderFile}")
+    
     renderPass.DisplayDriver.set("exr")
 
 sceneDir = guerilla.envcontext.getenv("SCENE_PATH")

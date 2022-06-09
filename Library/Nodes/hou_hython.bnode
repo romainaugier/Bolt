@@ -64,23 +64,9 @@ command.append(inscript)
 
 BoltLogMessage(f"Hython Command : {' '.join(command)}")
 
-process = subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, encoding="ISO-8859-1")
+process = subprocess.Popen(command, stdout = sys.stdout, stderr = sys.stderr)
 
-while True:
-    output = process.stdout.readline()
-    errput = process.stderr.readline()
-
-    if process.poll() is not None:
-        break
-    if len(errput) > 0:
-        BoltLogError(errput)
-        BoltLogError(f"Hython error, terminating subprocess. Check the log for more details")
-        sys.stderr.flush()
-        process.terminate()
-        break
-    if output:
-        print(output.strip())
-
+process.wait()
 
 BoltLogMessage(f"Hython : Finished executing script : {inscript}")
 

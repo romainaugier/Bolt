@@ -1,0 +1,132 @@
+{
+  "nodes": [
+    {
+      "name": "NK_CopyCompToLocal",
+      "category": "Nuke",
+      "id": "3437323764376563333366623336653339353239663237313838366466346265",
+      "color": [
+        0,
+        0,
+        0
+      ],
+      "iconPath": "$BOLT_ICONS/nuke.png",
+      "definitionPath": "$BOLT_LIB/Nodes/nk_copycomptolocal.bnode",
+      "nodeType": "Nuke/NK_CopyCompToLocal",
+      "opCode": "\nimport os, shutil\n\nfileName, fileExt = os.path.splitext(os.path.basename(incompfile))\n\nlocalDir = f\"D:/LOCAL_COMP/{fileName}\"\nlocalFile = f\"{localDir}/{fileName}{fileExt}\"\n\nif not os.path.exists(localDir):\n    os.makedirs(localDir)\n\nshutil.copy2(incompfile, localFile)\n\ngeneratedScript = f\"\"\"import nuke, os, sys, subprocess, re\n\nprint(\"Opening {localFile}\")\n\nnuke.scriptOpen(\"{localFile}\")\n\nlocalCache = \"{localDir}/dependencies\"\nfiles = {{}}\nthreadCount = int(os.getenv(\"NUMBER_OF_PROCESSORS\"))\n\ndef isLocal(path):\n    if (path.startswith(\"D:/\") or\n        path.startswith(\"C:/\") or \n        path.startswith(\"E:/\") or \n        path.startswith(\"G:/\")):\n        return True\n    \n    return False\n\ndef fileExists(fileName):\n    localDirList = [\"D:/\", \"E:/\", \"G:/\", \"C:/\"]\n\n    for dir in localDirList:\n        if not os.path.exists(dir): continue\n\n        os.chdir(dir)\n        \n        p = subprocess.check_output(\"dir /b /s {{}}\".format(fileName), shell=True)\n\n        stdout = p.decode()\n\n        stdout = stdout.replace(\"\\\\\\\\\", \"/\")\n        stdout = stdout.replace(\"\\\\r\", \"\")\n\n        stdoutSplit = stdout.split(\"\\\\n\")\n\n        for f in stdoutSplit:\n            if fileName in f:\n                return f\n\n    return None\n\ndef makeLocalPath(path):\n    global localCache\n\n    pathSplit = path.split(\"/\")\n\n    newPath = \"{{}}/{{}}\".format(localCache, \"/\".join(pathSplit[2:]))\n\n    return newPath\n\nprint(\"Looking for read nodes...\")\n\nfor node in nuke.allNodes():\n    if node.Class() == \"Read\" or node.Class() == \"DeepRead\":\n        print(\"Found Read : {{}}\".format(node[\"name\"].value()))\n\n        file = node.knob(\"file\").getValue()\n        \n        if {incheckfiles}:\n            fExists = fileExists(os.path.basename(file))\n        \n            if fExists is not None:\n                node.knob(\"file\").setValue(fExists)\n                \n        elif isLocal(file): continue\n\n        elif not file in files:\n            localFile = makeLocalPath(file)\n            files[file] = localFile\n            node.knob(\"file\").setValue(localFile)\n        else:\n            node.knob(\"file\").setValue(files[file])\n\nfileSeqPattern = r\"\\#+|%\\d+d\"\n\ndepsFmt = \"\\\\n\".join([file for file in files.keys()])\n\nprint(\"File dependencies found : {{}}\".format(depsFmt))\n\nfor file, localFile in files.items():\n    fileName = os.path.basename(file)\n\n    filesDir = os.path.dirname(file)\n    localDir = os.path.dirname(localFile)\n\n    if not os.path.exists(localDir): \n        os.makedirs(localDir)\n\n    command = []\n    command.append(\"robocopy\")\n    command.append(filesDir)\n    command.append(localDir)\n\n    filesPattern = re.sub(fileSeqPattern, \"*\", fileName)\n\n    command.append(filesPattern)\n\n    command += [\"/J\", \"/Z\", \"/MT:{{}}\".format(threadCount), \"/s\"]\n\n    print(\"Copying {{}} -> {{}}\".format(file, localFile))\n\n    subprocess.call(command)\n\nnuke.scriptSave(\"{localFile}\")\n\n\"\"\"\n\ntmpScriptFilePath = BoltTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as file:\n    file.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\n\n",
+      "disabled": false,
+      "isSubGraph": false,
+      "inputs": {
+        "incompfile": [
+          {
+            "shortName": "incompfile",
+            "longName": "Compositing file",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/COMPOSITING/SQ120/SHOT030/SQ120_SHOT030_compositing.nk",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "outfile",
+            "connectionNodeId": "6238653134383632393662343939356664613264323565623966363233653734"
+          }
+        ],
+        "incheckfiles": [
+          {
+            "shortName": "incheckfiles",
+            "longName": "Check if files are already local",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": false,
+            "defaultData": true,
+            "type": 8,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outscriptfile": [
+          {
+            "shortName": "outscriptfile",
+            "longName": "Script File",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "C:/Users/r.augier/AppData/Roaming/Bolt/6531623037386362633366653661643731353534636431383034643866353765.py",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "File",
+      "category": "Utility",
+      "id": "6238653134383632393662343939356664613264323565623966363233653734",
+      "color": [
+        255,
+        220,
+        106
+      ],
+      "iconPath": "$BOLT_ICONS/file.png",
+      "definitionPath": "$BOLT_LIB/Nodes/file.bnode",
+      "nodeType": "Utility/File",
+      "opCode": "\noutfile = infile\n\n",
+      "disabled": false,
+      "isSubGraph": false,
+      "inputs": {
+        "infile": [
+          {
+            "shortName": "infile",
+            "longName": "Input File Path",
+            "index": 0,
+            "isExposed": true,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/COMPOSITING/SQ120/SHOT030/SQ120_SHOT030_compositing.nk",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": null,
+            "connectionNodeId": null
+          }
+        ]
+      },
+      "outputs": {
+        "outfile": [
+          {
+            "shortName": "outfile",
+            "longName": "Output File Path",
+            "index": 0,
+            "isExposed": false,
+            "isHidden": false,
+            "isExposedToGraph": false,
+            "data": "Z:/OEUF/COMPOSITING/SQ120/SHOT030/SQ120_SHOT030_compositing.nk",
+            "defaultData": "",
+            "type": 7,
+            "connectionName": "incompfile",
+            "connectionNodeId": "3437323764376563333366623336653339353239663237313838366466346265"
+          }
+        ]
+      }
+    }
+  ],
+  "tracker": null,
+  "positions": [
+    {
+      "id": "3437323764376563333366623336653339353239663237313838366466346265",
+      "x": 396.0,
+      "y": 251.0
+    },
+    {
+      "id": "6238653134383632393662343939356664613264323565623966363233653734",
+      "x": -95.0,
+      "y": 126.5
+    }
+  ]
+}

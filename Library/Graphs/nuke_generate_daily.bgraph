@@ -24,7 +24,7 @@
             "isExposed": true,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "Z:/OEUF/RENDER/SQ110/SHOT030/LD6",
+            "data": "Z:/OEUF/RENDER/SQ010/SHOT070/HD2",
             "defaultData": "",
             "type": 7,
             "connectionName": null,
@@ -41,7 +41,7 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "Z:/OEUF/RENDER/SQ110/SHOT030/LD6",
+            "data": "Z:/OEUF/RENDER/SQ010/SHOT070/HD2",
             "defaultData": "",
             "type": 7,
             "connectionName": "inrenderdir",
@@ -74,7 +74,7 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Bolt/3439303637366535336466633663626236363730353435323936616332323132.py",
+            "data": "C:/Users/r.augier/AppData/Roaming/Bolt/6537643336356163333434363038323038316333643066323236393762376361.py",
             "defaultData": "",
             "type": 7,
             "connectionName": "outscriptfile",
@@ -192,7 +192,7 @@
       "iconPath": "$BOLT_ICONS/nuke.png",
       "definitionPath": "$BOLT_LIB/Nodes/nk_generatedaily.bnode",
       "nodeType": "Nuke/NK_GenerateDaily",
-      "opCode": "\nif inapplyaces:\n    writeNodeName = \"MAIN_WRITE\"\nelse:\n    writeNodeName = \"MAIN_WRITE_RAW\"\n\ngeneratedScript = f\"\"\"import nuke, os, sys\n\nnuke.scriptOpen(\"{innuketemplate}\")\n\nseqs = nuke.getFileNameList(\"{inrenderdir}\")\n\nsupdir = os.path.basename(\"{inrenderdir}\")\nsupdir1 = os.path.basename(os.path.dirname(\"{inrenderdir}\"))\nsupdir2 = os.path.basename(os.path.dirname(os.path.dirname(\"{inrenderdir}\")))\n\noutputfile = \"{inrenderdir}/daily/{{}}_{{}}_{{}}_daily.mov\".format(supdir2, supdir1, supdir)\n\nprint(seqs)\n\nif len(seqs) > 0:\n    if not os.path.exists(outputfile):\n        os.makedirs(os.path.dirname(outputfile))\n\n    read = nuke.toNode(\"MAIN_READ\")\n    read.knob(\"file\").fromUserText(\"{inrenderdir}/\" + seqs[0])\n\n    write = nuke.toNode(\"{writeNodeName}\")\n    write.knob(\"file\").fromUserText(outputfile)\n\n    first = int(read.knob(\"first\").getValue())\n    last = int(read.knob(\"last\").getValue())\n\n    nuke.execute(\"{writeNodeName}\", start=first, end=last, incr=1)\n\nelse:\n    sys.stderr.write(\"[ERROR] Nk_GenerateDaily : No file sequence found\")\n\n\"\"\"\n\ntmpScriptFilePath = BoltTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as file:\n    file.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\n\n",
+      "opCode": "\nif inapplyaces:\n    readNodeName = \"MAIN_READ\"\n    writeNodeName = \"MAIN_WRITE\"\nelse:\n    readNodeName = \"MAIN_READ_RAW\"\n    writeNodeName = \"MAIN_WRITE_RAW\"\n\ngeneratedScript = f\"\"\"import nuke, os, sys\n\nnuke.scriptOpen(\"{innuketemplate}\")\n\nseqs = nuke.getFileNameList(\"{inrenderdir}\")\n\nsupdir = os.path.basename(\"{inrenderdir}\")\nsupdir1 = os.path.basename(os.path.dirname(\"{inrenderdir}\"))\nsupdir2 = os.path.basename(os.path.dirname(os.path.dirname(\"{inrenderdir}\")))\n\noutputfile = \"{inrenderdir}/daily/{{}}_{{}}_{{}}_daily.mov\".format(supdir2, supdir1, supdir)\n\nprint(seqs)\n\nif len(seqs) > 0:\n    if not os.path.exists(outputfile):\n        os.makedirs(os.path.dirname(outputfile))\n\n    read = nuke.toNode(\"{readNodeName}\")\n    read.knob(\"file\").fromUserText(\"{inrenderdir}/\" + seqs[0])\n\n    write = nuke.toNode(\"{writeNodeName}\")\n    write.knob(\"file\").fromUserText(outputfile)\n\n    first = int(read.knob(\"first\").getValue())\n    last = int(read.knob(\"last\").getValue())\n\n    nuke.execute(\"{writeNodeName}\", start=first, end=last, incr=1)\n\nelse:\n    sys.stderr.write(\"[ERROR] Nk_GenerateDaily : No file sequence found\")\n\n\"\"\"\n\ntmpScriptFilePath = BoltTempScript()\n\nwith open(tmpScriptFilePath, \"w\") as file:\n    file.write(generatedScript)\n\noutscriptfile = tmpScriptFilePath\n\n",
       "disabled": false,
       "isSubGraph": false,
       "inputs": {
@@ -204,7 +204,7 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "Z:/OEUF/RENDER/SQ110/SHOT030/LD6",
+            "data": "Z:/OEUF/RENDER/SQ010/SHOT070/HD2",
             "defaultData": "",
             "type": 7,
             "connectionName": "outdir",
@@ -251,7 +251,7 @@
             "isExposed": false,
             "isHidden": false,
             "isExposedToGraph": false,
-            "data": "C:\\Users\\r.augier\\AppData\\Roaming\\Bolt/3439303637366535336466633663626236363730353435323936616332323132.py",
+            "data": "C:/Users/r.augier/AppData/Roaming/Bolt/6537643336356163333434363038323038316333643066323236393762376361.py",
             "defaultData": "",
             "type": 7,
             "connectionName": "inscriptfile",
@@ -280,8 +280,8 @@
   "positions": [
     {
       "id": "6361613533383534326539376133363263393736306265363937393532333562",
-      "x": -200.0,
-      "y": 301.0
+      "x": -198.0,
+      "y": 303.0
     },
     {
       "id": "3231396138376430653937353964616334653261303364326334383632346162",
@@ -295,8 +295,8 @@
     },
     {
       "id": "3738396565336231356266653933336633376436343864313235653237383830",
-      "x": 150.69999999999993,
-      "y": 300.3
+      "x": 151.79999999999995,
+      "y": 301.40000000000003
     }
   ]
 }

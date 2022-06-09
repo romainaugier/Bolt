@@ -1,4 +1,4 @@
-import sys, pathlib, os, binascii, shutil, subprocess, re
+import sys, pathlib, os, binascii, shutil, subprocess, re, time
 
 from BoltApi.Utils.String import GetCurrentTimeAsStr, GetRandomStrId
 
@@ -44,7 +44,7 @@ def GetRoamingDataDir() -> str:
     if not os.path.exists(boltRoamingDataDirPath):
         os.makedirs(boltRoamingDataDirPath)
 
-    return boltRoamingDataDirPath
+    return boltRoamingDataDirPath.replace("\\", "/")
 
 def GetNewRandomPyFile() -> str:
     """
@@ -129,4 +129,32 @@ def GetLastVersionDir(directory : str) -> str:
     assert(len(lastVersionPath) > 0)
                 
     return lastVersionPath.replace("\\", "/")
-        
+       
+def SafeCopy(src : str, dst : str) -> None:
+    """
+    Copies a file from src to dst using robocopy to make sure
+    everything works properly
+    
+    Args:
+        src (str): source file
+        dst (str): destination file path 
+    """
+    srcDir = os.path.dirname(src)
+    dstDir = os.path.dirname(dst)
+    
+    srcName = os.path.basename(src)
+    
+    command = []
+    command.append("robocopy")
+    command.append(srcDir)
+    command.append(dstDir)
+    command.append(srcName)
+    command.append(f"/MT:{int(os.getenv('NUMBER_OF_PROCESSORS'))}")
+    command.append("/s")
+    command.append("/J")
+    command.append("/Z")
+    
+    p = subprocess.Popen(command)
+    
+    p.wait()
+            

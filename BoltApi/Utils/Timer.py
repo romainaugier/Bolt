@@ -38,6 +38,6 @@ class Timer():
 
             time = Timer.Time(start, end)
 
-            print(f"{time:.3f}")
+            print(f"Timer ({function.func_name}) : {time:.3f}")
 
         return _Time

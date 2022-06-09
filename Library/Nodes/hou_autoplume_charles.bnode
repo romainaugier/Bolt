@@ -61,6 +61,16 @@ exposedToGraph = False
 
 # BeginPlug
 
+shortName = inmultiplefiles
+longName = Has Multiple Files
+defaultValue = False
+type = bool
+exposed = True
+
+# EndPlug
+
+# BeginPlug
+
 shortName = outscriptfile
 longName = Output Script
 defaultValue = ""
@@ -95,9 +105,21 @@ if isinstance(inanimationfile, list):
 fr = inshotspecs["FrameRange"].split("-")
 framerange = [int(fr[0]), int(fr[1])]
 
-cacheDir = f"{incachedir}/{inshotspecs['Sequence']}/{inshotspecs['Shot']}/Charles"
-outputfilefur = f"{cacheDir}/{inshotspecs['Sequence']}_{inshotspecs['Shot']}_charles_cache_fur.abc"
-outputfileplumes = f"{cacheDir}/{inshotspecs['Sequence']}_{inshotspecs['Shot']}_charles_cache_plumes.abc"
+localSSD = ClientUtils.GetRoamingDataDir().replace("\\", "/")
+localAnimationFile = f"{localSSD}/{os.path.basename(inanimationfile)}"
+
+ClientUtils.SafeCopy(inanimationfile, localAnimationFile)
+
+if inmultiplefiles:
+    cacheDir = f"{incachedir}/{inshotspecs['Sequence']}/{inshotspecs['Shot']}/Charles"
+    animFile, _ = os.path.splitext(os.path.basename(inanimationfile))
+    animFile = animFile.replace("anim", "").replace("displaced", "")
+    outputfilefur = f"{cacheDir}/{animFile}_cache_fur.abc"
+    outputfileplumes = f"{cacheDir}/{animFile}_cache_plumes.abc"
+else:
+    cacheDir = f"{incachedir}/{inshotspecs['Sequence']}/{inshotspecs['Shot']}/Charles"
+    outputfilefur = f"{cacheDir}/{inshotspecs['Sequence']}_{inshotspecs['Shot']}_charles_cache_fur.abc"
+    outputfileplumes = f"{cacheDir}/{inshotspecs['Sequence']}_{inshotspecs['Shot']}_charles_cache_plumes.abc"
 
 generatedScript = f"""import hou
 animSopNode = None
@@ -112,7 +134,7 @@ for node in hou.node("/obj").children():
 if animSopNode != None:
     for node in animSopNode.children():
         if node.type().name() == "alembic":
-            node.parm("fileName").set("{inanimationfile}")
+            node.parm("fileName").set("{localAnimationFile}")
             break
 
 if plumeSopNode != None:

@@ -5,6 +5,8 @@ from BoltApp.Interface.Icons import *
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+from collections import deque
+
 class ConsoleLineEdit(QtWidgets.QLineEdit):
     """
     """
@@ -49,7 +51,7 @@ class ConsoleLabel(QtWidgets.QLineEdit):
         """)
 
 
-class Console(QtWidgets.QWidget):
+class LineConsole(QtWidgets.QWidget):
     """
     """
 
@@ -104,6 +106,8 @@ class Console(QtWidgets.QWidget):
             self.messageDisplay.setTextColor(GetColorFromPalette(ColorPalette.ERRORCOLOR))
         elif level == LogLevel.WARNING:
             self.messageDisplay.setTextColor(GetColorFromPalette(ColorPalette.WARNINGCOLOR))
+        elif level == LogLevel.DIAGNOSTIC:
+            self.messageDisplay.setTextColor(GetColorFromPalette(ColorPalette.GREENCOLOR))
         else:
             self.messageDisplay.setTextColor(GetColorFromPalette(ColorPalette.FOREGROUND))
 
@@ -121,3 +125,45 @@ class Console(QtWidgets.QWidget):
         """
         """
         self.messageDisplay.setText("")
+        
+        
+class ConsoleHighligher(QtGui.QSyntaxHighlighter):
+    """
+    Simple syntax highlighter for the console
+    """
+    def __init__(self, parent=None):
+        """
+        """
+        super().__init__(parent=parent)
+        
+        self.messageFmt = QtGui.QTextCharFormat()
+        self.messageFmt.setForeground(GetQColorFromPalette(ColorPalette.FOREGROUND))
+        
+        self.warningFmt = QtGui.QTextCharFormat()
+        self.warningFmt.setForeground(GetColorFromPalette(ColorPalette.WARNINGCOLOR))
+        
+        self.errorFmt = QtGui.QTextCharFormat()
+        self.errorFmt.setForeground(GetColorFromPalette(ColorPalette.ERRORCOLOR))
+        
+        self.messageFmt = QtGui.QTextCharFormat()
+        self.messageFmt.setForeground(GetColorFromPalette(ColorPalette.FOREGROUND))
+        
+        self.diagnosticFmt = QtGui.QTextCharFormat()
+        self.diagnosticFmt.setForeground(GetQColorFromPalette(ColorPalette.GREENCOLOR))
+        
+    def highlightBlock(self, text):
+        if "ERROR" in text:
+            self.setFormat(0, len(text), self.errorFmt)
+        elif "WARNING" in text:
+            self.setFormat(0, len(text), self.warningFmt)
+        elif "MESSAGE" in text:
+            self.setFormat(0, len(text), self.messageFmt)
+        elif "DIAGNOSTIC" in text:
+            self.setFormat(0, len(text), self.diagnosticFmt)
+        
+
+class Console(QtWidgets.QWidget):
+    """
+    Simple console to log everything happening in the application
+    """
+    pass

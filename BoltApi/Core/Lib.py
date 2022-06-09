@@ -1,5 +1,4 @@
-from re import search
-import sys, os, copy
+import os
 
 from BoltApi.Core.Node import *
 from BoltApi.Core.Logger import *
@@ -31,9 +30,6 @@ class Lib():
         """
         Load the nodes path
         """
-        foundIfNode = False
-        foundForNode = False
-        
         for path in self.path:
             rawPath = path
             path = self.environment.ReplaceInString(path)
@@ -41,13 +37,15 @@ class Lib():
             if os.path.exists(path):
                 for item in os.listdir(path):
                     if item.endswith(".bnode"):
-                        
-                        tmpNode = Node(self.environment)
-                        tmpNode.Load(f"{path}/{item}")
+                        try:
+                            tmpNode = Node(self.environment)
+                            tmpNode.Load(f"{path}/{item}")
 
-                        self.nodePaths[f"{tmpNode.GetCategory()}/{tmpNode.GetName()}"] = f"{rawPath}/{item}"
+                            self.nodePaths[f"{tmpNode.GetCategory()}/{tmpNode.GetName()}"] = f"{rawPath}/{item}"
 
-                        self.logger.Log(LogLevel.DEBUG, f"Loaded node : {tmpNode.GetCategory()}/{tmpNode.GetName()}")
+                            self.logger.Log(LogLevel.DEBUG, f"Loaded node : {tmpNode.GetCategory()}/{tmpNode.GetName()}")
+                        except CompilationError as err:
+                            self.logger.Log(LogLevel.ERROR, f"Can't load node : {tmpNode.GetCategory()}/{tmpNode.GetName()}\{err}")
                    
         # Add builtin nodes
              

@@ -6,6 +6,7 @@ import BoltApi.Core.FileSystem as FileSystem
 from BoltApi.Core.Logger import *
 from BoltApi.Core.Environment import *
 from BoltApi.Core.Expressions import *
+from BoltApi.Core.Exception import CompilationError
 from BoltApi.Utils.Timer import Timer
 from BoltApi.Utils import Client
 
@@ -359,6 +360,7 @@ class Parser():
 
         return definition
 
+
 class Plug():
     """
     A Plug represents a node input or output
@@ -485,6 +487,7 @@ class Plug():
         """
         Sets the plug graph exposition state
 
+                
         Args:
             exposedToGraph (bool, optional): state of graph exposition. Defaults to True.
         """
@@ -556,9 +559,27 @@ class Plug():
         """
         Set the data of the plug
 
+        In case there is some forward slashes in string
+        data, we replace them with backslashes to make
+        sure everything works fine
+
         Args:
             data (any): data to set
         """
+        if self.GetType() == PlugType.STR:
+            if data is not None and isinstance(data, str): 
+                data = data.replace("\\", "/")
+        elif self.GetType() == PlugType.LIST:
+            if data is not None:
+                for item in data:
+                    if isinstance(item, str):
+                        item = item.replace("\\", "/")
+        elif self.GetType() == PlugType.DICT:
+            if data is not None:
+                for key, value in data.items():
+                    if isinstance(value, str):
+                        value = value.replace("\\", "/")
+
         self.data = data
         
     def SetDefaultData(self, data) -> None:
@@ -649,6 +670,7 @@ class Node():
         
         # The id is not set here as we will set a unique one for each node in the graph
         self.id = 0 
+        self.graph = None
         
         self.opCode = ""
         self.opCompiledCode = ""
@@ -670,6 +692,12 @@ class Node():
         
         return f"Node: \n- name={self.GetName()}\n- inputPlugs={inputsStr}\n- outputPlugs={outputsStr}"
         
+    def GetNodePathFmt(self) -> str:
+        """
+        Returns the graph name and node name formatted correctly for logging
+        """
+        return f"{self.GetGraph().GetName()} | {self.GetName()}"
+    
     # SETTERS / GETTERS
 
     def SetName(self, name : str) -> None:
@@ -739,6 +767,18 @@ class Node():
             str: node unique id
         """
         return self.id
+
+    def SetGraph(self, graph) -> None:
+        """
+        Sets the pointer to the graph the node belongs to
+        """
+        self.graph = graph
+
+    def GetGraph(self) -> any:
+        """
+        Returns the graph the node belongs to
+        """
+        return self.graph
 
     def SetColor(self, color : list) -> None:
         """
@@ -1086,14 +1126,14 @@ class Node():
         """
         try:
             self.opCompiledCode = compile(self.opCode, "compiledCode", "exec")
-        except SyntaxError as err:
-            self.logger.Log(LogLevel.ERROR, f"""Node : {self.GetName()} | Code Compilation | Syntax error :
-Node won't execute any code and the outputs values will be set to None""")
-            
+        except SyntaxError:
             self.opCompiledCode = compile("", "compiledCode", "exec")
             
             for output in self.GetOutputs().values():
                 output.SetData(None)
+                
+            raise CompilationError(f"""Node : {self.GetName()} | Code Compilation | Syntax error :
+Node won't execute any code and the outputs values will be set to None\n{err}""")
              
     def EvaluateInputs(self) -> dict:
         """
@@ -1115,7 +1155,6 @@ Node won't execute any code and the outputs values will be set to None""")
             else:
                 dataToEvaluate = input.GetData()
                 
-                
                 result = None
                 
                 if input.GetType() == PlugType.STR:
@@ -1128,11 +1167,11 @@ Node won't execute any code and the outputs values will be set to None""")
                             try:
                                 exprResult = SafeExprEvaluator(match.group().replace("`", ""))
                             except SyntaxError as err:
-                                self.logger.Log(LogLevel.ERROR, f"""Node : {self.GetName()} | Plug : {inputName}
+                                self.logger.Log(LogLevel.ERROR, f"""{self.GetNodePathFmt()} | Plug : {inputName}
 Invalid expression syntax '{err}'\nExpression will be evaluated to empty string""")
                                 exprResult = ""
                             except (NameError, ValueError) as err:
-                                self.logger.Log(LogLevel.ERROR, f"""Node : {self.GetName()} | Plug : {inputName}\n'{err}'
+                                self.logger.Log(LogLevel.ERROR, f"""{self.GetNodePathFmt()} | Plug : {inputName}\n'{err}'
 Expression will be evaluated to empty string""")
                                 exprResult = ""
                                 
@@ -1158,11 +1197,11 @@ Expression will be evaluated to empty string""")
                                 try:
                                     exprResult = SafeExprEvaluator(match.group().replace("`", ""))
                                 except SyntaxError as err:
-                                    self.logger.Log(LogLevel.ERROR, f"""Node : {self.GetName()} | Plug : {inputName} | Key : {key}
+                                    self.logger.Log(LogLevel.ERROR, f"""{self.GetNodePathFmt()} | Plug : {inputName} | Key : {key}
 Invalid expression syntax '{err}'\nExpression will be evaluated to empty string""")
                                     exprResult = ""
                                 except (NameError, ValueError) as err:
-                                    self.logger.Log(LogLevel.ERROR, f"""Node : {self.GetName()} | Plug : {inputName}\n'{err}' | Key : {key}
+                                    self.logger.Log(LogLevel.ERROR, f"""{self.GetNodePathFmt()} | Plug : {inputName}\n'{err}' | Key : {key}
 Expression will be evaluated to empty string""")
                                     exprResult = ""
                                     
@@ -1192,11 +1231,11 @@ Expression will be evaluated to empty string""")
                                 try:
                                     exprResult = SafeExprEvaluator(match.group().replace("`", ""))
                                 except SyntaxError as err:
-                                    self.logger.Log(LogLevel.ERROR, f"""Node : {self.GetName()} | Plug : {inputName} | Index : {i}
+                                    self.logger.Log(LogLevel.ERROR, f"""{self.GetNodePathFmt()} | Plug : {inputName} | Index : {i}
 Invalid expression syntax '{err}'\nExpression will be evaluated to empty string""")
                                     exprResult = ""
                                 except (NameError, ValueError) as err:
-                                    self.logger.Log(LogLevel.ERROR, f"""Node : {self.GetName()} | Plug : {inputName}\n'{err}' | Index : {i}
+                                    self.logger.Log(LogLevel.ERROR, f"""{self.GetNodePathFmt()} | Plug : {inputName}\n'{err}' | Index : {i}
 Expression will be evaluated to empty string""")
                                     exprResult = ""
                                     
@@ -1215,11 +1254,11 @@ Expression will be evaluated to empty string""")
                     try:
                         result = SafeExprEvaluator(dataToEvaluate)
                     except SyntaxError as err:
-                        self.logger.Log(LogLevel.ERROR, f"""Node : {self.GetName()} | Plug : {inputName}
+                        self.logger.Log(LogLevel.ERROR, f"""{self.GetNodePathFmt()} | Plug : {inputName}
 Invalid expression syntax '{err}'\nExpression will be evaluated to None""")
                         result = None
                     except (NameError, ValueError) as err:
-                        self.logger.Log(LogLevel.ERROR, f"""Node : {self.GetName()} | Plug : {inputName}\n'{err}'
+                        self.logger.Log(LogLevel.ERROR, f"""{self.GetNodePathFmt()} | Plug : {inputName}\n'{err}'
 Expression will be evaluated to None""")
                         result = None
                 
@@ -1330,7 +1369,7 @@ Expression will be evaluated to None""")
         Log an error to the passed logger. This function is made to be 
         used in the user code
         """
-        self.logger.Log(LogLevel.ERROR, f"(Node : {self.GetName()}) : {message}", getTraceback=True)
+        self.logger.Log(LogLevel.ERROR, f"{self.GetNodePathFmt()} : {message}", getTraceback=True)
         self.errorMessage = message
 
         self.ReportError()
@@ -1340,7 +1379,7 @@ Expression will be evaluated to None""")
         Log a warning to the passed logger. This function is made to be 
         used in the user code
         """
-        self.logger.Log(LogLevel.WARNING, f"(Node : {self.GetName()}) : {message}")
+        self.logger.Log(LogLevel.WARNING, f"{self.GetNodePathFmt()} : {message}")
         self.warningMessage = message
 
         self.ReportWarning()
@@ -1350,7 +1389,7 @@ Expression will be evaluated to None""")
         Log a message to the passed logger. This function is made to be 
         used in the user code
         """
-        self.logger.Log(LogLevel.MESSAGE, f"(Node : {self.GetName()}) : {message}")
+        self.logger.Log(LogLevel.MESSAGE, f"{self.GetNodePathFmt()} : {message}")
     
     # I/O Functions
         
@@ -1388,7 +1427,7 @@ Expression will be evaluated to None""")
                 self.outputs[plug.GetShortName()] = plug
 
         self.UpdateEnv()
-
+        
         self.Compile()
 
     def ToDict(self) -> dict:

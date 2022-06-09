@@ -26,14 +26,14 @@ if __name__ == "__main__":
     subGraphNode = SubGraph(environment, logger, Graph(logger, environment), initialize=True)
     
     subGraphDebugNode = nodeLibrary.Get("Debug/Debug")
-    subGraphNode.graph.AddNode(subGraphDebugNode)
+    subGraphNode.subgraph.AddNode(subGraphDebugNode)
     
     subGraphFileNode = nodeLibrary.Get("Utility/File")
     subGraphFileNode.SetPlugValue("infile", "hello from subgraph")
-    subGraphNode.graph.AddNode(subGraphFileNode)
+    subGraphNode.subgraph.AddNode(subGraphFileNode)
     
     subGraphMergeNode = nodeLibrary.Get("Utility/Merge")
-    subGraphNode.GetGraph().AddNode(subGraphMergeNode)
+    subGraphNode.GetSubGraph().AddNode(subGraphMergeNode)
     
     logger.Log(LogLevel.DEBUG, "Connecting subgraph nodes...")
     

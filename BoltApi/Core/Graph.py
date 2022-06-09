@@ -52,6 +52,13 @@ class Tracker():
             return None
 
 
+class CallStack():
+    """
+    Simple call stack system that keeps track of which node is called in which graph
+    """
+    pass
+
+
 class Graph():
     """
     """
@@ -341,8 +348,7 @@ class Graph():
             self.logger.Log(LogLevel.ERROR, f"(Graph : {self.name}) : Graph needs to be saved before cooking it")
             return
         
-        if not self.IsSubGraph():
-            self.SaveToFile(self.GetSavePath())
+        self.Save()
         
         cookStart = Timer.Start()
         self.UpdateProgress(0.0)
@@ -375,8 +381,8 @@ class Graph():
                         self.logger.Log(LogLevel.ERROR, f"(Graph : {self.name} : Cooking interrupted")
                         self.tracker.Update()
                         
-                        if not self.IsSubGraph():
-                            self.SaveToFile(self.GetSavePath())
+                        self.Save()
+                                    
                         return
 
                 if skipCookedNodes:
@@ -387,8 +393,7 @@ class Graph():
 
                 self.tracker.Update()
                 
-                if not self.IsSubGraph():
-                    self.SaveToFile(self.GetSavePath())
+                self.Save()
 
                 # Check for errors
                 if node.hasError:
@@ -409,12 +414,13 @@ class Graph():
                             self.isCooked = True
                             self.tracker = None
                         
-                        if not self.IsSubGraph():
-                            self.SaveToFile(self.GetSavePath())
+                        self.Save()
                         
                         break
 
             if not self.hasError:
+                self.logger.Log(LogLevel.MESSAGE, f"(Graph : {self.name}) : Cooking finished")
+                
                 cookEnd = Timer.Stop()
                 
                 self.cookTime = Timer.Time(cookStart, cookEnd)
@@ -426,8 +432,7 @@ class Graph():
                     self.isCooked = True
                     self.tracker = None
                 
-                if not self.IsSubGraph():
-                    self.SaveToFile(self.GetSavePath())
+                self.Save()
 
     def StopCook(self) -> None:
         """
@@ -471,6 +476,7 @@ class Graph():
         """
         """
         node.SetID(GetRandomStrId())
+        node.SetGraph(self)
 
         while self.GetNodeWithName(node.GetName()) is not None:
             node.SetName(Increment(node.GetName()))
@@ -584,6 +590,7 @@ class Graph():
                 tmpNode.SetLogger(self.logger)
             
             tmpNode.FromDict(node)
+            tmpNode.SetGraph(self)
             
             self.nodes.append(tmpNode)
 
@@ -609,64 +616,99 @@ class Graph():
         else:
             self.tracker = Tracker(self)
 
-    def SaveToFile(self, filePath : str, saveAsString : bool = True) -> None:
+    def SaveToFile(self, filePath : str, saveAsString : bool = True) -> bool:
         """
         Saves the graph to a scene file and sets its name to the given filename
 
         Args:
             filePath (str): path of the file
+        Returns:
+            bool: True if the file was successfully saved
         """
-        if not os.path.exists(os.path.dirname(filePath)):
-            os.makedirs(os.path.dirname(filePath))
+        try:
+            if not os.path.exists(os.path.dirname(filePath)):
+                os.makedirs(os.path.dirname(filePath))
 
-        self.name, _ = os.path.splitext(os.path.basename(filePath))
-        self.savePath = filePath
+            self.name, _ = os.path.splitext(os.path.basename(filePath))
+            self.savePath = filePath
+            
+            fileAlreadyExists = os.path.exists(filePath)
+            
+            if fileAlreadyExists:
+                with open(filePath, "r") as file:
+                    oldFileContent = file.read()
+                    oldFileData = json.loads(oldFileContent)
+                    
+            if saveAsString:
+                with open(filePath, "w") as file:
+                    serializedGraph = self.Serialize()
+                    
+                    jsonGraph = json.loads(serializedGraph)
+                    
+                    if fileAlreadyExists:
+                        if "positions" in oldFileData:
+                            jsonGraph["positions"] = oldFileData["positions"]
+                    
+                    serializedGraph = json.dumps(jsonGraph, indent=2)
+                    
+                    file.write(serializedGraph)
+            else:
+                with open(filePath, "wb") as file:
+                    serializedGraph = self.Serialize().encode("utf-8")
+                    file.write(serializedGraph)
+
+            self.UpdateEnv()
+            
+            return True
+            
+        except (OSError, FileNotFoundError) as e:
+            self.logger.Log(LogLevel.ERROR, "Could not save file")
+            
+            return False
         
-        fileAlreadyExists = os.path.exists(filePath)
-        
-        if fileAlreadyExists:
-            with open(filePath, "r") as file:
-                oldFileContent = file.read()
-                oldFileData = json.loads(oldFileContent)
-                
-        if saveAsString:
-            with open(filePath, "w") as file:
-                serializedGraph = self.Serialize()
-                
-                jsonGraph = json.loads(serializedGraph)
-                
-                if fileAlreadyExists:
-                    if "positions" in oldFileData:
-                        jsonGraph["positions"] = oldFileData["positions"]
-                
-                serializedGraph = json.dumps(jsonGraph, indent=2)
-                
-                file.write(serializedGraph)
-        else:
-            with open(filePath, "wb") as file:
-                serializedGraph = self.Serialize().encode("utf-8")
-                file.write(serializedGraph)
+    def Save(self) -> None:
+        """
+        Save the graph to its file if it's not a subgraph.
+        The while loop is to make sure the file is saved,
+        sometimes when working on a network if it turns off while
+        we are saving the file, it can cause issues, so we make sure 
+        to save it
+        """
+        if not self.IsSubGraph():
+            saved = self.SaveToFile(self.GetSavePath())
+            
+            if not saved:
+                while saved is False:
+                    saved = self.SaveToFile(self.GetSavePath())
 
-        self.UpdateEnv()
-
-    def LoadFromFile(self, filePath : str) -> None:
+    def LoadFromFile(self, filePath : str) -> bool:
         """
         Loads a graph from a file
 
         Args:
             filePath (str): file to load the graph from
+        Returns:
+            bool: True if the file was loaded successfully
         """
-        if self.environment.SearchInString(filePath):
-            filePath = self.environment.ReplaceInString(filePath)
+        try:
+            if self.environment.SearchInString(filePath):
+                filePath = self.environment.ReplaceInString(filePath)
 
-        if not os.path.exists(filePath):
-            self.logger.Log(LogLevel.ERROR, f"Can't load graph from file {filePath}, it does not exist")
-            return
-        else:
-            self.savePath = filePath
-            self.name, _ = os.path.splitext(os.path.basename(filePath))
+            if not os.path.exists(filePath):
+                self.logger.Log(LogLevel.ERROR, f"Can't load graph from file {filePath}, it does not exist")
+                return
+            else:
+                self.savePath = filePath
+                self.name, _ = os.path.splitext(os.path.basename(filePath))
 
-            with open(filePath, "r", encoding="utf-8") as file:
-                self.Deserialize(file.read())
+                with open(filePath, "r", encoding="utf-8") as file:
+                    self.Deserialize(file.read())
 
-        self.UpdateEnv()
+            self.UpdateEnv()
+            
+            return True
+        
+        except (OSError, FileNotFoundError) as e:
+            self.logger.Log(LogLevel.ERROR, "Could not load file")
+            
+            return False

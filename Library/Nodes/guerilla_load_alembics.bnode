@@ -22,6 +22,16 @@ exposed = False
 
 # BeginPlug
 
+shortName = indebug
+longName = Debug 
+defaultValue = False
+type = bool
+exposed = True
+
+# EndPlug 
+
+# BeginPlug
+
 shortName = outscriptfile
 longName = Output Script File
 defaultValue = ""
@@ -49,13 +59,19 @@ generatedScript = f"""import guerilla, os
 
 paths = {inabcfiles}
 
-for path in paths:
+for i, path in enumerate(paths):
     name = os.path.basename(path)
 
     name = name.replace(".abc", "")
 
     with guerilla.Modifier() as mod:
         mod.createref(name, path, options={{ 'prefixnodes' : False,'containschildren' : True }})
+
+        if {indebug}:
+            print("Loaded {{}}".format(name))
+        
+        if i % 10 == 0:
+            guerilla.Document().save()  
 
 guerilla.Document().save()
 """

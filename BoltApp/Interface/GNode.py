@@ -930,7 +930,7 @@ class GNode(QtWidgets.QGraphicsObject):
         """
         """
         if self.isSubGraph():
-            self.openSubGraph.emit(self.getInternalNode().GetGraph())
+            self.openSubGraph.emit(self.getInternalNode().GetSubGraph())
 
     def mouseMoveEvent(self, event : QtGui.QMouseEvent) -> None:
         """

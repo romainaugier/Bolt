@@ -14,7 +14,7 @@ category = Oeuf
 
 shortName = inrenderoptions
 longName = Render Options
-defaultValue = {"Type":"LD","Team":"oeuf","Optims":True,"AdaptiveThreshold":0.1}
+defaultValue = {"Type":"LD","Team":"oeuf","Optims":True,"AdaptiveThreshold":0.1,"Denoise":True}
 type = dict
 exposed = True
 

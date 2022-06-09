@@ -59,19 +59,10 @@ Read {
  origlast 120
  origset true
  name MAIN_READ
- xpos 110
- ypos -73
+ xpos -15
+ ypos -77
 }
-set N1be19800 [stack 0]
-Viewer {
- frame 1
- frame_range 1-120
- viewerProcess "sRGB (ACES)"
- name Viewer1
- xpos 271
- ypos 65
-}
-push $N1be19800
+set Ne9c6b000 [stack 0]
 Write {
  file D:/output.mov
  colorspace "Output - Rec.709"
@@ -79,7 +70,7 @@ Write {
  mov64_format "mov (QuickTime / MOV)"
  mov64_codec h264
  mov_h264_codec_profile "High 4:2:0 8-bit"
- mov64_pixel_format {{0}}
+ mov64_pixel_format {{0} "yuv420p\tYCbCr 4:2:0 8-bit"}
  mov64_quality High
  mov64_fast_start true
  mov64_write_timecode true
@@ -91,11 +82,25 @@ Write {
  mov64_quality_max 3
  create_directories true
  checkHashOnRead false
+ in_colorspace scene_linear
+ out_colorspace scene_linear
  name MAIN_WRITE
  xpos -5
  ypos 108
 }
-push $N1be19800
+Read {
+ inputs 0
+ file_type exr
+ file Z:/OEUF/RENDER/sequence/shot/LD2/render_sequence_shot_#.exr
+ format "2048 858 0 0 2048 858 1 "
+ last 120
+ origlast 120
+ origset true
+ colorspace reference
+ name MAIN_READ_RAW
+ xpos 173
+ ypos -73
+}
 Write {
  file D:/output.mov
  colorspace data
@@ -118,4 +123,12 @@ Write {
  name MAIN_WRITE_RAW
  xpos 180
  ypos 112
+}
+push $Ne9c6b000
+Viewer {
+ frame_range 1-120
+ viewerProcess "sRGB (ACES)"
+ name Viewer1
+ xpos -215
+ ypos 16
 }

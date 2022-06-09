@@ -75,18 +75,23 @@ class Logger():
             now = datetime.now()
             current_time = now.strftime("%H:%M:%S")
 
-            tracebackMessage = traceback.format_exc() + "\n" if getTraceback else ""
+            traceBack = traceback.format_exc()
+
+            if getTraceback and traceBack is not None:
+                tracebackMessage = "{0}\n".format(traceBack)
+            else:
+                tracebackMessage = ""
 
             message = "{0}[{1}] {2} : {3}\n{4}".format(level.GetAsColor(), level.GetAsString(), current_time, input, tracebackMessage)
             messageClean = "[{0}] {1} : {2}\n{3}".format(level.GetAsString(), current_time, input, tracebackMessage)
             
             if self.logToConsole: 
                 if level == LogLevel.ERROR: 
-                    sys.stderr.write(message)
-                    sys.stdout.write(colorama.Fore.RESET)
+                    sys.__stderr__.write(message)
+                    sys.__stderr__.write(colorama.Fore.RESET)
                 else:
-                    sys.stdout.write(message)
-                    sys.stdout.write(colorama.Fore.RESET)
+                    sys.__stdout__.write(message)
+                    sys.__stdout__.write(colorama.Fore.RESET)
             
             self.__LogToFile(messageClean)
 
@@ -111,3 +116,41 @@ class Logger():
         """
         if self.logToCustomConsole and self.callbackFunction is not None:
             self.callbackFunction(logLevel, logMessage)
+
+
+class StdOut():
+    """
+    Simple class with a write function that replace stdout to add a few infos
+    """
+    def write(text : str):
+        """
+        Args:
+            text (str): text to write to __stdout__
+        """
+        now =  datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+
+        # To keep python 2.7 compatibility we do not use f strings
+        message = "[STDOUT] {0} : {1}\n".format(current_time, text)
+        
+        sys.__stdout__.write(message)
+        sys.__stdout__.write(colorama.Fore.RESET)
+        
+        
+class StdErr():
+    """
+    Simple class with a write function that replace stderr to add a few infos
+    """
+    def write(text : str):
+        """
+        Args:
+            text (str): text to write to __stderr__
+        """
+        now =  datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+
+        # To keep python 2.7 compatibility we do not use f strings
+        message = "{0}[STDERR] {1} : {2}\n".format(LogLevel.ERROR.GetAsColor(), current_time, text)
+        
+        sys.__stderr__.write(message)
+        sys.__stderr__.write(colorama.Fore.RESET)

@@ -61,8 +61,10 @@ type = str
 # BeginOp
 
 if inapplyaces:
+    readNodeName = "MAIN_READ"
     writeNodeName = "MAIN_WRITE"
 else:
+    readNodeName = "MAIN_READ_RAW"
     writeNodeName = "MAIN_WRITE_RAW"
 
 generatedScript = f"""import nuke, os, sys
@@ -83,7 +85,7 @@ if len(seqs) > 0:
     if not os.path.exists(outputfile):
         os.makedirs(os.path.dirname(outputfile))
 
-    read = nuke.toNode("MAIN_READ")
+    read = nuke.toNode("{readNodeName}")
     read.knob("file").fromUserText("{inrenderdir}/" + seqs[0])
 
     write = nuke.toNode("{writeNodeName}")

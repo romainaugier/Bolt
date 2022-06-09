@@ -58,10 +58,10 @@ class SubGraph(Node):
         self.SetCategory("Utility")
         self.SetNodeType("SubGraph")
         
-        self.graph = graph
+        self.subgraph = graph
         self.SetName("SubGraph")
             
-        self.graph.SetSubGraph(True)
+        self.subgraph.SetSubGraph(True)
         
         if initialize:
             self.Initialize()
@@ -72,23 +72,23 @@ class SubGraph(Node):
         """
         super().SetName(name)
         
-        self.graph.SetName(self.GetName())
+        self.subgraph.SetName(self.GetName())
         
-    def SetGraph(self, graph : Graph) -> None:
+    def SetSubGraph(self, graph : Graph) -> None:
         """
         Sets the graph of this subgraph node
         
         Args:
             graph (Graph): graph to set 
         """
-        self.graph = graph
+        self.subgraph = graph
         
-    def GetGraph(self) -> Graph:
+    def GetSubGraph(self) -> Graph:
         """
         Returns:
             Graph: graph contained in the subgraph node
         """
-        return self.graph
+        return self.subgraph
     
     def Initialize(self) -> None:
         """
@@ -100,8 +100,8 @@ class SubGraph(Node):
         self.AddInput(Plug("input0", "Input0", self))
         self.AddOutput(Plug("output0", "Output0", self))
         
-        self.graph.AddNode(self.inputNode)
-        self.graph.AddNode(self.outputNode)
+        self.subgraph.AddNode(self.inputNode)
+        self.subgraph.AddNode(self.outputNode)
         
     def UpdateInputs(self) -> None:
         """
@@ -163,9 +163,9 @@ class SubGraph(Node):
                 self.hasWarning = False
                 self.warningMessage = ""
             
-            self.graph.Cook(skipCookedNodes=False)
+            self.subgraph.Cook(skipCookedNodes=False)
             
-            if self.graph.HasError():
+            if self.subgraph.HasError():
                 self.ReportError()
                 self.LogError(f"Error cooking node {self.GetName()}")
                 self.cookTime = None
@@ -199,7 +199,7 @@ class SubGraph(Node):
         
         nodeAsDict["isSubGraph"] = True
         
-        nodeAsDict["subgraph"] = self.graph.Serialize()
+        nodeAsDict["subgraph"] = self.subgraph.Serialize()
         
         return nodeAsDict
     
@@ -208,10 +208,10 @@ class SubGraph(Node):
         """
         super().FromDict(nodeAsDict)
         
-        self.graph.Deserialize(nodeAsDict["subgraph"])
+        self.subgraph.Deserialize(nodeAsDict["subgraph"])
         
-        self.inputNode = self.graph.GetNodeWithName("Inputs")
-        self.outputNode = self.graph.GetNodeWithName("Outputs")
+        self.inputNode = self.subgraph.GetNodeWithName("Inputs")
+        self.outputNode = self.subgraph.GetNodeWithName("Outputs")
         
         
 class IfSubGraph(SubGraph):
@@ -261,9 +261,9 @@ class IfSubGraph(SubGraph):
                     self.hasWarning = False
                     self.warningMessage = ""
                 
-                self.graph.Cook(skipCookedNodes=False)
+                self.subgraph.Cook(skipCookedNodes=False)
                 
-                if self.graph.HasError():
+                if self.subgraph.HasError():
                     self.ReportError()
                     self.LogError(f"Error cooking node {self.GetName()}")
                     self.cookTime = None
@@ -332,19 +332,77 @@ class ForSubGraph(SubGraph):
         self.AddInput(Plug("input0", "Input0", self, dataType=PlugType.LIST))
         self.AddOutput(Plug("output0", "Output0", self, dataType=PlugType.LIST))
         
-        self.graph.AddNode(self.inputNode)
-        self.graph.AddNode(self.outputNode)
+        self.subgraph.AddNode(self.inputNode)
+        self.subgraph.AddNode(self.outputNode)
         
         
     def Cook(self) -> None:
         """
         """
-        self.UpdateInputs()
+        if not self.IsDisabled():
+            startTime = Timer.Start()
+
+            with self.GetLock():
+                self.isCooking = True
+                self.isCooked = False
+
+                self.hasError = False
+                self.errorMessage = ""
+                self.hasWarning = False
+                self.warningMessage = ""
+
+            self.UpdateInputs()
+            
+            listToIterate = self.GetInput(name="input0").GetData()
+            
+            if isinstance(listToIterate, list):
+                
+                results = []
+                
+                for i, item in enumerate(listToIterate):
+                    self.logger.Log(LogLevel.MESSAGE, f"Node ({self.GetName()}) : Cooking iteration {i}")
+                    
+                    self.inputNode.GetOutput(index=0).SetData(item)
+            
+                    self.subgraph.Cook(skipCookedNodes=False)
+                    
+                    results.append(self.outputNode.GetInput(index=0).GetData())
+                    
+                self.outputNode.GetInput(index=0).SetData(results)
+            elif isinstance(listToIterate, dict):
+                
+                results = []
+                
+                for i, item in enumerate(listToIterate.values()):
+                    self.logger.Log(LogLevel.MESSAGE, f"Node ({self.GetName()}) : Cooking iteration {i}")
+                    
+                    self.inputNode.GetOutput(index=0).SetData(item)
+            
+                    self.subgraph.Cook(skipCookedNodes=False)
+                    
+                    results.append(self.outputNode.GetInput(index=0).GetData())
+                    
+                self.outputNode.GetInput(index=0).SetData(results)
+            else:
+                self.logger.Log(LogLevel.ERROR, f"Node ({self.GetName()}) : Invalid input type, it must be a list or a dictionnary")
+                self.ReportError()
+                return
+            
+            self.UpdateOutputs()
+            
         
-        self.graph.Cook(skipCookedNodes=False)
-        
-        self.UpdateOutputs()
-        
+            with self.GetLock():
+                self.isDirty = False
+                self.isCooking = False
+                self.isCooked = True
+
+            endTime = Timer.Stop()
+
+            self.cookTime = Timer.Time(startTime, endTime)
+        else:
+           output = self.GetOutput(name="output0")
+           output.SetData(self.GetInput(name="input0").GetData())
+
     # I/O
 
     def ToDict(self) -> dict:
