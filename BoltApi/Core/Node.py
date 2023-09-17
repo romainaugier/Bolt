@@ -1,6 +1,15 @@
+from __future__ import annotations
+
+import typing
+import re
+import os
+import copy
+import threading
+import io
+import traceback
+
 from ast import literal_eval
 from enum import IntEnum
-import re, copy, os, threading, io
 
 import BoltApi.Core.FileSystem as FileSystem
 from BoltApi.Core.Logger import *
@@ -19,6 +28,18 @@ class Plug():
     pass
 
 # Plug type enumeration
+
+class _PlugType():
+    
+    def __init__(self, id: int, name: str) -> None:
+        self._id = id
+        self._name = name
+
+    def __str__(self) -> str:
+        return self._name
+
+    def __eq__(self, other: _PlugType) -> bool:
+        return self._id == other._id
 
 class PlugType(IntEnum):
     """
