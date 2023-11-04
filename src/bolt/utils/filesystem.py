@@ -22,8 +22,8 @@ def get_documents_folder():
         ctypes.OleDLL("shell32").SHGetFolderPathW(None, 5, None, 0, buf)
 
         return buf.value.replace("\\", "/")
-    else:
-        return ""
+    elif platform.system() == "Linux":
+        return os.path.expanduser("~/Documents")
 
 
 def safe_file_copy(src: str,
@@ -160,3 +160,7 @@ def safe_directory_clean(directory_path: str):
                            shell=True)
         else:
             os.remove(entry.path)
+
+
+def is_executable() -> bool:
+    return "python" not in sys.executable

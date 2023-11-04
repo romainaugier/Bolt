@@ -5,8 +5,13 @@ import typing
 import enum
 import importlib
 import threading
+import functools
+import traceback
 
-import log
+from collections import OrderedDict
+
+import bolt.utils.log as log
+from bolt.utils.expression import globalExprEvaluator
 
 
 class PlugWarning(Exception):
@@ -17,44 +22,14 @@ class PlugError(Exception):
     pass
 
 
-class _PlugType():
-    
-    def __init__(self, id: int, name: str) -> None:
-        self._id = id
-        self._name = name
-
-    def __str__(self) -> str:
-        return self._name
-
-    def __eq__(self, other: _PlugType) -> bool:
-        return self._id == other._id
-
-
-class PlugType():
-    INT = _PlugType(0, "int")
-    FLOAT = _PlugType(1, "float")
-    STR = _PlugType(2, "str")
-    BOOL = _PlugType(3, "bool")
-    LIST = _PlugType(4, "list")
-    DICT = _PlugType(5, "dict")
-    CUSTOM = _PlugType(6, "custom")
-
-
-def plug_type_from_str(plug_type_as_str: str) -> PlugType:
-    if plug_type_as_str == "int":
-        return PlugType.INT
-    if plug_type_as_str == "float":
-        return PlugType.FLOAT
-    if plug_type_as_str == "str":
-        return PlugType.STR
-    if plug_type_as_str == "bool":
-        return PlugType.BOOL
-    if plug_type_as_str == "list":
-        return PlugType.LIST
-    if plug_type_as_str == "dict":
-        return PlugType.DICT
-
-    return PlugType.CUSTOM
+class PlugType(enum.Enum):
+    INT = 0
+    FLOAT = 1
+    STR = 2
+    BOOL = 3
+    LIST = 4
+    DICT = 5
+    CUSTOM = 6
 
 
 class PlugMode(enum.IntEnum):
@@ -121,14 +96,14 @@ class Plug():
 
     def update_inputs(self) -> None:
         if len(self.connections) == 1:
-            self.data = self.connections[0].data
+            self.data = self.connections[0].eval()
         elif len(self.connections) > 1:
             self.data = list()
 
             for connection in self.connections:
-                self.data.append(connection.data)
+                self.data.append(connection.eval())
         else:
-            raise PlugError(f"Plug {self.long_name} as no connections, "
+            raise PlugError(f"Plug {self.short_name} as no connections, "
                             f"cannot update data from inputs")
 
     def connect(self,
@@ -137,8 +112,8 @@ class Plug():
             return
 
         if self.mode != PlugMode.PLUG or other.mode != PlugMode.PLUG:
-            raise PlugError(f"Plug {self.long_name} cant be connected "
-                            f"to plug {self.long_name}, either this plug or the "
+            raise PlugError(f"Plug {self.short_name} cant be connected "
+                            f"to plug {self.short_name}, either this plug or the "
                             f"other is a parameter or a graph parameter")
 
         self.connections.append(other)
@@ -149,8 +124,8 @@ class Plug():
             return
 
         if not other in self.connections:
-            raise PlugError(f"Plug {other.long_name} is not connected to plug "
-                            f"{self.long_name} and this cant be disconnected")
+            raise PlugError(f"Plug {other.short_name} is not connected to plug "
+                            f"{self.short_name} and this cant be disconnected")
 
         self.connections.remove(other)
         other.connections.remove(self)
@@ -162,6 +137,38 @@ class Plug():
     def __lshift__(self,
                    other: Plug) -> None:
         other.connect(self)
+
+    def eval(self) -> typing.Any:
+        if self._data_type == PlugType.INT:
+            if (globalExprEvaluator.stringContainsExpr(str(self.data)) or 
+                globalExprEvaluator.stringContainsVar(str(self.data))):
+                return int(globalExprEvaluator.expandString(self.data))
+            else:
+                return self.data
+        elif self._data_type == PlugType.FLOAT:
+            if (globalExprEvaluator.stringContainsExpr(str(self.data)) or 
+                globalExprEvaluator.stringContainsVar(str(self.data))):
+                return float(globalExprEvaluator.expandString(self.data))
+            else:
+                return self.data
+        elif self._data_type == PlugType.STR:
+            if (globalExprEvaluator.stringContainsExpr(str(self.data)) or 
+                globalExprEvaluator.stringContainsVar(str(self.data))):
+                return globalExprEvaluator.expandString(self.data)
+            else:
+                return self.data
+        elif self._data_type == PlugType.BOOL:
+            if (globalExprEvaluator.stringContainsExpr(str(self.data)) or 
+                globalExprEvaluator.stringContainsVar(str(self.data))):
+                return bool(globalExprEvaluator.expandString(self.data))
+            else:
+                return self.data
+        elif self._data_type == PlugType.LIST:
+            return self.data
+        elif self._data_type == PlugType.DICT:
+            return self.data
+        elif self._data_type == PlugType.CUSTOM:
+            return self.data
 
 
 class Result(enum.IntEnum):
@@ -192,22 +199,25 @@ class NodeState(enum.IntEnum):
     Dirty = 0
     Cooking = 1
     Cooked = 2
+    Error = 3
 
 
 class Node():
 
     def __init__(self):
-        self._definition = dict()
+        self._inputs = OrderedDict()
+        self._outputs = OrderedDict()
+        self._parameters = OrderedDict()
 
-        self._inputs = dict()
-        self._outputs = dict()
-        self._parameters = dict()
+        self._metadata = dict()
         
         self._lock = threading.Lock()
 
         self._id = 0
         self._name = None
         self._parent_graph = None
+        self._path = None
+        self._is_disabled = False
 
         self._state = NodeState.Dirty
 
@@ -233,12 +243,28 @@ class Node():
         self._id = id
 
     @property
+    def path(self) -> str:
+        return self._path
+    
+    @path.setter 
+    def path(self, path: str) -> None:
+        self._path = path
+
+    @property
     def parent_graph(self) -> typing.Any:
         return self._parent_graph
     
     @parent_graph.setter 
     def parent_graph(self, parent_graph: typing.Any) -> None:
         self._parent_graph = parent_graph
+
+    @property
+    def is_disabled(self) -> bool:
+        return self._is_disabled
+    
+    @is_disabled.setter 
+    def is_disabled(self, disabled: bool) -> None:
+        self._is_disabled = disabled
 
     @property
     def in_queue(self) -> bool:
@@ -309,8 +335,14 @@ class Node():
     def get_input(self, name: str) -> Plug:
         return self._inputs.get(name, None)
 
+    def get_input_by_index(self, index: int) -> Plug:
+        return self.get_input(self._inputs.keys()[index])
+
     def get_output(self, name: str) -> Plug:
         return self._outputs.get(name, None)
+
+    def get_output_by_index(self, index: int) -> Plug:
+        return self.get_output(self._outputs.keys()[index])
 
     def get_parameter(self, name: str) -> Plug:
         return self._parameters.get(name, None)
@@ -324,3 +356,73 @@ class Node():
             return self._parameters[name]
         else:
             return None
+
+    def has_inputs(self) -> bool:
+        return len(self._inputs) > 0
+
+    def has_outputs(self) -> bool:
+        return len(self._outputs) > 0
+
+    def has_parameters(self) -> bool:
+        return len(self._parameters) > 0
+
+    @property
+    def inputs(self) -> typing.Dict[str, Plug]:
+        return self._inputs
+
+    @property
+    def outputs(self) -> typing.Dict[str, Plug]:
+        return self._outputs
+
+    @property
+    def parameters(self) -> typing.Dict[str, Plug]:
+        return self._parameters
+
+    # Metadata
+    
+    def get_metadata(self, key: str) -> typing.Any:
+        return self._metadata.get(key)
+
+    def set_metadata(self, key: str, value: typing.Any) -> None:
+        self._metadata[key] = value
+
+    # Cooking
+    
+    def _cook(self) -> CookResult:
+        if not self.is_disabled:
+            for input in self.inputs.values():
+                input.update_inputs()
+
+            with self._lock:
+                self._state = NodeState.Cooking
+
+            try:
+                result = self.cook()
+            except Exception:
+                with self._lock:
+                    self._state = NodeState.Error
+
+                err_message = f"Error caught during node cooking ({self.path}) :\n{traceback.format_exc()}"
+
+                result = CookResult(Result.Error, err_message)
+
+                log.error(err_message)
+        else:
+            if self.has_inputs():
+                first_input = self.get_input_by_index(0)
+
+                for output in self._outputs.items():
+                    output.set_data(first_input.eval())
+
+                result = CookResult(Result.Ok)
+
+        return result
+
+    def cook(self) -> CookResult:
+        """
+        This function should be overloaded by the users
+
+        Returns:
+            CookResult: result of the cooking op
+        """
+        return CookResult(Result.Ok)

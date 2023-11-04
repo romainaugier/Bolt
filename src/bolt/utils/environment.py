@@ -2,25 +2,21 @@ import os
 import re
 import json
 
-import bolt.log as log
-import bolt.utils.filesystem as fs
+import bolt.utils.log as log
+import bolt.utils.filesystem as filesys
+import bolt.utils.config as conf
 
 from bolt.utils.singleton import Singleton
-
 
 
 class Environment(Singleton):
     """
     Contains all the environment variables and the utils to find and replace them
     in a string
-    All environment variables written in a string should begin with $ and be capital letters,
-    with underscores for separation
     
-    For example : $BOLT_ROOT, $GRAPH_DIR, $GRAPH_NAME
-    
-    To ease environment settings, you can provide files that can be located in the $BOLT_LIB/env or
-    HOME/Documents/Bolt/env folders. 
-    Those files should be named "whatever_you_want.benv" and be formatted as json files like the following :
+    To ease environment settings, you can provide files that can be located in the $APP_NAME_LIB/env or
+    HOME/Documents/App Name/env folders. 
+    Those files should be named "whatever_you_want.env" and be formatted as json files like the following :
     
     [
         { 
@@ -41,64 +37,66 @@ class Environment(Singleton):
     """
     
     _variables = {}
+    _var_regex = None
 
     def __init__(self):
         """
         """
         for var, value in os.environ.items():
-            self._variables[var] = fs.clean_path(value)
+            self._variables[var] = filesys.clean_path(value)
 
-        self._variables["BOLT_ROOT"] = CleanPath(boltRoot)
-        self._variables["BOLT_LIB"] = f"{CleanPath(boltRoot)}/Library"
-        self._variables["BOLT_ICONS"] = f"{CleanPath(boltRoot)}/Library/Icons"
-        self._variables["BOLT_PREFS"] = f"{fs.get_documents_folder()}/Bolt"
-        self._variables["BOLT_PORT"] = 1
+        app_name = conf.Config().get("app_name")
+        app_root = filesys.clean_path(conf.Config().get("app_root"))
+
+        self._variables[f"{app_name.upper()}_ROOT"] = conf.Config().get("app_root")
+        self._variables[f"{app_name.upper()}_LIB"] = f"{app_root}/library"
+        self._variables[f"{app_name.upper()}_ICONS"] = f"{app_root}/library/icons"
+        self._variables[f"{app_name.upper()}_PREFS"] = f"{filesys.get_documents_folder()}/{app_name}"
+        self._variables[f"{app_name.upper()}_PORT"] = 45678
         
         if not os.path.exists(self.get("BOLT_PREFS")):
             os.makedirs(self.get("BOLT_PREFS"))
         
-        if IsExecutable():
-            self._variables["BOLT_COMMAND"] = f"{CleanPath(boltRoot)}/bin/BoltCommand.exe"
-        else:
-            self._variables["BOLT_COMMAND"] = f"{CleanPath(boltRoot)}/BoltCommand/Command.py"
-
-    def get(self, varName : str) -> str:
+    def get(self, key : str) -> str:
         """
         """
-        if varName in self._variables:
-            return self._variables[varName]
+        if key in self._variables:
+            return self._variables[key]
         else:
             return ""
 
-    def set(self, varName : str, varValue : str) -> None:
+    def set(self, key : str, value : str) -> None:
         """
         """
-        self._variables[varName] = varValue
+        self._variables[key] = value
         
     def build_environment_from_files(self) -> None:
         """
         Go through all files found in /env folders and parse them to add to
         update the environment
         """
-        boltEnvs = self.get("BOLT_ENVS")
+        app_name = conf.Config().get("app_name")
+        app_root = self.get(f"{app_name.uppper()}_ROOT")
+
+        bolt_envs = self.get(f"{app_name.upper()}_ENVS")
         
-        if len(boltEnvs) == 0:
-            boltEnvs = f"{self.get('BOLT_ROOT')}/env"
+        if len(bolt_envs) == 0:
+            bolt_envs = f"{app_root}/env"
         else:
-            boltEnvs += f"{os.pathsep}{self.get('BOLT_ROOT')}/env"
+            bolt_envs += f"{os.pathsep}{app_root}/env"
         
-        prefsDir = self.get("BOLT_PREFS")
+        prefs_dir = self.get(f"{app_name.upper()}_PREFS")
         
-        if os.path.exists(f"{prefsDir}/env"):
-            boltEnvs += f"{os.pathsep}{prefsDir}/env"
+        if os.path.exists(f"{prefs_dir}/env"):
+            bolt_envs += f"{os.pathsep}{prefs_dir}/env"
             
-        for path in boltEnvs.split(os.pathsep):
-            evalPath = self.replace_in_string(path)
+        for path in bolt_envs.split(os.pathsep):
+            eval_path = self.expand_string(path)
             
-            if os.path.exists(evalPath):
-                for file in os.listdir(evalPath):
-                    if ".benv" in file:
-                        with open(f"{evalPath}/{file}") as f:
+            if os.path.exists(eval_path):
+                for file in os.listdir(eval_path):
+                    if ".env" in file:
+                        with open(f"{eval_path}/{file}") as f:
                             try:
                                 data = json.load(f)
                                 
@@ -107,64 +105,64 @@ class Environment(Singleton):
                                         if key == "mode":
                                             continue
                                         else:
-                                            oldEnvValue = ""
+                                            old_env_value = ""
                                             
                                             if env["mode"] == "append":
-                                                oldEnvValue = self.get(key)
+                                                old_env_value = self.get(key)
                                                 
-                                                if oldEnvValue == "":
+                                                if old_env_value == "":
                                                     if isinstance(value, list):
-                                                        for i, envVal in enumerate(value):
+                                                        for i, env_val in enumerate(value):
                                                             if i == 0:
-                                                                oldEnvValue += f"{envVal}"
+                                                                old_env_value += f"{env_val}"
                                                             else:
-                                                                oldEnvValue += f";{envVal}"
+                                                                old_env_value += f";{env_val}"
                                                     else:
-                                                        oldEnvValue = value
+                                                        old_env_value = value
                                                 else:
                                                     if isinstance(value, list):
-                                                        for envVal in value:
-                                                            oldEnvValue += f";{envVal}"
+                                                        for env_val in value:
+                                                            old_env_value += f";{env_val}"
                                                     else:
-                                                        oldEnvValue += f";{value}"
+                                                        old_env_value += f";{value}"
                                             else:
                                                 if isinstance(value, list):
-                                                    for i, envVal in enumerate(value):
+                                                    for i, env_val in enumerate(value):
                                                         if i == 0:
-                                                            oldEnvValue = f"{envVal}"
+                                                            old_env_value = f"{env_val}"
                                                         else:
-                                                            oldEnvValue += f";{envVal}"
+                                                            old_env_value += f";{env_val}"
                                                 else:
-                                                    oldEnvValue = value
+                                                    old_env_value = value
                                                     
-                                            self.set(key, oldEnvValue)
+                                            self.set(key, old_env_value)
                                                 
                             except ValueError:
-                                log.error("Error during json decoding, file ({evalPath}/{file}) will be discarded")
+                                log.error(f"Error during json decoding, file \"{eval_path}/{file}\" will be discarded")
             else:
-                log.error(f"Error during environment building, directory ({evalPath}) does not exist")
+                log.error(f"Error during environment building, directory \"{eval_path}\" does not exist")
                         
     def build_regex(self) -> re.Pattern:
         """
         """
-        varRegex = r""
+        var_regex = r""
 
         for i, var in enumerate(self._variables):
             if i == 0:
-                varRegex += fr"\${var}"
+                var_regex += fr"\$\({var}\)"
             else:
-                varRegex += fr"|\${var}"
+                var_regex += fr"|\$\({var}\)"
 
-        return re.compile(varRegex)
+        return re.compile(var_regex)
 
     def search_in_string(self, string: str) -> bool:
         """
         """
-        varPattern = self.build_regex()
+        var_pattern = self.build_regex()
 
-        return re.search(varPattern, string) is not None
+        return re.search(var_pattern, string) is not None
 
-    def replace_in_string(self, string: str) -> str:
+    def expand_string(self, string: str) -> str:
         """
         """
         varPattern = self.build_regex()
@@ -174,3 +172,11 @@ class Environment(Singleton):
             string = string.replace(match.group(), self.get(varName))
 
         return string
+
+
+def setenv(key: str, value: str) -> None:
+    Environment().set(key, value)
+
+
+def getenv(key: str) -> str:
+    return Environment().get(key)

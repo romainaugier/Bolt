@@ -8,12 +8,12 @@ import json
 import os
 import typing
 
-import bolt.utils.filesystem as fs
-import bolt.log as log
+import bolt.utils.filesystem as filesys
+import bolt.utils.log as log
 
 from bolt.utils.singleton import Singleton
 
-USER_SETTINGS_FILE = f"{fs.get_documents_folder()}/bolt/settings.json"
+USER_SETTINGS_FILE = f"{filesys.get_documents_folder()}/bolt/settings.json"
 USER_SETTINGS_DIR = os.path.dirname(USER_SETTINGS_FILE)
 
 class Settings(Singleton):
