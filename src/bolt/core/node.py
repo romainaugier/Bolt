@@ -171,19 +171,18 @@ class Plug():
             return self.data
 
 
-class Result(enum.IntEnum):
+class NodeResult(enum.IntEnum):
     Ok = 0
-    Warning = 1
-    Error = 2
+    Error = 1
 
 
-class CookResult():
-    def __init__(self, result: Result, message: str = None) -> None:
+class NodeCookResult():
+    def __init__(self, result: NodeResult, message: str = None) -> None:
         self._result = result
         self._message = message
         
     @property
-    def result(self) -> Result:
+    def result(self) -> NodeResult:
         return self._result
     
     @property
@@ -388,7 +387,7 @@ class Node():
 
     # Cooking
     
-    def _cook(self) -> CookResult:
+    def _cook(self) -> NodeCookResult:
         if not self.is_disabled:
             for input in self.inputs.values():
                 input.update_inputs()
@@ -404,7 +403,7 @@ class Node():
 
                 err_message = f"Error caught during node cooking ({self.path}) :\n{traceback.format_exc()}"
 
-                result = CookResult(Result.Error, err_message)
+                result = NodeCookResult(NodeResult.Error, err_message)
 
                 log.error(err_message)
         else:
@@ -414,15 +413,15 @@ class Node():
                 for output in self._outputs.items():
                     output.set_data(first_input.eval())
 
-                result = CookResult(Result.Ok)
+                result = NodeCookResult(NodeResult.Ok)
 
         return result
 
-    def cook(self) -> CookResult:
+    def cook(self) -> NodeCookResult:
         """
         This function should be overloaded by the users
 
         Returns:
             CookResult: result of the cooking op
         """
-        return CookResult(Result.Ok)
+        return NodeCookResult(NodeResult.Ok)

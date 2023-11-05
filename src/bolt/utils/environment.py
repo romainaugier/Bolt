@@ -54,8 +54,8 @@ class Environment(Singleton):
         self._variables[f"{app_name.upper()}_PREFS"] = f"{filesys.get_documents_folder()}/{app_name}"
         self._variables[f"{app_name.upper()}_PORT"] = 45678
         
-        if not os.path.exists(self.get("BOLT_PREFS")):
-            os.makedirs(self.get("BOLT_PREFS"))
+        if not os.path.exists(self.get(f"{app_name.upper()}_PREFS")):
+            os.makedirs(self.get(f"{app_name.upper()}_PREFS"))
         
     def get(self, key : str) -> str:
         """
