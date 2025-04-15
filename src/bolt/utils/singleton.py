@@ -1,5 +1,4 @@
 
-
 class Singleton:
     
     __instance = None

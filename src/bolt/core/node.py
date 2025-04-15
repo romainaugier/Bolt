@@ -140,27 +140,27 @@ class Plug():
 
     def eval(self) -> typing.Any:
         if self._data_type == PlugType.INT:
-            if (globalExprEvaluator.stringContainsExpr(str(self.data)) or 
-                globalExprEvaluator.stringContainsVar(str(self.data))):
-                return int(globalExprEvaluator.expandString(self.data))
+            if (globalExprEvaluator.string_contains_expr(str(self.data)) or 
+                globalExprEvaluator.string_contains_var(str(self.data))):
+                return int(globalExprEvaluator.expand_string(self.data))
             else:
                 return self.data
         elif self._data_type == PlugType.FLOAT:
-            if (globalExprEvaluator.stringContainsExpr(str(self.data)) or 
-                globalExprEvaluator.stringContainsVar(str(self.data))):
-                return float(globalExprEvaluator.expandString(self.data))
+            if (globalExprEvaluator.string_contains_expr(str(self.data)) or 
+                globalExprEvaluator.string_contains_var(str(self.data))):
+                return float(globalExprEvaluator.expand_string(self.data))
             else:
                 return self.data
         elif self._data_type == PlugType.STR:
-            if (globalExprEvaluator.stringContainsExpr(str(self.data)) or 
-                globalExprEvaluator.stringContainsVar(str(self.data))):
-                return globalExprEvaluator.expandString(self.data)
+            if (globalExprEvaluator.string_contains_expr(str(self.data)) or 
+                globalExprEvaluator.string_contains_var(str(self.data))):
+                return globalExprEvaluator.expand_string(self.data)
             else:
                 return self.data
         elif self._data_type == PlugType.BOOL:
-            if (globalExprEvaluator.stringContainsExpr(str(self.data)) or 
-                globalExprEvaluator.stringContainsVar(str(self.data))):
-                return bool(globalExprEvaluator.expandString(self.data))
+            if (globalExprEvaluator.string_contains_expr(str(self.data)) or 
+                globalExprEvaluator.string_contains_var(str(self.data))):
+                return bool(globalExprEvaluator.expand_string(self.data))
             else:
                 return self.data
         elif self._data_type == PlugType.LIST:
@@ -424,4 +424,4 @@ class Node():
         Returns:
             CookResult: result of the cooking op
         """
-        return NodeCookResult(NodeResult.Ok)
+        raise NotImplementedError

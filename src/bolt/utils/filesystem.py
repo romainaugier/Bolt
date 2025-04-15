@@ -9,10 +9,8 @@ import hashlib
 import typing
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-
 def clean_path(path: str) -> str:
     return path.replace("\\", "/")
-
 
 def get_documents_folder():
     """
@@ -25,7 +23,6 @@ def get_documents_folder():
     elif platform.system() == "Linux":
         return os.path.expanduser("~/Documents")
 
-
 def safe_file_copy(src: str,
                  dst: str):
     """
@@ -37,7 +34,6 @@ def safe_file_copy(src: str,
         os.makedirs(os.path.dirname(dst))
 
     shutil.copy2(src, dst)
-
 
 def safe_dir_copy(src: str,
                   dst: str,
@@ -78,7 +74,6 @@ def safe_dir_copy(src: str,
     else:
         raise NotImplementedError("safe_dir_copy() has not been implemented on this platform")
 
-
 def multithreaded_dir_copy(src: str,
                            dst: str,
                            callbackProgressFunc: typing.Callable = None):
@@ -113,7 +108,6 @@ def multithreaded_dir_copy(src: str,
     if callbackProgressFunc is not None:
         callbackProgressFunc(100.0)
 
-
 def replace_extension(filepath: str,
                       new_extension: str) -> str:
     """
@@ -142,14 +136,12 @@ def get_directory_content_hash(directory_path: str):
 
     return hash.hexdigest()
 
-
 def safe_rmdir(directory_path: str):
     """
     """
     if os.path.exists(directory_path):
         subprocess.run(["rmdir", "/s", "/q", directory_path],
                     shell=True)
-
 
 def safe_directory_clean(directory_path: str):
     """
@@ -160,7 +152,6 @@ def safe_directory_clean(directory_path: str):
                            shell=True)
         else:
             os.remove(entry.path)
-
 
 def is_executable() -> bool:
     return "python" not in sys.executable

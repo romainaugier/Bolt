@@ -1,7 +1,5 @@
 import re
-import io
 import os
-import typing
 import math
 import traceback
 
@@ -10,9 +8,7 @@ import bolt.utils.environment as env
 
 from bolt.utils.singleton import Singleton
 
-
 _exprPattern = re.compile(r"`[^`]*`")
-
 
 _allowedExprFunctions = dict()
 
@@ -31,7 +27,6 @@ _allowedBuiltinsFunctions = dict()
 for allowedBuiltin in _allowedBuiltins:
     _allowedBuiltinsFunctions[allowedBuiltin] = __builtins__[allowedBuiltin]
 
-
 class ExpressionEvaluator():
 
     """
@@ -42,7 +37,7 @@ class ExpressionEvaluator():
     def __init__(self) -> None:
         pass
 
-    def _varEvaluator(self, text: str) -> str:
+    def _var_evaluator(self, text: str) -> str:
         """ 
         Returns the text expanded with the corresponding variables values if any is present in the text
         """
@@ -50,13 +45,13 @@ class ExpressionEvaluator():
 
         return text
 
-    def _exprEvaluator(self, text: str) -> str:
+    def _expr_evaluator(self, text: str) -> str:
         """ 
         Return the text expanded with the corresponding expressions results. If any error, sets None to replace the expression
         """
         if re.search(_exprPattern, text) is not None:
             for match in re.finditer(_exprPattern, text):
-                expr = match.group().replace("`", "")
+                expr = match.group().replace('`', '')
 
                 try:
                     code = compile(expr, "<string>", "eval")
@@ -70,23 +65,21 @@ class ExpressionEvaluator():
                 
         return text
 
-    def expandString(self, string: str) -> str:
+    def expand_string(self, string: str) -> str:
         """
         Returns a string with its expressions and variables expanded
         """
-        return self._exprEvaluator(self._varEvaluator(string))
+        return self._expr_evaluator(self._var_evaluator(string))
 
-    def stringContainsExpr(self, text: str) -> bool:
+    def string_contains_expr(self, text: str) -> bool:
         return _exprPattern.search(text) is not None
     
-    def stringContainsVar(self, text: str) -> bool:
+    def string_contains_var(self, text: str) -> bool:
         return env.Environment().search_in_string(text) is not None
-
         
 class _GlobalExprEvaluator(Singleton, ExpressionEvaluator):
     
     def __init__(self) -> None:
         super().__init__(os.environ)
-
 
 globalExprEvaluator = _GlobalExprEvaluator()

@@ -4,24 +4,31 @@ import os
 import time
 import typing
 import io
+import tempfile
 
+from bolt.utils.config import Config, ConfigConstants
 
 formatter = logging.Formatter("[%(levelname)s] %(asctime)s : %(message)s",
                               datefmt="%H:%M:%S")
 
-rootLogger = logging.getLogger()
-rootLogger.setLevel(logging.DEBUG)
+root_logger = logging.getLogger()
+root_logger.setLevel(logging.DEBUG)
 
-fileHandler = logging.FileHandler(filename="{0}/boltlog_{1}.txt".format(os.getenv("TEMP"), time.strftime("%d_%m_%Y")))
-fileHandler.setFormatter(formatter)
-rootLogger.addHandler(fileHandler)
+app_name = Config.get(ConfigConstants.AppName)
+app_log_file = os.getenv(f"{app_name.upper()}_LOG_FILE")
 
+if app_log_file is None:
+    temp_dir = tempfile.gettempdir()
+    app_log_file = f"{temp_dir}/{app_name}_log.txt"
+
+file_handler = logging.FileHandler(filename=app_log_file)
+file_handler.setFormatter(formatter)
+root_logger.addHandler(file_handler)
 
 if sys.stdout is not None:
-    consoleHandler = logging.StreamHandler()
-    consoleHandler.setFormatter(formatter)
-    rootLogger.addHandler(consoleHandler)
-
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+    root_logger.addHandler(console_handler)
 
 def _list_fmt(l: typing.List) -> str:
     if not isinstance(l, list):
@@ -34,7 +41,6 @@ def _list_fmt(l: typing.List) -> str:
 
     return buffer.getvalue()
 
-
 def _dict_fmt(d: typing.Dict) -> str:
     if not isinstance(d, dict):
         return str(d)
@@ -46,13 +52,11 @@ def _dict_fmt(d: typing.Dict) -> str:
     
     return buffer.getvalue()
 
-
 _FMT_FUNCS = {
     list: _list_fmt,
     dict: _dict_fmt,
     None: str
 }
-
 
 def _fmt(obj: typing.Any) -> str:
     try:
@@ -62,26 +66,20 @@ def _fmt(obj: typing.Any) -> str:
     except:
         return str(obj)
 
-
 def _args_fmt(*args) -> str:
     return _fmt(args[0]).strip("\n") if len(args) == 1 else ", ".join([_fmt(arg) for arg in args]).strip("\n")
-
 
 def debug(*args):
     logging.debug(_args_fmt(*args))
 
-
 def info(*args):
     logging.info(_args_fmt(*args))
-
 
 def warning(*args):
     logging.warning(_args_fmt(*args))
 
-
 def error(*args):
     logging.error(_args_fmt(*args))
-
 
 def critical(*args):
     logging.critical(_args_fmt(*args))

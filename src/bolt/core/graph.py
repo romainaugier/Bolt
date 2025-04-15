@@ -4,11 +4,9 @@ import typing
 
 from bolt.core.node import Node, NodeResult, NodeCookResult
 
-
 class GraphResult(enum.IntEnum):
     Ok = 0
     Error = 1
-
     
 class GraphCookResult():
     def __init__(self, result: GraphResult, message: str = None) -> None:

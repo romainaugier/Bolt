@@ -1,9 +1,3 @@
-# Library containing an utility class for settings
-
-# name of a setting should always be <namespace>_<setting_name>
-# for example : "launcher_last_project_used"
-#               "ndb_opened_projects"
-
 import json
 import os
 import typing
@@ -12,8 +6,9 @@ import bolt.utils.filesystem as filesys
 import bolt.utils.log as log
 
 from bolt.utils.singleton import Singleton
+from bolt.utils.config import Config
 
-USER_SETTINGS_FILE = f"{filesys.get_documents_folder()}/bolt/settings.json"
+USER_SETTINGS_FILE = f"{filesys.get_documents_folder()}/{Config().get()}/settings.json"
 USER_SETTINGS_DIR = os.path.dirname(USER_SETTINGS_FILE)
 
 class Settings(Singleton):

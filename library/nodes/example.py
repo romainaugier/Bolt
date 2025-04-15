@@ -7,7 +7,7 @@ class ExampleNode(bolt.Node):
     def __init__(self) -> None:
         super().__init__()
         
-        self.add_input()
+        self.add_input("input1", )
 
         self.add_parameter()
 
@@ -15,3 +15,7 @@ class ExampleNode(bolt.Node):
     
     def cook(self) -> bolt.CookResult:
         print("Hello from example node")
+
+        
+def get_node():
+    return ExampleNode()

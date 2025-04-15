@@ -1,4 +1,6 @@
-import time, os
+import time
+import os
+
 from contextlib import ContextDecorator
 
 import bolt.utils.log as log
