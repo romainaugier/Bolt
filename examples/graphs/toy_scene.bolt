@@ -1,0 +1,169 @@
+{
+  "format": "bolt.graph",
+  "version": 1,
+  "graph": {
+    "name": "toy_scene",
+    "variables": {
+      "FRAME": 0
+    },
+    "nodes": [
+      {
+        "id": "456d24f92c224a1d8ecdde5cbb044351",
+        "name": "sun",
+        "type": "toy.sphere",
+        "version": 1,
+        "metadata": {
+          "position": [
+            0,
+            0
+          ]
+        },
+        "values": {
+          "x": -0.45,
+          "y": 0.2,
+          "z": 0.0,
+          "radius": 0.42,
+          "color": [
+            0.8980392156862745,
+            0.6274509803921569,
+            0.23529411764705882
+          ]
+        }
+      },
+      {
+        "id": "32d7d110becc4eb5b7da393820b599c2",
+        "name": "ocean",
+        "type": "toy.sphere",
+        "version": 1,
+        "metadata": {
+          "position": [
+            0,
+            240
+          ]
+        },
+        "values": {
+          "x": 0.35,
+          "y": -0.15,
+          "z": 0.2,
+          "radius": 0.5,
+          "color": [
+            0.23921568627450981,
+            0.5607843137254902,
+            0.8392156862745098
+          ]
+        }
+      },
+      {
+        "id": "ce5044a42d904e518978be751172ac1e",
+        "name": "moon",
+        "type": "toy.sphere",
+        "version": 1,
+        "metadata": {
+          "position": [
+            0,
+            480
+          ]
+        },
+        "values": {
+          "x": 0.55,
+          "y": 0.55,
+          "z": -0.3,
+          "radius": 0.18,
+          "color": [
+            0.7843137254901961,
+            0.8,
+            0.8313725490196079
+          ]
+        }
+      },
+      {
+        "id": "c84d1945eaf94a3096432a15545189ee",
+        "name": "scene",
+        "type": "toy.group",
+        "version": 1,
+        "metadata": {
+          "position": [
+            260,
+            220
+          ]
+        },
+        "values": {
+          "shapes": null
+        }
+      },
+      {
+        "id": "b13c989232c94318965ba10ecaed82d9",
+        "name": "orbit",
+        "type": "toy.offset",
+        "version": 1,
+        "metadata": {
+          "position": [
+            520,
+            220
+          ]
+        },
+        "values": {
+          "scene": {},
+          "shape": "moon",
+          "dx": "`0.3 * cos(FRAME / 10)`",
+          "dy": "`0.2 * sin(FRAME / 10)`"
+        }
+      },
+      {
+        "id": "d5c1ede97ba5479d9c72b5d8138e51c9",
+        "name": "render",
+        "type": "toy.render",
+        "version": 1,
+        "displayed": true,
+        "metadata": {
+          "position": [
+            780,
+            220
+          ]
+        },
+        "values": {
+          "scene": {},
+          "width": 320,
+          "height": 240,
+          "background": [
+            0.08235294117647059,
+            0.09019607843137255,
+            0.10196078431372549
+          ]
+        }
+      }
+    ],
+    "connections": [
+      [
+        "sun",
+        "shape",
+        "scene",
+        "shapes"
+      ],
+      [
+        "ocean",
+        "shape",
+        "scene",
+        "shapes"
+      ],
+      [
+        "moon",
+        "shape",
+        "scene",
+        "shapes"
+      ],
+      [
+        "scene",
+        "scene",
+        "orbit",
+        "scene"
+      ],
+      [
+        "orbit",
+        "scene_out",
+        "render",
+        "scene"
+      ]
+    ]
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "format": "bolt.graph",
+  "version": 1,
+  "graph": {
+    "name": "shot_paths",
+    "variables": {
+      "PROJECT_ROOT": "/projects/oeuf"
+    },
+    "nodes": [
+      {
+        "id": "b154b60a2e4746f692cbd7dbd23caf2d",
+        "name": "shot",
+        "type": "shots.make",
+        "version": 1,
+        "values": {
+          "sequence": "SQ010",
+          "name": "SH020",
+          "first_frame": 1001,
+          "last_frame": 1100
+        }
+      },
+      {
+        "id": "68c6fdac016049bc89b3ea39385a0a79",
+        "name": "path",
+        "type": "shots.path",
+        "version": 1,
+        "values": {
+          "shot": null,
+          "template": "$(PROJECT_ROOT)/{sequence}/{name}/{name}.####.exr"
+        }
+      },
+      {
+        "id": "4461439c488f4a4fabd772ec1ab95c12",
+        "name": "frame_list",
+        "type": "string.join",
+        "version": 1,
+        "values": {
+          "items": [],
+          "separator": ","
+        }
+      },
+      {
+        "id": "49b936efb049410e9c55d847a237777a",
+        "name": "report",
+        "type": "flow.log",
+        "version": 1,
+        "values": {
+          "input": null,
+          "message": "rendering $(PROJECT_ROOT) -> {value}",
+          "level": "info"
+        }
+      }
+    ],
+    "connections": [
+      [
+        "shot",
+        "shot",
+        "path",
+        "shot"
+      ],
+      [
+        "path",
+        "frames",
+        "frame_list",
+        "items"
+      ],
+      [
+        "path",
+        "path",
+        "report",
+        "input"
+      ]
+    ]
+  }
+}

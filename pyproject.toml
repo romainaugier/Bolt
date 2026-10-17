@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bolt"
+version = "2.0.0.dev0"
+description = "Generic node graph engine to embed in your own applications"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Romain Augier" }]
+license = { text = "MIT" }
+dependencies = []
+
+[project.optional-dependencies]
+ui = ["PySide6>=6.5"]
+dev = ["pytest>=7", "pytest-cov>=5", "PySide6>=6.5"]
+
+[project.scripts]
+bolt = "bolt.cli:main"
+
+[project.gui-scripts]
+bolt-editor = "bolt.ui.app:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"bolt.ui" = ["resources/icons/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.coverage.run]
+source = ["bolt"]
+branch = true
+
+[tool.coverage.report]
+skip_empty = true

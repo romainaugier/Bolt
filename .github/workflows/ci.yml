@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  QT_QPA_PLATFORM: offscreen
+  PYTHONFAULTHANDLER: "1"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+
+jobs:
+  tests:
+    name: ${{ matrix.target.os }} ${{ matrix.target.arch }}, Python ${{ matrix.python }}
+    runs-on: ${{ matrix.target.runner }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - { os: Linux, arch: x86_64, runner: ubuntu-24.04 }
+          - { os: Linux, arch: aarch64, runner: ubuntu-24.04-arm }
+          - { os: macOS, arch: x86_64, runner: macos-15-intel }
+          - { os: macOS, arch: arm64, runner: macos-15 }
+          - { os: Windows, arch: x86_64, runner: windows-2025 }
+          - { os: Windows, arch: arm64, runner: windows-11-arm }
+        python: ["3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - name: Install Qt runtime libraries
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libegl1 libgl1 libxkbcommon0 libfontconfig1 \
+            libdbus-1-3 libglib2.0-0t64
+      - name: Install Bolt
+        run: python -m pip install -e ".[dev]"
+      - name: Show versions
+        run: python -c "import platform, sys, PySide6; print(sys.version, platform.machine(), 'PySide6', PySide6.__version__)"
+      - name: Run tests
+        run: python -m pytest -q
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+          cache: pip
+      - name: Install Qt runtime libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libegl1 libgl1 libxkbcommon0 libfontconfig1 \
+            libdbus-1-3 libglib2.0-0t64
+      - name: Install Bolt
+        run: python -m pip install -e ".[dev]"
+      - name: Run tests with coverage
+        run: python -m pytest -q --cov --cov-report=term --cov-report=xml --cov-report=html
+      - name: Write the coverage summary
+        if: always()
+        run: python -m coverage report --format=markdown >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: |
+            coverage.xml
+            htmlcov/
