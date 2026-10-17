@@ -27,13 +27,16 @@ class RenderView(View):
 
     def __init__(self, workspace: Any, parent: QWidget | None = None) -> None:
         super().__init__(workspace, parent)
+
         self.canvas = ImageCanvas()
         self.info = QLabel()
         self.info.setObjectName("muted")
+
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.canvas, 1)
         layout.addWidget(self.info)
+
         self.node: RenderNode | None = None
         self.session: RenderSession | None = None
         self._session_lock = threading.Lock()
@@ -52,16 +55,19 @@ class RenderView(View):
     def close_view(self) -> None:
         self._attach(None)
         self.timer.stop()
+
         super().close_view()
 
     def _follow(self) -> None:
         document = self.workspace.current
         node = None
+
         if document is not None:
             selected = [n for n in document.selection if isinstance(n, RenderNode)]
             displayed = [n for n in document.graph.displayed_nodes() if isinstance(n, RenderNode)]
             candidates = selected or displayed or [n for n in document.graph if isinstance(n, RenderNode)]
             node = candidates[0] if candidates else None
+
         if node is not self.node or (node is not None and node.session is not self.session):
             self._attach(node)
 
@@ -69,16 +75,20 @@ class RenderView(View):
         with self._session_lock:
             if self.session is not None:
                 self.session.remove_listener(self._on_render)
+
             self.node = node
             self.session = node.session if node is not None else None
+
         if self.session is None:
             self.canvas.set_image(None)
             return
+
         self.session.add_listener(self._on_render)
         self._show_buffer()
 
     def _show_buffer(self) -> None:
         session = self.session
+
         if session is not None:
             self.canvas.set_buffer(session.buffer, session.width, session.height)
 
@@ -86,6 +96,7 @@ class RenderView(View):
         with self._session_lock:
             if self.session is None:
                 return
+
             if kind == "resized":
                 self.workspace.dispatcher.call_soon(self._show_buffer)
             else:
@@ -93,13 +104,16 @@ class RenderView(View):
 
     def _update_info(self) -> None:
         session = self.session
+
         if session is None:
             self.info.setText("  No toy.render node in this graph")
             return
+
         stats = session.stats
         state = "rendering" if stats.rendering else f"done in {stats.frame_time * 1000:.0f} ms"
         region = stats.region
         area = f"{region[2] - region[0]}×{region[3] - region[1]} px" if region else "-"
+
         self.info.setText(f"  {self.node.name}: {session.width}×{session.height}  ·  {state}  ·  last update: "
                           f"{stats.last_update or '-'} ({area})  ·  {stats.updates} update(s)")
 
@@ -109,6 +123,7 @@ class ColorEditor(ParameterEditor):
 
     def __init__(self, plug: bolt.Plug, parent: QWidget | None = None) -> None:
         super().__init__(plug, parent)
+
         self.button = QPushButton()
         self.button.clicked.connect(self._pick)
         self._layout.addWidget(self.button)
@@ -118,11 +133,14 @@ class ColorEditor(ParameterEditor):
     def set_value(self, value: Any) -> None:
         if isinstance(value, (tuple, list)) and len(value) == 3:
             self._value = tuple(value)
+
         color = QColor.fromRgbF(*self._value)
+
         self.button.setText(color.name())
         self.button.setStyleSheet(f"background: {color.name()}; color: {'#000' if color.lightnessF() > 0.5 else '#fff'};")
 
     def _pick(self) -> None:
         color = QColorDialog.getColor(QColor.fromRgbF(*self._value), self, self.plug.spec.label)
+
         if color.isValid():
             self._emit(color.name())

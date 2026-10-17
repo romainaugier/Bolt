@@ -51,22 +51,27 @@ class OffsetNode(bolt.Node):
 
     def __init__(self, name: str | None = None) -> None:
         super().__init__(name)
+
         self._moved: tuple[Sphere, float, float, Sphere] | None = None
 
     def cook(self, ctx: bolt.CookContext) -> None:
         scene = ctx.get("scene")
         name = ctx.get("shape")
         shape = scene.get(name)
+
         if shape is None:
             ctx.set("scene_out", scene)
             return
+
         dx, dy = ctx.get("dx"), ctx.get("dy")
         cached = self._moved
+
         if cached is not None and cached[0] is shape and cached[1:3] == (dx, dy):
             moved = cached[3]
         else:
             moved = dataclasses.replace(shape, x=shape.x + dx, y=shape.y + dy)
             self._moved = (shape, dx, dy, moved)
+
         ctx.set("scene_out", bolt.copy_with(scene, {name: moved}))
 
 
@@ -84,6 +89,7 @@ class RenderNode(bolt.Node):
 
     def __init__(self, name: str | None = None) -> None:
         super().__init__(name)
+
         self.session: RenderSession | None = None
 
     def on_attached(self) -> None:
@@ -98,6 +104,7 @@ class RenderNode(bolt.Node):
         session = self.session
         session.configure(ctx.get("width"), ctx.get("height"), ctx.get("background"))
         change = ctx.change("scene")
+
         if change.kind is bolt.ChangeKind.delta:
             if not change.delta.empty:
                 session.apply(change.delta)

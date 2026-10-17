@@ -71,18 +71,25 @@ class RenderSession:
     def apply(self, delta: MappingDelta) -> None:
         with self._condition:
             region = None
+
             for name in (*delta.removed, *delta.modified):
                 if name in self._scene:
                     region = _union(region, self._scene[name].bounds(self.width, self.height))
+
             scene = dict(self._scene)
+
             for name in delta.removed:
                 scene.pop(name, None)
+
             scene.update(delta.added)
             scene.update(delta.modified)
+
             for shape in (*delta.added.values(), *delta.modified.values()):
                 region = _union(region, shape.bounds(self.width, self.height))
+
             self._scene = scene
             self._record(f"delta: +{len(delta.added)} -{len(delta.removed)} ~{len(delta.modified)}")
+
             if region is not None:
                 self._invalidate(region)
 
@@ -90,14 +97,19 @@ class RenderSession:
         with self._condition:
             if (width, height) == (self.width, self.height) and background == self.background:
                 return
+
             resized = (width, height) != (self.width, self.height)
+
             self.width = width
             self.height = height
             self.background = background
+
             if resized:
                 self.buffer = bytearray(width * height * 4)
                 self._fill(self.buffer, background)
+
             self._invalidate((0, 0, width, height))
+
         if resized:
             self._notify("resized")
 
@@ -106,6 +118,7 @@ class RenderSession:
             self._closing = True
             self._generation += 1
             self._condition.notify_all()
+
         self._thread.join(timeout=2)
 
     def _record(self, text: str) -> None:
@@ -122,17 +135,24 @@ class RenderSession:
         while True:
             with self._condition:
                 self._condition.wait_for(lambda: self._closing or self._dirty is not None)
+
                 if self._closing:
                     return
+
                 region = self._dirty
+
                 self._dirty = None
+
                 generation = self._generation
                 scene = self._scene
                 buffer = self.buffer
                 width, height, background = self.width, self.height, self.background
+
             self.stats.rendering = True
             self.stats.region = region
+
             start = time.perf_counter()
+
             if self._render(scene, buffer, width, height, background, region, generation):
                 self.stats.frame_time = time.perf_counter() - start
                 self.stats.rendering = False
@@ -142,15 +162,20 @@ class RenderSession:
                 region: Region, generation: int) -> bool:
         spheres = sorted(scene.values(), key=lambda sphere: -sphere.z)
         left, top, right, bottom = region
+
         for block in block_sizes:
             self.stats.passes += 1
+
             for bucket_top in range(top, bottom, bucket):
                 for bucket_left in range(left, right, bucket):
                     if self._generation != generation:
                         return False
+
                     area = (bucket_left, bucket_top, min(bucket_left + bucket, right), min(bucket_top + bucket, bottom))
+
                     self._render_bucket(spheres, buffer, width, height, background, area, block)
                     self._notify("progress")
+
         return True
 
     def _render_bucket(self, spheres: list[Sphere], buffer: bytearray, width: int, height: int, background: Color,
@@ -159,33 +184,43 @@ class RenderSession:
         scale = min(width, height) / 2
         candidates = [sphere for sphere in spheres if _overlaps(sphere.bounds(width, height), area)]
         linear_background = tuple(component * component for component in background)
+
         for y in range(top, bottom, block):
             v = -((y + block / 2) - height / 2) / scale
+
             for x in range(left, right, block):
                 u = ((x + block / 2) - width / 2) / scale
                 color = linear_background
                 nearest = -math.inf
+
                 for sphere in candidates:
                     dx = u - sphere.x
                     dy = v - sphere.y
                     inside = sphere.radius * sphere.radius - dx * dx - dy * dy
+
                     if inside <= 0:
                         continue
+
                     dz = math.sqrt(inside)
                     depth = sphere.z + dz
+
                     if depth <= nearest:
                         continue
+
                     nearest = depth
                     normal = (dx / sphere.radius, dy / sphere.radius, dz / sphere.radius)
                     lambert = max(0.0, normal[0] * light[0] + normal[1] * light[1] + normal[2] * light[2])
                     shade = 0.12 + 0.88 * lambert
                     red, green, blue = sphere.color
                     color = (red * red * shade, green * green * shade, blue * blue * shade)
+
                 pixel = bytes((_byte(color[0]), _byte(color[1]), _byte(color[2]), 255))
                 row = pixel * (min(x + block, right) - x)
+
                 for line in range(y, min(y + block, bottom)):
                     offset = (line * width + x) * 4
                     buffer[offset:offset + len(row)] = row
+
                 self.stats.pixels += 1
 
     @staticmethod
@@ -205,6 +240,7 @@ def _byte(value: float) -> int:
 def _union(first: Region | None, second: Region) -> Region:
     if first is None:
         return second
+
     return min(first[0], second[0]), min(first[1], second[1]), max(first[2], second[2]), max(first[3], second[3])
 
 

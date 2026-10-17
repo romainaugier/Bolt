@@ -26,17 +26,22 @@ class Sphere:
         right = int((self.x + self.radius) * scale + width / 2) + 2
         top = int((-self.y - self.radius) * scale + height / 2) - 1
         bottom = int((-self.y + self.radius) * scale + height / 2) + 2
+
         return max(left, 0), max(top, 0), min(right, width), min(bottom, height)
 
 
 def parse_color(value: Any) -> Color:
     if isinstance(value, str):
         text = value.lstrip("#")
+
         if len(text) != 6:
             raise bolt.InvalidValueError(f"invalid color {value!r}, expected #rrggbb")
+
         return tuple(int(text[index:index + 2], 16) / 255 for index in (0, 2, 4))
+
     if isinstance(value, (list, tuple)) and len(value) == 3:
         return tuple(float(component) for component in value)
+
     raise bolt.InvalidValueError(f"invalid color {value!r}")
 
 
